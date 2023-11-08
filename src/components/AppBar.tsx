@@ -1,7 +1,8 @@
 import { Component, createSignal, JSX } from 'solid-js';
 
 import { Box, AppBar, Toolbar, IconButton, Typography, styled, alpha, InputBase, Menu, MenuItem, Badge } from '@suid/material';
-import MenuIcon from '@suid/icons-material/Menu';
+import ExpandLessIcon from '@suid/icons-material/ExpandLess';
+import ExpandMoreIcon from '@suid/icons-material/ExpandMore';
 import MailIcon from '@suid/icons-material/Mail';
 import NotificationsIcon from '@suid/icons-material/Notifications';
 import AccountCircle from '@suid/icons-material/AccountCircle';
@@ -10,7 +11,7 @@ import MoreIcon from '@suid/icons-material/More';
 import PlayArrowIcon from '@suid/icons-material/PlayArrow';
 import PauseIcon from '@suid/icons-material/Pause';
 
-import { GameStoreType } from '../includes/Process.interface';
+import { GameStoreType, MenuStateType } from '../includes/Process.interface';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -52,7 +53,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-const AppBarComponent: Component<{ gcStore?: GameStoreType }> = (props) => {
+const AppBarComponent: Component<{ gcStore?: GameStoreType, menuStateStore?: MenuStateType }> = (props) => {
 
     const [anchorEl, setAnchorEl] = createSignal<null | HTMLElement>(null);
     const [mobileAnchorEl, setMobileAnchorEl] = createSignal<null | HTMLElement>(null);
@@ -155,8 +156,9 @@ const AppBarComponent: Component<{ gcStore?: GameStoreType }> = (props) => {
                         aria-label='open drawer'
                         style={{ outline: 0 }}
                         sx={{ mr: 2 }}
+                        onClick={() => props.menuStateStore?.toggle()}
                     >
-                        <MenuIcon />
+                        {props.menuStateStore?.open ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                     </IconButton>
                     <Typography variant='h6' noWrap component='div' sx={{ display: { xs: 'none', sm: 'block' }}} style={{
                         width: '150px',

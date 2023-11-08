@@ -9,7 +9,7 @@ import App from './App';
 import { styled } from '@suid/material';
 
 import GameController from './lib/GameController';
-import Process, { GameStoreType } from './includes/Process.interface';
+import Process, { GameStoreType, MenuStateType } from './includes/Process.interface';
 
 const SecondApp = lazy(() => import('./SecondApp'));
 const Login = lazy(() => import('./components/Login'));
@@ -50,11 +50,17 @@ const useGameStore = (gameController: GameController) => create<GameStoreType>(s
     }
 }));
 
+const useMenuStateStore = create<MenuStateType> (set => ({
+    open: true,
+    toggle: () => set(state => ({ open: !state.open }))
+}));
+
 const Layout: Component<LayoutProps> = props => {
     const { auth, gameController } = props;
     console.log(`Username: ${auth.user?.username}`);
 
     const gameStore = useGameStore(gameController)();
+    const menuStateStore = useMenuStateStore();
 
     const mainProcess: Process = {
         id: 'main',
@@ -67,7 +73,7 @@ const Layout: Component<LayoutProps> = props => {
 
     return (
         <>
-            <AppBar gcStore={gameStore} />
+            <AppBar gcStore={gameStore} menuStateStore={menuStateStore} />
             <MainContainer>
                 <Background />
                 <GameContainer>
@@ -78,7 +84,7 @@ const Layout: Component<LayoutProps> = props => {
                         <Route path="/servers" element={<Servers />} />
                     </Routes>
                 </GameContainer>
-                <NavMenu />
+                <NavMenu menuStateStore={menuStateStore} />
             </MainContainer>
         </>
     );

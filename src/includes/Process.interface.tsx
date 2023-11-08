@@ -14,3 +14,8 @@ export type GameStoreType = {
     callback: (frame: number, count: number, exponent: number) => void,
     toggleGameLoop: () => void,
 };
+
+export type MenuStateType = {
+    open: boolean,
+    toggle: () => void,
+};
