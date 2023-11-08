@@ -15,6 +15,7 @@ const SecondApp = lazy(() => import('./SecondApp'));
 const Login = lazy(() => import('./components/Login'));
 const NavMenu = lazy(() => import('./components/NavMenu'));
 const Background = lazy(async () => await import('./components/Background'));
+const Servers = lazy(async () => import('./Servers'));
 
 type LayoutProps = {
     auth: AuthenticationState,
@@ -74,6 +75,7 @@ const Layout: Component<LayoutProps> = props => {
                         <Route path="/" element={<App gcStore={gameStore} />} />
                         <Route path="/login" element={<Login auth={props.auth} />} />
                         <Route path="/second" element={<SecondApp />} />
+                        <Route path="/servers" element={<Servers />} />
                     </Routes>
                 </GameContainer>
                 <NavMenu />
