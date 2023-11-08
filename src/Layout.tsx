@@ -31,6 +31,10 @@ const MainContainer = styled('div')(() => ({
     left: 0,
 }));
 
+const GameContainer = styled('div')(() => ({
+    marginLeft: '240px',
+}));
+
 const useGameStore = (gameController: GameController) => create<GameStoreType>(set => ({
     game: gameController,
     frame: 0,
@@ -65,11 +69,13 @@ const Layout: Component<LayoutProps> = props => {
             <AppBar gcStore={gameStore} />
             <MainContainer>
                 <Background />
-                <Routes>
-                    <Route path="/" element={<App gcStore={gameStore} />} />
-                    <Route path="/login" element={<Login auth={props.auth} />} />
-                    <Route path="/second" element={<SecondApp />} />
-                </Routes>
+                <GameContainer>
+                    <Routes>
+                        <Route path="/" element={<App gcStore={gameStore} />} />
+                        <Route path="/login" element={<Login auth={props.auth} />} />
+                        <Route path="/second" element={<SecondApp />} />
+                    </Routes>
+                </GameContainer>
                 <NavMenu />
             </MainContainer>
         </>

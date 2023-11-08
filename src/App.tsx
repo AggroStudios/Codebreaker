@@ -9,9 +9,11 @@ import { CounterState } from './includes/Counter.interface';
 import Counter from './Counter';
 import CounterDecrease from './CounterDecrease';
 import { Button } from '@suid/material';
-import Banana from './Banana';
+
 import { GameStoreType } from './includes/Process.interface';
 import { Component } from 'solid-js';
+
+import CipherBreak from './components/widgets/cipherBreak';
 
 const useStore = create<CounterState>(set => ({
   count: 1,
@@ -40,13 +42,15 @@ const App: Component<{ gcStore?: GameStoreType }> = props => {
       </div>
       <h1>Vite + Solid</h1>
       <div class="card">
-        <Banana banana={'Carmen'} />
         <Counter store={state} />
         <CounterDecrease store={state} />
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR<br />
           <code>{gcStore.frame}</code>
         </p>
+      </div>
+      <div class="card">
+        <CipherBreak gameController={gcStore.game} />
       </div>
       <div class="card">
         <Button variant='contained' onClick={() => navigate('/second')}>Go to second app</Button>

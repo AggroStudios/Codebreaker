@@ -10,5 +10,4 @@ export enum CipherState {
 export type CipherProps = {
     state: CipherState,
     progress: number,
-
 };

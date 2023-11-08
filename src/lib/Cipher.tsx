@@ -1,5 +1,4 @@
 import Process from "../includes/Process.interface";
-import { CipherProps } from '../includes/Cipher.interface';
 
 export default class Cipher implements Process {
 
@@ -7,7 +6,7 @@ export default class Cipher implements Process {
         return 'cipher';
     }
 
-    public callback(frame: number, count: number, exponent: number) {
-
+    public callback(frame: number) {
+        console.log(`Frame: ${frame}`);
     }
 };
