@@ -66,3 +66,7 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+code {
+  font-family: 'Fira Code VF', source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}

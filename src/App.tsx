@@ -13,7 +13,7 @@ import { Button } from '@suid/material';
 import { GameStoreType } from './includes/Process.interface';
 import { Component } from 'solid-js';
 
-import CipherBreak from './components/widgets/cipherBreak';
+import CipherBreak from './components/Widgets/cipherBreak';
 
 const useStore = create<CounterState>(set => ({
   count: 1,

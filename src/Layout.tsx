@@ -9,6 +9,8 @@ import App from './App';
 import { styled } from '@suid/material';
 
 import GameController from './lib/GameController';
+import TerminalController from './lib/terminal';
+
 import Process, { GameStoreType } from './includes/Process.interface';
 
 const SecondApp = lazy(() => import('./SecondApp'));
@@ -16,6 +18,7 @@ const Login = lazy(() => import('./components/Login'));
 const NavMenu = lazy(() => import('./components/NavMenu'));
 const Background = lazy(async () => await import('./components/Background'));
 const Servers = lazy(async () => import('./Servers'));
+const Terminal = lazy(async () => import('./components/Terminal'));
 
 type LayoutProps = {
     auth: AuthenticationState,
@@ -30,10 +33,14 @@ const MainContainer = styled('div')(() => ({
     position: 'absolute',
     top: 0,
     left: 0,
+    display: 'flex',
 }));
 
 const GameContainer = styled('div')(() => ({
     marginLeft: '240px',
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column',
 }));
 
 const useGameStore = (gameController: GameController) => create<GameStoreType>(set => ({
@@ -56,6 +63,8 @@ const Layout: Component<LayoutProps> = props => {
 
     const gameStore = useGameStore(gameController)();
 
+    const terminalController = new TerminalController();
+
     const mainProcess: Process = {
         id: 'main',
         callback: gameStore.callback
@@ -76,6 +85,7 @@ const Layout: Component<LayoutProps> = props => {
                         <Route path="/login" element={<Login auth={props.auth} />} />
                         <Route path="/second" element={<SecondApp />} />
                         <Route path="/servers" element={<Servers />} />
+                        <Route path="/terminal" element={<Terminal terminalController={terminalController} />} />
                     </Routes>
                 </GameContainer>
                 <NavMenu />

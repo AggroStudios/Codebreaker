@@ -1,0 +1,56 @@
+@keyframes blink {
+    50% {
+        background-color: transparent;
+        color: white;
+    }
+}
+
+.root {
+    height: 100%;
+    display: flex;
+    overflow: auto;
+    position: relative;
+    flex-grow: 1;
+    flex-basis: auto;
+    flex-shrink: 1;
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    padding: 16px;
+    text-align: center;
+    flex-direction: column;
+}
+
+.screen {
+    position: relative;
+    height: 100%;
+}
+
+.input {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    opacity: 0.1;
+    height: 100%;
+    width: 100%;
+}
+
+.commandError {
+    color: #f44336;
+}
+
+.cursor {
+    background-color: transparent;
+}
+
+span .active {
+    background-color: white;
+    color: black;
+    animation: blink 1s step-start infinite;
+}
+
+.prompt {
+    color: #26c6da;
+};

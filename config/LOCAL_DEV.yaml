@@ -1,0 +1,4 @@
+mongodb:
+  host: 10.87.230.12
+frontend:
+  endpoint: http://localhost:5000

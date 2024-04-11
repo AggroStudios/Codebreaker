@@ -34,7 +34,8 @@ const Background = () => {
                 try {
                     bg = await import(`../assets/backgrounds/${location.pathname.split('/')[1]}_bg.png`);
                 }
-                catch {}
+                catch {
+                }
                 setBackground(bg.default);
             }
         )
