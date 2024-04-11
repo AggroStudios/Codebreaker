@@ -1,7 +1,6 @@
-import { Component, createEffect } from 'solid-js';
+import { Component, lazy } from 'solid-js';
 import { AuthenticationState } from './includes/Authentication.interface';
 import { Routes, Route } from '@solidjs/router';
-import { lazy } from 'solid-js';
 import create from 'solid-zustand';
 
 import AppBar from './components/AppBar';
@@ -13,9 +12,10 @@ import TerminalController from './lib/terminal';
 
 import Process, { GameStoreType, MenuStateType } from './includes/Process.interface';
 
+import NavMenu from './components/NavMenu';
+
 const SecondApp = lazy(() => import('./SecondApp'));
 const Login = lazy(() => import('./components/Login'));
-const NavMenu = lazy(() => import('./components/NavMenu'));
 const Background = lazy(async () => await import('./components/Background'));
 const Servers = lazy(async () => import('./Servers'));
 const Terminal = lazy(async () => import('./components/Terminal'));
@@ -69,10 +69,6 @@ const Layout: Component<LayoutProps> = props => {
 
     const gameStore = useGameStore(gameController)();
     const menuStateStore = useMenuStateStore();
-
-    createEffect(() => {
-        console.log('Menu State Store:', menuStateStore.open);
-    }, [menuStateStore.open]);
 
     const terminalController = new TerminalController();
 

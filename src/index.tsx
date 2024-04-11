@@ -62,8 +62,6 @@ const useStore = create<AuthenticationState>(set => ({
     logout: () => console.log('Logout'),
 }));
 
-const state = useStore();
-
 const root = document.getElementById('root')
 
 const gameController = new GameController();
@@ -71,7 +69,7 @@ const gameController = new GameController();
 render(() => (
     <ThemeProvider theme={darkTheme}>
         <Router>
-            <Layout auth={state} gameController={gameController} />
+            <Layout auth={useStore()} gameController={gameController} />
         </Router>
     </ThemeProvider>
 ), root!)

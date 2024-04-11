@@ -67,7 +67,7 @@ function MainListItems(props: any) {
             {mainNavigation.map((item, key) =>
                 <ListItemNavLink key={key} to={item.link} {...props}>
                     <ListItemIcon>
-                        {item.icon}
+                        <item.icon />
                     </ListItemIcon>
                     <ListItemText primary={item.title} />
                 </ListItemNavLink>
@@ -82,7 +82,7 @@ function SecondaryListItems(props: any) {
             {secondaryNavigation.map((item, key) =>
                 <ListItemNavLink key={key} to={item.link} {...props}>
                     <ListItemIcon>
-                        {item.icon}
+                        <item.icon />
                     </ListItemIcon>
                     <ListItemText primary={item.title} />
                 </ListItemNavLink>

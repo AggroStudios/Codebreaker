@@ -28,8 +28,6 @@ const App: Component<{ gcStore?: GameStoreType }> = props => {
 
   const { gcStore } = props;
 
-  console.log('gcStore: ', gcStore);
-
   return (
     <>
       <div>

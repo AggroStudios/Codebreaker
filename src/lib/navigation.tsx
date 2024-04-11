@@ -18,20 +18,17 @@ export const adminNavigation = [
     {
         title: 'Players',
         link: '/admin/players',
-        icon: <PeopleTwoToneIcon />,
-        iconLarge: <PeopleTwoToneIcon class="logo" />
+        icon: PeopleTwoToneIcon,
     },
     {
         title: 'Vulnerabilities',
         link: '/admin/vulnerabilities',
-        icon: <PestControlTwoToneIcon />,
-        iconLarge: <PestControlTwoToneIcon class="logo" />
+        icon: PestControlTwoToneIcon,
     },
     {
         title: 'Scenario Builder',
         link: '/admin/scenarios',
-        icon: <AccountTreeTwoToneIcon />,
-        iconLarge: <AccountTreeTwoToneIcon class="logo" />
+        icon: AccountTreeTwoToneIcon,
     }
 ];
 
@@ -39,50 +36,42 @@ export const mainNavigation = [
     {
         title: 'Station',
         link: '/',
-        icon: <ImportantDevicesTwoToneIcon />,
-        iconLarge: <ImportantDevicesTwoToneIcon class="Logo" />
+        icon: ImportantDevicesTwoToneIcon,
     },
     {
         title: 'Servers',
         link: '/servers',
-        icon: <StorageTwoToneIcon />,
-        iconLarge: <StorageTwoToneIcon class="Logo" />
+        icon: StorageTwoToneIcon,
     },
     {
         title: 'Server Racks',
         link: '/racks',
-        icon: <CalendarViewDayTwoToneIcon />,
-        iconLarge: <CalendarViewDayTwoToneIcon class="Logo" />
+        icon: CalendarViewDayTwoToneIcon,
     },
     {
         title: 'Data Centers',
         link: '/dataCenters',
-        icon: <ApartmentTwoToneIcon />,
-        iconLarge: <ApartmentTwoToneIcon class="Logo" />
+        icon: ApartmentTwoToneIcon,
     },
     {
         title: 'Networks',
         link: '/networks',
-        icon: <RouterTwoToneIcon />,
-        iconLarge: <RouterTwoToneIcon class="Logo" />
+        icon: RouterTwoToneIcon,
     },
     {
         title: 'Dark Web',
         link: '/darkWeb',
-        icon: <PublicTwoToneIcon />,
-        iconLarge: <PublicTwoToneIcon class="Logo" />
+        icon: PublicTwoToneIcon,
     },
     {
         title: 'Neural Net',
         link: '/neuralNet',
-        icon: <ShareTwoToneIcon />,
-        iconLarge: <ShareTwoToneIcon class="Logo" />
+        icon: ShareTwoToneIcon,
     },
     {
         title: 'Terminal',
         link: '/terminal',
-        icon: <TerminalTwoTone />,
-        iconLarge: <TerminalTwoTone class="Logo" />,
+        icon: TerminalTwoTone,
     },
 ];
 
@@ -90,25 +79,21 @@ export const secondaryNavigation = [
     {
         title: 'Forums',
         link: '/forums',
-        icon: <ForumTwoToneIcon />,
-        iconLarge: <ForumTwoToneIcon class="Logo" />
+        icon: ForumTwoToneIcon,
     },
     {
         title: 'Perm Upgrades',
         link: '/upgrades',
-        icon: <PublishTwoToneIcon />,
-        iconLarge: <PublishTwoToneIcon class="Logo" />
+        icon: PublishTwoToneIcon,
     },
     {
         title: 'Prestige',
         link: '/prestige',
-        icon: <SettingsBackupRestoreTwoToneIcon />,
-        iconLarge: <SettingsBackupRestoreTwoToneIcon class="Logo" />
+        icon: SettingsBackupRestoreTwoToneIcon,
     },
     {
         title: 'Statistics',
         link: '/stats',
-        icon: <AssignmentIcon />,
-        iconLarge: <AssignmentIcon class="Logo" />
+        icon: AssignmentIcon,
     },
 ];
