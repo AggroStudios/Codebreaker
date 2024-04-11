@@ -11,7 +11,7 @@ import { styled } from '@suid/material';
 import GameController from './lib/GameController';
 import TerminalController from './lib/terminal';
 
-import Process, { GameStoreType } from './includes/Process.interface';
+import Process, { GameStoreType, MenuStateType } from './includes/Process.interface';
 
 const SecondApp = lazy(() => import('./SecondApp'));
 const Login = lazy(() => import('./components/Login'));
