@@ -1,4 +1,4 @@
-import { Component } from 'solid-js';
+import { Component, createEffect } from 'solid-js';
 import { AuthenticationState } from './includes/Authentication.interface';
 import { Routes, Route } from '@solidjs/router';
 import { lazy } from 'solid-js';
@@ -37,10 +37,11 @@ const MainContainer = styled('div')(() => ({
 }));
 
 const GameContainer = styled('div')(() => ({
-    marginLeft: '240px',
     flexGrow: 1,
     display: 'flex',
     flexDirection: 'column',
+    transitionDuration: '225ms',
+    transitionTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)',
 }));
 
 const useGameStore = (gameController: GameController) => create<GameStoreType>(set => ({
@@ -69,6 +70,10 @@ const Layout: Component<LayoutProps> = props => {
     const gameStore = useGameStore(gameController)();
     const menuStateStore = useMenuStateStore();
 
+    createEffect(() => {
+        console.log('Menu State Store:', menuStateStore.open);
+    }, [menuStateStore.open]);
+
     const terminalController = new TerminalController();
 
     const mainProcess: Process = {
@@ -85,7 +90,7 @@ const Layout: Component<LayoutProps> = props => {
             <AppBar gcStore={gameStore} menuStateStore={menuStateStore} />
             <MainContainer>
                 <Background />
-                <GameContainer>
+                <GameContainer style={{ "margin-left": menuStateStore.open ? '240px' : '0' }} >
                     <Routes>
                         <Route path="/" element={<App gcStore={gameStore} />} />
                         <Route path="/login" element={<Login auth={props.auth} />} />

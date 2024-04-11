@@ -60,7 +60,7 @@ function ListItemNavLink(props: { to: string, children: Element }) {
     );
 }
 
-function MainListItems(props) {
+function MainListItems(props: any) {
 
     return (
         <List>
@@ -76,7 +76,7 @@ function MainListItems(props) {
     );
 }
 
-function SecondaryListItems(props) {
+function SecondaryListItems(props: any) {
     return (
         <List>
             {secondaryNavigation.map((item, key) =>
@@ -96,6 +96,9 @@ const NavMenu: Component<{menuStateStore?: MenuStateType}> = (props) => {
         <StyledDrawer
             variant="persistent"
             open={props.menuStateStore?.open}
+            style={{
+                display: props.menuStateStore?.open ? 'block' : 'none'
+            }}
         >
             <StyledDrawerContainer>
                 <Divider />
