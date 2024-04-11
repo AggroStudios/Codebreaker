@@ -57,11 +57,17 @@ const useGameStore = (gameController: GameController) => create<GameStoreType>(s
     }
 }));
 
+const useMenuStateStore = create<MenuStateType> (set => ({
+    open: true,
+    toggle: () => set(state => ({ open: !state.open }))
+}));
+
 const Layout: Component<LayoutProps> = props => {
     const { auth, gameController } = props;
     console.log(`Username: ${auth.user?.username}`);
 
     const gameStore = useGameStore(gameController)();
+    const menuStateStore = useMenuStateStore();
 
     const terminalController = new TerminalController();
 
@@ -76,7 +82,7 @@ const Layout: Component<LayoutProps> = props => {
 
     return (
         <>
-            <AppBar gcStore={gameStore} />
+            <AppBar gcStore={gameStore} menuStateStore={menuStateStore} />
             <MainContainer>
                 <Background />
                 <GameContainer>
@@ -88,7 +94,7 @@ const Layout: Component<LayoutProps> = props => {
                         <Route path="/terminal" element={<Terminal terminalController={terminalController} />} />
                     </Routes>
                 </GameContainer>
-                <NavMenu />
+                <NavMenu menuStateStore={menuStateStore} />
             </MainContainer>
         </>
     );

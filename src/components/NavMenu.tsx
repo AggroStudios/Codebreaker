@@ -12,6 +12,7 @@ import { styled } from '@suid/material';
 import { useLocation } from '@solidjs/router';
 
 import { mainNavigation, secondaryNavigation } from '../lib/navigation';
+import { MenuStateType } from '../includes/Process.interface';
 
 const StyledLinkItemButton = styled(ListItemButton)<typeof ListItemButton>(({ theme }) => ({
     '&.Mui-selected': {
@@ -90,11 +91,11 @@ function SecondaryListItems(props) {
     );
 }
 
-const NavMenu: Component = () => {
+const NavMenu: Component<{menuStateStore?: MenuStateType}> = (props) => {
     return (
         <StyledDrawer
-            variant="permanent"
-            open={true}
+            variant="persistent"
+            open={props.menuStateStore?.open}
         >
             <StyledDrawerContainer>
                 <Divider />
