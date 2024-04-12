@@ -441,7 +441,7 @@ export default class Terminal {
                     await this.progressBar(100, 100);
                 }
                 catch (err) {
-                    this.stderr({...err});
+                    this.stderr.apply(null, err);
                 }
                 break;
             default:

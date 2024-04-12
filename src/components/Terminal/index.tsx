@@ -91,7 +91,7 @@ const useStore = create<TerminalState>(set => ({
     clearTerminal: () => set(() => ({
         terminalLines: []
     }))
-}))
+}));
 
 const Terminal: Component<{ terminalController: TerminalController, gameController?: GameController }> = props => {
 
@@ -119,7 +119,7 @@ const Terminal: Component<{ terminalController: TerminalController, gameControll
     let codeRef: HTMLElement;
     let inputRef: HTMLInputElement;
 
-    const terminalOutput = (data, stream, {
+    const terminalOutput = (data: any, stream: string, {
         prompt = '',
         lineIndex = -1,
         characterMode = false,
@@ -132,7 +132,6 @@ const Terminal: Component<{ terminalController: TerminalController, gameControll
         const error = stream === 'stderr';
 
         if (!caretAtEnd) {
-            console.log('Should move caret at end');
             setCursorOffset(data.length);
         }
 
@@ -166,7 +165,7 @@ const Terminal: Component<{ terminalController: TerminalController, gameControll
         terminalOutput(data, 'stdout', options);
     };
 
-    const handleStdErr = (data: string, options: any) => {
+    const handleStdErr = (data: any, options: any) => {
         terminalOutput(data, 'stderr', { ...options, prompt: '\u2718 ' });
     };
 
@@ -387,11 +386,6 @@ const Terminal: Component<{ terminalController: TerminalController, gameControll
     const displayPrompt = (prompt: string, error = false) => <span class={clsx(error ? 'error' : 'prompt')}>{prompt}</span>;
 
     const displayLine = (line: any) => {
-
-        if (typeof line === 'object') {
-            line = line[0];
-        }
-
         const colorRegex = /\^\[(.*?);(.*?)\^\]/g;
         const matches = [...line.matchAll(colorRegex)];
         if (isEmpty(matches)) {
@@ -425,12 +419,9 @@ const Terminal: Component<{ terminalController: TerminalController, gameControll
     };
     
     const displayLineWithCursor = (line: any) => {
-        if (typeof line === 'object') {
-            line = line[0];
-        }
         return (
             <span>
-                {line?.slice(0, (cursorPosition() + cursorOffset()))}
+                {line.slice(0, (cursorPosition() + cursorOffset()))}
                 <span class={clsx('cursor', (focus() && commandLoaded()) ? 'active' : '')}>
                     {line[cursorPosition() + cursorOffset()] || '\u00a0'}
                 </span>
