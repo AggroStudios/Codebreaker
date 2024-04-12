@@ -104,7 +104,7 @@ const Terminal: Component<{ terminalController: TerminalController, gameControll
         clearTerminal,
     } = useStore();
 
-    const { terminalController } = props;
+    const { terminalController, gameController } = props;
 
     const [previousCommandIndex, setPreviousCommandIndex] = createSignal(-1);
     const [cursorPosition, setCursorPosition] = createSignal(0);
@@ -169,14 +169,17 @@ const Terminal: Component<{ terminalController: TerminalController, gameControll
         terminalOutput(data, 'stderr', { ...options, prompt: '\u2718 ' });
     };
 
-    terminalController.attachTerminal({
-        stdin: handleStdIn,
-        stdout: handleStdOut,
-        stderr: handleStdErr,
-    });
-
     createEffect(() => {
         if (terminalLines.length === 0 && !terminalLoaded()) {
+
+            terminalController.attachTerminal({
+                stdin: handleStdIn,
+                stdout: handleStdOut,
+                stderr: handleStdErr,
+            });
+        
+            terminalController.attachGameController(gameController);
+
             terminalController.initialize();
             setTerminalLoaded(true);
             newLine();

@@ -8,6 +8,7 @@ function validateProcess(process: any): process is Process {
 
 // Exporting main game controller
 export default class GameController {
+    private pid: number = 10;
     private interval: null | number = null;
     private currentFrame: number = 0;
     private currentCount: number = 0;
@@ -44,9 +45,14 @@ export default class GameController {
         return this.isRunning;
     };
 
+    public listProcesses() {
+        return this.processes;
+    }
+
     addProcess(process: Process) {
         // Make sure the process object is valid and you can't duplicate processes
         const processIndex = this.processes.findIndex(i => i?.['id'] === process?.['id']);
+        process.pid = this.pid++;
         if (validateProcess(process) && processIndex === -1) {
             this.processes.push(process);
         }

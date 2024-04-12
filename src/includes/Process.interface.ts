@@ -3,6 +3,7 @@ import GameController from '../lib/GameController';
 export default interface Process {
     id: string,
     callback: Function,
+    pid?: number,
 }
 
 export type GameStoreType = {

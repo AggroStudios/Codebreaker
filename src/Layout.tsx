@@ -92,7 +92,7 @@ const Layout: Component<LayoutProps> = props => {
                         <Route path="/login" element={<Login auth={props.auth} />} />
                         <Route path="/second" element={<SecondApp />} />
                         <Route path="/servers" element={<Servers />} />
-                        <Route path="/terminal" element={<Terminal terminalController={terminalController} />} />
+                        <Route path="/terminal" element={<Terminal terminalController={terminalController} gameController={gameController} />} />
                     </Routes>
                 </GameContainer>
                 <NavMenu menuStateStore={menuStateStore} />
