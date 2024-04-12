@@ -11,30 +11,36 @@ export default Array<IApplication>(
         cmd : 'ps',
         path: '/',
         app : processes,
+        permissions: 755,
     },
     {
         cmd : 'dig',
         path: '/bin',
         app : dig,
+        permissions: 755,
     },
     {
         cmd : 'http',
         path: '/bin',
         app : http,
+        permissions: 755,
     },
     {
         cmd : 'ping',
         path: '/bin',
         app : ping,
+        permissions: 755,
     },
     {
         cmd : 'scan',
         path: '/bin',
         app : scan,
+        permissions: 755,
     },
     {
         cmd : 'sub',
         path: '/bin/sub',
         app: http,
+        permissions: 755,
     },
 );

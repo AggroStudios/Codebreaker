@@ -1,5 +1,6 @@
 import {
     lightBlue,
+    lightGreen,
 } from '@suid/material/colors';
 
 import minimist from 'minimist';
@@ -7,7 +8,8 @@ import minimist from 'minimist';
 import {
     filter,
     isEmpty,
-    uniq
+    uniq,
+    uniqBy,
 } from 'lodash';
 
 import {
@@ -25,8 +27,63 @@ export interface IDirectory {
     hidden?: boolean;
     owner: string;
     group: string;
-    permissions: number;
+    permissions: Permissions;
     directory: boolean;
+}
+
+class Permissions {
+    private owner: IPermission = { read: false, write: false, execute: false };
+    private group: IPermission = { read: false, write: false, execute: false };
+    private all: IPermission = { read: false, write: false, execute: false };
+
+    get isExecutable(): boolean {
+        return this.owner.execute || this.group.execute || this.all.execute;
+    }
+
+    get isWritable(): boolean {
+        return this.owner.write || this.group.write || this.all.write;
+    }
+
+    get isReadable(): boolean {
+        return this.owner.read || this.group.read || this.all.read;
+    }
+
+    constructor(permission: number) {
+        const perm = [this.owner, this.group, this.all];
+        permission.toString().split('').forEach((v, k) => {
+            if (parseInt(v) & 4) {
+                perm[k].read = true;
+            }
+            else {
+                perm[k].read = false;
+            }
+            if (parseInt(v) & 2) {
+                perm[k].write = true;
+            }
+            else {
+                perm[k].write = false;
+            }
+            if (parseInt(v) & 1) {
+                perm[k].execute = true;
+            }
+            else {
+                perm[k].execute = false;
+            }
+        });
+    }
+
+    private permissionToString(permission: IPermission) {
+        return `${permission.read ? 'r' : '-'}${permission.write ? 'w' : '-'}${permission.execute ? 'x': '-'}`;
+    }
+
+    toString(): string {
+        return `${this.permissionToString(this.owner)}${this.permissionToString(this.group)}${this.permissionToString(this.all)}`;
+    }
+}
+interface IPermission {
+    read: boolean;
+    write: boolean;
+    execute: boolean;
 }
 
 const stripLastSlash = (path: string) => path.replace(/\/$/, '');
@@ -40,17 +97,16 @@ function stripTrailingSlashes(path: string) {
 const directoryRegex = (path: string) => new RegExp(`^${stripLastSlash(path)}\/([a-zA-Z-_\s]+)$`);
 
 const getSubDirectories = (path: string, apps: IApplication[]) =>
-    uniq(apps.map(app => app.path))
-        .filter((dir: string) => dir.match(directoryRegex(path)))
-        .map((dir: string): IDirectory => ({
-            path: dir.split('/').pop(),
-            absolutePath: dir,
+    uniqBy(apps, 'path').filter((app: IApplication) => app.path.match(directoryRegex(path)))
+        .map((app: IApplication): IDirectory => ({
+            path: app.path.split('/').pop(),
+            absolutePath: path,
             owner: 'root',
             group: 'admin',
-            permissions: 644,
+            permissions: new Permissions(644),
             directory: true,
-        })
-);
+        }));
+
 
 export default class FileSystem {
 
@@ -119,7 +175,9 @@ export default class FileSystem {
         const parsed = path.parse(resolvedPath);
         const foundApp = this.apps.find(o => o.path === parsed.dir && o.cmd === parsed.base);
 
-        if (isEmpty(foundApp)) {
+        const permissions = new Permissions(foundApp.permissions);
+
+        if (isEmpty(foundApp) || !(permissions.isExecutable)) {
             throw new Error(`Command '${command}' not found.`);
         }
 
@@ -146,11 +204,21 @@ export default class FileSystem {
 
         const parsed = path.parse(resolvedPath);
 
-        const translatePermissions = (p: number) => p.toString().split('').map(v => `${parseInt(v) & 4 ? 'r' : '-'}${parseInt(v) & 2 ? 'w' : '-'}${parseInt(v) & 1 ? 'x' : '-'}`).join('');
+        const colorizePathType = (entry: IDirectory) => {
+            if (entry.directory) {
+                return `${colorizeString(entry.path, lightBlue['500'])}/`;
+            }
+            else if (entry.permissions.isExecutable) {
+                return `${colorizeString(entry.path, lightGreen['500'])}`;
+            }
+            else {
+                return entry.path;
+            }
+        };
 
         const listingOutput = (dir: IDirectory[]) => {
             if (!parsedArgs.list) {
-                const entries = dir.map(entry => entry.directory ? `${colorizeString(entry.path, lightBlue['500'])}/` : entry.path);
+                const entries = dir.map(colorizePathType);
                 let maxWidth = 0;
                 for (let entry of entries) {
                     maxWidth = Math.max(maxWidth, entry.length);
@@ -170,8 +238,8 @@ export default class FileSystem {
             }
 
             return dir.map(entry => {
-                const permissions = translatePermissions(entry.permissions);
-                const path = entry.directory ? `${colorizeString(entry.path, lightBlue['500'])}/` : entry.path;
+                const permissions = entry.permissions.toString();
+                const path = colorizePathType(entry);
                 return `${entry.directory ? 'd' : '-'}${permissions}\u00a0\u00a0${entry.owner.padEnd(maxOwnerWidth, '\u00a0')}\u00a0\u00a0${entry.group.padEnd(maxGroupWidth, '\u00a0')}\u00a0\u00a0\u00a0${path}`;
             });
         }
@@ -182,7 +250,7 @@ export default class FileSystem {
                 hidden: true,
                 owner: 'root',
                 group: 'admin',
-                permissions: 644,
+                permissions: new Permissions(644),
                 directory: true,
             },
             {
@@ -190,7 +258,7 @@ export default class FileSystem {
                 hidden: true,
                 owner: 'root',
                 group: 'admin',
-                permissions: 644,
+                permissions: new Permissions(644),
                 directory: true,
             },
         ];
@@ -220,7 +288,7 @@ export default class FileSystem {
                     path: cur.cmd,
                     owner: 'root',
                     group: 'admin',
-                    permissions: 644,
+                    permissions: new Permissions(cur.permissions),
                     directory: false,
                 });
             }

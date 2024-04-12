@@ -17,4 +17,5 @@ export interface IApplication {
     cmd: string;
     path: string;
     app: typeof TerminalApp;
+    permissions: number;
 }
