@@ -6,6 +6,8 @@ function validateProcess(process: any): process is Process {
     return 'id' in process && 'callback' in process;
 }
 
+export class OperatingSystemError extends Error {};
+
 // Exporting main game controller
 export default class OperatingSystem {
     private pid: number = 10;
@@ -51,6 +53,20 @@ export default class OperatingSystem {
             pid: process.pid,
             callback: process.callback
         }));
+    }
+
+    kill(pid: number) {
+        const processIndex = this.processes.findIndex(process => process.pid === pid);
+        // Make sure the process exists before trying to remove it.
+        if (processIndex > -1) {
+            this.processes = [
+                ...this.processes.slice(0, processIndex),
+                ...this.processes.slice(processIndex + 1)
+            ];
+        }
+        else {
+            throw new OperatingSystemError(`Unable to find pid '${pid}'.`);
+        }
     }
 
     addProcess(process: Process) {

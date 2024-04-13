@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Component, createEffect } from 'solid-js';
+import { Component } from 'solid-js';
 import { Card, CardContent, CardHeader, styled } from '@suid/material';
 
 import OperatingSystem from "../../lib/OperatingSystem";
@@ -17,19 +17,10 @@ const CipherBreak: Component<{ operatingSystem?: OperatingSystem, width: number,
     const cssClasses = [ 'breaking-1', 'breaking-2', 'breaking-3', 'breaking-4' ];
     const cipher: Cipher = new Cipher(width, height, cssClasses);
 
-    // const {
-    //     characterGrid,
-    //     setCharacterGrid,
-    // } = cipherStore();
-
     operatingSystem.addProcess(cipher);
 
-    createEffect(() => {
-        console.log('Mounted!');
-    }, []);
-
     return (
-        <Card>
+        <Card class="background">
             <CardHeader title='Cipher Break' />
             <CardContent>
                 <CipherContainer style={{

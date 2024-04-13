@@ -3,6 +3,7 @@ import http from './http';
 import ping from './ping';
 import scan from './scanVulnerabilities';
 import processes from './processes';
+import kill from './kill';
 
 import { IApplication } from '../../includes/Terminal.interface';
 
@@ -11,6 +12,12 @@ export default Array<IApplication>(
         cmd : 'ps',
         path: '/',
         app : processes,
+        permissions: 755,
+    },
+    {
+        cmd : 'kill',
+        path: '/',
+        app : kill,
         permissions: 755,
     },
     {
