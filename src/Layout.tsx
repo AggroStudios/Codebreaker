@@ -7,12 +7,12 @@ import AppBar from './components/AppBar';
 import App from './App';
 import { styled } from '@suid/material';
 
-import GameController from './lib/GameController';
 import TerminalController from './lib/terminal';
 
-import Process, { GameStoreType, MenuStateType } from './includes/Process.interface';
+import Process, { StationStoreType, MenuStateType } from './includes/Process.interface';
 
 import NavMenu from './components/NavMenu';
+import { Station } from './lib/Station';
 
 const SecondApp = lazy(() => import('./SecondApp'));
 const Login = lazy(() => import('./components/Login'));
@@ -22,7 +22,7 @@ const Terminal = lazy(async () => import('./components/Terminal'));
 
 type LayoutProps = {
     auth: AuthenticationState,
-    gameController?: GameController
+    station?: Station
 };
 
 const MainContainer = styled('div')(() => ({
@@ -44,18 +44,19 @@ const GameContainer = styled('div')(() => ({
     transitionTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)',
 }));
 
-const useGameStore = (gameController: GameController) => create<GameStoreType>(set => ({
-    game: gameController,
+const useStationStore = (station: Station) => create<StationStoreType>(set => ({
+    os: station.operatingSystem,
+    cpu: station.processor,
     frame: 0,
     count: 0,
     exponent: 0,
     isRunning: false,
     callback: (frame: number, count: number, exponent: number) => set(() => ({ frame, count, exponent })),
-    toggleGameLoop: () => {
-        gameController.toggleGameLoop();
-        set(() => ({ isRunning: gameController.isRunning }));
-        console.log(`Game loop is running: ${gameController.isRunning}`);
-    }
+    toggleGameLoop: () => set(state => {
+        state.os.toggleGameLoop();
+        console.log(`Game loop is running: ${state.os.isRunning}`);
+        return { isRunning: state.os.isRunning };
+    })
 }));
 
 const useMenuStateStore = create<MenuStateType> (set => ({
@@ -64,35 +65,35 @@ const useMenuStateStore = create<MenuStateType> (set => ({
 }));
 
 const Layout: Component<LayoutProps> = props => {
-    const { auth, gameController } = props;
+    const { auth, station } = props;
     console.log(`Username: ${auth.user?.username}`);
 
-    const gameStore = useGameStore(gameController)();
+    const stationStore = useStationStore(station)();
     const menuStateStore = useMenuStateStore();
 
     const terminalController = new TerminalController();
 
     const mainProcess: Process = {
         id: 'main',
-        callback: gameStore.callback
+        callback: stationStore.callback
     }
 
-    if (props.gameController) {
-        props.gameController.addProcess(mainProcess);
+    if (props.station.operatingSystem) {
+        props.station.operatingSystem.addProcess(mainProcess);
     }
 
     return (
         <>
-            <AppBar gcStore={gameStore} menuStateStore={menuStateStore} />
+            <AppBar stationStore={stationStore} menuStateStore={menuStateStore} />
             <MainContainer>
                 <Background />
                 <GameContainer style={{ "margin-left": menuStateStore.open ? '240px' : '0' }} >
                     <Routes>
-                        <Route path="/" element={<App gcStore={gameStore} />} />
+                        <Route path="/" element={<App stationStore={stationStore} />} />
                         <Route path="/login" element={<Login auth={props.auth} />} />
                         <Route path="/second" element={<SecondApp />} />
                         <Route path="/servers" element={<Servers />} />
-                        <Route path="/terminal" element={<Terminal terminalController={terminalController} gameController={gameController} />} />
+                        <Route path="/terminal" element={<Terminal terminalController={terminalController} operatingSystem={station.operatingSystem} />} />
                     </Routes>
                 </GameContainer>
                 <NavMenu menuStateStore={menuStateStore} />

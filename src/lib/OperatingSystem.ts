@@ -7,7 +7,7 @@ function validateProcess(process: any): process is Process {
 }
 
 // Exporting main game controller
-export default class GameController {
+export default class OperatingSystem {
     private pid: number = 10;
     private interval: null | number = null;
     private currentFrame: number = 0;
@@ -46,10 +46,15 @@ export default class GameController {
     };
 
     public listProcesses() {
-        return this.processes;
+        return this.processes.map(process => ({
+            id: process.id,
+            pid: process.pid,
+            callback: process.callback
+        }));
     }
 
     addProcess(process: Process) {
+        console.log('Adding process!', process);
         // Make sure the process object is valid and you can't duplicate processes
         const processIndex = this.processes.findIndex(i => i?.['id'] === process?.['id']);
         process.pid = this.pid++;
@@ -91,7 +96,7 @@ export default class GameController {
 
     // Main function
     update() {
-        console.debug('[GameController] - Update');
+        console.debug('[OperatingSystem] - Update');
         this.currentFrame += 0.001;
         if (this.currentFrame > 1) {
             this.currentFrame = 0;

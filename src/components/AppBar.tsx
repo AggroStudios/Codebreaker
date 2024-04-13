@@ -11,7 +11,7 @@ import MoreIcon from '@suid/icons-material/More';
 import PlayArrowIcon from '@suid/icons-material/PlayArrow';
 import PauseIcon from '@suid/icons-material/Pause';
 
-import { GameStoreType, MenuStateType } from '../includes/Process.interface';
+import { StationStoreType, MenuStateType } from '../includes/Process.interface';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -53,7 +53,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-const AppBarComponent: Component<{ gcStore?: GameStoreType, menuStateStore?: MenuStateType }> = (props) => {
+const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateStore?: MenuStateType }> = (props) => {
 
     const [anchorEl, setAnchorEl] = createSignal<null | HTMLElement>(null);
     const [mobileAnchorEl, setMobileAnchorEl] = createSignal<null | HTMLElement>(null);
@@ -173,18 +173,18 @@ const AppBarComponent: Component<{ gcStore?: GameStoreType, menuStateStore?: Men
                         <StyledInputBase placeholder='Search...' inputProps={{ 'aria-label': 'search' }} />
                     </Search>
                     <Box sx={{ flexGrow: 1 }}>
-                        {props.gcStore && (
+                        {props.stationStore && (
                             <>
                                 <Typography variant='h6' noWrap component='div' sx={{ display: { xs: 'none', sm: 'block' }}}>
-                                    Frame: {props.gcStore.frame.toFixed(3)} | Count: {props.gcStore.count} | Exponent: {props.gcStore.exponent}
+                                    Frame: {props.stationStore.frame.toFixed(3)} | Count: {props.stationStore.count} | Exponent: {props.stationStore.exponent}
                                     <IconButton
                                         size='large'
                                         aria-label='Start/Stop Game Timer'
                                         color='inherit'
                                         style={{ outline: 0 }}
-                                        onClick={() => props.gcStore.toggleGameLoop()}
+                                        onClick={() => props.stationStore.toggleGameLoop()}
                                     >
-                                        {props.gcStore.isRunning ? <PauseIcon /> : <PlayArrowIcon />}
+                                        {props.stationStore.isRunning ? <PauseIcon /> : <PlayArrowIcon />}
                                     </IconButton>
                                 </Typography>
                             </>

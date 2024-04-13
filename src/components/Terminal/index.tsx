@@ -1,6 +1,6 @@
 import { Component, createEffect, createSignal } from "solid-js";
 import { ThemeProvider, createTheme } from "@suid/material";
-import GameController from "../../lib/GameController";
+import OperatingSystem from "../../lib/OperatingSystem";
 import TerminalController from '../../lib/terminal';
 import create from 'solid-zustand';
 import clsx from 'clsx';
@@ -93,7 +93,7 @@ const useStore = create<TerminalState>(set => ({
     }))
 }));
 
-const Terminal: Component<{ terminalController: TerminalController, gameController?: GameController }> = props => {
+const Terminal: Component<{ terminalController: TerminalController, operatingSystem?: OperatingSystem }> = props => {
 
     const {
         terminalLines,
@@ -104,7 +104,7 @@ const Terminal: Component<{ terminalController: TerminalController, gameControll
         clearTerminal,
     } = useStore();
 
-    const { terminalController, gameController } = props;
+    const { terminalController, operatingSystem } = props;
 
     const [previousCommandIndex, setPreviousCommandIndex] = createSignal(-1);
     const [cursorPosition, setCursorPosition] = createSignal(0);
@@ -178,7 +178,7 @@ const Terminal: Component<{ terminalController: TerminalController, gameControll
                 stderr: handleStdErr,
             });
         
-            terminalController.attachGameController(gameController);
+            terminalController.attachOperatingSystem(operatingSystem);
 
             terminalController.initialize();
             setTerminalLoaded(true);

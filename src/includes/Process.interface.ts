@@ -1,4 +1,4 @@
-import GameController from '../lib/GameController';
+import OperatingSystem from '../lib/OperatingSystem';
 
 export default interface Process {
     id: string,
@@ -6,8 +6,9 @@ export default interface Process {
     pid?: number,
 }
 
-export type GameStoreType = {
-    game: null | GameController,
+export type StationStoreType = {
+    os: null | OperatingSystem,
+    cpu: null | IProcessorType,
     frame: number,
     count: number,
     exponent: number,
@@ -19,4 +20,23 @@ export type GameStoreType = {
 export type MenuStateType = {
     open: boolean,
     toggle: () => void,
+};
+
+export enum ProcessorArchitecture {
+    risc32 = 'risc32',
+    risc64 = 'risc64',
+    sca32 = 'sca32',
+    sca64 = 'sca64',
+    mca32 = 'mca32',
+    mca64 = 'mca64',
+};
+
+export interface IProcessorType {
+    flops: number;
+    cores: number;
+    manufacturer: string;
+    model: string;
+    speed: string;
+    architecture: ProcessorArchitecture;
+    toString: () => string;
 };

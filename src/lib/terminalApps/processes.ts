@@ -1,52 +1,52 @@
 import Terminal from '../terminal';
 import { TerminalApp } from '../../includes/Terminal.interface';
-import GameController from '../GameController';
+import OperatingSystem from '../OperatingSystem';
 
 class Processes extends TerminalApp {
 
-    private gameController: GameController;
+    private operatingSystem: OperatingSystem;
 
     constructor(terminal: Terminal) {
         super(terminal);
-        this.gameController = this.terminal.gameController;
+        this.operatingSystem = this.terminal.operatingSystem;
     }
 
     async run(command: string) {
         switch (command) {
             case undefined:
-                this.terminal.log(this.terminal.gameController.listProcesses());
+                this.terminal.log(this.terminal.operatingSystem.listProcesses());
                 break;
             case 'start':
-                if (this.gameController.isRunning) {
-                    this.terminal.stderr('Game controller is already running.');
+                if (this.operatingSystem.isRunning) {
+                    this.terminal.stderr('Operating system is already running.');
                 }
                 else {
-                    this.terminal.stdout('Starting game controller...');
-                    this.gameController.startGameLoop();
+                    this.terminal.stdout('Starting operating system...');
+                    this.operatingSystem.startGameLoop();
                 }
                 break;
             case 'stop':
-                if (!this.gameController.isRunning) {
-                    this.terminal.stderr('Game controller is not running.');
+                if (!this.operatingSystem.isRunning) {
+                    this.terminal.stderr('Operating system is not running.');
                 }
                 else {
-                    this.terminal.stdout('Stopping game controller...');
-                    this.gameController.stopGameLoop();
+                    this.terminal.stdout('Stopping operating system...');
+                    this.operatingSystem.stopGameLoop();
                 }
                 break;
             case 'toggle':
-                this.terminal.stdout('Toggling game controller...');
-                this.gameController.toggleGameLoop();
+                this.terminal.stdout('Toggling operating system...');
+                this.operatingSystem.toggleGameLoop();
                 break;
             case 'reset':
-                if (this.gameController.isRunning) {
-                    this.gameController.stopGameLoop();
+                if (this.operatingSystem.isRunning) {
+                    this.operatingSystem.stopGameLoop();
                 }
-                this.gameController.resetProcesses();
-                this.terminal.stdout('Game controller reset.');
+                this.operatingSystem.resetProcesses();
+                this.terminal.stdout('Stopping operating reset.');
                 break;
             case 'status':
-                this.terminal.stdout(`Game Controller Status: Frame: ${this.gameController.frame.toFixed(3)}, Exponent: ${this.gameController.exponent}, Running? ${this.gameController.isRunning ? 'Yes' : 'No'}`);
+                this.terminal.stdout(`Stopping operating Status: Frame: ${this.operatingSystem.frame.toFixed(3)}, Exponent: ${this.operatingSystem.exponent}, Running? ${this.operatingSystem.isRunning ? 'Yes' : 'No'}`);
                 break;
             default:
                 this.terminal.stdout(`Command passed: ${command}`);

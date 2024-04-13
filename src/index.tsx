@@ -7,9 +7,11 @@ import { ThemeProvider, createTheme } from '@suid/material/styles';
 
 import { AuthenticationState, User } from './includes/Authentication.interface';
 
-import GameController from './lib/GameController';
+import OperatingSystem from './lib/OperatingSystem';
 
 import './index.css';
+import { CodiumProcessor } from './lib/processors';
+import { Station } from './lib/Station';
 
 const darkTheme = createTheme({
     palette: {
@@ -64,12 +66,15 @@ const useStore = create<AuthenticationState>(set => ({
 
 const root = document.getElementById('root')
 
-const gameController = new GameController();
+const processor = new CodiumProcessor();
+const operatingSystem = new OperatingSystem();
+
+const station = new Station(processor, operatingSystem);
 
 render(() => (
     <ThemeProvider theme={darkTheme}>
         <Router>
-            <Layout auth={useStore()} gameController={gameController} />
+            <Layout auth={useStore()} station={station} />
         </Router>
     </ThemeProvider>
 ), root!)

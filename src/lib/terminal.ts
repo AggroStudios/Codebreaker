@@ -19,7 +19,7 @@ import {
 
 import FileSystem from "./terminal-utils/filesystem";
 import terminalApps from "./terminalApps";
-import GameController from '../lib/GameController';
+import OperatingSystem from './OperatingSystem';
 
 interface HistoryEntry {
     command: string;
@@ -37,7 +37,7 @@ export default class Terminal {
     private loaderChar: string = '';
     private fs: FileSystem;
 
-    private _gameController: GameController;
+    private _osController: OperatingSystem;
 
     private _stdin: (callback: (char: string) => void, options?: any) => void;
     private _stdout: (message: any, options?: any) => void;
@@ -64,8 +64,8 @@ export default class Terminal {
         return this._stderr;
     }
 
-    get gameController(): GameController {
-        return this._gameController;
+    get operatingSystem(): OperatingSystem {
+        return this._osController;
     }
 
     initialize() {
@@ -111,9 +111,9 @@ export default class Terminal {
         this._stderr = stderr;
     }
 
-    attachGameController(gameController: GameController) {
-        console.log('Game controller:', gameController);
-        this._gameController = gameController;
+    attachOperatingSystem(os: OperatingSystem) {
+        console.log('Operating System:', os);
+        this._osController = os;
     }
 
     async readSecure(prompt: string) {
