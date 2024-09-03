@@ -16,17 +16,29 @@ import { Component } from 'solid-js';
 import CipherBreak from './components/Widgets/cipherBreak';
 
 import Grid from '@suid/material/Grid';
+import Cipher from './lib/Cipher';
 
 const useStore = create<CounterState>(set => ({
     count: 1,
     increase: () => set(state => ({ count: state.count + 1 })),
-    decrease: () => set(state => ({ count: Math.max(1, state.count - 1) }))
+    decrease: () => set(state => ({ count: Math.max(1, state.count - 1) })),
+    cipher: null,
+    setCipher: (cipher: Cipher) => set(() => ({ cipher }))
 }));
 
 const App: Component<{ stationStore?: StationStoreType }> = props => {
   
     const navigate = useNavigate();
     const state = useStore();
+
+    const addCipher = () => {
+        const c = new Cipher(20, 10, cssClasses);
+        state.setCipher(c);
+        console.log('Adding cipher!', c);
+        stationStore.os.addProcess(c);
+    }
+
+    const cssClasses = [ 'breaking-1', 'breaking-2', 'breaking-3', 'breaking-4' ];
 
     const { stationStore } = props;
 
@@ -52,7 +64,7 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
             <div class="card">
                 <Grid container>
                     <Grid item xs={4}>
-                        <CipherBreak operatingSystem={stationStore.os} width={20} height={10} />
+                        <CipherBreak cipher={state.cipher} width={20} addCipher={addCipher} />
                     </Grid>
                 </Grid>
             </div>

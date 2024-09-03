@@ -17,10 +17,10 @@
     "clsx": "^2.1.0",
     "lodash": "^4.17.21",
     "minimist": "^1.2.8",
-    "solid-js": "^1.7.8",
+    "solid-js": "^1.8.16",
     "solid-styled-components": "^0.28.5",
-    "solid-zustand": "^1.7.0",
-    "zustand": "^4.4.3"
+    "solid-zustand": "^1.8.0",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.200",

@@ -19,7 +19,7 @@ interface IGridItem {
 export default class Cipher implements Process {
 
     private characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()/\\-=+,.<>;:';
-    private _characterGrid: IGridItem[];
+    private _characterGrid?: IGridItem[];
     private _setCharacterGrid: Function;
     private width: number;
     private height: number;
@@ -36,6 +36,8 @@ export default class Cipher implements Process {
         this.width = width;
         this.height = height;
         this.cssClasses = cssClasses;
+
+        console.log('Cipher constructed!');
     }
 
     public get characterGrid() {
@@ -44,7 +46,6 @@ export default class Cipher implements Process {
 
     private randomizeGrid() {
         const rndGrid = [];
-        console.log(this.width * this.height);
         for (let i = 0; i < (this.width * this.height); i++) {
             const cssClassIndex = Math.floor(Math.random() * this.cssClasses.length);
             const charIndex = Math.floor(Math.random() * this.characters.length);
