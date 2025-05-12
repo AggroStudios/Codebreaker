@@ -47,6 +47,8 @@ const GameContainer = styled('div')(() => ({
 const useStationStore = (station: Station) => create<StationStoreType>(set => ({
     os: station.operatingSystem,
     cpu: station.processor,
+    memory: null,
+    storage: [],
     frame: 0,
     count: 0,
     exponent: 0,

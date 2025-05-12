@@ -12,3 +12,9 @@ export class CodiumProcessor implements IProcessorType {
         return `${this.manufacturer} ${this.model} ${this.speed} (${this.architecture})`;
     }
 }
+
+export class CodiumProcessor64 extends CodiumProcessor {
+    flops: number = 1300000000;
+    model: string = 'Codium64 1';
+    architecture: ProcessorArchitecture = ProcessorArchitecture.risc64;
+}

@@ -4,6 +4,7 @@ import ping from './ping';
 import scan from './scanVulnerabilities';
 import processes from './processes';
 import kill from './kill';
+import FetchCipher from './fetchCipher';
 
 import { IApplication } from '../../includes/Terminal.interface';
 
@@ -12,6 +13,12 @@ export default Array<IApplication>(
         cmd : 'ps',
         path: '/',
         app : processes,
+        permissions: 755,
+    },
+    {
+        cmd: 'fetchCipher',
+        path: '/',
+        app: FetchCipher,
         permissions: 755,
     },
     {

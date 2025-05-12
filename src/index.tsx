@@ -12,6 +12,9 @@ import OperatingSystem from './lib/OperatingSystem';
 import './index.css';
 import { CodiumProcessor } from './lib/processors';
 import { Station } from './lib/Station';
+import { CodiumMemory } from './lib/memory';
+import { IStorageType } from './includes/Process.interface';
+import { CodiumStorageHdd } from './lib/storage';
 
 const darkTheme = createTheme({
     palette: {
@@ -68,8 +71,10 @@ const root = document.getElementById('root')
 
 const processor = new CodiumProcessor();
 const operatingSystem = new OperatingSystem();
+const memory = new CodiumMemory();
+const storage = new Array<IStorageType>(new CodiumStorageHdd());
 
-const station = new Station(processor, operatingSystem);
+const station = new Station(processor, operatingSystem, memory, storage);
 
 render(() => (
     <ThemeProvider theme={darkTheme}>
