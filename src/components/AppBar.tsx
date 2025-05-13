@@ -13,6 +13,9 @@ import PauseIcon from '@suid/icons-material/Pause';
 
 import { StationStoreType, MenuStateType } from '../includes/Process.interface';
 
+import CodeBreakerLogo from '../assets/logos/codebreaker-logo.png';
+import './AppBar.scss';
+
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
@@ -164,7 +167,7 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
                         width: '150px',
                         'text-align': 'left',
                     }}>
-                        Code Breaker
+                        <img src={CodeBreakerLogo} class="mainLogo" alt="Code Breaker Logo" />
                     </Typography>
                     <Search>
                         <SearchIconWrapper>

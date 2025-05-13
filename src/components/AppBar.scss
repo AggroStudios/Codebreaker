@@ -1,0 +1,10 @@
+.mainLogo {
+    height: 45px;
+    margin-top: 0.5em;
+    will-change: filter;
+    transition: filter 300ms;
+}
+
+.mainLogo:hover {
+    filter: drop-shadow(0 0 0.5em #61dafbaa);
+  }

@@ -91,11 +91,11 @@ const Layout: Component<LayoutProps> = props => {
                 <Background />
                 <GameContainer style={{ "margin-left": menuStateStore.open ? '240px' : '0' }} >
                     <Routes>
-                        <Route path="/" element={<App stationStore={stationStore} />} />
+                        <Route path="/" element={<Terminal terminalController={terminalController} operatingSystem={station.operatingSystem} />} />
+                        <Route path="/station" element={<App stationStore={stationStore} />} />
                         <Route path="/login" element={<Login auth={props.auth} />} />
                         <Route path="/second" element={<SecondApp />} />
                         <Route path="/servers" element={<Servers />} />
-                        <Route path="/terminal" element={<Terminal terminalController={terminalController} operatingSystem={station.operatingSystem} />} />
                     </Routes>
                 </GameContainer>
                 <NavMenu menuStateStore={menuStateStore} />

@@ -30,7 +30,7 @@ const Background = () => {
         on(
             () => location.pathname,
             async () => {
-                let bg = await import('../assets/backgrounds/station_bg.png');
+                let bg = await import('../assets/backgrounds/terminal_bg.png');
                 try {
                     bg = await import(`../assets/backgrounds/${location.pathname.split('/')[1]}_bg.png`);
                 }

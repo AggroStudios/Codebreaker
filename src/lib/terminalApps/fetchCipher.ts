@@ -35,14 +35,20 @@ class FetchCipher extends TerminalApp {
         this.terminal.stdout(`Encrypted: ${stringToEncrypt}`);
         
         while (tries > 0) {
-            const data = await this.captureAnswer();
-            if (this.rot13(data) === stringToEncrypt) {
-                this.terminal.stdout(`Success! Result: ${data}`);
-                // Give $2!
+            try {
+                const data = await this.captureAnswer();
+                if (this.rot13(data) === stringToEncrypt) {
+                    this.terminal.stdout(`Success! Result: ${data}`);
+                    // Give $2!
+                    return;
+                }
+                tries--;
+                this.terminal.stderr(`Incorrect solution. You have ${tries} tries left.`);
+            }
+            catch (error) {
+                this.terminal.stderr('^C');
                 return;
             }
-            tries--;
-            this.terminal.stderr(`Incorrect solution. You have ${tries} tries left.`);
         }
     }
 };

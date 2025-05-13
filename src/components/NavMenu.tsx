@@ -11,6 +11,8 @@ import { A } from '@solidjs/router';
 import { styled } from '@suid/material';
 import { useLocation } from '@solidjs/router';
 
+import LockTwoToneIcon from '@suid/icons-material/LockTwoTone';
+
 import { mainNavigation, secondaryNavigation } from '../lib/navigation';
 import { MenuStateType } from '../includes/Process.interface';
 
@@ -47,10 +49,11 @@ const StyledA = styled(A)(() => ({
     }
 }));
 
-function ListItemNavLink(props: { to: string, children: Element }) {
+function ListItemNavLink(props: { to: string, disabled: boolean, children: Element }) {
     const location = useLocation();
     return (
         <StyledLinkItemButton
+            disabled={props.disabled}
             selected={location.pathname === props.to}
             component={StyledA}
             href={props.to}
@@ -65,11 +68,11 @@ function MainListItems(props: any) {
     return (
         <List>
             {mainNavigation.map((item, key) =>
-                <ListItemNavLink key={key} to={item.link} {...props}>
+                <ListItemNavLink key={key} disabled={item.locked} to={item.link} {...props}>
                     <ListItemIcon>
-                        <item.icon />
+                        { item.locked ? <LockTwoToneIcon /> : <item.icon /> }
                     </ListItemIcon>
-                    <ListItemText primary={item.title} />
+                    <ListItemText primary={item.locked ? 'Locked' : item.title} />
                 </ListItemNavLink>
             )}
         </List>

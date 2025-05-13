@@ -34,44 +34,50 @@ export const adminNavigation = [
 
 export const mainNavigation = [
     {
-        title: 'Station',
+        title: 'Terminal',
         link: '/',
+        icon: TerminalTwoTone,
+    },
+    {
+        title: 'Station',
+        link: '/station',
         icon: ImportantDevicesTwoToneIcon,
     },
     {
         title: 'Servers',
         link: '/servers',
         icon: StorageTwoToneIcon,
+        locked: true,
     },
     {
         title: 'Server Racks',
         link: '/racks',
         icon: CalendarViewDayTwoToneIcon,
+        locked: true,
     },
     {
         title: 'Data Centers',
         link: '/dataCenters',
         icon: ApartmentTwoToneIcon,
+        locked: true,
     },
     {
         title: 'Networks',
         link: '/networks',
         icon: RouterTwoToneIcon,
+        locked: true,
     },
     {
         title: 'Dark Web',
         link: '/darkWeb',
         icon: PublicTwoToneIcon,
+        locked: true,
     },
     {
         title: 'Neural Net',
         link: '/neuralNet',
         icon: ShareTwoToneIcon,
-    },
-    {
-        title: 'Terminal',
-        link: '/terminal',
-        icon: TerminalTwoTone,
+        locked: true,
     },
 ];
 
@@ -80,6 +86,11 @@ export const secondaryNavigation = [
         title: 'Forums',
         link: '/forums',
         icon: ForumTwoToneIcon,
+    },
+    {
+        title: 'Talents',
+        link: '/talents',
+        icon: AccountTreeTwoToneIcon,
     },
     {
         title: 'Perm Upgrades',
