@@ -89,7 +89,8 @@ const Layout: Component<LayoutProps> = props => {
             <AppBar stationStore={stationStore} menuStateStore={menuStateStore} />
             <MainContainer>
                 <Background />
-                <GameContainer style={{ "margin-left": menuStateStore.open ? '240px' : '0' }} >
+                <NavMenu menuStateStore={menuStateStore} />
+                <GameContainer>
                     <Routes>
                         <Route path="/" element={<Terminal terminalController={terminalController} operatingSystem={station.operatingSystem} />} />
                         <Route path="/station" element={<App stationStore={stationStore} />} />
@@ -98,7 +99,6 @@ const Layout: Component<LayoutProps> = props => {
                         <Route path="/servers" element={<Servers />} />
                     </Routes>
                 </GameContainer>
-                <NavMenu menuStateStore={menuStateStore} />
             </MainContainer>
         </>
     );
