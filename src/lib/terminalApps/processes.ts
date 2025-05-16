@@ -11,7 +11,10 @@ class Processes extends TerminalApp {
         this.operatingSystem = this.terminal.operatingSystem;
     }
 
-    async run(command: string) {
+    async run(_: number, argv: string[]) {
+        
+        const command = argv[0];
+       
         switch (command) {
             case undefined:
                 this.terminal.log(this.terminal.operatingSystem.listProcesses());

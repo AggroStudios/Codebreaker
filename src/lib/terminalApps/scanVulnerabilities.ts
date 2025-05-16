@@ -19,7 +19,14 @@ export default class ScanVulnerabilities extends TerminalApp {
         `.split('\n').forEach(line => this.terminal.stdout(line));
     }
 
-    async run(ipAddress: string) {
+    async run(argc: number, argv: string[]) {
+
+        const ipAddress = argv[0];
+        if (argc < 1) {
+            this.terminal.stderr('Error: IP Address is undefined.\n');
+            this.help();
+            return;
+        }
 
         if (ipAddress === 'help' || ipAddress === '-h' || ipAddress === '-?') {
             this.help();

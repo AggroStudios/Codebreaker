@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { isEmpty } from 'lodash';
 
 import Terminal from '../terminal';
 import { TerminalApp } from '../../includes/Terminal.interface';
@@ -10,10 +9,12 @@ export default class HttpRequest extends TerminalApp {
         super(terminal);
     }
 
-    async run(url: string) {
-        if (isEmpty(url)) {
+    async run(argc: number, argv: string[]) {
+
+        if (argc < 1) {
             throw new Error('URL is required.');
         }
+        const url = argv[0];
 
         this.terminal.stdout(`Requesting GET from ${url}...`);
         // const loader = [ ' ⠷', ' ⠯', ' ⠟', ' ⠻', ' ⠽', ' ⠾' ];

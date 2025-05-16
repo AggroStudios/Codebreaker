@@ -1,4 +1,7 @@
+import { PlayerState } from '../includes/Player.interface';
 import Process from '../includes/Process.interface';
+
+import { NotificationLevel } from '../includes/OperatingSystem.interface';
 
 const FPS = 60;
 
@@ -17,6 +20,12 @@ export default class OperatingSystem {
     private currentExponent: number = 1;
     private processes: Array<Process> = [];
 
+    private _player: PlayerState;
+
+    constructor(player: PlayerState) {
+        this._player = player;
+    }
+
     public startGameLoop() {
         this.interval = setInterval(() => this.update(), 5000 / FPS);
     };
@@ -25,6 +34,10 @@ export default class OperatingSystem {
         clearInterval(this.interval);
         this.interval = null;
     };
+
+    get player() {
+        return this._player;
+    }
 
     get isRunning() {
         return this.interval !== null;
@@ -53,6 +66,31 @@ export default class OperatingSystem {
             pid: process.pid,
             callback: process.callback
         }));
+    }
+
+    public sendNotification(message: string, level: NotificationLevel = NotificationLevel.INFO) {
+        this._player.addNotification({
+            message,
+            level,
+            unread: true,
+        });
+    }
+
+    public sendMessage(sender: string, body: string) {
+        this._player.addMessage({
+            sender,
+            body,
+            date: new Date(),
+            unread: true,
+        });
+    }
+
+    public markMessageRead(index: number) {
+        this._player.markMessageAsRead(index);
+    }
+
+    public markNotificationRead(index: number) {
+        this._player.markNotificationAsRead(index);
     }
 
     kill(pid: number) {

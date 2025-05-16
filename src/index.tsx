@@ -6,7 +6,7 @@ import Layout from './Layout';
 import { ThemeProvider, createTheme } from '@suid/material/styles';
 
 import { AuthenticationState, User } from './includes/Authentication.interface';
-
+import { PlayerState, Player } from './includes/Player.interface';
 import OperatingSystem from './lib/OperatingSystem';
 
 import './index.css';
@@ -67,10 +67,47 @@ const useStore = create<AuthenticationState>(set => ({
     logout: () => console.log('Logout'),
 }));
 
+const playerStore = create<PlayerState>(set => ({
+    player: {
+        name: 'Player',
+        money: 1000,
+        notifications: [],
+        messages: []
+    } as Player,
+    addMoney: (amount: number) => set(state => ({ player: { ...state.player, money: state.player.money + amount } })),
+    removeMoney: (amount: number) => set(state => ({ player: { ...state.player, money: state.player.money - amount } })),
+    addNotification: (notification) => set(state => ({
+        player: {
+            ...state.player,
+            notifications: [...state.player.notifications, { ...notification, unread: true }]
+        }
+    })),
+    addMessage: (message) => set(state => ({
+        player: {
+            ...state.player,
+            messages: [...state.player.messages, { ...message, unread: true }]
+        }
+    })),
+    markMessageAsRead: (index: number) => set(state => {
+        const messages = [...state.player.messages];
+        if (messages[index]) {
+            messages[index].unread = false;
+        }
+        return { player: { ...state.player, messages } };
+    }),
+    markNotificationAsRead: (index: number) => set(state => {
+        const notifications = [...state.player.notifications];
+        if (notifications[index]) {
+            notifications[index].unread = false;
+        }
+        return { player: { ...state.player, notifications } };
+    }),
+}))();
+
 const root = document.getElementById('root')
 
 const processor = new CodiumProcessor();
-const operatingSystem = new OperatingSystem();
+const operatingSystem = new OperatingSystem(playerStore);
 const memory = new CodiumMemory();
 const storage = new Array<IStorageType>(new CodiumStorageHdd());
 
@@ -79,7 +116,7 @@ const station = new Station(processor, operatingSystem, memory, storage);
 render(() => (
     <ThemeProvider theme={darkTheme}>
         <Router>
-            <Layout auth={useStore()} station={station} />
+            <Layout auth={useStore()} station={station} player={playerStore} />
         </Router>
     </ThemeProvider>
 ), root!)

@@ -10,6 +10,7 @@ import { styled } from '@suid/material';
 import TerminalController from './lib/terminal';
 
 import Process, { StationStoreType, MenuStateType } from './includes/Process.interface';
+import { PlayerState } from './includes/Player.interface';
 
 import NavMenu from './components/NavMenu';
 import { Station } from './lib/Station';
@@ -23,6 +24,7 @@ const Terminal = lazy(async () => import('./components/Terminal'));
 type LayoutProps = {
     auth: AuthenticationState,
     station?: Station
+    player: PlayerState
 };
 
 const MainContainer = styled('div')(() => ({
@@ -67,7 +69,7 @@ const useMenuStateStore = create<MenuStateType> (set => ({
 }));
 
 const Layout: Component<LayoutProps> = props => {
-    const { auth, station } = props;
+    const { auth, station, player } = props;
     console.log(`Username: ${auth.user?.username}`);
 
     const stationStore = useStationStore(station)();
@@ -86,7 +88,7 @@ const Layout: Component<LayoutProps> = props => {
 
     return (
         <>
-            <AppBar stationStore={stationStore} menuStateStore={menuStateStore} />
+            <AppBar stationStore={stationStore} menuStateStore={menuStateStore} playerStateStore={player} />
             <MainContainer>
                 <Background />
                 <NavMenu menuStateStore={menuStateStore} />

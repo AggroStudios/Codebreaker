@@ -459,7 +459,9 @@ export default class Terminal {
             default:
                 try {
                     const app = this.fs.resolvePath(command);
-                    await (new app(this)).run(...args);
+                    const argc = args.length;
+                    const argv = args;
+                    await (new app(this)).run(argc, argv);
                     break;
                 }
                 catch (err) {

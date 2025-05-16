@@ -5,6 +5,7 @@ import scan from './scanVulnerabilities';
 import processes from './processes';
 import kill from './kill';
 import FetchCipher from './fetchCipher';
+import FetchPlayer from './player';
 
 import { IApplication } from '../../includes/Terminal.interface';
 
@@ -13,6 +14,12 @@ export default Array<IApplication>(
         cmd : 'ps',
         path: '/',
         app : processes,
+        permissions: 755,
+    },
+    {
+        cmd: 'player',
+        path: '/',
+        app: FetchPlayer,
         permissions: 755,
     },
     {

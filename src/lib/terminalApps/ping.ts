@@ -20,7 +20,17 @@ export default class Ping extends TerminalApp {
         `.split('\n').forEach(line => this.terminal.stdout(line));
     }
 
-    async run(host: string, ...options: string[]) {
+    async run(argc: number, argv: string[]) {
+        
+        let host = argv[0]
+        if (argc < 0) {
+            this.terminal.stderr('Error: Host is undefined.\n');
+            this.help();
+            return;
+        }
+        
+        const options = argv.slice(1);
+
         if (host === 'help' || host === '-h' || host === '-?') {
             this.help();
             return;

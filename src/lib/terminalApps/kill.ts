@@ -11,7 +11,13 @@ class Processes extends TerminalApp {
         this.operatingSystem = this.terminal.operatingSystem;
     }
 
-    async run(pid: string) {
+    async run(argc: number, argv: string[]) {
+
+        if (argc < 1) {
+            this.terminal.stderr('Usage: kill <pid>');
+            return;
+        }
+        const pid = argv[0];
         
         try {
             this.operatingSystem.kill(parseInt(pid));

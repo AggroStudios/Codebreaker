@@ -8,7 +8,13 @@ class Dig extends TerminalApp {
         super(terminal);
     }
 
-    async run(domain: string) {
+    async run(argc: number, argv: string[]) {
+        if (argc < 1) {
+            this.terminal.stderr('Usage: dig <domain>');
+            return;
+        }
+        const domain = argv[0];
+        
         const existingDomains = HackingScenarios.getAllDomains();
 
         if (existingDomains.includes(domain)) {

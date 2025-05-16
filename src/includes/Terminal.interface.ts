@@ -1,7 +1,7 @@
 import Terminal from '../lib/terminal';
 
 export interface ITerminalApp {
-    run(domain: string, args?: any): void;
+    run(argc: number, argv: string[]): void;
     help?(): void;
 }
 
@@ -10,7 +10,7 @@ export class TerminalApp implements ITerminalApp {
     constructor(terminal: Terminal) {
         this.terminal = terminal;
     }
-    async run(_?:any) { throw new Error('Not Implemented.') };
+    async run(_?: number, __?: string[]) { throw new Error('Not Implemented.') };
 };
 
 export interface IApplication {
