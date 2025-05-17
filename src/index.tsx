@@ -6,7 +6,7 @@ import Layout from './Layout';
 import { ThemeProvider, createTheme } from '@suid/material/styles';
 
 import { AuthenticationState, User } from './includes/Authentication.interface';
-import { PlayerState, Player } from './includes/Player.interface';
+import { PlayerState, Player, experienceForLevel } from './includes/Player.interface';
 import OperatingSystem from './lib/OperatingSystem';
 
 import './index.css';
@@ -71,9 +71,33 @@ const playerStore = create<PlayerState>(set => ({
     player: {
         name: 'Player',
         money: 1000,
+        experience: 0,
+        nextLevel: experienceForLevel(1),
+        level: 1,
         notifications: [],
         messages: []
     } as Player,
+    earnExperience: (amount: number) => set(state => {
+
+        let nextLevel = experienceForLevel(state.player.level);
+        let experience = state.player.experience + amount;
+        let level = state.player.level;
+
+        while (experience >= nextLevel) {
+            experience -= nextLevel;
+            level++;
+            nextLevel = experienceForLevel(level);
+        }
+        
+        return {
+            player: {
+                ...state.player,
+                experience,
+                level,
+                nextLevel,
+            }
+        };
+    }),
     addMoney: (amount: number) => set(state => ({ player: { ...state.player, money: state.player.money + amount } })),
     removeMoney: (amount: number) => set(state => ({ player: { ...state.player, money: state.player.money - amount } })),
     addNotification: (notification) => set(state => ({

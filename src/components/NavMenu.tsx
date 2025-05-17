@@ -5,7 +5,12 @@ import {
     ListItemIcon,
     ListItemText,
     Drawer,
-    Divider
+    Divider,
+    Card,
+    CardHeader,
+    CardContent,
+    Box,
+    LinearProgress
 } from '@suid/material';
 import { A } from '@solidjs/router';
 import { styled } from '@suid/material';
@@ -15,6 +20,7 @@ import LockTwoToneIcon from '@suid/icons-material/LockTwoTone';
 
 import { mainNavigation, secondaryNavigation } from '../lib/navigation';
 import { MenuStateType } from '../includes/Process.interface';
+import { PlayerState } from '../includes/Player.interface';
 
 import AggroStudios from '../assets/logos/AggroStudios.png';
 import './NavMenu.scss';
@@ -108,7 +114,21 @@ function SecondaryListItems(props: any) {
     );
 }
 
-const NavMenu: Component<{menuStateStore?: MenuStateType}> = (props) => {
+function PlayerLevel(props: { player: PlayerState }) {
+    console.log((props.player.player.experience / props.player.player.nextLevel) * 100);
+    return (
+        <Card>
+            <CardHeader title={`Level ${props.player.player.level}`} />
+            <CardContent>
+            <Box sx={{ width: '100%' }}>
+                <LinearProgress variant="determinate" value={(props.player.player.experience / props.player.player.nextLevel) * 100} />
+            </Box>
+            </CardContent>
+        </Card>
+    )
+}
+
+const NavMenu: Component<{menuStateStore?: MenuStateType, playerStateStore?: PlayerState}> = (props) => {
     return (
         <StyledDrawer
             variant="persistent"
@@ -123,6 +143,7 @@ const NavMenu: Component<{menuStateStore?: MenuStateType}> = (props) => {
                 <Divider />
                 <SecondaryListItems />
                 <StyledDrawerSpacer />
+                <PlayerLevel player={props.playerStateStore} />
                 <img src={AggroStudios} class="aggroLogo" />
             </StyledDrawerContainer>
         </StyledDrawer>

@@ -18,6 +18,7 @@ class FetchPlayer extends TerminalApp {
         - help | -h | --help | -? : Brings up this cool little help text.
         - give <amount> : Pay the player a certain amount of money.
         - take <amount> : Take a certain amount of money from the player.
+        - xp <amount> : Give the player a certain amount of experience.
         - message <message> : Send a message to the player.
         - notifyInfo <message> : Send an info notification to the player.
         - notifyWarning <message> : Send a warning notification to the player.
@@ -56,6 +57,16 @@ class FetchPlayer extends TerminalApp {
                     const takeAmount = parseFloat(argv[1]);
                     this.terminal.operatingSystem.player.removeMoney(takeAmount);
                     this.terminal.stdout(`Took ${takeAmount} money from player.`);
+                    break;
+                case 'xp':
+                    if (argc < 2) {
+                        this.terminal.stderr('Error: Amount is undefined.\n');
+                        this.help();
+                        break;
+                    }
+                    const xpAmount = parseInt(argv[1]);
+                    this.terminal.operatingSystem.player.earnExperience(xpAmount);
+                    this.terminal.stdout(`Gave player ${xpAmount} experience.`);
                     break;
                 case 'message':
                     if (argc < 2) {

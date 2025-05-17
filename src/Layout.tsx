@@ -91,7 +91,7 @@ const Layout: Component<LayoutProps> = props => {
             <AppBar stationStore={stationStore} menuStateStore={menuStateStore} playerStateStore={player} />
             <MainContainer>
                 <Background />
-                <NavMenu menuStateStore={menuStateStore} />
+                <NavMenu menuStateStore={menuStateStore} playerStateStore={player} />
                 <GameContainer>
                     <Routes>
                         <Route path="/" element={<Terminal terminalController={terminalController} operatingSystem={station.operatingSystem} />} />
