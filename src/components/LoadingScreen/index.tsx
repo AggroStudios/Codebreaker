@@ -22,7 +22,7 @@ const BackgroundElement = styled('div')(() => `
 const Background = (props: { loading: number }) => {
 
     return (
-        <BackgroundElement style={{ display: props.loading < 100 ? 'block' : 'none' }}>
+        <BackgroundElement style={{ display: props.loading < 100 ? 'block' : 'none', overflow: 'hidden' }}>
             <img src={LoadingImage} class="logoImage" />
             <LinearProgress
                 variant="determinate"
