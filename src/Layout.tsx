@@ -4,6 +4,7 @@ import { Routes, Route } from '@solidjs/router';
 import create from 'solid-zustand';
 
 import AppBar from './components/AppBar';
+
 import App from './App';
 import { styled } from '@suid/material';
 

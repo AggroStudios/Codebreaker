@@ -115,9 +115,8 @@ function SecondaryListItems(props: any) {
 }
 
 function PlayerLevel(props: { player: PlayerState }) {
-    console.log((props.player.player.experience / props.player.player.nextLevel) * 100);
     return (
-        <Card>
+        <Card class="playerLevelCard">
             <CardHeader title={`Level ${props.player.player.level}`} />
             <CardContent>
             <Box sx={{ width: '100%' }}>
