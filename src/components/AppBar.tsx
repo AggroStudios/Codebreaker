@@ -7,8 +7,6 @@ import {
     ListItemText
 } from '@suid/material';
 
-import ExpandLessIcon from '@suid/icons-material/ExpandLess';
-import ExpandMoreIcon from '@suid/icons-material/ExpandMore';
 import MailIcon from '@suid/icons-material/Mail';
 import NotificationsIcon from '@suid/icons-material/Notifications';
 import AccountCircle from '@suid/icons-material/AccountCircle';
@@ -251,19 +249,8 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position='fixed' style={{ background: 'rgba(50, 50, 50, 0.75)'}}>
                 <Toolbar>
-                    <IconButton
-                        size='large'
-                        edge='start'
-                        color='inherit'
-                        aria-label='open drawer'
-                        style={{ outline: 0 }}
-                        sx={{ mr: 2 }}
-                        onClick={() => props.menuStateStore?.toggle()}
-                    >
-                        {props.menuStateStore?.open ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-                    </IconButton>
                     <Typography variant='h6' noWrap component='div' sx={{ display: { xs: 'none', sm: 'block' }}} style={{
-                        width: '150px',
+                        width: '240px',
                         'text-align': 'left',
                     }}>
                         <img src={CodeBreakerLogo} class="mainLogo" alt="Code Breaker Logo" />

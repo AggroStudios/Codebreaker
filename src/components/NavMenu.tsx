@@ -131,10 +131,8 @@ const NavMenu: Component<{menuStateStore?: MenuStateType, playerStateStore?: Pla
     return (
         <StyledDrawer
             variant="persistent"
-            open={props.menuStateStore?.open}
-            style={{
-                display: props.menuStateStore?.open ? 'flex' : 'none'
-            }}
+            open={true}
+            style={{ display: 'flex' }}
         >
             <StyledDrawerContainer>
                 <Divider />
