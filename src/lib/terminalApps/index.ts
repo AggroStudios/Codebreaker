@@ -8,6 +8,7 @@ import FetchCipher from './fetchCipher';
 import FetchPlayer from './player';
 
 import { IApplication } from '../../includes/Terminal.interface';
+import BootSequence from './bootSequence';
 
 export default Array<IApplication>(
     {
@@ -26,6 +27,12 @@ export default Array<IApplication>(
         cmd: 'fetchCipher',
         path: '/',
         app: FetchCipher,
+        permissions: 755,
+    },
+    {
+        cmd: 'boot',
+        path: '/',
+        app: BootSequence,
         permissions: 755,
     },
     {

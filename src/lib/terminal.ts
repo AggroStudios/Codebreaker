@@ -19,6 +19,8 @@ import {
 
 import FileSystem from "./terminal-utils/filesystem";
 import terminalApps from "./terminalApps";
+import BootSequence from './terminalApps/bootSequence';
+
 import OperatingSystem from './OperatingSystem';
 
 interface HistoryEntry {
@@ -68,7 +70,7 @@ export default class Terminal {
         return this._osController;
     }
 
-    initialize() {
+    async initialize() {
         const welcomeScreenLine1 = String.raw`
    _____    ________  _________________ ________
   /  _  \  /  _____/ /  _____|______   \\_____  \
@@ -92,7 +94,7 @@ export default class Terminal {
             const colorIndex = (welcomeScreenLine2.split('\n').length - index) * 100;
             this.stdout(line.replaceAll(' ', '\u00a0'), { color: cyan[colorIndex] });
         });
-        this.stdout('Welcome to the terminal!', { fsPath: this.fs.cwd });
+        await new BootSequence(this).run(null, null);
     }
 
     addHistory(commandLine: string, commandId: number) {
@@ -431,9 +433,13 @@ export default class Terminal {
                 }
                 break;
             case 'help':
+                const str = 
                 `This is help:
+
+
                 hello!
-                Multi line thing!`.split('\n').forEach(line => this.stdout(line));
+                Multi line thing!`;
+                str.split('\n').forEach(line => this.stdout(line));
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 break;
             case 'loader':

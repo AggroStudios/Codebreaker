@@ -6,7 +6,6 @@ import create from 'solid-zustand';
 import clsx from 'clsx';
 
 import { 
-    compact,
     isEmpty,
     isNil,
 } from "lodash";
@@ -40,24 +39,24 @@ const useStore = create<TerminalState>(set => ({
     updateLine: (line, index = -1) => set(state => {
         index = index > -1 ? index : state.terminalLines.length - 1;
         return {
-            terminalLines: compact([
+            terminalLines: [
                 ...state.terminalLines.slice(0, index),
                 line,
                 ...state.terminalLines.slice(index + 1),
-            ])
+            ]
         }
     }),
     appendLine: (value, index = -1) => set(state => {
         index = index > -1 ? index : state.terminalLines.length - 1;
         return {
-            terminalLines: compact([
+            terminalLines: [
                 ...state.terminalLines.slice(0, index),
                 {
                     ...state.terminalLines[index],
                     value: state.terminalLines[index].value + value
                 },
                 ...state.terminalLines.slice(index + 1),
-            ])
+            ]
         }
     }),
     replaceCharsForRange: (line, index = -1) => set(state => {
@@ -71,7 +70,7 @@ const useStore = create<TerminalState>(set => ({
         }
 
         return {
-            terminalLines: compact([
+            terminalLines: [
                 ...state.terminalLines.slice(0, index),
                 {
                     prompt: line.prompt,
@@ -79,14 +78,14 @@ const useStore = create<TerminalState>(set => ({
                     value: lineValue.slice(0, line.start) + line.value + lineValue.slice(line.end)
                 },
                 ...state.terminalLines.slice(index + 1)
-            ])
+            ]
         };
     }),
     addLine: terminalLine => set(state => ({
-        terminalLines: compact([
+        terminalLines: [
             ...state.terminalLines,
             terminalLine
-        ])
+        ]
     })),
     clearTerminal: () => set(() => ({
         terminalLines: []
@@ -169,7 +168,7 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
         terminalOutput(data, 'stderr', { ...options, prompt: '\u2718 ' });
     };
 
-    createEffect(() => {
+    createEffect(async () => {
         if (terminalLines.length === 0 && !terminalLoaded()) {
 
             terminalController.attachTerminal({
@@ -180,8 +179,10 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
         
             terminalController.attachOperatingSystem(operatingSystem);
 
-            terminalController.initialize();
+            setCommandLoaded(false);
+            await terminalController.initialize();
             setTerminalLoaded(true);
+            setCommandLoaded(true);
             newLine();
         }
     }, [terminalController, terminalLines, terminalLoaded()]);
@@ -272,7 +273,7 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
                 }
                 break;
             case 'l':
-                if (event.ctrlKey) {
+                if (event.ctrlKey && terminalLoaded()) {
                     terminalFunctions.clear();
                 }
                 break;
@@ -392,7 +393,7 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
         const colorRegex = /\^\[(.*?);(.*?)\^\]/g;
         const matches = [...line.matchAll(colorRegex)];
         if (isEmpty(matches)) {
-            return <span>{line}</span>;
+            return <span class={clsx(isEmpty(line) ? 'empty' : '')}>{line}</span>;
         }
         else {
             const returnElements = [];

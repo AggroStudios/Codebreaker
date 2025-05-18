@@ -1,0 +1,45 @@
+{
+    "application": "BootSequence",
+    "steps": [
+        {
+            "action": "output",
+            "message": ">> Starting terminal..."
+        },
+        {
+            "action": "showLoader",
+            "delay": 2000
+        },
+        {
+            "action": "output",
+            "message": ">> Boot sequence complete."
+        },
+        {
+            "action": "output",
+            "message": ">> Incoming transmission detected..."
+        },
+        {
+            "action": "showLoader",
+            "delay": 1000
+        },
+        {
+            "action": "output",
+            "message": "[Signal integrity: 43%]"
+        },
+        {
+            "action": "output",
+            "message": ">> Decryption required."
+        },
+        {
+            "action": "output",
+            "message": ""
+        },
+        {
+            "action": "output",
+            "message": "ENCRYPTED MESSAGE:"
+        },
+        {
+            "action": "output",
+            "message": ""
+        }
+    ]
+}

@@ -55,6 +55,11 @@ span .active {
     animation: blink 1s step-start infinite;
 }
 
+code span.empty {
+    min-height: 1.20em;
+    display: inline-block;
+}
+
 .prompt {
     color: #26c6da;
 };

@@ -3,9 +3,9 @@ import { render } from 'solid-js/web';
 import { Router } from '@solidjs/router';
 import create from 'solid-zustand';
 import Layout from './Layout';
-import LoadingScreen from './components/LoadingScreen';
+// import LoadingScreen from './components/LoadingScreen';
 
-import { createSignal } from 'solid-js';
+// import { createSignal } from 'solid-js';
 
 import { ThemeProvider, createTheme } from '@suid/material/styles';
 
@@ -141,22 +141,22 @@ const storage = new Array<IStorageType>(new CodiumStorageHdd());
 
 const station = new Station(processor, operatingSystem, memory, storage);
 
-const [loadingProgress, setLoadingProgress] = createSignal<number>(0);
+// const [loadingProgress, setLoadingProgress] = createSignal<number>(0);
 
-const interval = setInterval(() => {
-    if (loadingProgress() < 100) {
-        setLoadingProgress(loadingProgress() + 10);
-    }
-    else {
-        clearInterval(interval);
-    }
-}, 1000);
+// const interval = setInterval(() => {
+//     if (loadingProgress() < 100) {
+//         setLoadingProgress(loadingProgress() + 10);
+//     }
+//     else {
+//         clearInterval(interval);
+//     }
+// }, 1000);
 
 render(() => (
     <ThemeProvider theme={darkTheme}>
         <Router>
             <Layout auth={useStore()} station={station} player={playerStore} />
         </Router>
-        <LoadingScreen loading={loadingProgress()} />
+        {/* <LoadingScreen loading={loadingProgress()} /> */}
     </ThemeProvider>
 ), root!)
