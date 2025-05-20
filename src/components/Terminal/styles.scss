@@ -55,9 +55,8 @@ span .active {
     animation: blink 1s step-start infinite;
 }
 
-code span.empty {
-    min-height: 1.20em;
-    display: inline-block;
+div.terminalLine {
+    min-height: 1.5em;
 }
 
 .prompt {

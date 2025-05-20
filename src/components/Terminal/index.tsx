@@ -393,7 +393,7 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
         const colorRegex = /\^\[(.*?);(.*?)\^\]/g;
         const matches = [...line.matchAll(colorRegex)];
         if (isEmpty(matches)) {
-            return <span class={clsx(isEmpty(line) ? 'empty' : '')}>{line}</span>;
+            return <span>{line}</span>;
         }
         else {
             const returnElements = [];
@@ -443,7 +443,7 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
                         <input ref={el => inputRef=el} class="input" onFocus={() => setFocus(true)} onBlur={() => setFocus(false)} onKeyUp={handleKeyUp} onInput={handleChange} />
                         <Content ref={el => codeRef=el} onMouseUp={handleCodeSelect} tabIndex={-1} onKeyUp={() => inputRef.focus()}>
                             {terminalLines.map((line: TerminalLine, index: number) => 
-                                <div>
+                                <div class="terminalLine">
                                     <span class={clsx(line.error ? 'commandError' : '')}>
                                         {line.prompt && displayPrompt(line.prompt, line.error)}
                                         {
