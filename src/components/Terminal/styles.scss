@@ -55,7 +55,7 @@ span .active {
     animation: blink 1s step-start infinite;
 }
 
-div.terminalLine {
+code > div {
     min-height: 1.5em;
 }
 
