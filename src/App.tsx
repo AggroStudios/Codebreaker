@@ -31,14 +31,9 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
     const navigate = useNavigate();
     const state = useStore();
 
-    const addCipher = () => {
-        const c = new Cipher(20, 10, cssClasses);
-        state.setCipher(c);
-        console.log('Adding cipher!', c);
+    const addCipher = (c: Cipher) => {
         stationStore.os.addProcess(c);
     }
-
-    const cssClasses = [ 'breaking-1', 'breaking-2', 'breaking-3', 'breaking-4' ];
 
     const { stationStore } = props;
 
@@ -64,7 +59,7 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
             <div class="card">
                 <Grid container>
                     <Grid item xs={4}>
-                        <CipherBreak cipher={state.cipher} width={20} addCipher={addCipher} />
+                        <CipherBreak state={state} width={20} queueProcess={addCipher} />
                     </Grid>
                 </Grid>
             </div>
