@@ -35,7 +35,7 @@ export default class Terminal {
     private options: any;
     private _history: Array<HistoryEntry> = [];
     private commandId: number = 0;
-    private loaderTimer: number | null = null;
+    private loaderTimer: NodeJS.Timeout | null = null;
     private loaderChar: string = '';
     private fs: FileSystem;
 
