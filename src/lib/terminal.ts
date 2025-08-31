@@ -138,8 +138,7 @@ export default class Terminal {
                     default:
                         // Set the buffer to whatever came in the input
                         buffer = char;
-                        const output = characterOverride ? characterOverride.repeat(char.length) : char;
-                        this.stdout(`${prompt}${output}`, { updateMode: true });
+                        this.stdout(`${prompt}${characterOverride ? characterOverride.repeat(char.length) : char}`, { updateMode: true });
                         break;
                 }
             });
@@ -237,14 +236,14 @@ export default class Terminal {
                 const returnStr = drawBar(progress, total);
                 this.stdout(returnStr, { replaceRange: [-(previousString.length)] });
                 previousString = returnStr;
-                await new Promise(resolve => setTimeout(resolve, delay));
+                await new Promise(res => setTimeout(res, delay));
             }
             this.stdin(null);
             if (!shouldExit) resolve();
         });
     }
 
-    async withLoader(callback: Function, loaderCharacters: string[]) {
+    async withLoader(callback: (...args: unknown[]) => unknown, loaderCharacters: string[]) {
         this.showLoader(loaderCharacters);
         const result = await callback();
         this.hideLoader();
@@ -356,7 +355,7 @@ export default class Terminal {
             case 'history':
                 this.history.slice(0).reverse().forEach(line => this.stdout(`> ${line.id} - ${line.command}`));
                 break;
-            case 'test':
+            case 'test': {
                 const depth = parseInt(args[0]);
                 this.log({
                     prop: 'value',
@@ -388,6 +387,7 @@ export default class Terminal {
                     }
                 }, depth);
                 break;
+            }
             case 'clear':
                 return { command: 'clear' };
             case 'reboot':
@@ -431,7 +431,7 @@ export default class Terminal {
                     this.stderr(error, { updateMode: true });
                 }
                 break;
-            case 'help':
+            case 'help': {
                 const str = 
                 `This is help:
 
@@ -441,17 +441,19 @@ export default class Terminal {
                 str.split('\n').forEach(line => this.stdout(line));
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 break;
+            }
             case 'loader':
                 this.stdout('Loading...');
                 this.showLoader();
                 await this.readChar();
                 this.hideLoader();
                 break;
-            case 'fancyLoader':
+            case 'fancyLoader': {
                 const loader = [ '⠷', '⠯', '⠟', '⠻', '⠽', '⠾' ];
                 this.stdout('Loading... ');
                 await this.withLoader(async () => await this.readChar(), loader);
                 break;
+            }
             case 'progress':
                 this.stdout('Testing progress bar... what if I make this longer?');
                 try {

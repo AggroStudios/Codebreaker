@@ -14,7 +14,7 @@ const Counter: Component<{ auth: AuthenticationState }> = props => {
         state.login(username(), password());
     };
 
-    const handleFieldChange = (setter: Function) => (_: Event, value: string) => {
+    const handleFieldChange = (setter: (value: unknown) => void) => (_: Event, value: string) => {
         setter(value);
     }
 

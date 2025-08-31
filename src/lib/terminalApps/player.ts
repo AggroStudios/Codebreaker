@@ -38,7 +38,7 @@ class FetchPlayer extends TerminalApp {
         }
         else {
             switch (argv[0]) {
-                case 'give':
+                case 'give': {
                     if (argc < 2) {
                         this.terminal.stderr('Error: Amount is undefined.\n');
                         this.help();
@@ -48,7 +48,8 @@ class FetchPlayer extends TerminalApp {
                     this.terminal.operatingSystem.player.addMoney(giveAmount);
                     this.terminal.stdout(`Gave player ${giveAmount} money.`);
                     break;
-                case 'take':
+                }
+                case 'take': {
                     if (argc < 2) {
                         this.terminal.stderr('Error: Amount is undefined.\n');
                         this.help();
@@ -58,7 +59,8 @@ class FetchPlayer extends TerminalApp {
                     this.terminal.operatingSystem.player.removeMoney(takeAmount);
                     this.terminal.stdout(`Took ${takeAmount} money from player.`);
                     break;
-                case 'xp':
+                }
+                case 'xp': {
                     if (argc < 2) {
                         this.terminal.stderr('Error: Amount is undefined.\n');
                         this.help();
@@ -68,6 +70,7 @@ class FetchPlayer extends TerminalApp {
                     this.terminal.operatingSystem.player.earnExperience(xpAmount);
                     this.terminal.stdout(`Gave player ${xpAmount} experience.`);
                     break;
+                }
                 case 'message':
                     if (argc < 2) {
                         this.terminal.stderr('Error: Message is undefined.\n');

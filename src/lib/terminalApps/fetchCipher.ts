@@ -45,7 +45,7 @@ class FetchCipher extends TerminalApp {
                 tries--;
                 this.terminal.stderr(`Incorrect solution. You have ${tries} tries left.`);
             }
-            catch (error) {
+            catch {
                 this.terminal.stderr('^C');
                 return;
             }

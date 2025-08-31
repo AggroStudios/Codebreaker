@@ -155,7 +155,7 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
         }
     };
 
-    const handleStdIn = (callback: Function, { characterMode = false } = {}) => {
+    const handleStdIn = (callback: () => void, { characterMode = false } = {}) => {
         setStdInCharacterMode(characterMode);
         setStdInCallback(() => callback);
     }

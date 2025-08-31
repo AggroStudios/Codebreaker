@@ -2,7 +2,7 @@ import OperatingSystem from '../lib/OperatingSystem';
 
 export default interface Process {
     id: string,
-    callback: Function,
+    callback: (...args: unknown[]) => unknown,
     pid?: number,
 }
 
@@ -14,7 +14,7 @@ export type StationStoreType = {
     frame: number,
     count: number,
     exponent: number,
-    isRunning: Boolean,
+    isRunning: boolean,
     callback: (frame: number, count: number, exponent: number) => void,
     toggleGameLoop: () => void,
 };

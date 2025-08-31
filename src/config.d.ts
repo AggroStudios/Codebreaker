@@ -2,4 +2,4 @@ interface IConfig {
     endpoint: string;
 }
 
-declare var $config: IConfig;
+declare let $config: IConfig;

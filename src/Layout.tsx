@@ -14,7 +14,7 @@ import Process, { StationStoreType, MenuStateType } from './includes/Process.int
 import { PlayerState } from './includes/Player.interface';
 
 import NavMenu from './components/NavMenu';
-import { Station } from './lib/Station';
+import { Station } from './lib/station';
 
 const SecondApp = lazy(() => import('./SecondApp'));
 const Login = lazy(() => import('./components/Login'));

@@ -94,7 +94,7 @@ function stripTrailingSlashes(path: string) {
     return path;
 }
 
-const directoryRegex = (path: string) => new RegExp(`^${stripLastSlash(path)}\/([a-zA-Z-_\s]+)$`);
+const directoryRegex = (path: string) => new RegExp(`^${stripLastSlash(path)}/([a-zA-Z-_]+)$`);
 
 const getSubDirectories = (path: string, apps: IApplication[]) =>
     uniqBy(apps, 'path').filter((app: IApplication) => app.path.match(directoryRegex(path)))
@@ -134,7 +134,7 @@ export default class FileSystem {
             case '..':
                 destinationPath = this._cwd.split('/').slice(0, -1).join('/') || '/';
                 break;
-            default:
+            default: {
                 // Create a new path to match the path you're going to.
                 let newPath = passedPath;
                 // This means we're resolving from a relative path
@@ -152,6 +152,7 @@ export default class FileSystem {
                     throw new Error(`Directory not found: ${passedPath}`);
                 }
                 break;
+            }
         }
 
         // If the destination path is different than the current path, change it.
@@ -220,7 +221,7 @@ export default class FileSystem {
             if (!parsedArgs.list) {
                 const entries = dir.map(colorizePathType);
                 let maxWidth = 0;
-                for (let entry of entries) {
+                for (const entry of entries) {
                     maxWidth = Math.max(maxWidth, entry.length);
                 }
                 maxWidth = Math.max(maxWidth, 15);
@@ -232,7 +233,7 @@ export default class FileSystem {
 
             let maxOwnerWidth = 0;
             let maxGroupWidth = 0;
-            for (let entry of dir) {
+            for (const entry of dir) {
                 maxOwnerWidth = Math.max(maxOwnerWidth, entry.owner.length);
                 maxGroupWidth = Math.max(maxGroupWidth, entry.group.length);
             }

@@ -42,7 +42,7 @@ export default class ScanVulnerabilities extends TerminalApp {
         this.terminal.stdout(`Scanning ${ipAddress} for vulnerabilities...`);
         return new Promise<void>(async resolve => {
             const v = HackingScenarios.findVulnerabilityByIp(ipAddress);
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(res => setTimeout(res, 2000));
 
             if (v) {
                 this.terminal.log(v);

@@ -20,7 +20,7 @@ export default class Cipher implements Process {
 
     private characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()/\\-=+,.<>;:';
     private _characterGrid?: IGridItem[];
-    private _setCharacterGrid: Function;
+    private _setCharacterGrid: (...args:unknown[]) => unknown;
     private width: number;
     private height: number;
     private cssClasses: string[];
@@ -32,7 +32,7 @@ export default class Cipher implements Process {
         } = cipherStore();
 
         this._characterGrid = characterGrid;
-        this,this._setCharacterGrid = setCharacterGrid;
+        this._setCharacterGrid = setCharacterGrid;
         this.width = width;
         this.height = height;
         this.cssClasses = cssClasses;

@@ -63,7 +63,7 @@ export default class Ping extends TerminalApp {
                 const pingReply = Math.floor(Math.random() * 100);
                 this.terminal.stdout(`ping ${host} - ${pingReply}ms`, { caretAtEnd: true });
                 if (step < pingSteps - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    await new Promise(res => setTimeout(res, 1000));
                 }
                 step++;
             }

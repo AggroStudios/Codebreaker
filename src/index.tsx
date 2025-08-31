@@ -15,7 +15,7 @@ import OperatingSystem from './lib/OperatingSystem';
 
 import './index.css';
 import { CodiumProcessor } from './lib/processors';
-import { Station } from './lib/Station';
+import { Station } from './lib/station';
 import { CodiumMemory } from './lib/memory';
 import { IStorageType } from './includes/Process.interface';
 import { CodiumStorageHdd } from './lib/storage';
@@ -43,7 +43,7 @@ const users: Array<User> = [
 
 const useStore = create<AuthenticationState>(set => ({
     user: null,
-    login: (username: string, password: string): Boolean => {
+    login: (username: string, password: string): boolean => {
         const foundUser = users.find(i => {
             console.log('Comparing to:', i);
             return i.username === username;

@@ -157,7 +157,7 @@ export default class OperatingSystem {
             this.currentCount++;
         }
 
-        for (let process of this.processes) {
+        for (const process of this.processes) {
             process.callback(Number(this.currentFrame.toFixed(3)), this.currentCount, this.currentExponent);
         }
     };
