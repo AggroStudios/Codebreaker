@@ -14,7 +14,7 @@ export class OperatingSystemError extends Error {};
 // Exporting main game controller
 export default class OperatingSystem {
     private pid: number = 10;
-    private interval: null | number = null;
+    private interval: null | NodeJS.Timeout = null;
     private currentFrame: number = 0;
     private currentCount: number = 0;
     private currentExponent: number = 1;
@@ -108,7 +108,7 @@ export default class OperatingSystem {
     }
 
     addProcess(process: Process) {
-        console.log('Adding process!', process);
+        // console.log('Adding process!', process);
         // Make sure the process object is valid and you can't duplicate processes
         const processIndex = this.processes.findIndex(i => i?.['id'] === process?.['id']);
         process.pid = this.pid++;
@@ -150,7 +150,7 @@ export default class OperatingSystem {
 
     // Main function
     update() {
-        console.debug('[OperatingSystem] - Update');
+        // console.debug('[OperatingSystem] - Update');
         this.currentFrame += 0.001;
         if (this.currentFrame > 1) {
             this.currentFrame = 0;
