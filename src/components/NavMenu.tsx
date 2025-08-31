@@ -22,7 +22,7 @@ import { mainNavigation, secondaryNavigation } from '../lib/navigation';
 import { MenuStateType } from '../includes/Process.interface';
 import { PlayerState } from '../includes/Player.interface';
 
-import AggroStudios from '../assets/logos/AggroStudios.png';
+import AggroStudios from '../assets/logos/AggroStudios-old.png';
 import './NavMenu.scss';
 
 const StyledLinkItemButton = styled(ListItemButton)<typeof ListItemButton>(({ theme }) => ({
