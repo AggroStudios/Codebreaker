@@ -9,11 +9,14 @@ import { CounterState } from './includes/Counter.interface';
 
 import Counter from './Counter';
 import CounterDecrease from './CounterDecrease';
+import Cipher from './lib/Cipher';
 
 const useStore = create<CounterState>(set => ({
-  count: 0,
-  increase: () => set(state => ({ count: state.count + 1 })),
-  decrease: () => set(state => ({ count: Math.max(0, state.count - 1)})),
+    count: 0,
+    increase: () => set(state => ({ count: state.count + 1 })),
+    decrease: () => set(state => ({ count: Math.max(0, state.count - 1)})),
+    cipher: null,
+    setCipher: (cipher: Cipher) => set(() => ({ cipher })),
 }));
 
 function SecondApp() {
