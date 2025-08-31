@@ -114,7 +114,6 @@ export default class Terminal {
     }
 
     attachOperatingSystem(os: OperatingSystem) {
-        console.log('Operating System:', os);
         this._osController = os;
     }
 
