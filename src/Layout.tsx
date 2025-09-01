@@ -87,7 +87,8 @@ const Layout: Component<LayoutProps> = props => {
         props.station.operatingSystem.addProcess(mainProcess);
     }
 
-    const layout = (props) => 
+    return (
+        <Router root={(props) => 
         <>
             <AppBar stationStore={stationStore} menuStateStore={menuStateStore} playerStateStore={player} />
             <MainContainer>
@@ -97,10 +98,7 @@ const Layout: Component<LayoutProps> = props => {
                     {props.children}
                 </GameContainer>
             </MainContainer>
-        </>;
-
-    return (
-        <Router root={layout}>
+        </>}>
             <Route path="/" component={() => <Terminal terminalController={terminalController} operatingSystem={station.operatingSystem} />} />
             <Route path="/station" component={() => <App stationStore={stationStore} />} />
             <Route path="/login" component={() => <Login auth={props.auth} />} />
