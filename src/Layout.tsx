@@ -1,6 +1,6 @@
 import { Component, lazy } from 'solid-js';
 import { AuthenticationState } from './includes/Authentication.interface';
-import { Routes, Route } from '@solidjs/router';
+import { Route, Router } from '@solidjs/router';
 import create from 'solid-zustand';
 
 import AppBar from './components/AppBar';
@@ -87,23 +87,26 @@ const Layout: Component<LayoutProps> = props => {
         props.station.operatingSystem.addProcess(mainProcess);
     }
 
-    return (
+    const layout = (props) => 
         <>
             <AppBar stationStore={stationStore} menuStateStore={menuStateStore} playerStateStore={player} />
             <MainContainer>
                 <Background />
                 <NavMenu menuStateStore={menuStateStore} playerStateStore={player} />
                 <GameContainer>
-                    <Routes>
-                        <Route path="/" element={<Terminal terminalController={terminalController} operatingSystem={station.operatingSystem} />} />
-                        <Route path="/station" element={<App stationStore={stationStore} />} />
-                        <Route path="/login" element={<Login auth={props.auth} />} />
-                        <Route path="/second" element={<SecondApp />} />
-                        <Route path="/servers" element={<Servers />} />
-                    </Routes>
+                    {props.children}
                 </GameContainer>
             </MainContainer>
-        </>
+        </>;
+
+    return (
+        <Router root={layout}>
+            <Route path="/" component={() => <Terminal terminalController={terminalController} operatingSystem={station.operatingSystem} />} />
+            <Route path="/station" component={() => <App stationStore={stationStore} />} />
+            <Route path="/login" component={() => <Login auth={props.auth} />} />
+            <Route path="/second" component={SecondApp} />
+            <Route path="/servers" component={Servers} />
+        </Router>
     );
 };
 

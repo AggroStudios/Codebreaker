@@ -1,6 +1,5 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import { Router } from '@solidjs/router';
 import create from 'solid-zustand';
 import Layout from './Layout';
 // import LoadingScreen from './components/LoadingScreen';
@@ -154,9 +153,10 @@ const station = new Station(processor, operatingSystem, memory, storage);
 
 render(() => (
     <ThemeProvider theme={darkTheme}>
-        <Router>
-            <Layout auth={useStore()} station={station} player={playerStore} />
-        </Router>
+        <Layout auth={useStore()} station={station} player={playerStore} />
+        {/* <Router>
+            <Route path="*" component={() => 
+        </Router> */}
         {/* <LoadingScreen loading={loadingProgress()} /> */}
     </ThemeProvider>
 ), root!)
