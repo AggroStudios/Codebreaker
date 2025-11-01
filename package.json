@@ -15,7 +15,7 @@
     "@suid/icons-material": "^0.6.11",
     "@suid/material": "^0.18.0",
     "@suid/vite-plugin": "^0.3.1",
-    "axios": "^1.6.8",
+    "axios": "^1.12.0",
     "clsx": "^2.1.0",
     "d3": "^7.9.0",
     "lodash": "^4.17.21",
