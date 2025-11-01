@@ -318,12 +318,8 @@ export default class FileSystem {
         });
 
         if (!parsedArgs.all) {
-            const output = listingOutput(filter(dir, d => !d.hidden));
-            console.log(output);
-            return output;
+            return listingOutput(filter(dir, d => !d.hidden));
         }
-        const output = listingOutput(dir);
-        console.log(output);
-        return output;
+        return listingOutput(dir);
     }
 }
