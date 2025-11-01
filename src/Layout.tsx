@@ -16,7 +16,6 @@ import { PlayerState } from './includes/Player.interface';
 import NavMenu from './components/NavMenu';
 import { Station } from './lib/station';
 
-const SecondApp = lazy(() => import('./SecondApp'));
 const Login = lazy(() => import('./components/Login'));
 const Background = lazy(async () => await import('./components/Background'));
 const Servers = lazy(async () => import('./Servers'));
@@ -103,7 +102,6 @@ const Layout: Component<LayoutProps> = props => {
             <Route path="/" component={() => <Terminal terminalController={terminalController} operatingSystem={station.operatingSystem} />} />
             <Route path="/station" component={() => <App stationStore={stationStore} />} />
             <Route path="/login" component={() => <Login auth={props.auth} />} />
-            <Route path="/second" component={SecondApp} />
             <Route path="/servers" component={Servers} />
         </Router>
     );
