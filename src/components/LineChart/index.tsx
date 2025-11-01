@@ -200,8 +200,6 @@ export default function LineChart(props: LineChartProps) {
     // Recreate chart when data or props change
     createEffect(() => {
         // Access reactive props to track them
-        props.data;
-        props.maxDataPoints;
         rollingData(); // Track the computed rolling data
         width();
         containerWidth();
@@ -209,8 +207,6 @@ export default function LineChart(props: LineChartProps) {
         margin();
         strokeColor();
         strokeWidth();
-        props.xLabel;
-        props.yLabel;
         createChart();
     });
 
