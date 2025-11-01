@@ -19,7 +19,7 @@ import {
 
 import FileSystem from "./terminal-utils/filesystem";
 import terminalApps from "./terminalApps";
-import BootSequence from './terminalApps/bootSequence';
+// import BootSequence from './terminalApps/bootSequence';
 
 import OperatingSystem from './OperatingSystem';
 
@@ -94,7 +94,7 @@ export default class Terminal {
             const colorIndex = (welcomeScreenLine2.split('\n').length - index) * 100;
             this.stdout(line.replaceAll(' ', '\u00a0'), { color: cyan[colorIndex] });
         });
-        await new BootSequence(this).run(null, null);
+        // await new BootSequence(this).run(null, null);
     }
 
     addHistory(commandLine: string, commandId: number) {
@@ -339,6 +339,16 @@ export default class Terminal {
                         this.stdout(entry);
                     });
 
+                }
+                catch (err) {
+                    this.stderr(err.message);
+                }
+                break;
+            case 'cat':
+                try {
+                    this.fs.cat(args).forEach(line => {
+                        this.stdout(line);
+                    });
                 }
                 catch (err) {
                     this.stderr(err.message);

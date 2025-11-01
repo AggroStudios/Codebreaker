@@ -391,7 +391,9 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
 
     const displayLine = (line: any) => {
         const colorRegex = /\^\[(.*?);(.*?)\^\]/g;
+        console.log('Line:', line);
         const matches = [...line.matchAll(colorRegex)];
+        console.log('Matches:', matches);
         if (isEmpty(matches)) {
             return <span>{line}</span>;
         }

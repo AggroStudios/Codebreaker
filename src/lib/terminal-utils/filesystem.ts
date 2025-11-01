@@ -121,6 +121,22 @@ export default class FileSystem {
         return this._cwd;
     }
 
+    cat([passedPath]:string[]) {
+        if (isEmpty(passedPath)) {
+            throw new Error('Path is empty.');
+        }
+        const file = this.apps.find(app => app.cmd === passedPath && app.contentType === 'text/plain');
+        if (isEmpty(file)) {
+            throw new Error(`File not found: ${passedPath}`);
+        }
+        const outputArray = [];
+
+        for (const line of file.content.split('\r\n')) {
+            outputArray.push(line.replaceAll(' ', '\u00a0'));
+        }
+        return outputArray;
+    }
+
     changeDirectory([passedPath]:string[]) {
         if (isEmpty(passedPath)) {
             throw new Error('Path is empty.');
@@ -302,9 +318,12 @@ export default class FileSystem {
         });
 
         if (!parsedArgs.all) {
-            return listingOutput(filter(dir, d => !d.hidden));
+            const output = listingOutput(filter(dir, d => !d.hidden));
+            console.log(output);
+            return output;
         }
-
-        return listingOutput(dir);
+        const output = listingOutput(dir);
+        console.log(output);
+        return output;
     }
 }

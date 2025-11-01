@@ -5,7 +5,7 @@ import create from 'solid-zustand';
 
 import AppBar from './components/AppBar';
 
-import App from './App';
+import App from './Station';
 import { styled } from '@suid/material';
 
 import TerminalController from './lib/terminal';
@@ -50,8 +50,8 @@ const GameContainer = styled('div')(() => ({
 const useStationStore = (station: Station) => create<StationStoreType>(set => ({
     os: station.operatingSystem,
     cpu: station.processor,
-    memory: null,
-    storage: [],
+    memory: station.memory,
+    storage: station.storage,
     frame: 0,
     count: 0,
     exponent: 0,
@@ -89,16 +89,17 @@ const Layout: Component<LayoutProps> = props => {
 
     return (
         <Router root={(props) => 
-        <>
-            <AppBar stationStore={stationStore} menuStateStore={menuStateStore} playerStateStore={player} />
-            <MainContainer>
-                <Background />
-                <NavMenu menuStateStore={menuStateStore} playerStateStore={player} />
-                <GameContainer>
-                    {props.children}
-                </GameContainer>
-            </MainContainer>
-        </>}>
+            <>
+                <AppBar stationStore={stationStore} menuStateStore={menuStateStore} playerStateStore={player} />
+                <MainContainer>
+                    <Background />
+                    <NavMenu menuStateStore={menuStateStore} playerStateStore={player} />
+                    <GameContainer>
+                        {props.children}
+                    </GameContainer>
+                </MainContainer>
+            </>
+        }>
             <Route path="/" component={() => <Terminal terminalController={terminalController} operatingSystem={station.operatingSystem} />} />
             <Route path="/station" component={() => <App stationStore={stationStore} />} />
             <Route path="/login" component={() => <Login auth={props.auth} />} />

@@ -38,12 +38,14 @@ export class TerminalApp implements ITerminalApp {
 
     }
 
-    async run(_?: number, __?: string[]) { throw new Error('Not Implemented.') };
+    async run(_?: number, __?: string[]): Promise<unknown> { throw new Error('Not Implemented.') };
 };
 
 export interface IApplication {
     cmd: string;
     path: string;
-    app: typeof TerminalApp;
+    app?: typeof TerminalApp;
     permissions: number;
+    content?: string;
+    contentType?: string;
 }

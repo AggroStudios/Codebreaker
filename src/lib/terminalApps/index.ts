@@ -18,6 +18,13 @@ export default Array<IApplication>(
         permissions: 755,
     },
     {
+        cmd : 'readme.txt',
+        path: '/',
+        contentType: 'text/plain',
+        permissions: 644,
+        content: `--------- readme.txt ----------\r\n\r\n        LEAVE ME HERE\r\n\r\n-------------------------------`
+    },
+    {
         cmd: 'player',
         path: '/',
         app: FetchPlayer,

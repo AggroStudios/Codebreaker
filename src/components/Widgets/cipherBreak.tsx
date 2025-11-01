@@ -25,6 +25,10 @@ const CipherBreak: Component<{ state: CounterState, width: number, queueProcess:
         queueProcess(c);
     }
 
+    const { cpu, memory } = state.station;
+
+    console.log(cpu.flops, cpu.cores, memory.capacity);
+
     return (
         <Card class="background">
             <CardHeader
