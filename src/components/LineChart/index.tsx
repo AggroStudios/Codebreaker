@@ -98,10 +98,13 @@ export default function LineChart(props: LineChartProps) {
         const line = d3
             .line<DataPoint>()
             .x(d => {
-                if (isDate || isNumeric) {
-                    return xScale(d.x as number | Date) as number;
+                if (isDate) {
+                    return (xScale as d3.ScaleTime<number, number>)(d.x as Date);
+                } else if (isNumeric) {
+                    return (xScale as d3.ScaleLinear<number, number>)(d.x as number);
+                } else {
+                    return (xScale as d3.ScalePoint<string>)(String(d.x)) || 0;
                 }
-                return (xScale as d3.ScalePoint<string>)(String(d.x)) || 0;
             })
             .y(d => yScale(d.y))
             .curve(d3.curveMonotoneX);
@@ -157,13 +160,16 @@ export default function LineChart(props: LineChartProps) {
             .data(chartData)
             .enter()
             .append('circle')
-            .attr('cx', d => {
-                if (isDate || isNumeric) {
-                    return xScale(d.x as number | Date) as number;
+            .attr('cx', (d: DataPoint) => {
+                if (isDate) {
+                    return (xScale as d3.ScaleTime<number, number>)(d.x as Date);
+                } else if (isNumeric) {
+                    return (xScale as d3.ScaleLinear<number, number>)(d.x as number);
+                } else {
+                    return (xScale as d3.ScalePoint<string>)(String(d.x)) || 0;
                 }
-                return (xScale as d3.ScalePoint<string>)(String(d.x)) || 0;
             })
-            .attr('cy', d => yScale(d.y))
+            .attr('cy', (d: DataPoint) => yScale(d.y))
             .attr('r', 4)
             .attr('fill', strokeColor())
             .attr('stroke', '#fff')
