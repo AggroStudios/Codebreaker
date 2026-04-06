@@ -8,8 +8,6 @@ export interface CounterState {
     runningCiphers: Cipher[],
     addCipher: (cipher: Cipher) => void,
     removeCipher: (cipher: Cipher) => void,
-    cipher?: Cipher,
-    setCipher: (cipher: Cipher) => void,
     station: StationStoreType,
     setStation: (station: StationStoreType) => void,
     cpuActivity: { x: number, y: number }[],

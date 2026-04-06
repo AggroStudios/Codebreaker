@@ -24,8 +24,6 @@ const useStore = create<CounterState>(set => ({
     runningCiphers: [],
     addCipher: (cipher: Cipher) => set(state => ({ runningCiphers: [...state.runningCiphers, cipher] })),
     removeCipher: (cipher: Cipher) => set(state => ({ runningCiphers: state.runningCiphers.filter(c => c !== cipher) })),
-    cipher: null,
-    setCipher: (cipher: Cipher) => set(() => ({ cipher })),
     setStation: (station: StationStoreType) => set(() => ({ station })),
     station: null,
     cpuActivity: [],
@@ -36,9 +34,22 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
   
     const state = useStore();
 
+    const completeCipher = (cipher: Cipher, cancelled: boolean = false) => {
+        state.removeCipher(cipher);
+        stationStore.os.removeProcess(cipher);
+        if (!cancelled) {
+            // Add money for completion
+            // add experience for completion
+            console.log('Cipher completed', cipher);
+        } else {
+            console.log('Cipher cancelled', cipher);
+        }
+        // Add notification
+    }
+
     const addCipher = () => {
         const cssClasses = [ 'breaking-1', 'breaking-2', 'breaking-3', 'breaking-4' ];
-        const c = new Cipher(20, 10, cssClasses);
+        const c = new Cipher(20, 10, cssClasses, completeCipher);
         state.addCipher(c);
         console.log(c);
         stationStore.os.addProcess(c);
