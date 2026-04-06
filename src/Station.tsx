@@ -1,5 +1,3 @@
-import solidLogo from './assets/solid.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import create from 'solid-zustand';
 
@@ -15,6 +13,7 @@ import CipherBreak from './components/Widgets/cipherBreak';
 import StationStatistics from './components/StationStatistics';
 
 import Grid from '@suid/material/Grid';
+
 import Cipher from './lib/Cipher';
 import { CpuActivityWidget } from './components/Widgets/cpuActivity';
 
@@ -22,6 +21,9 @@ const useStore = create<CounterState>(set => ({
     count: 1,
     increase: () => set(state => ({ count: state.count + 1 })),
     decrease: () => set(state => ({ count: Math.max(1, state.count - 1) })),
+    runningCiphers: [],
+    addCipher: (cipher: Cipher) => set(state => ({ runningCiphers: [...state.runningCiphers, cipher] })),
+    removeCipher: (cipher: Cipher) => set(state => ({ runningCiphers: state.runningCiphers.filter(c => c !== cipher) })),
     cipher: null,
     setCipher: (cipher: Cipher) => set(() => ({ cipher })),
     setStation: (station: StationStoreType) => set(() => ({ station })),
@@ -34,7 +36,11 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
   
     const state = useStore();
 
-    const addCipher = (c: Cipher) => {
+    const addCipher = () => {
+        const cssClasses = [ 'breaking-1', 'breaking-2', 'breaking-3', 'breaking-4' ];
+        const c = new Cipher(20, 10, cssClasses);
+        state.addCipher(c);
+        console.log(c);
         stationStore.os.addProcess(c);
     }
 
@@ -43,15 +49,6 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
 
     return (
         <>
-            <div>
-                <a href="https://vitejs.dev" target="_blank">
-                    <img src={viteLogo} class="logo" alt="Vite logo" />
-                </a>
-                <a href="https://solidjs.com" target="_blank">
-                    <img src={solidLogo} class="logo solid" alt="Solid logo" />
-                </a>
-            </div>
-            <h1>Vite + Solid</h1>
             <div class="card">
                 <Grid container spacing={2}>
                     <Grid item xs={4}>
@@ -67,10 +64,16 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
                 <CounterDecrease store={state} />
             </div>
             <div class="card">
-                <Grid container>
+                <Grid container spacing={2}>
+                    {state.runningCiphers.length > 0 && state.runningCiphers.map(cipher =>
+                        <Grid item xs={4}>
+                            <CipherBreak station={state.station} width={20} cipher={cipher} newCipher={addCipher} />
+                        </Grid>
+                    ) || 
                     <Grid item xs={4}>
-                        <CipherBreak state={state} width={20} queueProcess={addCipher} />
+                        <CipherBreak station={state.station} width={20} newCipher={addCipher} />
                     </Grid>
+                    }
                 </Grid>
             </div>
         </>

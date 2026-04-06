@@ -1,15 +1,4 @@
 import Process from "../includes/Process.interface";
-import create from 'solid-zustand';
-
-interface ICipherGrid {
-    characterGrid: IGridItem[];
-    setCharacterGrid(charactedGrid: IGridItem[]): void;
-}
-
-const cipherStore = create<ICipherGrid>(set => ({
-    characterGrid: [],
-    setCharacterGrid: (characterGrid: IGridItem[]) => set(() => ({ characterGrid })),
-}));
 
 interface IGridItem {
     character: string;
@@ -18,24 +7,20 @@ interface IGridItem {
 
 export default class Cipher implements Process {
 
-    private characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()/\\-=+,.<>;:';
-    private _characterGrid?: IGridItem[];
-    private _setCharacterGrid: (...args:unknown[]) => unknown;
+    private readonly characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()/\\-=+,.<>;:';
+    private _characterGrid: IGridItem[] = [];
+    private _setGrid: ((grid: IGridItem[]) => void) | undefined = undefined;
     private width: number;
     private height: number;
     private cssClasses: string[];
+    private _id: string;
 
-    constructor(width: number, height: number, cssClasses: string[]) {
-        const {
-            characterGrid,
-            setCharacterGrid
-        } = cipherStore();
-
-        this._characterGrid = characterGrid;
-        this._setCharacterGrid = setCharacterGrid;
+    constructor(width: number, height: number, cssClasses: string[], setGrid?: ((grid: IGridItem[]) => void) | undefined) {
         this.width = width;
         this.height = height;
         this.cssClasses = cssClasses;
+        this._setGrid = setGrid;
+        this._id = crypto.randomUUID();
 
         console.log('Cipher constructed!');
     }
@@ -44,7 +29,7 @@ export default class Cipher implements Process {
         return this._characterGrid;
     }
 
-    private randomizeGrid() {
+    private generateGrid(): IGridItem[] {
         const rndGrid = [];
         for (let i = 0; i < (this.width * this.height); i++) {
             const cssClassIndex = Math.floor(Math.random() * this.cssClasses.length);
@@ -54,14 +39,24 @@ export default class Cipher implements Process {
                 cssClass: this.cssClasses[cssClassIndex],
             });
         }
-        this._setCharacterGrid(rndGrid);
+        console.log('generateGrid', rndGrid);
+        return rndGrid;
+    }
+
+    private randomizeGrid() {
+        this._setGrid?.(this.generateGrid());
     }
 
     public get id() {
-        return 'cipher';
+        return `cipher-${this._id}`;
+    }
+
+    public setGrid(fn: ((grid: IGridItem[]) => void)) {
+        this._setGrid = fn;
     }
 
     public callback(_: number) {
         this.randomizeGrid();
+        console.log(`Cipher ${this._id}:`, this._characterGrid);
     }
 };

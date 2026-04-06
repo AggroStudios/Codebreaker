@@ -41,9 +41,11 @@ const MainContainer = styled('div')(() => ({
 const GameContainer = styled('div')(() => ({
     flexGrow: 1,
     display: 'flex',
+    height: '100%',
     flexDirection: 'column',
     transitionDuration: '225ms',
     transitionTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)',
+    overflowY: 'auto',
 }));
 
 const useStationStore = (station: Station) => create<StationStoreType>(set => ({

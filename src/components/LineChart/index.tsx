@@ -7,8 +7,18 @@ interface DataPoint {
     y: number;
 }
 
-interface LineChartProps {
+interface LineSeries {
+    id?: string;
+    label?: string;
     data: DataPoint[];
+    strokeColor?: string;
+    strokeWidth?: number;
+}
+
+type LineChartData = DataPoint[] | LineSeries[];
+
+interface LineChartProps {
+    data: LineChartData;
     maxDataPoints?: number;
     width?: number;
     height?: number;
@@ -32,17 +42,53 @@ export default function LineChart(props: LineChartProps) {
     const strokeWidth = () => props.strokeWidth || 2;
 
     // Rolling data: keep only the most recent maxDataPoints
-    const rollingData = createMemo(() => {
-        if (!props.maxDataPoints || props.data.length <= props.maxDataPoints) {
-            return props.data;
+    const isLineSeriesArray = (data: LineChartData): data is LineSeries[] => {
+        return Array.isArray(data) && data.length > 0 && (data as LineSeries[]).every(series => Array.isArray(series.data));
+    };
+
+    const rollingData = createMemo<LineChartData>(() => {
+        const source = props.data;
+        const maxPoints = props.maxDataPoints;
+
+        if (!maxPoints) {
+            return source;
         }
-        // Return the last maxDataPoints items
-        return props.data.slice(-props.maxDataPoints);
+
+        if (isLineSeriesArray(source)) {
+            return source.map(series => {
+                if (series.data.length <= maxPoints) {
+                    return series;
+                }
+
+                return {
+                    ...series,
+                    data: series.data.slice(-maxPoints)
+                };
+            });
+        }
+
+        if (source.length <= maxPoints) {
+            return source;
+        }
+
+        return source.slice(-maxPoints);
     });
 
     const createChart = () => {
-        const chartData = rollingData();
-        if (!svgRef || !chartData || chartData.length === 0) return;
+		const chartData = rollingData();
+		if (!svgRef) return;
+
+		let seriesList: LineSeries[];
+		if (isLineSeriesArray(chartData)) {
+			seriesList = chartData;
+		} else {
+			seriesList = [{ id: 'series-0', data: chartData, strokeColor: props.strokeColor, strokeWidth: props.strokeWidth }];
+		}
+
+		if (seriesList.length === 0) return;
+
+		const allPoints = seriesList.flatMap(series => series.data);
+		if (allPoints.length === 0) return;
 
         // Clear previous content
         d3.select(svgRef).selectAll('*').remove();
@@ -62,35 +108,44 @@ export default function LineChart(props: LineChartProps) {
             .append('g')
             .attr('transform', `translate(${m.left},${m.top})`);
 
-        // Determine if x values are dates or numbers
-        const isDate = chartData.some(d => d.x instanceof Date);
-        const isNumeric = typeof chartData[0]?.x === 'number';
+		// Determine if x values are dates or numbers
+		const xValuesAreDates = allPoints.every(d => d.x instanceof Date);
+		const xValuesAreNumeric = allPoints.every(d => typeof d.x === 'number');
 
         // Set up scales
         let xScale: d3.ScaleTime<number, number> | d3.ScaleLinear<number, number> | d3.ScalePoint<string>;
         
-        if (isDate) {
+		if (xValuesAreDates) {
             xScale = d3
                 .scaleTime()
-                .domain(d3.extent(chartData, d => d.x as Date) as [Date, Date])
+				.domain(d3.extent(allPoints, d => d.x as Date) as [Date, Date])
                 .range([0, innerWidth]);
-        } else if (isNumeric) {
+		} else if (xValuesAreNumeric) {
             xScale = d3
                 .scaleLinear()
-                .domain(d3.extent(chartData, d => d.x as number) as [number, number])
+				.domain(d3.extent(allPoints, d => d.x as number) as [number, number])
                 .range([0, innerWidth]);
         } else {
             xScale = d3
                 .scalePoint<string>()
-                .domain(chartData.map(d => String(d.x)))
+				.domain(Array.from(new Set(allPoints.map(d => String(d.x)))))
                 .range([0, innerWidth])
                 .padding(0.1);
         }
 
-        const yExtent = d3.extent(chartData, d => d.y) as [number, number];
+		const extent = d3.extent(allPoints, d => d.y) as [number | undefined, number | undefined];
+		let [yMin, yMax] = extent;
+		if (yMin === undefined || yMax === undefined) {
+			return;
+		}
+		if (yMin === yMax) {
+			const offset = yMin === 0 ? 1 : Math.abs(yMin) * 0.1 || 1;
+			yMin -= offset;
+			yMax += offset;
+		}
         const yScale = d3
             .scaleLinear()
-            .domain(yExtent)
+			.domain([yMin, yMax])
             .nice()
             .range([innerHeight, 0]);
 
@@ -98,9 +153,9 @@ export default function LineChart(props: LineChartProps) {
         const line = d3
             .line<DataPoint>()
             .x(d => {
-                if (isDate) {
+				if (xValuesAreDates) {
                     return (xScale as d3.ScaleTime<number, number>)(d.x as Date);
-                } else if (isNumeric) {
+				} else if (xValuesAreNumeric) {
                     return (xScale as d3.ScaleLinear<number, number>)(d.x as number);
                 } else {
                     return (xScale as d3.ScalePoint<string>)(String(d.x)) || 0;
@@ -147,33 +202,44 @@ export default function LineChart(props: LineChartProps) {
                 .text(props.yLabel);
         }
 
-        // Draw the line
-        g.append('path')
-            .datum(chartData)
-            .attr('fill', 'none')
-            .attr('stroke', strokeColor())
-            .attr('stroke-width', strokeWidth())
-            .attr('d', line);
+		const seriesKeys = seriesList.map((series, index) => series.id || series.label || `series-${index}`);
+		const palette = (d3.schemeTableau10 as readonly string[] | undefined) ?? (d3.schemeCategory10 as readonly string[] | undefined);
+		const colorScale = palette
+			? d3.scaleOrdinal<string, string>().domain(seriesKeys).range(Array.from(palette))
+			: undefined;
 
-        // Add data points as circles
-        g.selectAll('circle')
-            .data(chartData)
-            .enter()
-            .append('circle')
-            .attr('cx', (d: DataPoint) => {
-                if (isDate) {
-                    return (xScale as d3.ScaleTime<number, number>)(d.x as Date);
-                } else if (isNumeric) {
-                    return (xScale as d3.ScaleLinear<number, number>)(d.x as number);
-                } else {
-                    return (xScale as d3.ScalePoint<string>)(String(d.x)) || 0;
-                }
-            })
-            .attr('cy', (d: DataPoint) => yScale(d.y))
-            .attr('r', 4)
-            .attr('fill', strokeColor())
-            .attr('stroke', '#fff')
-            .attr('stroke-width', 2);
+		seriesList.forEach((series, index) => {
+			const seriesKey = seriesKeys[index];
+			const color = series.strokeColor ?? (colorScale ? colorScale(seriesKey) : strokeColor());
+			const width = series.strokeWidth ?? strokeWidth();
+
+			g.append('path')
+				.datum(series.data)
+				.attr('fill', 'none')
+				.attr('stroke', color)
+				.attr('stroke-width', width)
+				.attr('d', line);
+
+			g.append('g')
+				.selectAll('circle')
+				.data(series.data)
+				.enter()
+				.append('circle')
+				.attr('cx', (d: DataPoint) => {
+					if (xValuesAreDates) {
+						return (xScale as d3.ScaleTime<number, number>)(d.x as Date);
+					} else if (xValuesAreNumeric) {
+						return (xScale as d3.ScaleLinear<number, number>)(d.x as number);
+					} else {
+						return (xScale as d3.ScalePoint<string>)(String(d.x)) || 0;
+					}
+				})
+				.attr('cy', (d: DataPoint) => yScale(d.y))
+				.attr('r', 4)
+				.attr('fill', color)
+				.attr('stroke', '#fff')
+				.attr('stroke-width', 2);
+		});
     };
 
     onMount(() => {
