@@ -53,6 +53,7 @@ const useStationStore = (station: Station) => create<StationStoreType>(set => ({
     cpu: station.processor,
     memory: station.memory,
     storage: station.storage,
+    network: station.network,
     frame: 0,
     count: 0,
     exponent: 0,

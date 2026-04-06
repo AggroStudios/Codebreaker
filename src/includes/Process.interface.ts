@@ -1,5 +1,19 @@
 import OperatingSystem from '../lib/OperatingSystem';
 
+export enum NetworkConnectionType {
+    dsl = 'DSL',
+    cable = 'Cable',
+    fiber = 'Fiber',
+    cellular = 'Cellular',
+    satellite = 'Satellite',
+}
+
+export interface INetworkType {
+    connectionType: NetworkConnectionType;
+    speedInBps: number;
+    toString: () => string;
+}
+
 export default interface Process {
     id: string,
     callback: (...args: unknown[]) => unknown,
@@ -11,6 +25,7 @@ export type StationStoreType = {
     cpu: null | IProcessorType,
     memory: null | IMemoryType,
     storage: IStorageType[],
+    network: null | INetworkType,
     frame: number,
     count: number,
     exponent: number,

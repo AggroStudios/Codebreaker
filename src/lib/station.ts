@@ -1,4 +1,4 @@
-import { IMemoryType, IProcessorType, IStorageType } from "../includes/Process.interface";
+import { IMemoryType, INetworkType, IProcessorType, IStorageType } from "../includes/Process.interface";
 import OperatingSystem from "./OperatingSystem";
 
 export class Station {
@@ -7,12 +7,14 @@ export class Station {
     private _operatingSystem: OperatingSystem;
     private _memory: IMemoryType;
     private _storage: IStorageType[];
+    private _network: INetworkType;
 
-    constructor(processor: IProcessorType, operatingSystem: OperatingSystem, memory: IMemoryType, storage: IStorageType[] = []) {
+    constructor(processor: IProcessorType, operatingSystem: OperatingSystem, memory: IMemoryType, storage: IStorageType[] = [], network: INetworkType) {
         this._processor = processor;
         this._operatingSystem = operatingSystem;
         this._memory = memory;
         this._storage = storage;
+        this._network = network;
     }
 
     public get processor() {
@@ -29,5 +31,9 @@ export class Station {
 
     public get storage() {
         return this._storage;
+    }
+
+    public get network() {
+        return this._network;
     }
 }

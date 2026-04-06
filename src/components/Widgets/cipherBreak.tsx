@@ -20,9 +20,24 @@ interface IGridItem {
     cssClass: string;
 }
 
-function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
+enum CipherState {
+    IDLE = undefined,
+    DOWNLOADING = 'Downloading',
+    BREAKING = 'Breaking',
+    SUCCESS = 'Success',
+    FAILURE = 'Failure',
+    PAUSED = 'Paused',
+}
+
+function LinearProgressWithLabel(props: LinearProgressProps & { value: number, label?: string }) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        {props.label && <Box sx={{ minWidth: 65, textAlign: 'left' }}>
+          <Typography
+            variant="body2"
+            sx={{ color: 'text.secondary' }}
+          >{props.label}</Typography>
+        </Box>}
         <Box sx={{ width: '100%', mr: 1 }}>
           <LinearProgress variant="determinate" {...props} />
         </Box>
@@ -34,13 +49,13 @@ function LinearProgressWithLabel(props: LinearProgressProps & { value: number })
         </Box>
       </Box>
     );
-  }
+}
 
 const CipherBreak: Component<{ station: StationStoreType, width: number, cipher?: Cipher, newCipher: () => void }> = (props) => {
-    
 
     const [grid, setGrid] = createSignal<IGridItem[]>([]);
     const [progress, setProgress] = createSignal<number>(0);
+    const [label, setLabel] = createSignal<CipherState>(CipherState.IDLE);
 
     const { station, width, cipher, newCipher } = props;
     const { cpu, memory } = station;
@@ -49,6 +64,7 @@ const CipherBreak: Component<{ station: StationStoreType, width: number, cipher?
 
     cipher?.setGrid((grid: IGridItem[], p: number) => {
         setGrid(grid);
+        setLabel(CipherState.BREAKING);
         console.log('progress', p);
         if (p !== progress()) {
             setProgress(p);
@@ -67,7 +83,7 @@ const CipherBreak: Component<{ station: StationStoreType, width: number, cipher?
             />
             <CardContent>
                 {grid().length > 0 && <div class="progress">
-                    <LinearProgressWithLabel variant="determinate" value={progress()} />
+                    <LinearProgressWithLabel variant="determinate" value={progress()} label={label()?.toString()} />
                 </div>}
                 <CipherContainer style={{
                     'grid-template-columns': `repeat(${width}, ${100/width}%)`

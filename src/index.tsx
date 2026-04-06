@@ -18,6 +18,7 @@ import { Station } from './lib/station';
 import { CodiumMemory } from './lib/memory';
 import { IStorageType } from './includes/Process.interface';
 import { CodiumStorageHdd } from './lib/storage';
+import { NetworkDSL } from './lib/network';
 
 const darkTheme = createTheme({
     palette: {
@@ -137,8 +138,9 @@ const processor = new CodiumProcessor();
 const operatingSystem = new OperatingSystem(playerStore);
 const memory = new CodiumMemory();
 const storage = new Array<IStorageType>(new CodiumStorageHdd());
+const network = new NetworkDSL();
 
-const station = new Station(processor, operatingSystem, memory, storage);
+const station = new Station(processor, operatingSystem, memory, storage, network);
 
 // const [loadingProgress, setLoadingProgress] = createSignal<number>(0);
 
