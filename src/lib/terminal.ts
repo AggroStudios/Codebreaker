@@ -28,6 +28,12 @@ interface HistoryEntry {
     id: number;
 }
 
+interface TerminalAttachment {
+    stdin: any;
+    stdout: any;
+    stderr: any;
+}
+
 export default class Terminal {
 
     private defaultPrompt: string = '$ ';
@@ -107,7 +113,7 @@ export default class Terminal {
         return this._history;
     }
 
-    attachTerminal({ stdin, stdout, stderr }) {
+    attachTerminal({ stdin, stdout, stderr }: TerminalAttachment) {
         this._stdin = stdin;
         this._stdout = stdout;
         this._stderr = stderr;
