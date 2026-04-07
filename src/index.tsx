@@ -1,6 +1,6 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import create from 'solid-zustand';
+import { create } from 'solid-zustand/store';
 import Layout from './Layout';
 // import LoadingScreen from './components/LoadingScreen';
 

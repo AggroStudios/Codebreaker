@@ -18,6 +18,7 @@ interface LineSeries {
 type LineChartData = DataPoint[] | LineSeries[];
 
 interface LineChartProps {
+    title?: string;
     data: LineChartData;
     maxDataPoints?: number;
     width?: number;
@@ -35,6 +36,7 @@ export default function LineChart(props: LineChartProps) {
     let resizeObserver: ResizeObserver | undefined;
     const [containerWidth, setContainerWidth] = createSignal(800);
 
+    const title = () => props.title || "Line Chart";
     const width = () => props.width || containerWidth();
     const height = () => props.height || 400;
     const margin = () => props.margin || { top: 20, right: 30, bottom: 40, left: 60 };
@@ -283,8 +285,8 @@ export default function LineChart(props: LineChartProps) {
     });
 
     return (
-        <Card>
-            <CardHeader title="Line Chart" />
+        <Card class="background">
+            <CardHeader title={title()} />
             <CardContent ref={containerRef} style="width: 100%;">
                 <svg ref={svgRef} style="display: block; width: 100%; height: auto;"></svg>
             </CardContent>

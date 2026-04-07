@@ -1,7 +1,7 @@
 import { Component, lazy } from 'solid-js';
 import { AuthenticationState } from './includes/Authentication.interface';
 import { Route, Router } from '@solidjs/router';
-import create from 'solid-zustand';
+import { create } from 'solid-zustand/store';
 
 import AppBar from './components/AppBar';
 

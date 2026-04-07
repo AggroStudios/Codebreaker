@@ -1,5 +1,5 @@
 import './App.css'
-import create from 'solid-zustand';
+import { create } from 'solid-zustand/store';
 
 import { CounterState } from './includes/Counter.interface';
 
@@ -66,7 +66,7 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
                         <StationStatistics station={stationStore} />
                     </Grid>
                     <Grid item xs={8}>
-                        <CpuActivityWidget state={state} />
+                        <CpuActivityWidget state={state} title="CPU Activity" />
                     </Grid>
                 </Grid>
             </div>

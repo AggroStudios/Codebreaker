@@ -2,7 +2,7 @@ import { Component, createEffect, createSignal } from "solid-js";
 import { ThemeProvider, createTheme } from "@suid/material";
 import OperatingSystem from "../../lib/OperatingSystem";
 import TerminalController from '../../lib/terminal';
-import create from 'solid-zustand';
+import { create } from 'solid-zustand/store';
 import clsx from 'clsx';
 
 import { 

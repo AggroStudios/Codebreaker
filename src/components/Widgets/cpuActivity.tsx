@@ -3,9 +3,9 @@ import LineChart from '../LineChart';
 import { CounterState } from '../../includes/Counter.interface';
 import CpuActivity from '../../lib/CpuActivity';
 
-export const CpuActivityWidget: Component<{ state: CounterState }> = (props) => {
+export const CpuActivityWidget: Component<{ state: CounterState, title?: string }> = (props) => {
 
-    const { state } = props;
+    const { state, title } = props;
     const { station } = state;
     onMount(() => {
         const cpuActivity = new CpuActivity(100, 50, state);
@@ -14,6 +14,7 @@ export const CpuActivityWidget: Component<{ state: CounterState }> = (props) => 
 
     return (
         <LineChart
+            title={title}
             data={state.cpuActivity}
             maxDataPoints={50}
             height={400}
