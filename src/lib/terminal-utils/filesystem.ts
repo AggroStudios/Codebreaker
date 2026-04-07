@@ -259,7 +259,7 @@ export default class FileSystem {
                 const path = colorizePathType(entry);
                 return `${entry.directory ? 'd' : '-'}${permissions}\u00a0\u00a0${entry.owner.padEnd(maxOwnerWidth, '\u00a0')}\u00a0\u00a0${entry.group.padEnd(maxGroupWidth, '\u00a0')}\u00a0\u00a0\u00a0${path}`;
             });
-        }
+        };
 
         const defaultDir: IDirectory[] = [
             {

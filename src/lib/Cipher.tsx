@@ -80,7 +80,7 @@ export default class Cipher implements Process {
             this._characterGrid[solvedIndex] = {
                 character: solvedValue.toString(),
                 cssClass: 'broken',
-            }
+            };
 
             this.unsolvedIndexes.splice(this.unsolvedIndexes.indexOf(solvedIndex), 1);
             console.log(`Solved Index: ${solvedIndex}, Unsolved indexes:`, this.unsolvedIndexes);

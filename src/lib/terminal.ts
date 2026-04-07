@@ -226,7 +226,7 @@ export default class Terminal {
                 const emptyBar = '░'.repeat(empty);
                 const bar = `${filledBar}${emptyBar}`;
                 return ` ${bar} ${percent}%`;
-            }
+            };
             const barStr = drawBar(0, total);
             let previousString = barStr;
             this.stdout(barStr, { characterMode: true });
@@ -327,7 +327,7 @@ export default class Terminal {
             else {
                 return commandLine;
             }
-        }
+        };
 
         const processedCommandLine = commandToRun(commandLine.trim());
         const [command, ...args] = processedCommandLine.split(' ');

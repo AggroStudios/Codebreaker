@@ -99,7 +99,7 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
 
     const handleMobileMenuClose = () => {
         setMobileAnchorEl(null);
-    }
+    };
 
     const handleNotificationMenuClose = () => {
         setNotificationAnchorEl(null);
@@ -135,7 +135,7 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
             default:
                 return null;
         }
-    }
+    };
 
     const notificationId = 'primary-search-notification-menu';
     const renderNotificationMenu = (
