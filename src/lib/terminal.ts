@@ -62,9 +62,18 @@ export default class Terminal {
 
     private _osController: OperatingSystem;
 
-    private _stdin: (callback: (char: string) => void, options?: TerminalAttachmentOptions) => void;
-    private _stdout: (message: string, options?: TerminalAttachmentOptions) => void;
-    private _stderr: (message: string, options?: TerminalAttachmentOptions) => void;
+    private _stdin: (callback: (char: string) => void, options?: TerminalAttachmentOptions) => void =
+        (_callback: (char: string) => void, _options?: TerminalAttachmentOptions) => {
+            // default no-op stdin implementation; real implementation should be attached later
+        };
+    private _stdout: (message: string, options?: TerminalAttachmentOptions) => void =
+        (_message: string, _options?: TerminalAttachmentOptions) => {
+            // default no-op stdout implementation; real implementation should be attached later
+        };
+    private _stderr: (message: string, options?: TerminalAttachmentOptions) => void =
+        (_message: string, _options?: TerminalAttachmentOptions) => {
+            // default no-op stderr implementation; real implementation should be attached later
+        };
 
     constructor(options: TerminalOptions = { historySize: 10 }) {
         this.options = options;
@@ -321,7 +330,7 @@ export default class Terminal {
             if (isString(message)) {
                 this.stdout('"', { characterMode: true });
                 const lines = message.split('\n');
-                const firstLine = lines.shift();
+                const firstLine = lines.shift() ?? '';
                 this.stdout(firstLine, { characterMode: true });
                 lines.forEach(line => { this.stdout(`${margin(2)}${line}`); });
                 this.stdout('"', { characterMode: true });
@@ -353,6 +362,8 @@ export default class Terminal {
                 if (historyCommand) {
                     return historyCommand.command;
                 }
+                // Fallback: if no matching history entry is found, use the original command line
+                return commandLine;
             }
             else {
                 return commandLine;
@@ -396,7 +407,8 @@ export default class Terminal {
                 this.history.slice(0).reverse().forEach(line => this.stdout(`> ${line.id} - ${line.command}`));
                 break;
             case 'test': {
-                const depth = parseInt(args[0]);
+                const parsedDepth = parseInt(args[0]);
+                const depth = Number.isNaN(parsedDepth) ? 0 : parsedDepth;
                 this.log({
                     prop: 'value',
                     propArray: ['value1', 'value2'],
