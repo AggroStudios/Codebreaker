@@ -209,15 +209,6 @@ export default class Terminal {
 
         return await new Promise<void>(async (resolve, reject) => {
             let shouldExit = false;
-            this.stdin(char => {
-                switch (char) {
-                    case '^C':
-                        shouldExit = true;
-                        reject([`${previousString}^C`, { replaceRange: [-(previousString.length)] }]);
-                        break;
-                }
-            });
-
             const drawBar = (progress: number, total: number) => {
                 const percent = Math.ceil((progress / total) * 100);
                 const filled = Math.ceil((progress / total) * options.width);
@@ -230,6 +221,15 @@ export default class Terminal {
             const barStr = drawBar(0, total);
             let previousString = barStr;
             this.stdout(barStr, { characterMode: true });
+
+            this.stdin(char => {
+                switch (char) {
+                    case '^C':
+                        shouldExit = true;
+                        reject([`${previousString}^C`, { replaceRange: [-(previousString.length)] }]);
+                        break;
+                }
+            });
 
             for (let progress = 0; progress <= total; progress++) {
                 if (shouldExit) break;
