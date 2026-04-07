@@ -78,7 +78,6 @@ export default function LineChart(props: LineChartProps) {
 
     const createChart = () => {
 		const chartData = rollingData();
-		if (!svgRef) return;
 
 		let seriesList: LineSeries[];
 		if (isLineSeriesArray(chartData)) {
@@ -93,9 +92,9 @@ export default function LineChart(props: LineChartProps) {
 		if (allPoints.length === 0) return;
 
         // Clear previous content
-        d3.select(svgRef).selectAll('*').remove();
+        d3.select(svgRef!).selectAll('*').remove();
 
-        const svg = d3.select(svgRef);
+        const svg = d3.select(svgRef!);
         const w = width();
         const h = height();
         const m = margin();
@@ -246,7 +245,7 @@ export default function LineChart(props: LineChartProps) {
 
     onMount(() => {
         // Handle responsive resizing by observing the container
-        if (containerRef && typeof ResizeObserver !== 'undefined') {
+        if (typeof ResizeObserver !== 'undefined') {
             resizeObserver = new ResizeObserver((entries) => {
                 for (const entry of entries) {
                     const width = entry.contentRect.width;
@@ -256,10 +255,10 @@ export default function LineChart(props: LineChartProps) {
                 }
                 createChart();
             });
-            resizeObserver.observe(containerRef);
             
             // Set initial width
             if (containerRef) {
+                resizeObserver.observe(containerRef);
                 setContainerWidth(containerRef.clientWidth || 800);
             }
         }
