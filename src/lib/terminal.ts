@@ -62,9 +62,9 @@ export default class Terminal {
 
     private _osController: OperatingSystem;
 
-    private _stdin: (callback: (char: string) => void, options?: any) => void;
-    private _stdout: (message: any, options?: any) => void;
-    private _stderr: (message: any, options?: any) => void;
+    private _stdin: (callback: (char: string) => void, options?: TerminalAttachmentOptions) => void;
+    private _stdout: (message: string, options?: TerminalAttachmentOptions) => void;
+    private _stderr: (message: string, options?: TerminalAttachmentOptions) => void;
 
     constructor(options: TerminalOptions = { historySize: 10 }) {
         this.options = options;
@@ -166,7 +166,7 @@ export default class Terminal {
         });
     }
 
-    async readChar(limitedCharacters = [], defaultCharacter = '', caseSensitive = true) {
+    async readChar(limitedCharacters: string[] = [], defaultCharacter: string = '', caseSensitive: boolean = true) {
         return await new Promise((resolve, reject) => {
             const characterSetPrompt = limitedCharacters.length ? `(${limitedCharacters.join('/')}) ` : '';
             const defaultPrompt = defaultCharacter !== '' ? ` [${defaultCharacter}] ` : '';
