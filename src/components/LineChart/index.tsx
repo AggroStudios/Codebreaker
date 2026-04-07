@@ -257,7 +257,7 @@ export default function LineChart(props: LineChartProps) {
             });
             
             // Set initial width
-            if (containerRef) {
+            if (containerRef instanceof HTMLElement) {
                 resizeObserver.observe(containerRef);
                 setContainerWidth(containerRef.clientWidth || 800);
             }
