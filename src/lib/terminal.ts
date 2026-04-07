@@ -28,11 +28,32 @@ interface HistoryEntry {
     id: number;
 }
 
+interface TerminalOptions {
+    historySize: number;
+    [key: string]: unknown;
+}
+
+export interface TerminalAttachmentOptions {
+    color?: string | null;
+    caretAtEnd?: boolean;
+    lineIndex?: number;
+    characterMode?: boolean;
+    updateMode?: boolean;
+    replaceRange?: number[];
+    prompt?: string;
+}
+
+interface TerminalAttachment {
+    stdin: (callback: (char: string) => void, options?: TerminalAttachmentOptions) => void;
+    stdout: (message: string, options?: TerminalAttachmentOptions) => void;
+    stderr: (message: string, options?: TerminalAttachmentOptions) => void;
+}
+
 export default class Terminal {
 
     private defaultPrompt: string = '$ ';
 
-    private options: any;
+    private options: TerminalOptions;
     private _history: Array<HistoryEntry> = [];
     private commandId: number = 0;
     private loaderTimer: NodeJS.Timeout | null = null;
@@ -45,7 +66,7 @@ export default class Terminal {
     private _stdout: (message: any, options?: any) => void;
     private _stderr: (message: any, options?: any) => void;
 
-    constructor(options: any = { historySize: 10 }) {
+    constructor(options: TerminalOptions = { historySize: 10 }) {
         this.options = options;
         this.fs = new FileSystem(terminalApps);
     }
@@ -107,7 +128,7 @@ export default class Terminal {
         return this._history;
     }
 
-    attachTerminal({ stdin, stdout, stderr }) {
+    attachTerminal({ stdin, stdout, stderr }: TerminalAttachment) {
         this._stdin = stdin;
         this._stdout = stdout;
         this._stderr = stderr;
@@ -209,15 +230,6 @@ export default class Terminal {
 
         return await new Promise<void>(async (resolve, reject) => {
             let shouldExit = false;
-            this.stdin(char => {
-                switch (char) {
-                    case '^C':
-                        shouldExit = true;
-                        reject([`${previousString}^C`, { replaceRange: [-(previousString.length)] }]);
-                        break;
-                }
-            });
-
             const drawBar = (progress: number, total: number) => {
                 const percent = Math.ceil((progress / total) * 100);
                 const filled = Math.ceil((progress / total) * options.width);
@@ -230,6 +242,15 @@ export default class Terminal {
             const barStr = drawBar(0, total);
             let previousString = barStr;
             this.stdout(barStr, { characterMode: true });
+
+            this.stdin(char => {
+                switch (char) {
+                    case '^C':
+                        shouldExit = true;
+                        reject([`${previousString}^C`, { replaceRange: [-(previousString.length)] }]);
+                        break;
+                }
+            });
 
             for (let progress = 0; progress <= total; progress++) {
                 if (shouldExit) break;

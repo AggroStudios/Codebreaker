@@ -1,7 +1,7 @@
 import { Component, createEffect, createSignal } from "solid-js";
 import { ThemeProvider, createTheme } from "@suid/material";
 import OperatingSystem from "../../lib/OperatingSystem";
-import TerminalController from '../../lib/terminal';
+import TerminalController, { type TerminalAttachmentOptions } from '../../lib/terminal';
 import { create } from 'solid-zustand/store';
 import clsx from 'clsx';
 
@@ -155,7 +155,10 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
         }
     };
 
-    const handleStdIn = (callback: () => void, { characterMode = false } = {}) => {
+    const handleStdIn = (
+        callback: ((char: string) => void) | null,
+        { characterMode = false }: Pick<TerminalAttachmentOptions, 'characterMode'> = {}
+    ) => {
         setStdInCharacterMode(characterMode);
         setStdInCallback(() => callback);
     }

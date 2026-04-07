@@ -94,7 +94,7 @@ export default function LineChart(props: LineChartProps) {
         // Clear previous content
         d3.select(svgRef!).selectAll('*').remove();
 
-        const svg = d3.select(svgRef!);
+        const svg = d3.select(svgRef);
         const w = width();
         const h = height();
         const m = margin();
@@ -245,7 +245,7 @@ export default function LineChart(props: LineChartProps) {
 
     onMount(() => {
         // Handle responsive resizing by observing the container
-        if (typeof ResizeObserver !== 'undefined') {
+        if (containerRef && typeof ResizeObserver !== 'undefined') {
             resizeObserver = new ResizeObserver((entries) => {
                 for (const entry of entries) {
                     const width = entry.contentRect.width;
@@ -253,14 +253,11 @@ export default function LineChart(props: LineChartProps) {
                         setContainerWidth(width);
                     }
                 }
-                createChart();
             });
-            
+
+            resizeObserver.observe(containerRef);
             // Set initial width
-            if (containerRef instanceof HTMLElement) {
-                resizeObserver.observe(containerRef);
-                setContainerWidth(containerRef.clientWidth || 800);
-            }
+            setContainerWidth(containerRef.clientWidth || 800);
         }
     });
 
