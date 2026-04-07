@@ -167,7 +167,7 @@ export default class Terminal {
     }
 
     async readChar(limitedCharacters: string[] = [], defaultCharacter: string = '', caseSensitive: boolean = true) {
-        return await new Promise((resolve, reject) => {
+        return await new Promise<string>((resolve, reject) => {
             const characterSetPrompt = limitedCharacters.length ? `(${limitedCharacters.join('/')}) ` : '';
             const defaultPrompt = defaultCharacter !== '' ? ` [${defaultCharacter}] ` : '';
             const finalPrompt = `${characterSetPrompt}${defaultPrompt}`;
@@ -228,7 +228,7 @@ export default class Terminal {
 
     async progressBar(total: number, delay: number, options = { width: 20 }) {
 
-        return await new Promise<void>(async (resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             let shouldExit = false;
             const drawBar = (progress: number, total: number) => {
                 const percent = Math.ceil((progress / total) * 100);
@@ -252,15 +252,23 @@ export default class Terminal {
                 }
             });
 
-            for (let progress = 0; progress <= total; progress++) {
-                if (shouldExit) break;
+            const step = (progress: number) => {
+                if (shouldExit) {
+                    // Cleanup input
+                    this.stdin(null);
+                    return;
+                }
                 const returnStr = drawBar(progress, total);
                 this.stdout(returnStr, { replaceRange: [-(previousString.length)] });
                 previousString = returnStr;
-                await new Promise(res => setTimeout(res, delay));
+                if (progress >= total) {
+                    this.stdin(null);
+                    if (!shouldExit) resolve();
+                    return;
+                }
+                setTimeout(() => step(progress + 1), delay);
             }
-            this.stdin(null);
-            if (!shouldExit) resolve();
+            step(0);
         });
     }
 
@@ -284,7 +292,7 @@ export default class Terminal {
                 this.stdout('[', { characterMode: true });
                 message.forEach((m, i) => {
                     this.stdout(margin(2));
-                    this.log(m, depth, indent + 2)
+                    this.log(m, depth, indent + 2);
                     if (i < message.length - 1) {
                         this.stdout(',', { characterMode: true });
                     }
@@ -298,10 +306,11 @@ export default class Terminal {
             }
             else {
                 this.stdout('{', { characterMode: true });
-                for (const key in message as any) {
+                const obj = message as Record<string, unknown>;
+                for (const key in obj) {
                     this.stdout(`${margin(2)}${key}: `, { color: lightGreen['400'] });
-                    this.log(message[key], depth, indent + 2);
-                    if (Object.keys(message).indexOf(key) < Object.keys(message).length - 1) {
+                    this.log(obj[key], depth, indent + 2);
+                    if (Object.keys(obj).indexOf(key) < Object.keys(obj).length - 1) {
                         this.stdout(',', { characterMode: true });
                     }
                 }
@@ -314,7 +323,7 @@ export default class Terminal {
                 const lines = message.split('\n');
                 const firstLine = lines.shift();
                 this.stdout(firstLine, { characterMode: true });
-                lines.forEach(line => { this.stdout(`${margin(2)}${line}`)});
+                lines.forEach(line => { this.stdout(`${margin(2)}${line}`); });
                 this.stdout('"', { characterMode: true });
             }
             else {
