@@ -116,12 +116,14 @@ export default class Terminal {
 /_______  /|__| |____/\____ | |__|\____/
         \/                 \/`;
         
-        welcomeScreenLine1.split('\n').forEach((line, index) => {
-            const colorIndex = (welcomeScreenLine1.split('\n').length - index) * 100;
+        const lines1 = welcomeScreenLine1.split('\n');
+        const lines2 = welcomeScreenLine2.split('\n');
+        lines1.forEach((line, index) => {
+            const colorIndex = (lines1.length - index) * 100;
             this.stdout(line.replaceAll(' ', '\u00a0'), { color: lightBlue[colorIndex] });
         });
-        welcomeScreenLine2.split('\n').forEach((line, index) => {
-            const colorIndex = (welcomeScreenLine2.split('\n').length - index) * 100;
+        lines2.forEach((line, index) => {
+            const colorIndex = (lines2.length - index) * 100;
             this.stdout(line.replaceAll(' ', '\u00a0'), { color: cyan[colorIndex] });
         });
         // await new BootSequence(this).run(null, null);
@@ -152,7 +154,7 @@ export default class Terminal {
     }
 
     async readLine(prompt: string, characterOverride = null) {
-        return await new Promise<string>((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             let buffer = '';
             this.stdout(prompt, { caretAtEnd: true });
             this.stdin(char => {
@@ -176,34 +178,40 @@ export default class Terminal {
     }
 
     async readChar(limitedCharacters: string[] = [], defaultCharacter: string = '', caseSensitive: boolean = true) {
-        return await new Promise<string>((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             const characterSetPrompt = limitedCharacters.length ? `(${limitedCharacters.join('/')}) ` : '';
             const defaultPrompt = defaultCharacter !== '' ? ` [${defaultCharacter}] ` : '';
             const finalPrompt = `${characterSetPrompt}${defaultPrompt}`;
             this.stdout(finalPrompt, { characterMode: true });
+            const normalizedSet = caseSensitive ? limitedCharacters : limitedCharacters.map(c => c.toUpperCase());
             this.stdin(char => {
                 if (char === '^C') {
                     this.stdin(null);
                     reject(`${finalPrompt}^C`);
+                    return;
                 }
                 if (limitedCharacters.length) {
                     if (char === '\n' && defaultCharacter !== '') {
                         this.stdin(null);
                         resolve(defaultCharacter);
+                        return;
                     }
-                    if (limitedCharacters.map(c => caseSensitive ? c : c.toUpperCase()).includes(caseSensitive ? char : char.toUpperCase())) {
+                    if (normalizedSet.includes(caseSensitive ? char : char.toUpperCase())) {
                         this.stdin(null);
                         resolve(char);
+                        return;
                     }
                 }
                 else {
                     if (char === '\n' && defaultCharacter !== '') {
                         this.stdin(null);
                         resolve(defaultCharacter);
+                        return;
                     }
                     else {
                         this.stdin(null);
                         resolve(char);
+                        return;
                     }
                 }
             }, { characterMode: true });
@@ -277,7 +285,7 @@ export default class Terminal {
                 }
                 setTimeout(() => step(progress + 1), delay);
             }
-            step(0);
+            step(1);
         });
     }
 
@@ -316,10 +324,11 @@ export default class Terminal {
             else {
                 this.stdout('{', { characterMode: true });
                 const obj = message as Record<string, unknown>;
-                for (const key in obj) {
+                const keys = Object.keys(obj);
+                for (const [index, key] of keys.entries()) {
                     this.stdout(`${margin(2)}${key}: `, { color: lightGreen['400'] });
                     this.log(obj[key], depth, indent + 2);
-                    if (Object.keys(obj).indexOf(key) < Object.keys(obj).length - 1) {
+                    if (index < keys.length - 1) {
                         this.stdout(',', { characterMode: true });
                     }
                 }
@@ -373,7 +382,7 @@ export default class Terminal {
         const processedCommandLine = commandToRun(commandLine.trim());
         const [command, ...args] = processedCommandLine.split(' ');
 
-        switch (command.trim()) {
+        switch (command) {
             case 'ls':
                 try {
                     this.fs.listDirectory(args).forEach(entry => {
@@ -404,7 +413,9 @@ export default class Terminal {
                 }
                 break;
             case 'history':
-                this.history.slice(0).reverse().forEach(line => this.stdout(`> ${line.id} - ${line.command}`));
+                for (let i = this.history.length - 1; i >= 0; i--) {
+                    this.stdout(`> ${this.history[i].id} - ${this.history[i].command}`);
+                }
                 break;
             case 'test': {
                 const parsedDepth = parseInt(args[0]);
@@ -503,7 +514,7 @@ export default class Terminal {
             case 'fancyLoader': {
                 const loader = [ '⠷', '⠯', '⠟', '⠻', '⠽', '⠾' ];
                 this.stdout('Loading... ');
-                await this.withLoader(async () => await this.readChar(), loader);
+                await this.withLoader(() => this.readChar(), loader);
                 break;
             }
             case 'progress':
@@ -512,15 +523,13 @@ export default class Terminal {
                     await this.progressBar(100, 100);
                 }
                 catch (err) {
-                    this.stderr.apply(null, err);
+                    this.stderr(err[0], err[1]);
                 }
                 break;
             default:
                 try {
                     const app = this.fs.resolvePath(command);
-                    const argc = args.length;
-                    const argv = args;
-                    await (new app(this)).run(argc, argv);
+                    await (new app(this)).run(args.length, args);
                     break;
                 }
                 catch (err) {
