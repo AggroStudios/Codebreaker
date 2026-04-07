@@ -470,7 +470,7 @@ export default class Terminal {
                     await this.progressBar(100, 100);
                 }
                 catch (err) {
-                    this.stderr.apply(null, err);
+                    this.stderr(...err);
                 }
                 break;
             default:
