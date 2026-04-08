@@ -3,9 +3,6 @@ import { create } from 'solid-zustand/store';
 
 import { CounterState } from './includes/Counter.interface';
 
-import Counter from './Counter';
-import CounterDecrease from './CounterDecrease';
-
 import { StationStoreType } from './includes/Process.interface';
 import { Component } from 'solid-js';
 
@@ -69,10 +66,6 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
                         <CpuActivityWidget state={state} title="CPU Activity" />
                     </Grid>
                 </Grid>
-            </div>
-            <div class="card">
-                <Counter store={state} />
-                <CounterDecrease store={state} />
             </div>
             <div class="card">
                 <Grid container spacing={2}>

@@ -2,9 +2,6 @@ import Cipher from '../lib/Cipher';
 import { StationStoreType } from './Process.interface';
 
 export interface CounterState {
-    count: number,
-    increase: () => void,
-    decrease: () => void,
     runningCiphers: Cipher[],
     addCipher: (cipher: Cipher) => void,
     removeCipher: (cipher: Cipher) => void,
