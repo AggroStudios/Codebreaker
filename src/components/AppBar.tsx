@@ -247,9 +247,6 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
     );  
 
     let moneyLabelRef: HTMLElement | undefined = undefined;
-    createEffect(() => {
-        console.log(props.playerStateStore?.moneyLabel);
-    });
     
     return (
         <Box sx={{ flexGrow: 1 }}>
