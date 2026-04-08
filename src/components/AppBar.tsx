@@ -1,4 +1,4 @@
-import { Component, createSignal, JSX, Show, createEffect } from 'solid-js';
+import { Component, createSignal, JSX, Show } from 'solid-js';
 
 import {
     Box, AppBar, Toolbar, IconButton,
