@@ -29,4 +29,38 @@ export interface ICipherType {
         size: number,
         unit: BlockUnit
     };
+    payout: number;
 }
+
+export const CipherTypes: ICipherType[] = [
+    {
+        name: 'Cipher 1',
+        complexity: 1,
+        parallelism: 1,
+        block: {
+            size: 1024,
+            unit: BlockUnit.bytes,
+        },
+        payout: 100,
+    },
+    {
+        name: 'Cipher 2',
+        complexity: 2,
+        parallelism: 2,
+        block: {
+            size: 2048,
+            unit: BlockUnit.bytes,
+        },
+        payout: 200,
+    },
+    {
+        name: 'Cipher 3',
+        complexity: 3,
+        parallelism: 3,
+        block: {
+            size: 3072,
+            unit: BlockUnit.bytes,
+        },
+        payout: 300,
+    },
+];

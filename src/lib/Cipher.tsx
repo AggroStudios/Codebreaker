@@ -1,4 +1,6 @@
+import { ICipherType } from "../includes/Cipher.interface";
 import Process from "../includes/Process.interface";
+import OperatingSystem from '../lib/OperatingSystem';
 
 interface IGridItem {
     character: string;
@@ -9,29 +11,31 @@ export default class Cipher implements Process {
 
     private readonly characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()/\\-=+,.<>;:';
     private _characterGrid: IGridItem[] = [];
-    private _setGrid: ((grid: IGridItem[], progress: number) => void) | undefined = undefined;
+    private _setGrid: ((grid: IGridItem[], cipherType: ICipherType, progress: number) => void) = () => {};
     private unsolvedIndexes: number[] = [];
     private width: number;
     private height: number;
     private cssClasses: string[];
     private _id: string;
-    private _completeCipher: (cipher: Cipher, cancelled: boolean) => void;
+    private _completeCipher: (cipher: Cipher, cancelled: boolean) => void = () => {};
     private progress: number = 0;
     private frame: number = 0;
+    private _stationOs: OperatingSystem;
+    private _cipherType: ICipherType;
 
-    constructor(width: number, height: number, cssClasses: string[], completeCipher: (cipher: Cipher, cancelled: boolean) => void, setGrid?: ((grid: IGridItem[], progress: number) => void) | undefined) {
+    constructor(width: number, height: number, cssClasses: string[], cipherType: ICipherType, stationOs: OperatingSystem) {
         this.width = width;
         this.height = height;
         this.cssClasses = cssClasses;
-        this._setGrid = setGrid;
         this._id = crypto.randomUUID();
-        this._completeCipher = completeCipher;
+        this._stationOs = stationOs;
+        this._cipherType = cipherType;
 
         for (let i = 0; i < this.width * this.height; i++) {
             this.unsolvedIndexes.push(i);
         }
 
-        console.log('Cipher constructed!');
+        stationOs.addProcess(this);
     }
 
     public get characterGrid() {
@@ -57,23 +61,24 @@ export default class Cipher implements Process {
     }
 
     private randomizeGrid() {
-        this._setGrid?.(this.generateGrid(), this.progress);
+        this._setGrid(this.generateGrid(), this._cipherType, this.progress);
     }
 
     public get id() {
         return `cipher-${this._id}`;
     }
 
-    public setGrid(fn: ((grid: IGridItem[], progress: number) => void)) {
+    public setCompleteCipher(fn: (cipher: Cipher, cancelled: boolean) => void) {
+        this._completeCipher = fn;
+    }
+
+    public setGrid(fn: ((grid: IGridItem[], cipherType: ICipherType, progress: number) => void)) {
         this._setGrid = fn;
     }
 
     public callback(_: number) {
-        this.randomizeGrid();
         this.frame++;
-        if (this.frame > 0 && this.frame % 5 === 0) {
-            console.log(`Cipher ${this._id}: progress ${this.progress}%`);
-            
+        if (this.frame > 0 && this.frame % 1 === 0) {
             const solvedIndex = this.unsolvedIndexes[Math.floor(Math.random() * this.unsolvedIndexes.length)];
             const solvedValue = Math.round(Math.random());
 
@@ -83,11 +88,13 @@ export default class Cipher implements Process {
             };
 
             this.unsolvedIndexes.splice(this.unsolvedIndexes.indexOf(solvedIndex), 1);
-            console.log(`Solved Index: ${solvedIndex}, Unsolved indexes:`, this.unsolvedIndexes);
             this.progress = Math.floor((this.width * this.height - this.unsolvedIndexes.length) / (this.width * this.height) * 100);
         }
 
+        this.randomizeGrid();
+
         if (this.progress >= 100) {
+            this._stationOs.removeProcess(this);
             this._completeCipher(this, false);
         }
     }

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Component, createSignal } from 'solid-js';
+import { Component, createSignal, onMount } from 'solid-js';
 import { Box, Card, CardContent, CardHeader, LinearProgress, styled, Typography } from '@suid/material';
 import type { LinearProgressProps } from '@suid/material/LinearProgress';
 
@@ -10,6 +10,7 @@ import Cipher from "../../lib/Cipher";
 
 import './styles.scss';
 import { StationStoreType } from '../../includes/Process.interface';
+import { ICipherType } from '../../includes/Cipher.interface';
 
 const CipherContainer = styled('div')({
     display: 'grid'
@@ -51,30 +52,56 @@ function LinearProgressWithLabel(props: LinearProgressProps & { value: number, l
     );
 }
 
-const CipherBreak: Component<{ station: StationStoreType, width: number, cipher?: Cipher, newCipher: () => void }> = (props) => {
+interface CipherBreakOptions {
+    station: StationStoreType;
+    width: number;
+    cipher?: Cipher;
+    newCipher: () => void;
+    onComplete?: (cipher: Cipher, cipherType: ICipherType, cancelled: boolean) => void;
+};
+
+const CipherBreak: Component<CipherBreakOptions> = (props) => {
+
+    let cardRef: HTMLElement | undefined = undefined;
 
     const [grid, setGrid] = createSignal<IGridItem[]>([]);
     const [progress, setProgress] = createSignal<number>(0);
+    const [cipherType, setCipherType] = createSignal<ICipherType|undefined>(undefined);
     const [label, setLabel] = createSignal<CipherState>(CipherState.IDLE);
 
     const { station, width, cipher, newCipher } = props;
     const { cpu, memory } = station;
 
-    console.log(cpu.flops, cpu.cores, memory.capacity, cipher?.id);
+    onMount(() => {
+        console.log(cpu.flops, cpu.cores, memory.capacity, cipher?.id);
 
-    cipher?.setGrid((grid: IGridItem[], p: number) => {
-        setGrid(grid);
-        setLabel(CipherState.BREAKING);
-        console.log('progress', p);
-        if (p !== progress()) {
-            setProgress(p);
-        }
+        cipher?.setGrid((grid: IGridItem[], ct: ICipherType, p: number) => {
+            setGrid(grid);
+            setCipherType(ct);
+            setLabel(CipherState.BREAKING);
+            if (p !== progress()) {
+                setProgress(p);
+            }
+        });
+
+        cipher?.setCompleteCipher((c: Cipher, cancelled: boolean) => {
+            setLabel(CipherState.SUCCESS);
+            cardRef?.classList.add('success');
+            cardRef?.classList.remove('background');
+            setTimeout(() => {
+                cardRef?.classList.add('background');
+                cardRef?.classList.remove('success');
+                props.onComplete?.(c, cipherType(), cancelled);
+                setCipherType(undefined);
+            }, 1000);
+        });
     });
     
     return (
-        <Card class="background">
+        <Card ref={el => cardRef = el} class="background">
             <CardHeader
                 title='Cipher Break'
+                subheader={cipherType()?.name}
                 action={
                     <IconButton onClick={newCipher}>
                         <AddTwoTone />

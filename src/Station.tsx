@@ -16,6 +16,7 @@ import Grid from '@suid/material/Grid';
 
 import Cipher from './lib/Cipher';
 import { CpuActivityWidget } from './components/Widgets/cpuActivity';
+import { CipherTypes, ICipherType } from './includes/Cipher.interface';
 
 const useStore = create<CounterState>(set => ({
     count: 1,
@@ -34,25 +35,24 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
   
     const state = useStore();
 
-    const completeCipher = (cipher: Cipher, cancelled: boolean = false) => {
+    const completeCipher = (cipher: Cipher, cipherType: ICipherType, cancelled: boolean = false) => {
         state.removeCipher(cipher);
-        stationStore.os.removeProcess(cipher);
         if (!cancelled) {
             // Add money for completion
             // add experience for completion
-            console.log('Cipher completed', cipher);
+            console.log('Cipher completed', cipher, cipherType);
+            stationStore.os.player.addMoney(cipherType.payout);
         } else {
-            console.log('Cipher cancelled', cipher);
+            console.log('Cipher cancelled', cipher, cipherType);
         }
         // Add notification
     }
 
     const addCipher = () => {
+        const cipherType = CipherTypes[Math.floor(Math.random() * CipherTypes.length)];
         const cssClasses = [ 'breaking-1', 'breaking-2', 'breaking-3', 'breaking-4' ];
-        const c = new Cipher(20, 10, cssClasses, completeCipher);
+        const c = new Cipher(20, 10, cssClasses, cipherType, stationStore.os);
         state.addCipher(c);
-        console.log(c);
-        stationStore.os.addProcess(c);
     }
 
     const { stationStore } = props;
@@ -78,7 +78,7 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
                 <Grid container spacing={2}>
                     {state.runningCiphers.length > 0 && state.runningCiphers.map(cipher =>
                         <Grid item xs={4}>
-                            <CipherBreak station={state.station} width={20} cipher={cipher} newCipher={addCipher} />
+                            <CipherBreak station={state.station} width={20} cipher={cipher} newCipher={addCipher} onComplete={completeCipher} />
                         </Grid>
                     ) || 
                     <Grid item xs={4}>
