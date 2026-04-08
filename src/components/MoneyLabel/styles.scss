@@ -1,0 +1,50 @@
+.glow {
+    font-size: 20px;
+    position: absolute;
+    z-index: 1200;
+    font-size: 20px;
+}
+
+.income {
+    text-shadow: 0 0 10px rgba(40, 255, 40, 0.8);
+    color: rgb(40, 255, 40);
+    animation: incomeAnimation 1s ease-in-out reverse;
+    animation-iteration-count: 1;
+}
+
+.expense {
+    text-shadow: 0 0 10px rgba(255, 40, 40, 0.8);
+    color: rgb(255, 40, 40);
+    animation: expenseAnimation 1s ease-in-out reverse;
+    animation-iteration-count: 1;
+}
+
+@keyframes incomeAnimation {
+    0% {
+        transform: translateY(-30px);
+        opacity: 0;
+        scale: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-10px);
+        opacity: 1;
+    }
+}
+
+@keyframes expenseAnimation {
+    0% {
+        transform: translateY(30px);
+        opacity: 0;
+        scale: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(10);
+        opacity: 1;
+    }
+}

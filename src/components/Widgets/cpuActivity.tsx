@@ -17,10 +17,10 @@ export const CpuActivityWidget: Component<{ state: CounterState, title?: string 
             title={title}
             data={state.cpuActivity}
             maxDataPoints={50}
-            height={400}
+            height={300}
             margin={{ top: 20, right: 80, bottom: 40, left: 60 }}
             xLabel="Time"
-            yLabel="Value"
+            yLabel="% Usage"
             strokeColor="#2563eb"
             strokeWidth={2}
         />

@@ -1,4 +1,4 @@
-import { Component, createSignal, JSX } from 'solid-js';
+import { Component, createSignal, JSX, Show, createEffect } from 'solid-js';
 
 import {
     Box, AppBar, Toolbar, IconButton,
@@ -24,6 +24,7 @@ import { PlayerState } from '../includes/Player.interface';
 import CodeBreakerLogo from '../assets/logos/codebreaker-logo.png';
 import './AppBar.scss';
 import { NotificationLevel } from '../includes/OperatingSystem.interface';
+import MoneyLabel from './MoneyLabel';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -245,6 +246,11 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
         </Menu>
     );  
 
+    let moneyLabelRef: HTMLElement | undefined = undefined;
+    createEffect(() => {
+        console.log(props.playerStateStore?.moneyLabel);
+    });
+    
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position='fixed' style={{ background: 'rgba(50, 50, 50, 0.75)'}}>
@@ -279,7 +285,10 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
                             </>
                         )}
                     </Box>
-                    <Box sx={{ display: { xs: 'none', md: 'flex' }}}>
+                    <Box ref={el => moneyLabelRef = el} sx={{ display: { xs: 'none', md: 'flex' }}}>
+                        <Show when={props.playerStateStore?.moneyLabel?.amount} keyed>
+                            {(amount) => <MoneyLabel amount={amount} anchorRef={moneyLabelRef} />}
+                        </Show>
                         $: {props.playerStateStore?.player.money.toFixed(2)}
                     </Box>
                     <Box sx={{ display: { xs: 'none', md: 'flex' }}}>

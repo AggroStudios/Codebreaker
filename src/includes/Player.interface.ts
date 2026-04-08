@@ -12,8 +12,12 @@ export type Player = {
     messages: Message[],
 };
 
+export type MoneyLabelSpawn = { amount: number; id: number };
+
 export interface PlayerState {
     player: Player,
+    moneyLabel: MoneyLabelSpawn | null,
+    setMoneyLabel: (amount: number) => void,
     earnExperience: (amount: number) => void,
     addMoney: (amount: number) => void,
     removeMoney: (amount: number) => void,

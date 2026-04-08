@@ -187,7 +187,7 @@ export default function LineChart(props: LineChartProps) {
             g.append('text')
                 .attr('transform', `translate(${innerWidth / 2}, ${innerHeight + 35})`)
                 .style('text-anchor', 'middle')
-                .style('fill', '#374151')
+                .style('fill', '#d0d0d0')
                 .style('font-size', '12px')
                 .text(props.xLabel);
         }
@@ -198,7 +198,7 @@ export default function LineChart(props: LineChartProps) {
                 .attr('y', -m.left + 15)
                 .attr('x', -innerHeight / 2)
                 .style('text-anchor', 'middle')
-                .style('fill', '#374151')
+                .style('fill', '#d0d0d0')
                 .style('font-size', '12px')
                 .text(props.yLabel);
         }

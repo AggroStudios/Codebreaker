@@ -81,6 +81,7 @@ const playerStore = create<PlayerState>(set => ({
         notifications: [],
         messages: []
     } as Player,
+    moneyLabel: null,
     earnExperience: (amount: number) => set(state => {
 
         let nextLevel = experienceForLevel(state.player.level);
@@ -102,6 +103,8 @@ const playerStore = create<PlayerState>(set => ({
             }
         };
     }),
+    // setStation: (station: StationStoreType) => set(() => ({ station })),
+    setMoneyLabel: (amount: number) => set(() => ({ moneyLabel: { amount, id: Date.now() } })),
     addMoney: (amount: number) => set(state => ({ player: { ...state.player, money: state.player.money + amount } })),
     removeMoney: (amount: number) => set(state => ({ player: { ...state.player, money: state.player.money - amount } })),
     addNotification: (notification) => set(state => ({
