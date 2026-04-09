@@ -69,12 +69,9 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
     const [cipherType, setCipherType] = createSignal<ICipherType|undefined>(undefined);
     const [label, setLabel] = createSignal<CipherState>(CipherState.IDLE);
 
-    const { station, width, cipher, newCipher } = props;
-    const { cpu, memory } = station;
+    const { width, cipher, newCipher } = props;
 
     onMount(() => {
-        console.log(cpu.flops, cpu.cores, memory.capacity, cipher?.id);
-
         cipher?.setGrid((grid: IGridItem[], ct: ICipherType, p: number) => {
             setGrid(grid);
             setCipherType(ct);
