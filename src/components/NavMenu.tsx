@@ -1,4 +1,4 @@
-import { Component } from 'solid-js';
+import { Component, Show } from 'solid-js';
 import {
     List,
     ListItemButton,
@@ -24,6 +24,7 @@ import { PlayerState } from '../includes/Player.interface';
 
 import AggroStudios from '../assets/logos/AggroStudios.png';
 import './NavMenu.scss';
+import XpLabel from './XpLabel';
 
 const StyledLinkItemButton = styled(ListItemButton)<typeof ListItemButton>(({ theme }) => ({
     '&.Mui-selected': {
@@ -115,11 +116,21 @@ function SecondaryListItems(props: any) {
 }
 
 function PlayerLevel(props: { player: PlayerState }) {
+    let xpLabelRef: HTMLElement | undefined = undefined;
     return (
-        <Card class="playerLevelCard">
+        <Card ref={el => xpLabelRef = el} class="playerLevelCard">
             <CardHeader title={`Level ${props.player.player.level}`} />
             <CardContent>
             <Box sx={{ width: '100%' }}>
+                <Show when={
+                    props.player.xpLabel?.data?.amount ?
+                        { 
+                            amount: props.player.xpLabel?.data?.amount,
+                            levelUp: props.player.xpLabel?.data?.levelUp
+                        } : null
+                    } keyed>
+                    {(data) => <XpLabel amount={data?.amount} levelUp={data?.levelUp} anchorRef={xpLabelRef} />}
+                </Show>
                 <LinearProgress variant="determinate" value={(props.player.player.experience / props.player.player.nextLevel) * 100} />
             </Box>
             </CardContent>

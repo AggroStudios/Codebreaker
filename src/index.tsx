@@ -72,6 +72,7 @@ const useStore = create<AuthenticationState>(set => ({
 }));
 
 let hideMoneyLabelTimer: ReturnType<typeof setTimeout> | null = null;
+let hideXpLabelTimer: ReturnType<typeof setTimeout> | null = null;
 
 const playerStore = create<PlayerState>(set => ({
     player: {
@@ -84,18 +85,33 @@ const playerStore = create<PlayerState>(set => ({
         messages: []
     } as Player,
     moneyLabel: null,
+    xpLabel: null,
+    setXpLabel: (amount: number, levelUp?: boolean) => set(() => ({ xpLabel: { data: { amount, levelUp }, id: Date.now() } })),
     earnExperience: (amount: number) => set(state => {
 
         let nextLevel = experienceForLevel(state.player.level);
         let experience = state.player.experience + amount;
         let level = state.player.level;
 
+        let levelUp = false;
+
         while (experience >= nextLevel) {
             experience -= nextLevel;
             level++;
             nextLevel = experienceForLevel(level);
+            levelUp = true;
         }
         
+        if (hideXpLabelTimer !== null) {
+            clearTimeout(hideXpLabelTimer);
+            hideXpLabelTimer = null;
+        }
+        state.setXpLabel(amount, levelUp);
+        hideXpLabelTimer = setTimeout(() => {
+            state.setXpLabel(null);
+            hideXpLabelTimer = null;
+        }, 990);
+
         return {
             player: {
                 ...state.player,

@@ -1,0 +1,29 @@
+.glow {
+    font-size: 20px;
+    position: absolute;
+    z-index: 1200;
+    font-size: 20px;
+    text-align: center;
+}
+
+.animate {
+    text-shadow: 0 0 10px rgba(68, 189, 255, 0.8);
+    color: rgb(68, 189, 255);
+    animation: levelAnimation 1s ease-in-out reverse;
+    animation-iteration-count: 1;
+}
+
+@keyframes levelAnimation {
+    0% {
+        transform: translateY(-30px);
+        opacity: 0;
+        scale: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-10px);
+        opacity: 1;
+    }
+}

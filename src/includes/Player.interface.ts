@@ -13,11 +13,14 @@ export type Player = {
 };
 
 export type MoneyLabelSpawn = { amount: number; id: number };
+export type XpLabelSpawn = { data: {amount: number; levelUp?: boolean }; id: number };
 
 export interface PlayerState {
     player: Player,
     moneyLabel: MoneyLabelSpawn | null,
+    xpLabel: XpLabelSpawn | null,
     setMoneyLabel: (amount: number) => void,
+    setXpLabel: (amount: number, levelUp?: boolean) => void,
     earnExperience: (amount: number) => void,
     addMoney: (amount: number) => void,
     removeMoney: (amount: number) => void,
