@@ -71,6 +71,8 @@ const useStore = create<AuthenticationState>(set => ({
     logout: () => console.log('Logout'),
 }));
 
+let hideMoneyLabelTimer: ReturnType<typeof setTimeout> | null = null;
+
 const playerStore = create<PlayerState>(set => ({
     player: {
         name: 'Player',
@@ -105,8 +107,35 @@ const playerStore = create<PlayerState>(set => ({
     }),
     // setStation: (station: StationStoreType) => set(() => ({ station })),
     setMoneyLabel: (amount: number) => set(() => ({ moneyLabel: { amount, id: Date.now() } })),
-    addMoney: (amount: number) => set(state => ({ player: { ...state.player, money: state.player.money + amount } })),
-    removeMoney: (amount: number) => set(state => ({ player: { ...state.player, money: state.player.money - amount } })),
+    addMoney: (amount: number) => set(state => {
+        if (hideMoneyLabelTimer !== null) {
+            clearTimeout(hideMoneyLabelTimer);
+            hideMoneyLabelTimer = null;
+        }
+        state.setMoneyLabel(amount);
+        hideMoneyLabelTimer = setTimeout(() => {
+            state.setMoneyLabel(null);
+            hideMoneyLabelTimer = null;
+        }, 990);
+
+        return {
+            player: { ...state.player, money: state.player.money + amount }
+        };
+    }),
+    removeMoney: (amount: number) => set(state => {
+        if (hideMoneyLabelTimer !== null) {
+            clearTimeout(hideMoneyLabelTimer);
+            hideMoneyLabelTimer = null;
+        }
+        state.setMoneyLabel(-amount);
+        hideMoneyLabelTimer = setTimeout(() => {
+            state.setMoneyLabel(null);
+            hideMoneyLabelTimer = null;
+        }, 990);
+        return {
+            player: { ...state.player, money: state.player.money - amount }
+        };
+    }),
     addNotification: (notification) => set(state => ({
         player: {
             ...state.player,
