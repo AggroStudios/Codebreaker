@@ -27,7 +27,7 @@ export default class OperatingSystem {
     }
 
     public startGameLoop() {
-        this.interval = setInterval(() => this.update(), 5000 / FPS);
+        this.interval = setInterval(() => this.update(), 500 / FPS);
     };
 
     public stopGameLoop() {

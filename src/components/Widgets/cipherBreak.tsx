@@ -57,7 +57,7 @@ interface CipherBreakOptions {
     width: number;
     cipher?: Cipher;
     newCipher: () => void;
-    onComplete?: (cipher: Cipher, cipherType: ICipherType, cancelled: boolean) => void;
+    onComplete?: (cipher: Cipher) => void;
 };
 
 const CipherBreak: Component<CipherBreakOptions> = (props) => {
@@ -69,7 +69,7 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
     const [cipherType, setCipherType] = createSignal<ICipherType|undefined>(undefined);
     const [label, setLabel] = createSignal<CipherState>(CipherState.IDLE);
 
-    const { width, cipher, newCipher } = props;
+    const { width, cipher, newCipher, station, onComplete } = props;
 
     onMount(() => {
         cipher?.setGrid((grid: IGridItem[], ct: ICipherType, p: number) => {
@@ -85,10 +85,14 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
             setLabel(CipherState.SUCCESS);
             cardRef?.classList.add('success');
             cardRef?.classList.remove('background');
+            if (!cancelled) {
+                station.os.player.earnExperience(cipherType()?.xp ?? 0);
+                station.os.player.addMoney(cipherType()?.payout ?? 0);
+            }
             setTimeout(() => {
                 cardRef?.classList.add('background');
                 cardRef?.classList.remove('success');
-                props.onComplete?.(c, cipherType(), cancelled);
+                onComplete?.(c);
                 setCipherType(undefined);
             }, 1000);
         });

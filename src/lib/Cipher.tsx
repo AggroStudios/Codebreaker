@@ -78,7 +78,7 @@ export default class Cipher implements Process {
 
     public callback(_: number) {
         this.frame++;
-        if (this.frame > 0 && this.frame % 1 === 0) {
+        if (this.frame > 0 && this.frame % 10 === 0) {
             const solvedIndex = this.unsolvedIndexes[Math.floor(Math.random() * this.unsolvedIndexes.length)];
             const solvedValue = Math.round(Math.random());
 
@@ -89,10 +89,13 @@ export default class Cipher implements Process {
 
             this.unsolvedIndexes.splice(this.unsolvedIndexes.indexOf(solvedIndex), 1);
             this.progress = Math.floor((this.width * this.height - this.unsolvedIndexes.length) / (this.width * this.height) * 100);
+
         }
 
-        this.randomizeGrid();
-
+        if (this.frame > 0 && this.frame % 10 === 0) {
+            this.randomizeGrid();
+        }
+        
         if (this.progress >= 100) {
             this._stationOs.removeProcess(this);
             this._completeCipher(this, false);

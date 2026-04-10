@@ -34,7 +34,7 @@ export default class CpuActivity implements Process {
     }
 
     public callback(frame: number) {
-        if (parseFloat((frame / 0.01).toFixed(2)) % 1 === 0) {
+        if (parseFloat((frame / 0.1).toFixed(2)) % 1 === 0) {
             this.randomizeData();
         }
     }

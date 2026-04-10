@@ -13,7 +13,7 @@ import Grid from '@suid/material/Grid';
 
 import Cipher from './lib/Cipher';
 import { CpuActivityWidget } from './components/Widgets/cpuActivity';
-import { CipherTypes, ICipherType } from './includes/Cipher.interface';
+import { CipherTypes } from './includes/Cipher.interface';
 import Button from '@suid/material/Button';
 
 const useStore = create<CounterState>(set => ({
@@ -31,16 +31,8 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
     const state = useStore();
     let hideMoneyLabelTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const completeCipher = (cipher: Cipher, cipherType: ICipherType, cancelled: boolean = false) => {
+    const completeCipher = (cipher: Cipher) => {
         state.removeCipher(cipher);
-        if (!cancelled) {
-            // Add money for completion
-            // add experience for completion
-            console.log('Cipher completed', cipher, cipherType);
-            stationStore.os.player.addMoney(cipherType.payout);
-        } else {
-            console.log('Cipher cancelled', cipher, cipherType);
-        }
         // Add notification
     }
 

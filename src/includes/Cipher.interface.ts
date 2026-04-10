@@ -30,6 +30,7 @@ export interface ICipherType {
         unit: BlockUnit
     };
     payout: number;
+    xp: number;
 }
 
 export const CipherTypes: ICipherType[] = [
@@ -42,6 +43,7 @@ export const CipherTypes: ICipherType[] = [
             unit: BlockUnit.bytes,
         },
         payout: 100,
+        xp: 10,
     },
     {
         name: 'Cipher 2',
@@ -52,6 +54,7 @@ export const CipherTypes: ICipherType[] = [
             unit: BlockUnit.bytes,
         },
         payout: 200,
+        xp: 12,
     },
     {
         name: 'Cipher 3',
@@ -62,5 +65,6 @@ export const CipherTypes: ICipherType[] = [
             unit: BlockUnit.bytes,
         },
         payout: 300,
+        xp: 17,
     },
 ];
