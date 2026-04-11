@@ -24,6 +24,10 @@ describe('Terminal', () => {
 
   it('should attach operating system', () => {
     const os = new OperatingSystem({
+      moneyLabel: null,
+      xpLabel: null,
+      setMoneyLabel: vi.fn(),
+      setXpLabel: vi.fn(),
       addNotification: vi.fn(),
       addMessage: vi.fn(),
       markMessageAsRead: vi.fn(),
