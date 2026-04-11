@@ -118,7 +118,7 @@ function SecondaryListItems(props: any) {
 function PlayerLevel(props: { player: PlayerState }) {
     let xpLabelRef: HTMLElement | undefined = undefined;
     return (
-        <Card ref={el => xpLabelRef = el} class="playerLevelCard">
+        <Card ref={el => xpLabelRef = el} class="playerLevelCard centerContent">
             <CardHeader title={`Level ${props.player.player.level}`} />
             <CardContent>
             <Box sx={{ width: '100%' }}>

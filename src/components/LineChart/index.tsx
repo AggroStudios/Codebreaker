@@ -1,6 +1,7 @@
 import { onMount, onCleanup, createEffect, createSignal, createMemo } from 'solid-js';
 import * as d3 from 'd3';
-import { Card, CardContent, CardHeader } from '@suid/material';
+import { Avatar, Card, CardContent, CardHeader } from '@suid/material';
+import { SsidChartOutlined } from '@suid/icons-material';
 
 interface DataPoint {
     x: number | string | Date;
@@ -282,7 +283,14 @@ export default function LineChart(props: LineChartProps) {
 
     return (
         <Card class="background">
-            <CardHeader title={title()} />
+            <CardHeader
+                title={title()}
+                titleTypographyProps={{
+                    variant: 'h5',
+                    noWrap: true,
+                }}
+                avatar={<Avatar><SsidChartOutlined /></Avatar>}
+            />
             <CardContent ref={containerRef} style="width: 100%;">
                 <svg ref={svgRef} style="display: block; width: 100%; height: auto;"></svg>
             </CardContent>

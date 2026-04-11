@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { Component, createSignal, onMount } from 'solid-js';
 import {
+    Avatar,
     Box,
     Button,
     Card,
@@ -16,7 +17,7 @@ import {
 } from '@suid/material';
 import type { LinearProgressProps } from '@suid/material/LinearProgress';
 
-import { AddTwoTone } from '@suid/icons-material';
+import { AddTwoTone, CodeTwoTone, PauseTwoTone, PlayArrowTwoTone } from '@suid/icons-material';
 import IconButton from '@suid/material/IconButton';
 
 import Cipher from "../../lib/Cipher";
@@ -77,10 +78,6 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
 
     const { width, cipher, newCipher, station, onComplete } = props;
 
-    const handleClose = () => {
-        setOpen(false);
-    }
-
     onMount(() => {
         cipher?.setProgress((p: number, type: ICipherType, state: CipherState) => {
             if (p !== progress()) {
@@ -120,24 +117,57 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
         });
     });
 
+    const handleOpen = () => {
+        setOpen(true);
+        cipher?.pause();
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+        cipher?.resume();
+    }
+    
     const cancelCipher = () => {
         setOpen(false);
         cipher?.cancel();
+    }
+
+    const pauseCipher = () => {
+        cipher?.pause();
+    }
+
+    const resumeCipher = () => {
+        cipher?.resume();
     }
     
     return (
         <>
             <Card ref={el => cardRef = el} class="background">
                 <CardHeader
+                    avatar={<Avatar><CodeTwoTone /></Avatar>}
                     title='Cipher Break'
+                    titleTypographyProps={{
+                        variant: 'h5',
+                        noWrap: true,
+                    }}
                     subheader={cipherType()?.name}
                     action={
-                        <IconButton onClick={newCipher}>
-                            <AddTwoTone />
-                        </IconButton>
+                        <>
+                            {([CipherState.BREAKING, CipherState.DOWNLOADING].includes(cipherState()) && cipherState() !== CipherState.PAUSED) &&
+                            <IconButton onClick={pauseCipher}>
+                                <PauseTwoTone />
+                            </IconButton>}
+                            {cipherState() === CipherState.PAUSED && 
+                            <IconButton onClick={resumeCipher}>
+                                <PlayArrowTwoTone />
+                            </IconButton>}
+                            <IconButton onClick={newCipher}>
+                                <AddTwoTone />
+                            </IconButton>
+                        </>
                     }
                 />
-                <CardContent>
+                <CardContent class="centerContent">
                     {cipherState() && <div class="progress">
                         <LinearProgressWithLabel variant="determinate" value={progress()} label={cipherState()?.toString()} />
                     </div>}
@@ -146,7 +176,7 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
                     }}>
                         {grid().map(char => <div class={clsx(char.cssClass)}>{char.character}</div>)}
                     </CipherContainer>}
-                    {[CipherState.BREAKING, CipherState.DOWNLOADING].includes(cipherState()) && <Button onClick={() => setOpen(true)} variant="contained" color="error">Cancel</Button>}
+                    {[CipherState.BREAKING, CipherState.DOWNLOADING, CipherState.PAUSED].includes(cipherState()) && <Button onClick={handleOpen} variant="contained" color="error">Cancel</Button>}
                 </CardContent>
             </Card>
             <Dialog open={open()} onClose={handleClose}>

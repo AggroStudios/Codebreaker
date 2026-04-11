@@ -264,7 +264,7 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
                         </SearchIconWrapper>
                         <StyledInputBase placeholder='Search...' inputProps={{ 'aria-label': 'search' }} />
                     </Search>
-                    <Box sx={{ flexGrow: 1 }}>
+                    <Box sx={{ flexGrow: 1 }} class="centerContent">
                         {props.stationStore && (
                             <>
                                 <Typography variant='h6' noWrap component='div' sx={{ display: { xs: 'none', sm: 'block' }}}>

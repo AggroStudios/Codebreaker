@@ -29,6 +29,7 @@ export default class Cipher implements Process {
     private _cipherType: ICipherType;
     private cipherSize: number;
     private _state: CipherState = CipherState.DOWNLOADING;
+    private _previousState: CipherState | undefined = undefined;
 
     constructor(width: number, height: number, cssClasses: string[], cipherType: ICipherType, station: StationStoreType) {
         this.width = width;
@@ -58,6 +59,20 @@ export default class Cipher implements Process {
 
     public get state() {
         return this._state;
+    }
+
+    public pause() {
+        if ([CipherState.DOWNLOADING, CipherState.BREAKING].includes(this._state)) {
+            this._previousState = this._state;
+            this.state = CipherState.PAUSED;
+        }
+    }
+
+    public resume() {
+        if (this._previousState) {
+            this.state = this._previousState;
+            this._previousState = undefined;
+        }
     }
 
     public cancel() {
@@ -110,7 +125,9 @@ export default class Cipher implements Process {
     }
 
     private breaking() {
-        if (this.frame > 0 && this.frame % 10 === 0) {
+        const complexity = Math.round(10 * this._cipherType.complexity);
+        console.log('Complexity:', complexity);
+        if (this.frame > 0 && this.frame % complexity === 0) {
             const solvedIndex = this.unsolvedIndexes[Math.floor(Math.random() * this.unsolvedIndexes.length)];
             const solvedValue = Math.round(Math.random());
 
@@ -150,6 +167,8 @@ export default class Cipher implements Process {
     }
 
     public callback(_: number) {
+        if (this._state === CipherState.PAUSED) return;
+
         this.frame++;
         switch (this._state) {
             case CipherState.DOWNLOADING:

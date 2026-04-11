@@ -48,7 +48,7 @@ export const CipherTypes: ICipherType[] = [
     },
     {
         name: 'Cipher 2',
-        complexity: 2,
+        complexity: 1.8,
         parallelism: 2,
         block: {
             size: 2048,
@@ -59,7 +59,7 @@ export const CipherTypes: ICipherType[] = [
     },
     {
         name: 'Cipher 3',
-        complexity: 3,
+        complexity: 2.5,
         parallelism: 3,
         block: {
             size: 3072,
