@@ -14,7 +14,6 @@ import Grid from '@suid/material/Grid';
 import Cipher from './lib/Cipher';
 import { CpuActivityWidget } from './components/Widgets/cpuActivity';
 import { CipherTypes } from './includes/Cipher.interface';
-import Button from '@suid/material/Button';
 
 const useStore = create<CounterState>(set => ({
     runningCiphers: [],
@@ -29,8 +28,6 @@ const useStore = create<CounterState>(set => ({
 const App: Component<{ stationStore?: StationStoreType }> = props => {
   
     const state = useStore();
-    let hideMoneyLabelTimer: ReturnType<typeof setTimeout> | null = null;
-
     const completeCipher = (cipher: Cipher) => {
         state.removeCipher(cipher);
         // Add notification
@@ -46,23 +43,6 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
     const { stationStore } = props;
     state.setStation(stationStore);
 
-    const showMoneyLabel = () => {
-        if (hideMoneyLabelTimer !== null) {
-            clearTimeout(hideMoneyLabelTimer);
-            hideMoneyLabelTimer = null;
-        }
-        let amount = Math.ceil(Math.random() * 100);
-        const positive = Math.random() > 0.5;
-        if (!positive) {
-            amount = -amount;
-        }
-        stationStore.os.player.setMoneyLabel(amount);
-        hideMoneyLabelTimer = setTimeout(() => {
-            stationStore.os.player.setMoneyLabel(null);
-            hideMoneyLabelTimer = null;
-        }, 990);
-    }
-    
     return (
         <>
             <div class="card">
@@ -75,7 +55,6 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
                     </Grid>
                 </Grid>
             </div>
-            <div><Button onClick={showMoneyLabel}>Show Money Label</Button></div>
             <div class="card">
                 <Grid container spacing={2}>
                     {state.runningCiphers.length > 0 && state.runningCiphers.map(cipher =>

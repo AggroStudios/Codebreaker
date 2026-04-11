@@ -71,8 +71,8 @@ const useStore = create<AuthenticationState>(set => ({
     logout: () => console.log('Logout'),
 }));
 
-let hideMoneyLabelTimer: ReturnType<typeof setTimeout> | null = null;
-let hideXpLabelTimer: ReturnType<typeof setTimeout> | null = null;
+const hideMoneyLabelTimer: ReturnType<typeof setTimeout> | null = null;
+const hideXpLabelTimer: ReturnType<typeof setTimeout> | null = null;
 
 const animationWrapper = (timer: ReturnType<typeof setTimeout> | null, startCallback: () => void, endCallback: () => void) => {
     if (timer !== null) {
