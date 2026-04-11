@@ -13,7 +13,7 @@ const StationStatistics: Component<{ station: StationStoreType }> = (props) => {
                 <Typography variant="body1">CPU: {station.cpu?.toString()}</Typography>
                 <Typography variant="body1">Memory: {station.memory?.capacity} GB</Typography>
                 <Typography variant="body1">Storage: {station.storage?.map(storage => storage.capacity).join(', ')} GB</Typography>
-                <Typography variant="body1">Network: {station.network?.toString()}</Typography>
+                <Typography variant="body1">Network: {station.network?.network.toString()}</Typography>
             </CardContent>
         </Card>
     )

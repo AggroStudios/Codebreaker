@@ -26,12 +26,22 @@
     margin-bottom: 10px;
 }
 
-.success {
+.cipher-success {
     animation: successPulse 1s !important;
+}
+
+.cipher-error {
+    animation: errorPulse 1s !important;
 }
 
 @keyframes successPulse {
     0% { background-color: rgba(25, 25, 25, 0.8); }
     25% { background-color: rgba(0, 128, 0, 0.8); }
+    100% { background-color: rgba(25, 25, 25, 0.8); }
+}
+
+@keyframes errorPulse {
+    0% { background-color: rgba(25, 25, 25, 0.8); }
+    25% { background-color: rgba(128, 0, 0, 0.8); }
     100% { background-color: rgba(25, 25, 25, 0.8); }
 }

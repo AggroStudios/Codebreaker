@@ -1,10 +1,11 @@
 export enum CipherState {
-    IDLE,
-    DOWNLOADING,
-    BREAKING,
-    SUCCESS,
-    FAILURE,
-    PAUSED,
+    IDLE = undefined,
+    DOWNLOADING = 'Download',
+    BREAKING = 'Breaking',
+    SUCCESS = 'Success',
+    CANCELLED = 'Cancelled',
+    FAILURE = 'Failure',
+    PAUSED = 'Paused',
 };
 
 export type CipherProps = {
@@ -40,7 +41,7 @@ export const CipherTypes: ICipherType[] = [
         parallelism: 1,
         block: {
             size: 1024,
-            unit: BlockUnit.bytes,
+            unit: BlockUnit.megabytes,
         },
         payout: 100,
         xp: 10,
@@ -51,7 +52,7 @@ export const CipherTypes: ICipherType[] = [
         parallelism: 2,
         block: {
             size: 2048,
-            unit: BlockUnit.bytes,
+            unit: BlockUnit.megabytes,
         },
         payout: 200,
         xp: 12,
@@ -62,7 +63,7 @@ export const CipherTypes: ICipherType[] = [
         parallelism: 3,
         block: {
             size: 3072,
-            unit: BlockUnit.bytes,
+            unit: BlockUnit.megabytes,
         },
         payout: 300,
         xp: 17,

@@ -122,14 +122,7 @@ export default class OperatingSystem {
     };
 
     removeProcess(process: Process) {
-        const processIndex = this.processes.findIndex(i => i?.['id'] === process?.['id']);
-        // Make sure the process exists before trying to remove it.
-        if (processIndex > -1) {
-            this.processes = [
-                ...this.processes.slice(0, processIndex),
-                ...this.processes.slice(processIndex + 1)
-            ];
-        }
+        this.processes = this.processes.filter(p => p?.['id'] !== process?.['id']);
     };
 
     resetProcesses() {

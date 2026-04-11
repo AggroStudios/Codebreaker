@@ -39,7 +39,7 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
     const addCipher = () => {
         const cipherType = CipherTypes[Math.floor(Math.random() * CipherTypes.length)];
         const cssClasses = [ 'breaking-1', 'breaking-2', 'breaking-3', 'breaking-4' ];
-        const c = new Cipher(20, 10, cssClasses, cipherType, stationStore.os);
+        const c = new Cipher(20, 10, cssClasses, cipherType, stationStore);
         state.addCipher(c);
     }
 

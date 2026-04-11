@@ -1,3 +1,4 @@
+import { Networking } from '../lib/network';
 import OperatingSystem from '../lib/OperatingSystem';
 
 export enum NetworkConnectionType {
@@ -25,7 +26,7 @@ export type StationStoreType = {
     cpu: null | IProcessorType,
     memory: null | IMemoryType,
     storage: IStorageType[],
-    network: null | INetworkType,
+    network: null | Networking,
     frame: number,
     count: number,
     exponent: number,

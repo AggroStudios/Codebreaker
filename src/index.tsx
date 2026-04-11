@@ -18,7 +18,7 @@ import { Station } from './lib/station';
 import { CodiumMemory } from './lib/memory';
 import { IStorageType } from './includes/Process.interface';
 import { CodiumStorageHdd } from './lib/storage';
-import { NetworkDSL } from './lib/network';
+import { NetworkDSL, Networking } from './lib/network';
 
 const darkTheme = createTheme({
     palette: {
@@ -74,6 +74,17 @@ const useStore = create<AuthenticationState>(set => ({
 let hideMoneyLabelTimer: ReturnType<typeof setTimeout> | null = null;
 let hideXpLabelTimer: ReturnType<typeof setTimeout> | null = null;
 
+const animationWrapper = (timer: ReturnType<typeof setTimeout> | null, startCallback: () => void, endCallback: () => void) => {
+    if (timer !== null) {
+        clearTimeout(timer);
+        timer = null;
+    }
+    startCallback();
+    timer = setTimeout(() => {
+        endCallback();
+    }, 990);
+}
+
 const playerStore = create<PlayerState>(set => ({
     player: {
         name: 'Player',
@@ -86,7 +97,7 @@ const playerStore = create<PlayerState>(set => ({
     } as Player,
     moneyLabel: null,
     xpLabel: null,
-    setXpLabel: (amount: number, levelUp?: boolean) => set(() => ({ xpLabel: { data: { amount, levelUp }, id: Date.now() } })),
+    setXpLabel: (amount: number | null, levelUp?: boolean) => set(() => ({ xpLabel: { data: { amount, levelUp }, id: Date.now() } })),
     earnExperience: (amount: number) => set(state => {
 
         let nextLevel = experienceForLevel(state.player.level);
@@ -102,15 +113,7 @@ const playerStore = create<PlayerState>(set => ({
             levelUp = true;
         }
         
-        if (hideXpLabelTimer !== null) {
-            clearTimeout(hideXpLabelTimer);
-            hideXpLabelTimer = null;
-        }
-        state.setXpLabel(amount, levelUp);
-        hideXpLabelTimer = setTimeout(() => {
-            state.setXpLabel(null);
-            hideXpLabelTimer = null;
-        }, 990);
+        animationWrapper(hideXpLabelTimer, () => state.setXpLabel(amount, levelUp), () => state.setXpLabel(null));
 
         return {
             player: {
@@ -121,33 +124,15 @@ const playerStore = create<PlayerState>(set => ({
             }
         };
     }),
-    // setStation: (station: StationStoreType) => set(() => ({ station })),
-    setMoneyLabel: (amount: number) => set(() => ({ moneyLabel: { amount, id: Date.now() } })),
+    setMoneyLabel: (amount: number | null) => set(() => ({ moneyLabel: { amount, id: Date.now() } })),
     addMoney: (amount: number) => set(state => {
-        if (hideMoneyLabelTimer !== null) {
-            clearTimeout(hideMoneyLabelTimer);
-            hideMoneyLabelTimer = null;
-        }
-        state.setMoneyLabel(amount);
-        hideMoneyLabelTimer = setTimeout(() => {
-            state.setMoneyLabel(null);
-            hideMoneyLabelTimer = null;
-        }, 990);
-
+        animationWrapper(hideMoneyLabelTimer, () => state.setMoneyLabel(amount), () => state.setMoneyLabel(null));
         return {
             player: { ...state.player, money: state.player.money + amount }
         };
     }),
     removeMoney: (amount: number) => set(state => {
-        if (hideMoneyLabelTimer !== null) {
-            clearTimeout(hideMoneyLabelTimer);
-            hideMoneyLabelTimer = null;
-        }
-        state.setMoneyLabel(-amount);
-        hideMoneyLabelTimer = setTimeout(() => {
-            state.setMoneyLabel(null);
-            hideMoneyLabelTimer = null;
-        }, 990);
+        animationWrapper(hideMoneyLabelTimer, () => state.setMoneyLabel(-amount), () => state.setMoneyLabel(null));
         return {
             player: { ...state.player, money: state.player.money - amount }
         };
@@ -186,7 +171,7 @@ const processor = new CodiumProcessor();
 const operatingSystem = new OperatingSystem(playerStore);
 const memory = new CodiumMemory();
 const storage = new Array<IStorageType>(new CodiumStorageHdd());
-const network = new NetworkDSL();
+const network = new Networking(new NetworkDSL());
 
 const station = new Station(processor, operatingSystem, memory, storage, network);
 

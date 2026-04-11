@@ -1,6 +1,19 @@
 import clsx from 'clsx';
 import { Component, createSignal, onMount } from 'solid-js';
-import { Box, Card, CardContent, CardHeader, LinearProgress, styled, Typography } from '@suid/material';
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    CardHeader,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    LinearProgress,
+    styled,
+    Typography
+} from '@suid/material';
 import type { LinearProgressProps } from '@suid/material/LinearProgress';
 
 import { AddTwoTone } from '@suid/icons-material';
@@ -10,10 +23,11 @@ import Cipher from "../../lib/Cipher";
 
 import './styles.scss';
 import { StationStoreType } from '../../includes/Process.interface';
-import { ICipherType } from '../../includes/Cipher.interface';
+import { CipherState, ICipherType } from '../../includes/Cipher.interface';
 
 const CipherContainer = styled('div')({
-    display: 'grid'
+    display: 'grid',
+    marginBottom: '12px',
 });
 
 interface IGridItem {
@@ -21,19 +35,10 @@ interface IGridItem {
     cssClass: string;
 }
 
-enum CipherState {
-    IDLE = undefined,
-    DOWNLOADING = 'Downloading',
-    BREAKING = 'Breaking',
-    SUCCESS = 'Success',
-    FAILURE = 'Failure',
-    PAUSED = 'Paused',
-}
-
 function LinearProgressWithLabel(props: LinearProgressProps & { value: number, label?: string }) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        {props.label && <Box sx={{ minWidth: 65, textAlign: 'left' }}>
+        {props.label && <Box sx={{ minWidth: 75, textAlign: 'left' }}>
           <Typography
             variant="body2"
             sx={{ color: 'text.secondary' }}
@@ -67,59 +72,94 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
     const [grid, setGrid] = createSignal<IGridItem[]>([]);
     const [progress, setProgress] = createSignal<number>(0);
     const [cipherType, setCipherType] = createSignal<ICipherType|undefined>(undefined);
-    const [label, setLabel] = createSignal<CipherState>(CipherState.IDLE);
+    const [cipherState, setCipherState] = createSignal<CipherState|undefined>(undefined);
+    const [open, setOpen] = createSignal<boolean>(false);
 
     const { width, cipher, newCipher, station, onComplete } = props;
 
+    const handleClose = () => {
+        setOpen(false);
+    }
+
     onMount(() => {
-        cipher?.setGrid((grid: IGridItem[], ct: ICipherType, p: number) => {
-            setGrid(grid);
-            setCipherType(ct);
-            setLabel(CipherState.BREAKING);
+        cipher?.setProgress((p: number, type: ICipherType, state: CipherState) => {
             if (p !== progress()) {
                 setProgress(p);
             }
+            if (type !== cipherType()) {
+                setCipherType(type);
+            }
+            if (state !== cipherState()) {
+                setCipherState(state);
+            }
+        });
+
+        cipher?.setGrid((grid: IGridItem[]) => {
+            setGrid(grid);
         });
 
         cipher?.setCompleteCipher((c: Cipher, cancelled: boolean) => {
-            setLabel(CipherState.SUCCESS);
-            cardRef?.classList.add('success');
             cardRef?.classList.remove('background');
             if (!cancelled) {
+                setCipherState(CipherState.SUCCESS);
+                cardRef?.classList.add('cipher-success');
                 station.os.player.earnExperience(cipherType()?.xp ?? 0);
                 station.os.player.addMoney(cipherType()?.payout ?? 0);
             }
+            else {
+                setCipherState(CipherState.CANCELLED);
+                cardRef?.classList.add('cipher-error');
+            }
             setTimeout(() => {
                 cardRef?.classList.add('background');
-                cardRef?.classList.remove('success');
+                cardRef?.classList.remove('cipher-success');
+                cardRef?.classList.remove('cipher-error');
                 onComplete?.(c);
                 setCipherType(undefined);
             }, 1000);
         });
     });
+
+    const cancelCipher = () => {
+        setOpen(false);
+        cipher?.cancel();
+    }
     
     return (
-        <Card ref={el => cardRef = el} class="background">
-            <CardHeader
-                title='Cipher Break'
-                subheader={cipherType()?.name}
-                action={
-                    <IconButton onClick={newCipher}>
-                        <AddTwoTone />
-                    </IconButton>
-                }
-            />
-            <CardContent>
-                {grid().length > 0 && <div class="progress">
-                    <LinearProgressWithLabel variant="determinate" value={progress()} label={label()?.toString()} />
-                </div>}
-                <CipherContainer style={{
-                    'grid-template-columns': `repeat(${width}, ${100/width}%)`
-                }}>
-                    {grid().map(char => <div class={clsx(char.cssClass)}>{char.character}</div>)}
-                </CipherContainer>
-            </CardContent>
-        </Card>
+        <>
+            <Card ref={el => cardRef = el} class="background">
+                <CardHeader
+                    title='Cipher Break'
+                    subheader={cipherType()?.name}
+                    action={
+                        <IconButton onClick={newCipher}>
+                            <AddTwoTone />
+                        </IconButton>
+                    }
+                />
+                <CardContent>
+                    {cipherState() && <div class="progress">
+                        <LinearProgressWithLabel variant="determinate" value={progress()} label={cipherState()?.toString()} />
+                    </div>}
+                    {grid().length > 0 && <CipherContainer style={{
+                        'grid-template-columns': `repeat(${width}, ${100/width}%)`
+                    }}>
+                        {grid().map(char => <div class={clsx(char.cssClass)}>{char.character}</div>)}
+                    </CipherContainer>}
+                    {[CipherState.BREAKING, CipherState.DOWNLOADING].includes(cipherState()) && <Button onClick={() => setOpen(true)} variant="contained" color="error">Cancel</Button>}
+                </CardContent>
+            </Card>
+            <Dialog open={open()} onClose={handleClose}>
+                <DialogTitle>Cancel Cipher?</DialogTitle>
+                <DialogContent>
+                    <Typography>Are you sure you want to cancel this process? You will not be able to recover the data you already downloaded and will not be rewarded any experience or money.</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={cancelCipher} variant="contained" color="success">Yes</Button>
+                    <Button onClick={handleClose} variant="contained" color="primary">No</Button>
+                </DialogActions>
+            </Dialog>
+        </>
     )
 }
 

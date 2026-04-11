@@ -186,7 +186,7 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
                         <span style={{ "font-weight": message.unread ? 'bold' : 'normal' }}>{index} - {message.body}</span>
                     </MenuItem>
                 )) :
-                <MenuItem onClick={handleNotificationMenuClose}>
+                <MenuItem onClick={handleMessageMenuClose}>
                     <span style={{ "font-weight": 'bold' }}>No messages</span>
                 </MenuItem>
             }
@@ -211,7 +211,7 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
         >
             <MenuItem>
                 <IconButton size="large" aria-label="show 4 new mails" color="inherit" style={{ outline: 0 }}>
-                    <Badge badgeContent={4} color="error">
+                    <Badge badgeContent={props.playerStateStore?.player.messages.filter(o => o.unread).length ?? 0} color="error">
                         <MailIcon />
                     </Badge>
                 </IconButton>
@@ -224,7 +224,7 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
                     color="inherit"
                     style={{ outline: 0 }}
                 >
-                    <Badge badgeContent={17} color="error">
+                    <Badge badgeContent={props.playerStateStore?.player.notifications.filter(o => o.unread).length ?? 0} color="error">
                         <NotificationsIcon />
                     </Badge>
                 </IconButton>
