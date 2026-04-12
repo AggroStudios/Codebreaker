@@ -37,17 +37,21 @@ describe('OperatingSystem', () => {
   });
 
   it('should add, list, and remove processes', () => {
+    expect(os.listProcesses().some((p) => p.id === 'cpuActivity')).toBe(true);
     os.addProcess({ ...mockProcess });
-    expect(os.listProcesses()).toHaveLength(1);
+    expect(os.listProcesses()).toHaveLength(2);
     os.removeProcess(mockProcess);
-    expect(os.listProcesses()).toHaveLength(0);
+    expect(os.listProcesses()).toHaveLength(1);
+    expect(os.listProcesses()[0].id).toBe('cpuActivity');
   });
 
   it('should kill a process by pid', () => {
     os.addProcess({ ...mockProcess });
-    const proc = os.listProcesses()[0];
-    os.kill(proc.pid);
-    expect(os.listProcesses()).toHaveLength(0);
+    const proc = os.listProcesses().find((p) => p.id === 'proc1');
+    expect(proc).toBeDefined();
+    os.kill(proc!.pid);
+    expect(os.listProcesses().some((p) => p.id === 'proc1')).toBe(false);
+    expect(os.listProcesses().some((p) => p.id === 'cpuActivity')).toBe(true);
   });
 
   it('should throw error when killing non-existent pid', () => {
