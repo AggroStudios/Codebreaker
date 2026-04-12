@@ -1,15 +1,16 @@
-import { IDomain } from '../../includes/Domain.interface';
-import allDomains from './domains';
+import { IDomain } from "../../includes/Domain.interface";
+import allDomains from "./domains";
 
 export class HackingScenarios {
-    
     static getAllDomains(): string[] {
-        return allDomains.map(domain => domain.domain);
+        return allDomains.map((domain) => domain.domain);
     }
 
     static findVulnerabilityByIp(ip: string) {
-        const vulnerabilities = allDomains.find((domain: IDomain) => Object.keys(domain.vulnerabilities).includes(ip));
-        
+        const vulnerabilities = allDomains.find((domain: IDomain) =>
+            Object.keys(domain.vulnerabilities).includes(ip),
+        );
+
         if (vulnerabilities) {
             if (Object.keys(vulnerabilities.vulnerabilities).includes(ip)) {
                 return vulnerabilities.vulnerabilities[ip];
@@ -17,5 +18,4 @@ export class HackingScenarios {
         }
         return;
     }
-};
-    
+}

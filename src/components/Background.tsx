@@ -1,12 +1,13 @@
-import { createSignal, createEffect, on } from 'solid-js';
-import { styled } from 'solid-styled-components';
-import { useLocation } from '@solidjs/router';
+import { createSignal, createEffect, on } from "solid-js";
+import { styled } from "solid-styled-components";
+import { useLocation } from "@solidjs/router";
 
 interface BackgroundProps {
-    background: null | string
-};
+    background: null | string;
+}
 
-const BackgroundElement = styled('div')<BackgroundProps>( props => `
+const BackgroundElement = styled("div")<BackgroundProps>(
+    (props) => `
     boxSizing: border-box;
     position: absolute;
     top: 0;
@@ -19,32 +20,31 @@ const BackgroundElement = styled('div')<BackgroundProps>( props => `
     backgroundPosition: center;
     width: 100%;
     zIndex: -1;
-`);
+`,
+);
 
 const Background = () => {
-
     const location = useLocation();
-    const [background, setBackground] = createSignal<null|string>(null);
+    const [background, setBackground] = createSignal<null | string>(null);
 
     createEffect(
         on(
             () => location.pathname,
             async () => {
-                let bg = await import('../assets/backgrounds/terminal_bg.png');
+                let bg = await import("../assets/backgrounds/terminal_bg.png");
                 try {
-                    bg = await import(`../assets/backgrounds/${location.pathname.split('/')[1]}_bg.png`);
-                }
-                catch {
+                    bg = await import(
+                        `../assets/backgrounds/${location.pathname.split("/")[1]}_bg.png`
+                    );
+                } catch {
                     /* empty */
                 }
                 setBackground(bg.default);
-            }
-        )
+            },
+        ),
     );
 
-    return (
-        <BackgroundElement background={ background() } />
-    );
+    return <BackgroundElement background={background()} />;
 };
 
 export default Background;

@@ -1,96 +1,120 @@
-import { Component, createSignal, JSX, Show } from 'solid-js';
+import { Component, createSignal, JSX, Show } from "solid-js";
 
 import {
-    Box, AppBar, Toolbar, IconButton,
-    Typography, styled, alpha, InputBase,
-    Menu, MenuItem, Badge, ListItemIcon,
-    ListItemText
-} from '@suid/material';
+    Box,
+    AppBar,
+    Toolbar,
+    IconButton,
+    Typography,
+    styled,
+    alpha,
+    InputBase,
+    Menu,
+    MenuItem,
+    Badge,
+    ListItemIcon,
+    ListItemText,
+} from "@suid/material";
 
-import MailIcon from '@suid/icons-material/Mail';
-import NotificationsIcon from '@suid/icons-material/Notifications';
-import AccountCircle from '@suid/icons-material/AccountCircle';
-import SearchIcon from '@suid/icons-material/Search';
-import MoreIcon from '@suid/icons-material/More';
-import PlayArrowIcon from '@suid/icons-material/PlayArrow';
-import PauseIcon from '@suid/icons-material/Pause';
-import InfoTwoTone from '@suid/icons-material/InfoTwoTone';
-import WarningTwoTone from '@suid/icons-material/WarningTwoTone';
-import ErrorTwoTone from '@suid/icons-material/ErrorTwoTone';
+import MailIcon from "@suid/icons-material/Mail";
+import NotificationsIcon from "@suid/icons-material/Notifications";
+import AccountCircle from "@suid/icons-material/AccountCircle";
+import SearchIcon from "@suid/icons-material/Search";
+import MoreIcon from "@suid/icons-material/More";
+import PlayArrowIcon from "@suid/icons-material/PlayArrow";
+import PauseIcon from "@suid/icons-material/Pause";
+import InfoTwoTone from "@suid/icons-material/InfoTwoTone";
+import WarningTwoTone from "@suid/icons-material/WarningTwoTone";
+import ErrorTwoTone from "@suid/icons-material/ErrorTwoTone";
 
-import { StationStoreType, MenuStateType } from '../includes/Process.interface';
-import { PlayerState } from '../includes/Player.interface';
+import { StationStoreType, MenuStateType } from "../includes/Process.interface";
+import { PlayerState } from "../includes/Player.interface";
 
-import CodeBreakerLogo from '../assets/logos/codebreaker-logo.png';
-import './AppBar.scss';
-import { NotificationLevel } from '../includes/OperatingSystem.interface';
-import MoneyLabel from './MoneyLabel';
+import CodeBreakerLogo from "../assets/logos/codebreaker-logo.png";
+import "./AppBar.scss";
+import { NotificationLevel } from "../includes/OperatingSystem.interface";
+import MoneyLabel from "./MoneyLabel";
 
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
+const Search = styled("div")(({ theme }) => ({
+    position: "relative",
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
+    "&:hover": {
         backgroundColor: alpha(theme.palette.common.white, 0.25),
     },
     marginRight: theme.spacing(2),
     marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
         marginLeft: theme.spacing(3),
-        width: 'auto',
+        width: "auto",
     },
 }));
 
-const SearchIconWrapper = styled('div')(({ theme }) => ({
+const SearchIconWrapper = styled("div")(({ theme }) => ({
     padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: "100%",
+    position: "absolute",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
+    color: "inherit",
+    "& .MuiInputBase-input": {
         padding: theme.spacing(1, 1, 1, 0),
         // vertical padding + font size from searchIcon
         paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('md')]: {
-            width: '20ch',
+        transition: theme.transitions.create("width"),
+        width: "100%",
+        [theme.breakpoints.up("md")]: {
+            width: "20ch",
         },
     },
 }));
 
-const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateStore?: MenuStateType, playerStateStore?: PlayerState }> = (props) => {
-
+const AppBarComponent: Component<{
+    stationStore?: StationStoreType;
+    menuStateStore?: MenuStateType;
+    playerStateStore?: PlayerState;
+}> = (props) => {
     const [anchorEl, setAnchorEl] = createSignal<null | HTMLElement>(null);
-    const [mobileAnchorEl, setMobileAnchorEl] = createSignal<null | HTMLElement>(null);
-    const [notificationAnchorEl, setNotificationAnchorEl] = createSignal<null | HTMLElement>(null);
-    const [messageAnchorEl, setMessageAnchorEl] = createSignal<null | HTMLElement>(null);
+    const [mobileAnchorEl, setMobileAnchorEl] =
+        createSignal<null | HTMLElement>(null);
+    const [notificationAnchorEl, setNotificationAnchorEl] =
+        createSignal<null | HTMLElement>(null);
+    const [messageAnchorEl, setMessageAnchorEl] =
+        createSignal<null | HTMLElement>(null);
 
     const isMenuOpen = () => Boolean(anchorEl());
     const isMobileMenuOpen = () => Boolean(mobileAnchorEl());
     const isNotificationMenuOpen = () => Boolean(notificationAnchorEl());
     const isMessageMenuOpen = () => Boolean(messageAnchorEl());
 
-    const handleProfileMenuOpen: JSX.EventHandler<HTMLElement, MouseEvent> = event => {
+    const handleProfileMenuOpen: JSX.EventHandler<HTMLElement, MouseEvent> = (
+        event,
+    ) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleMobileMenuOpen: JSX.EventHandler<HTMLElement, MouseEvent> = event => {
+    const handleMobileMenuOpen: JSX.EventHandler<HTMLElement, MouseEvent> = (
+        event,
+    ) => {
         setMobileAnchorEl(event.currentTarget);
     };
 
-    const handleNotificationMenuOpen: JSX.EventHandler<HTMLElement, MouseEvent> = event => {
+    const handleNotificationMenuOpen: JSX.EventHandler<
+        HTMLElement,
+        MouseEvent
+    > = (event) => {
         setNotificationAnchorEl(event.currentTarget);
     };
 
-    const handleMessageMenuOpen: JSX.EventHandler<HTMLElement, MouseEvent> = event => {
+    const handleMessageMenuOpen: JSX.EventHandler<HTMLElement, MouseEvent> = (
+        event,
+    ) => {
         setMessageAnchorEl(event.currentTarget);
     };
 
@@ -110,13 +134,13 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
         setMessageAnchorEl(null);
     };
 
-    const menuId = 'primary-search-account-menu';
+    const menuId = "primary-search-account-menu";
     const renderMenu = (
         <Menu
             anchorEl={anchorEl()}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             id={menuId}
-            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
             open={isMenuOpen()}
             onClose={handleMenuClose}
         >
@@ -138,80 +162,123 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
         }
     };
 
-    const notificationId = 'primary-search-notification-menu';
+    const notificationId = "primary-search-notification-menu";
     const renderNotificationMenu = (
         <Menu
             anchorEl={notificationAnchorEl()}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             id={notificationId}
-            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
             open={isNotificationMenuOpen()}
             onClose={handleNotificationMenuClose}
         >
-            {props.playerStateStore?.player.notifications.length > 0 ?
-                props.playerStateStore?.player.notifications.map((notification, index) => (
-                    <MenuItem onClick={() => {
-                        props.playerStateStore?.markNotificationAsRead(index);
-                    }}>
-                        <ListItemIcon>
-                            {notificationIcon(notification.level)}
-                        </ListItemIcon>
-                        <ListItemText style={{ "font-weight": notification.unread ? 'bold' : 'normal' }} primary={notification.message}>
-                            {notification.message}
-                        </ListItemText>
-                    </MenuItem>
-                )) :
+            {props.playerStateStore?.player.notifications.length > 0 ? (
+                props.playerStateStore?.player.notifications.map(
+                    (notification, index) => (
+                        <MenuItem
+                            onClick={() => {
+                                props.playerStateStore?.markNotificationAsRead(
+                                    index,
+                                );
+                            }}
+                        >
+                            <ListItemIcon>
+                                {notificationIcon(notification.level)}
+                            </ListItemIcon>
+                            <ListItemText
+                                style={{
+                                    "font-weight": notification.unread
+                                        ? "bold"
+                                        : "normal",
+                                }}
+                                primary={notification.message}
+                            >
+                                {notification.message}
+                            </ListItemText>
+                        </MenuItem>
+                    ),
+                )
+            ) : (
                 <MenuItem onClick={handleNotificationMenuClose}>
-                    <span style={{ "font-weight": 'bold' }}>No notifications</span>
+                    <span style={{ "font-weight": "bold" }}>
+                        No notifications
+                    </span>
                 </MenuItem>
-            }
+            )}
         </Menu>
     );
 
-    const messageId = 'primary-search-message-menu';
+    const messageId = "primary-search-message-menu";
     const renderMessageMenu = (
         <Menu
             anchorEl={messageAnchorEl()}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             id={messageId}
-            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
             open={isMessageMenuOpen()}
             onClose={handleMessageMenuClose}
         >
-            {props.playerStateStore?.player.messages.length > 0 ?
-                props.playerStateStore?.player.messages.map((message, index) => (
-                    <MenuItem onClick={() => {
-                        props.playerStateStore?.markMessageAsRead(index);
-                    }}>
-                        <span style={{ "font-weight": message.unread ? 'bold' : 'normal' }}>{index} - {message.body}</span>
-                    </MenuItem>
-                )) :
+            {props.playerStateStore?.player.messages.length > 0 ? (
+                props.playerStateStore?.player.messages.map(
+                    (message, index) => (
+                        <MenuItem
+                            onClick={() => {
+                                props.playerStateStore?.markMessageAsRead(
+                                    index,
+                                );
+                            }}
+                        >
+                            <span
+                                style={{
+                                    "font-weight": message.unread
+                                        ? "bold"
+                                        : "normal",
+                                }}
+                            >
+                                {index} - {message.body}
+                            </span>
+                        </MenuItem>
+                    ),
+                )
+            ) : (
                 <MenuItem onClick={handleMessageMenuClose}>
-                    <span style={{ "font-weight": 'bold' }}>No messages</span>
+                    <span style={{ "font-weight": "bold" }}>No messages</span>
                 </MenuItem>
-            }
+            )}
         </Menu>
     );
 
-    const mobileMenuId = 'primary-search-account-menu-mobile';
+    const mobileMenuId = "primary-search-account-menu-mobile";
     const renderMobileMenu = (
         <Menu
             anchorEl={mobileAnchorEl()}
             anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
+                vertical: "top",
+                horizontal: "right",
             }}
             id={mobileMenuId}
             transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
+                vertical: "top",
+                horizontal: "right",
             }}
             open={isMobileMenuOpen()}
             onClose={handleMobileMenuClose}
         >
             <MenuItem>
-                <IconButton size="large" aria-label="show 4 new mails" color="inherit" style={{ outline: 0 }}>
-                    <Badge badgeContent={props.playerStateStore?.player.messages.filter(o => o.unread).length ?? 0} color="error">
+                <IconButton
+                    size="large"
+                    aria-label="show 4 new mails"
+                    color="inherit"
+                    style={{ outline: 0 }}
+                >
+                    <Badge
+                        badgeContent={
+                            props.playerStateStore?.player.messages.filter(
+                                (o) => o.unread,
+                            ).length ?? 0
+                        }
+                        color="error"
+                    >
                         <MailIcon />
                     </Badge>
                 </IconButton>
@@ -224,7 +291,14 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
                     color="inherit"
                     style={{ outline: 0 }}
                 >
-                    <Badge badgeContent={props.playerStateStore?.player.notifications.filter(o => o.unread).length ?? 0} color="error">
+                    <Badge
+                        badgeContent={
+                            props.playerStateStore?.player.notifications.filter(
+                                (o) => o.unread,
+                            ).length ?? 0
+                        }
+                        color="error"
+                    >
                         <NotificationsIcon />
                     </Badge>
                 </IconButton>
@@ -244,86 +318,142 @@ const AppBarComponent: Component<{ stationStore?: StationStoreType, menuStateSto
                 <p>Profile</p>
             </MenuItem>
         </Menu>
-    );  
+    );
 
     let moneyLabelRef: HTMLElement | undefined = undefined;
-    
+
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <AppBar position='fixed' style={{ background: 'rgba(50, 50, 50, 0.75)'}}>
+            <AppBar
+                position="fixed"
+                style={{ background: "rgba(50, 50, 50, 0.75)" }}
+            >
                 <Toolbar>
-                    <Typography variant='h6' noWrap component='div' sx={{ display: { xs: 'none', sm: 'block' }}} style={{
-                        width: '240px',
-                        'text-align': 'left',
-                    }}>
-                        <img src={CodeBreakerLogo} class="mainLogo" alt="Code Breaker Logo" />
+                    <Typography
+                        variant="h6"
+                        noWrap
+                        component="div"
+                        sx={{ display: { xs: "none", sm: "block" } }}
+                        style={{
+                            width: "240px",
+                            "text-align": "left",
+                        }}
+                    >
+                        <img
+                            src={CodeBreakerLogo}
+                            class="mainLogo"
+                            alt="Code Breaker Logo"
+                        />
                     </Typography>
                     <Search>
                         <SearchIconWrapper>
                             <SearchIcon />
                         </SearchIconWrapper>
-                        <StyledInputBase placeholder='Search...' inputProps={{ 'aria-label': 'search' }} />
+                        <StyledInputBase
+                            placeholder="Search..."
+                            inputProps={{ "aria-label": "search" }}
+                        />
                     </Search>
                     <Box sx={{ flexGrow: 1 }} class="centerContent">
                         {props.stationStore && (
                             <>
-                                <Typography variant='h6' noWrap component='div' sx={{ display: { xs: 'none', sm: 'block' }}}>
-                                    Frame: {props.stationStore.frame.toFixed(3)} | Count: {props.stationStore.count} | Exponent: {props.stationStore.exponent}
+                                <Typography
+                                    variant="h6"
+                                    noWrap
+                                    component="div"
+                                    sx={{
+                                        display: { xs: "none", sm: "block" },
+                                    }}
+                                >
+                                    Frame: {props.stationStore.frame.toFixed(3)}{" "}
+                                    | Count: {props.stationStore.count} |
+                                    Exponent: {props.stationStore.exponent}
                                     <IconButton
-                                        size='large'
-                                        aria-label='Start/Stop Game Timer'
-                                        color='inherit'
+                                        size="large"
+                                        aria-label="Start/Stop Game Timer"
+                                        color="inherit"
                                         style={{ outline: 0 }}
-                                        onClick={() => props.stationStore.toggleGameLoop()}
+                                        onClick={() =>
+                                            props.stationStore.toggleGameLoop()
+                                        }
                                     >
-                                        {props.stationStore.isRunning ? <PauseIcon /> : <PlayArrowIcon />}
+                                        {props.stationStore.isRunning ? (
+                                            <PauseIcon />
+                                        ) : (
+                                            <PlayArrowIcon />
+                                        )}
                                     </IconButton>
                                 </Typography>
                             </>
                         )}
                     </Box>
-                    <Box ref={el => moneyLabelRef = el} sx={{ display: { xs: 'none', md: 'flex' }}}>
-                        <Show when={props.playerStateStore?.moneyLabel?.amount} keyed>
-                            {(amount) => <MoneyLabel amount={amount} anchorRef={moneyLabelRef} />}
+                    <Box
+                        ref={(el) => (moneyLabelRef = el)}
+                        sx={{ display: { xs: "none", md: "flex" } }}
+                    >
+                        <Show
+                            when={props.playerStateStore?.moneyLabel?.amount}
+                            keyed
+                        >
+                            {(amount) => (
+                                <MoneyLabel
+                                    amount={amount}
+                                    anchorRef={moneyLabelRef}
+                                />
+                            )}
                         </Show>
                         $: {props.playerStateStore?.player.money.toFixed(2)}
                     </Box>
-                    <Box sx={{ display: { xs: 'none', md: 'flex' }}}>
+                    <Box sx={{ display: { xs: "none", md: "flex" } }}>
                         <IconButton
-                            size='large'
-                            color='inherit'
+                            size="large"
+                            color="inherit"
                             aria-controls={messageId}
                             onClick={handleMessageMenuOpen}
                             style={{ outline: 0 }}
                         >
-                            <Badge badgeContent={props.playerStateStore?.player.messages.filter(o => o.unread).length ?? 0} color='error'>
+                            <Badge
+                                badgeContent={
+                                    props.playerStateStore?.player.messages.filter(
+                                        (o) => o.unread,
+                                    ).length ?? 0
+                                }
+                                color="error"
+                            >
                                 <MailIcon />
                             </Badge>
                         </IconButton>
                         <IconButton
-                            size='large'
-                            color='inherit'
+                            size="large"
+                            color="inherit"
                             style={{ outline: 0 }}
                             aria-controls={notificationId}
                             onClick={handleNotificationMenuOpen}
                         >
-                            <Badge badgeContent={props.playerStateStore?.player.notifications.filter(o => o.unread).length ?? 0} color='error'>
+                            <Badge
+                                badgeContent={
+                                    props.playerStateStore?.player.notifications.filter(
+                                        (o) => o.unread,
+                                    ).length ?? 0
+                                }
+                                color="error"
+                            >
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>
                         <IconButton
-                            size='large'
-                            aria-label='Account of current user'
+                            size="large"
+                            aria-label="Account of current user"
                             aria-controls={menuId}
-                            aria-haspopup='true'
+                            aria-haspopup="true"
                             onClick={handleProfileMenuOpen}
-                            color='inherit'
+                            color="inherit"
                             style={{ outline: 0 }}
                         >
                             <AccountCircle />
                         </IconButton>
                     </Box>
-                    <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+                    <Box sx={{ display: { xs: "flex", md: "none" } }}>
                         <IconButton
                             size="large"
                             aria-label="show more"

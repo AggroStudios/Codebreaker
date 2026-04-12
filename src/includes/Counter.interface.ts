@@ -1,10 +1,10 @@
-import Cipher from '../lib/Cipher';
-import { StationStoreType } from './Process.interface';
+import Cipher from "../lib/Cipher";
+import { StationStoreType } from "./Process.interface";
 
 export interface CounterState {
-    runningCiphers: Cipher[],
-    addCipher: (cipher: Cipher) => void,
-    removeCipher: (cipher: Cipher) => void,
-    station: StationStoreType,
-    setStation: (station: StationStoreType) => void,
-};
+    runningCiphers: Cipher[];
+    addCipher: (cipher: Cipher) => void;
+    removeCipher: (cipher: Cipher) => void;
+    station: StationStoreType;
+    setStation: (station: StationStoreType) => void;
+}

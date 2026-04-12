@@ -1,9 +1,11 @@
-import { Component } from 'solid-js';
-import LineChart from '../LineChart';
-import { StationStoreType } from '../../includes/Process.interface';
+import { Component } from "solid-js";
+import LineChart from "../LineChart";
+import { StationStoreType } from "../../includes/Process.interface";
 
-export const CpuActivityWidget: Component<{ stationStore: StationStoreType, title?: string }> = (props) => {
-
+export const CpuActivityWidget: Component<{
+    stationStore: StationStoreType;
+    title?: string;
+}> = (props) => {
     const { stationStore, title } = props;
 
     return (
@@ -20,5 +22,5 @@ export const CpuActivityWidget: Component<{ stationStore: StationStoreType, titl
             minValue={0}
             maxValue={100}
         />
-    )
-}
+    );
+};

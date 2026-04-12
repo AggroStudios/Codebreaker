@@ -1,25 +1,25 @@
 export enum CipherState {
     IDLE = undefined,
-    DOWNLOADING = 'Download',
-    BREAKING = 'Breaking',
-    SUCCESS = 'Success',
-    CANCELLED = 'Cancelled',
-    FAILURE = 'Failure',
-    PAUSED = 'Paused',
-};
+    DOWNLOADING = "Download",
+    BREAKING = "Breaking",
+    SUCCESS = "Success",
+    CANCELLED = "Cancelled",
+    FAILURE = "Failure",
+    PAUSED = "Paused",
+}
 
 export type CipherProps = {
-    state: CipherState,
-    progress: number,
+    state: CipherState;
+    progress: number;
 };
 
 export enum BlockUnit {
-    bytes = 'B',
-    kilobytes = 'KB',
-    megabytes = 'MB',
-    gigabytes = 'GB',
-    terabytes = 'TB',
-    petabytes = 'PB',
+    bytes = "B",
+    kilobytes = "KB",
+    megabytes = "MB",
+    gigabytes = "GB",
+    terabytes = "TB",
+    petabytes = "PB",
 }
 
 export interface ICipherType {
@@ -27,8 +27,8 @@ export interface ICipherType {
     complexity: number;
     parallelism: number;
     block: {
-        size: number,
-        unit: BlockUnit
+        size: number;
+        unit: BlockUnit;
     };
     payout: number;
     xp: number;
@@ -36,7 +36,7 @@ export interface ICipherType {
 
 export const CipherTypes: ICipherType[] = [
     {
-        name: 'Cipher 1',
+        name: "Cipher 1",
         complexity: 1,
         parallelism: 1,
         block: {
@@ -47,7 +47,7 @@ export const CipherTypes: ICipherType[] = [
         xp: 10,
     },
     {
-        name: 'Cipher 2',
+        name: "Cipher 2",
         complexity: 1.8,
         parallelism: 2,
         block: {
@@ -58,7 +58,7 @@ export const CipherTypes: ICipherType[] = [
         xp: 12,
     },
     {
-        name: 'Cipher 3',
+        name: "Cipher 3",
         complexity: 2.5,
         parallelism: 3,
         block: {

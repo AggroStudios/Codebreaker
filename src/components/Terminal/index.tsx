@@ -1,21 +1,17 @@
 import { Component, createEffect, createSignal } from "solid-js";
 import { ThemeProvider, createTheme } from "@suid/material";
 import OperatingSystem from "../../lib/OperatingSystem";
-import TerminalController, { type TerminalAttachmentOptions } from '../../lib/terminal';
-import { create } from 'solid-zustand/store';
-import clsx from 'clsx';
+import TerminalController, {
+    type TerminalAttachmentOptions,
+} from "../../lib/terminal";
+import { create } from "solid-zustand/store";
+import clsx from "clsx";
 
-import { 
-    isEmpty,
-    isNil,
-} from "lodash";
+import { isEmpty, isNil } from "lodash";
 
-import {
-    Header,
-    Content,
-} from './components';
+import { Header, Content } from "./components";
 
-import './styles.scss';
+import "./styles.scss";
 
 type TerminalLine = {
     prompt: string;
@@ -23,7 +19,7 @@ type TerminalLine = {
     error?: any;
     start?: number;
     end?: number;
-}
+};
 
 interface TerminalState {
     terminalLines: TerminalLine[];
@@ -34,66 +30,73 @@ interface TerminalState {
     clearTerminal: () => void;
 }
 
-const useStore = create<TerminalState>(set => ({
+const useStore = create<TerminalState>((set) => ({
     terminalLines: [],
-    updateLine: (line, index = -1) => set(state => {
-        index = index > -1 ? index : state.terminalLines.length - 1;
-        return {
-            terminalLines: [
-                ...state.terminalLines.slice(0, index),
-                line,
-                ...state.terminalLines.slice(index + 1),
-            ]
-        }
-    }),
-    appendLine: (value, index = -1) => set(state => {
-        index = index > -1 ? index : state.terminalLines.length - 1;
-        return {
-            terminalLines: [
-                ...state.terminalLines.slice(0, index),
-                {
-                    ...state.terminalLines[index],
-                    value: state.terminalLines[index].value + value
-                },
-                ...state.terminalLines.slice(index + 1),
-            ]
-        }
-    }),
-    replaceCharsForRange: (line, index = -1) => set(state => {
-        index = index > -1 ? index : state.terminalLines.length - 1;
-        const lineValue = state.terminalLines[index].value;
-        if (isNil(line.start)) line.start = 0;
-        if (isNil(line.end)) line.end = lineValue.length;
+    updateLine: (line, index = -1) =>
+        set((state) => {
+            index = index > -1 ? index : state.terminalLines.length - 1;
+            return {
+                terminalLines: [
+                    ...state.terminalLines.slice(0, index),
+                    line,
+                    ...state.terminalLines.slice(index + 1),
+                ],
+            };
+        }),
+    appendLine: (value, index = -1) =>
+        set((state) => {
+            index = index > -1 ? index : state.terminalLines.length - 1;
+            return {
+                terminalLines: [
+                    ...state.terminalLines.slice(0, index),
+                    {
+                        ...state.terminalLines[index],
+                        value: state.terminalLines[index].value + value,
+                    },
+                    ...state.terminalLines.slice(index + 1),
+                ],
+            };
+        }),
+    replaceCharsForRange: (line, index = -1) =>
+        set((state) => {
+            index = index > -1 ? index : state.terminalLines.length - 1;
+            const lineValue = state.terminalLines[index].value;
+            if (isNil(line.start)) line.start = 0;
+            if (isNil(line.end)) line.end = lineValue.length;
 
-        if (line.start < 0) {
-            line.start = lineValue.length + line.start;
-        }
+            if (line.start < 0) {
+                line.start = lineValue.length + line.start;
+            }
 
-        return {
-            terminalLines: [
-                ...state.terminalLines.slice(0, index),
-                {
-                    prompt: line.prompt,
-                    error: line.error,
-                    value: lineValue.slice(0, line.start) + line.value + lineValue.slice(line.end)
-                },
-                ...state.terminalLines.slice(index + 1)
-            ]
-        };
-    }),
-    addLine: terminalLine => set(state => ({
-        terminalLines: [
-            ...state.terminalLines,
-            terminalLine
-        ]
-    })),
-    clearTerminal: () => set(() => ({
-        terminalLines: []
-    }))
+            return {
+                terminalLines: [
+                    ...state.terminalLines.slice(0, index),
+                    {
+                        prompt: line.prompt,
+                        error: line.error,
+                        value:
+                            lineValue.slice(0, line.start) +
+                            line.value +
+                            lineValue.slice(line.end),
+                    },
+                    ...state.terminalLines.slice(index + 1),
+                ],
+            };
+        }),
+    addLine: (terminalLine) =>
+        set((state) => ({
+            terminalLines: [...state.terminalLines, terminalLine],
+        })),
+    clearTerminal: () =>
+        set(() => ({
+            terminalLines: [],
+        })),
 }));
 
-const Terminal: Component<{ terminalController: TerminalController, operatingSystem?: OperatingSystem }> = props => {
-
+const Terminal: Component<{
+    terminalController: TerminalController;
+    operatingSystem?: OperatingSystem;
+}> = (props) => {
     const {
         terminalLines,
         addLine,
@@ -114,21 +117,23 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
     const [stdInCharacterMode, setStdInCharacterMode] = createSignal(false);
     const [terminalLoaded, setTerminalLoaded] = createSignal(false);
 
-
     let codeRef: HTMLElement;
     let inputRef: HTMLInputElement;
 
-    const terminalOutput = (data: any, stream: string, {
-        prompt = '',
-        lineIndex = -1,
-        characterMode = false,
-        updateMode = false,
-        caretAtEnd = true,
-        color = null,
-        replaceRange = [],
-    } = {}) => {
-
-        const error = stream === 'stderr';
+    const terminalOutput = (
+        data: any,
+        stream: string,
+        {
+            prompt = "",
+            lineIndex = -1,
+            characterMode = false,
+            updateMode = false,
+            caretAtEnd = true,
+            color = null,
+            replaceRange = [],
+        } = {},
+    ) => {
+        const error = stream === "stderr";
 
         if (!caretAtEnd) {
             setCursorOffset(data.length);
@@ -140,16 +145,16 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
 
         if (characterMode) {
             appendLine(data, lineIndex);
-        }
-        else if (replaceRange.length > 0) {
+        } else if (replaceRange.length > 0) {
             const [start, end] = replaceRange;
-            replaceCharsForRange({prompt, value: data, error, start, end}, lineIndex);
-        }
-        else {
+            replaceCharsForRange(
+                { prompt, value: data, error, start, end },
+                lineIndex,
+            );
+        } else {
             if (updateMode) {
                 updateLine({ prompt, value: data, error }, lineIndex);
-            }
-            else {
+            } else {
                 addLine({ prompt, value: data, error });
             }
         }
@@ -157,29 +162,30 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
 
     const handleStdIn = (
         callback: ((char: string) => void) | null,
-        { characterMode = false }: Pick<TerminalAttachmentOptions, 'characterMode'> = {}
+        {
+            characterMode = false,
+        }: Pick<TerminalAttachmentOptions, "characterMode"> = {},
     ) => {
         setStdInCharacterMode(characterMode);
         setStdInCallback(() => callback);
-    }
+    };
 
     const handleStdOut = (data: string, options: any) => {
-        terminalOutput(data, 'stdout', options);
+        terminalOutput(data, "stdout", options);
     };
 
     const handleStdErr = (data: any, options: any) => {
-        terminalOutput(data, 'stderr', { ...options, prompt: '\u2718 ' });
+        terminalOutput(data, "stderr", { ...options, prompt: "\u2718 " });
     };
 
     createEffect(async () => {
         if (terminalLines.length === 0 && !terminalLoaded()) {
-
             terminalController.attachTerminal({
                 stdin: handleStdIn,
                 stdout: handleStdOut,
                 stderr: handleStdErr,
             });
-        
+
             terminalController.attachOperatingSystem(operatingSystem);
 
             setCommandLoaded(false);
@@ -196,27 +202,27 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
             // Catching Ctrl + E and Ctrl + L
             if (e.ctrlKey) {
                 switch (e.key) {
-                    case 'l':
-                    case 'e':
+                    case "l":
+                    case "e":
                         e.preventDefault();
                         break;
                     default:
                         break;
                 }
             }
-        }
+        };
 
         return () => {
             window.onkeydown = null;
-        }
+        };
     }, []);
 
     const newLine = () => {
-        addLine({ prompt: terminalController.prompt, value: '' });
+        addLine({ prompt: terminalController.prompt, value: "" });
         setCursorPosition(0);
         setCursorOffset(0);
     };
-    
+
     // Window scrolling to the bottom
     createEffect(() => {
         codeRef.scrollTop = codeRef.scrollHeight - codeRef.clientHeight;
@@ -227,7 +233,7 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
 
     createEffect(() => {
         if (commandLoaded()) {
-            inputRef.value = '';
+            inputRef.value = "";
         }
     }, [commandLoaded()]);
 
@@ -238,7 +244,7 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
         reboot: () => {
             setTerminalLoaded(false);
             clearTerminal();
-        }
+        },
     };
 
     //#region Terminal input handling
@@ -247,104 +253,115 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
         if (!commandLoaded() && !stdInCallback()) return;
 
         switch (event.key) {
-            case 'a': 
+            case "a":
                 if (event.ctrlKey) {
                     event.preventDefault();
                     target.selectionStart = target.selectionEnd = 0;
                     setCursorPosition(0);
                 }
                 break;
-            case 'e': 
+            case "e":
                 if (event.ctrlKey) {
                     event.preventDefault();
-                    target.selectionStart = target.selectionEnd = target.value.length;
+                    target.selectionStart = target.selectionEnd =
+                        target.value.length;
                     setCursorPosition(target.value.length);
                 }
                 break;
-            case 'c':
+            case "c":
                 if (event.ctrlKey) {
                     event.preventDefault();
                     setPreviousCommandIndex(-1);
                     if (stdInCallback()) {
-                        stdInCallback()('^C');
-                    }
-                    else {
-                        updateLine({ prompt: terminalController.prompt, value: `${target.value}^C`});
+                        stdInCallback()("^C");
+                    } else {
+                        updateLine({
+                            prompt: terminalController.prompt,
+                            value: `${target.value}^C`,
+                        });
                         newLine();
                     }
-                    target.value = '';
+                    target.value = "";
                 }
                 break;
-            case 'l':
+            case "l":
                 if (event.ctrlKey && terminalLoaded()) {
                     terminalFunctions.clear();
                 }
                 break;
-            case 'Enter':
+            case "Enter":
                 setPreviousCommandIndex(-1);
                 if (stdInCallback()) {
-                    stdInCallback()('\n');
-                    target.value = '';
-                }
-                else {
+                    stdInCallback()("\n");
+                    target.value = "";
+                } else {
                     // addLine({ prompt, value: event.currentTarget.value });
-                    if (target.value.trim() !== '') {
+                    if (target.value.trim() !== "") {
                         setCommandLoaded(false);
                         const command = target.value;
-                        target.value = '';
-                        const commandReturn: { command?: string, value?: string } = await terminalController.command(command) || { value: '' };
+                        target.value = "";
+                        const commandReturn: {
+                            command?: string;
+                            value?: string;
+                        } = (await terminalController.command(command)) || {
+                            value: "",
+                        };
                         setCommandLoaded(true);
                         if (commandReturn.command) {
                             if (terminalFunctions[commandReturn.command]) {
                                 terminalFunctions[commandReturn.command]();
                             }
-                        }
-                        else {
+                        } else {
                             newLine();
                         }
-                        target.value = '';
-                    }
-                    else {
-                        target.value = '';
+                        target.value = "";
+                    } else {
+                        target.value = "";
                         newLine();
                     }
                 }
                 break;
 
-            case 'ArrowLeft':
+            case "ArrowLeft":
                 if (cursorPosition() > 0) {
                     setCursorPosition(cursorPosition() - 1);
                 }
                 break;
-            case 'ArrowRight':
+            case "ArrowRight":
                 if (cursorPosition() < target.value.length) {
                     setCursorPosition(cursorPosition() + 1);
                 }
                 break;
 
-            case 'ArrowUp':
+            case "ArrowUp":
                 if (event.shiftKey || event.ctrlKey) {
                     event.preventDefault();
                 }
-                if (previousCommandIndex() < terminalController.history.length) {
+                if (
+                    previousCommandIndex() < terminalController.history.length
+                ) {
                     const nextIndex = previousCommandIndex() + 1;
                     if (nextIndex < terminalController.history.length) {
-                        const value = terminalController.history[nextIndex].command;
+                        const value =
+                            terminalController.history[nextIndex].command;
                         target.value = value;
-                        updateLine({ prompt: terminalController.prompt, value });
+                        updateLine({
+                            prompt: terminalController.prompt,
+                            value,
+                        });
                         setCursorPosition(value.length);
                         setPreviousCommandIndex(nextIndex);
                     }
                 }
                 break;
 
-            case 'ArrowDown':
+            case "ArrowDown":
                 if (event.shiftKey || event.ctrlKey) {
                     event.preventDefault();
                 }
                 if (previousCommandIndex() > -1) {
                     const nextIndex = previousCommandIndex() - 1;
-                    let value = '';
+                    let value = "";
                     if (nextIndex >= 0) {
                         value = terminalController.history[nextIndex].command;
                     }
@@ -358,79 +375,89 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
             default:
                 break;
         }
-    }
+    };
 
     const handleChange = (event: InputEvent) => {
         const target = event.currentTarget as HTMLInputElement;
         if (stdInCallback()) {
             stdInCallback()(target.value);
             if (stdInCharacterMode()) {
-                target.value = '';
+                target.value = "";
             }
-        }
-        else {
+        } else {
             if (target.selectionStart !== target.selectionEnd) {
                 target.selectionStart = target.selectionEnd;
             }
             setCursorPosition(target.selectionStart);
-    
+
             if (commandLoaded()) {
-                updateLine({ prompt: terminalController.prompt, value: target.value });
-            }
-            else {
-                target.value = '';
+                updateLine({
+                    prompt: terminalController.prompt,
+                    value: target.value,
+                });
+            } else {
+                target.value = "";
             }
         }
-    }
+    };
 
     const handleCodeSelect = () => {
-        if (document.getSelection().toString() === '') {
+        if (document.getSelection().toString() === "") {
             inputRef.focus();
-        };
-    }
+        }
+    };
     //#endregion
 
-    const displayPrompt = (prompt: string, error = false) => <span class={clsx(error ? 'error' : 'prompt')}>{prompt}</span>;
+    const displayPrompt = (prompt: string, error = false) => (
+        <span class={clsx(error ? "error" : "prompt")}>{prompt}</span>
+    );
 
     const displayLine = (line: any) => {
         const colorRegex = /\^\[(.*?);(.*?)\^\]/g;
         const matches = [...line.matchAll(colorRegex)];
         if (isEmpty(matches)) {
             return <span>{line}</span>;
-        }
-        else {
+        } else {
             const returnElements = [];
             let remainder = line;
-            matches.forEach(match => {
-                const [ original, color, text ] = match;
+            matches.forEach((match) => {
+                const [original, color, text] = match;
                 const split = remainder.split(original, 2);
                 if (!isEmpty(split[0])) {
                     returnElements.push({ text: split[0] });
                 }
-                returnElements.push({ color, text })
+                returnElements.push({ color, text });
                 remainder = split[1];
             });
             if (!isEmpty(remainder)) {
                 returnElements.push({ text: remainder });
             }
 
-            return returnElements.map(element => {
+            return returnElements.map((element) => {
                 if (element.color) {
-                    return <span style={{ color: element.color }}>{element.text}</span>
-                }
-                else {
-                    return <span>{element.text}</span>
+                    return (
+                        <span style={{ color: element.color }}>
+                            {element.text}
+                        </span>
+                    );
+                } else {
+                    return <span>{element.text}</span>;
                 }
             });
         }
     };
-    
+
     const displayLineWithCursor = (line: any) => {
         return (
             <span>
-                {line.slice(0, (cursorPosition() + cursorOffset()))}
-                <span class={clsx('cursor', (focus() && commandLoaded()) ? 'active' : '')}>
-                    {line[cursorPosition() + cursorOffset()] || '\u00a0'}
+                {line.slice(0, cursorPosition() + cursorOffset())}
+                <span
+                    class={clsx(
+                        "cursor",
+                        focus() && commandLoaded() ? "active" : "",
+                    )}
+                >
+                    {line[cursorPosition() + cursorOffset()] || "\u00a0"}
                 </span>
                 {line.slice(cursorPosition() + cursorOffset() + 1)}
             </span>
@@ -443,19 +470,43 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
                 <div class="container">
                     <Header>Terminal</Header>
                     <div class="screen">
-                        <input ref={el => inputRef=el} class="input" onFocus={() => setFocus(true)} onBlur={() => setFocus(false)} onKeyUp={handleKeyUp} onInput={handleChange} />
-                        <Content ref={el => codeRef=el} onMouseUp={handleCodeSelect} tabIndex={-1} onKeyUp={() => inputRef.focus()}>
-                            {terminalLines.map((line: TerminalLine, index: number) => 
-                                <div>
-                                    <span class={clsx(line.error ? 'commandError' : '')}>
-                                        {line.prompt && displayPrompt(line.prompt, line.error)}
-                                        {
-                                            (index < terminalLines.length - 1)
+                        <input
+                            ref={(el) => (inputRef = el)}
+                            class="input"
+                            onFocus={() => setFocus(true)}
+                            onBlur={() => setFocus(false)}
+                            onKeyUp={handleKeyUp}
+                            onInput={handleChange}
+                        />
+                        <Content
+                            ref={(el) => (codeRef = el)}
+                            onMouseUp={handleCodeSelect}
+                            tabIndex={-1}
+                            onKeyUp={() => inputRef.focus()}
+                        >
+                            {terminalLines.map(
+                                (line: TerminalLine, index: number) => (
+                                    <div>
+                                        <span
+                                            class={clsx(
+                                                line.error
+                                                    ? "commandError"
+                                                    : "",
+                                            )}
+                                        >
+                                            {line.prompt &&
+                                                displayPrompt(
+                                                    line.prompt,
+                                                    line.error,
+                                                )}
+                                            {index < terminalLines.length - 1
                                                 ? displayLine(line.value)
-                                                : displayLineWithCursor(line.value)
-                                        }
-                                    </span>
-                                </div>
+                                                : displayLineWithCursor(
+                                                      line.value,
+                                                  )}
+                                        </span>
+                                    </div>
+                                ),
                             )}
                         </Content>
                     </div>
@@ -463,6 +514,6 @@ const Terminal: Component<{ terminalController: TerminalController, operatingSys
             </div>
         </ThemeProvider>
     );
-}
+};
 
 export default Terminal;

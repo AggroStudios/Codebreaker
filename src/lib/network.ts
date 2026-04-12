@@ -1,4 +1,7 @@
-import Process, { INetworkType, NetworkConnectionType } from "../includes/Process.interface";
+import Process, {
+    INetworkType,
+    NetworkConnectionType,
+} from "../includes/Process.interface";
 
 export class NetworkDSL implements INetworkType {
     connectionType: NetworkConnectionType = NetworkConnectionType.dsl;
@@ -40,7 +43,7 @@ export class Networking {
     }
 
     public removeProcess(process: Process) {
-        this._stack = this._stack.filter(p => p !== process);
+        this._stack = this._stack.filter((p) => p !== process);
     }
 
     public get stack() {

@@ -1,10 +1,9 @@
-import Terminal from '../terminal';
-import { TerminalApp } from '../../includes/Terminal.interface';
-import { HackingScenarios } from '../hackingScenarios';
-import { isEmpty } from 'lodash';
+import Terminal from "../terminal";
+import { TerminalApp } from "../../includes/Terminal.interface";
+import { HackingScenarios } from "../hackingScenarios";
+import { isEmpty } from "lodash";
 
 export default class ScanVulnerabilities extends TerminalApp {
-
     constructor(terminal: Terminal) {
         super(terminal);
     }
@@ -16,42 +15,46 @@ export default class ScanVulnerabilities extends TerminalApp {
         - ping (help | -h | -?) : Brings up this cool little help text.
         Example:
         - scan 10.0.0.1
-        `.split('\n').forEach(line => this.terminal.stdout(line));
+        `
+            .split("\n")
+            .forEach((line) => this.terminal.stdout(line));
     }
 
     async run(argc: number, argv: string[]) {
-
         const ipAddress = argv[0];
         if (argc < 1) {
-            this.terminal.stderr('Error: IP Address is undefined.\n');
+            this.terminal.stderr("Error: IP Address is undefined.\n");
             this.help();
             return;
         }
 
-        if (ipAddress === 'help' || ipAddress === '-h' || ipAddress === '-?') {
+        if (ipAddress === "help" || ipAddress === "-h" || ipAddress === "-?") {
             this.help();
             return;
         }
 
         if (isEmpty(ipAddress)) {
-            this.terminal.stdout('Error: IP Address is undefined.\n');
+            this.terminal.stdout("Error: IP Address is undefined.\n");
             this.help();
             return;
         }
 
         this.terminal.stdout(`Scanning ${ipAddress} for vulnerabilities...`);
-        return new Promise<void>(async resolve => {
+        return new Promise<void>(async (resolve) => {
             const v = HackingScenarios.findVulnerabilityByIp(ipAddress);
-            await new Promise(res => setTimeout(res, 2000));
+            await new Promise((res) => setTimeout(res, 2000));
 
             if (v) {
                 this.terminal.log(v);
-                this.terminal.stdout(`Found ${v.length} vulnerabilities for ${ipAddress}.`);
-            }
-            else {
-                this.terminal.stderr(`No vulnerabilities found for ${ipAddress}`);
+                this.terminal.stdout(
+                    `Found ${v.length} vulnerabilities for ${ipAddress}.`,
+                );
+            } else {
+                this.terminal.stderr(
+                    `No vulnerabilities found for ${ipAddress}`,
+                );
             }
             resolve();
         });
     }
-};
+}

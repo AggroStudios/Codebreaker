@@ -1,17 +1,17 @@
-import { PlayerState } from '../includes/Player.interface';
-import Process from '../includes/Process.interface';
-import CpuActivity from './CpuActivity';
+import { PlayerState } from "../includes/Player.interface";
+import Process from "../includes/Process.interface";
+import CpuActivity from "./CpuActivity";
 
-import { NotificationLevel } from '../includes/OperatingSystem.interface';
-import { StationStoreType } from '../includes/Process.interface';
+import { NotificationLevel } from "../includes/OperatingSystem.interface";
+import { StationStoreType } from "../includes/Process.interface";
 
 const FPS = 60;
 
 function validateProcess(process: any): process is Process {
-    return 'id' in process && 'callback' in process;
+    return "id" in process && "callback" in process;
 }
 
-export class OperatingSystemError extends Error {};
+export class OperatingSystemError extends Error {}
 
 // Exporting main game controller
 export default class OperatingSystem {
@@ -24,7 +24,7 @@ export default class OperatingSystem {
     private _player: PlayerState;
     private _cpuActivity: CpuActivity | null = null;
     private _station: StationStoreType | null = null;
-    
+
     constructor(player: PlayerState) {
         this._player = player;
         this._cpuActivity = new CpuActivity(100, 50);
@@ -32,12 +32,12 @@ export default class OperatingSystem {
 
     public startGameLoop() {
         this.interval = setInterval(() => this.update(), 500 / FPS);
-    };
+    }
 
     public stopGameLoop() {
         clearInterval(this.interval);
         this.interval = null;
-    };
+    }
 
     public set station(station: StationStoreType) {
         this._station = station;
@@ -50,15 +50,15 @@ export default class OperatingSystem {
 
     get isRunning() {
         return this.interval !== null;
-    };
+    }
 
     get frame() {
         return this.currentFrame + this.currentCount;
-    };
+    }
 
     get exponent() {
         return this.currentExponent;
-    };
+    }
 
     public toggleGameLoop() {
         if (this.isRunning) {
@@ -67,17 +67,20 @@ export default class OperatingSystem {
             this.startGameLoop();
         }
         return this.isRunning;
-    };
+    }
 
     public listProcesses() {
-        return this.processes.map(process => ({
+        return this.processes.map((process) => ({
             id: process.id,
             pid: process.pid,
-            callback: process.callback
+            callback: process.callback,
         }));
     }
 
-    public sendNotification(message: string, level: NotificationLevel = NotificationLevel.INFO) {
+    public sendNotification(
+        message: string,
+        level: NotificationLevel = NotificationLevel.INFO,
+    ) {
         this._player.addNotification({
             message,
             level,
@@ -103,15 +106,16 @@ export default class OperatingSystem {
     }
 
     kill(pid: number) {
-        const processIndex = this.processes.findIndex(process => process.pid === pid);
+        const processIndex = this.processes.findIndex(
+            (process) => process.pid === pid,
+        );
         // Make sure the process exists before trying to remove it.
         if (processIndex > -1) {
             this.processes = [
                 ...this.processes.slice(0, processIndex),
-                ...this.processes.slice(processIndex + 1)
+                ...this.processes.slice(processIndex + 1),
             ];
-        }
-        else {
+        } else {
             throw new OperatingSystemError(`Unable to find pid '${pid}'.`);
         }
     }
@@ -119,36 +123,39 @@ export default class OperatingSystem {
     addProcess(process: Process) {
         // console.log('Adding process!', process);
         // Make sure the process object is valid and you can't duplicate processes
-        const processIndex = this.processes.findIndex(i => i?.['id'] === process?.['id']);
+        const processIndex = this.processes.findIndex(
+            (i) => i?.["id"] === process?.["id"],
+        );
         process.pid = this.pid++;
         if (validateProcess(process) && processIndex === -1) {
             this.processes.push(process);
-        }
-        else {
+        } else {
             this.processes[processIndex] = process;
         }
         return processIndex !== -1;
-    };
+    }
 
     removeProcess(process: Process) {
-        this.processes = this.processes.filter(p => p?.['id'] !== process?.['id']);
-    };
+        this.processes = this.processes.filter(
+            (p) => p?.["id"] !== process?.["id"],
+        );
+    }
 
     resetProcesses() {
         this.processes = Array<Process>();
-    };
+    }
 
     increaseExponent(amount: number = 1) {
         this.currentExponent += amount;
-    };
+    }
 
     decreaseExponent(amount: number = 1) {
         this.currentExponent -= amount;
-    };
+    }
 
     setExponent(amount: number) {
         this.currentExponent = amount;
-    };
+    }
 
     // Main function
     update() {
@@ -159,15 +166,25 @@ export default class OperatingSystem {
             this.currentCount++;
         }
 
-        if (this._station && parseFloat((this.currentFrame / 0.1).toFixed(2)) % 1 === 0) {
-            const coreUsage = this.processes.reduce((acc, process) => acc + (process.cores || 0), 0);
+        if (
+            this._station &&
+            parseFloat((this.currentFrame / 0.1).toFixed(2)) % 1 === 0
+        ) {
+            const coreUsage = this.processes.reduce(
+                (acc, process) => acc + (process.cores || 0),
+                0,
+            );
             const coreCount = this._station.cpu?.cores || 1;
-            const cpuUsage = Math.round(coreUsage / coreCount * 100);
+            const cpuUsage = Math.round((coreUsage / coreCount) * 100);
             this._cpuActivity.usage(cpuUsage);
         }
 
         for (const process of this.processes) {
-            process.callback(Number(this.currentFrame.toFixed(3)), this.currentCount, this.currentExponent);
+            process.callback(
+                Number(this.currentFrame.toFixed(3)),
+                this.currentCount,
+                this.currentExponent,
+            );
         }
-    };
+    }
 }

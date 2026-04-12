@@ -1,4 +1,4 @@
-import { Component, Show } from 'solid-js';
+import { Component, Show } from "solid-js";
 import {
     List,
     ListItemButton,
@@ -10,65 +10,77 @@ import {
     CardHeader,
     CardContent,
     Box,
-    LinearProgress
-} from '@suid/material';
-import { A } from '@solidjs/router';
-import { styled } from '@suid/material';
-import { useLocation } from '@solidjs/router';
+    LinearProgress,
+} from "@suid/material";
+import { A } from "@solidjs/router";
+import { styled } from "@suid/material";
+import { useLocation } from "@solidjs/router";
 
-import LockTwoToneIcon from '@suid/icons-material/LockTwoTone';
+import LockTwoToneIcon from "@suid/icons-material/LockTwoTone";
 
-import { mainNavigation, secondaryNavigation } from '../lib/navigation';
-import { MenuStateType } from '../includes/Process.interface';
-import { PlayerState } from '../includes/Player.interface';
+import { mainNavigation, secondaryNavigation } from "../lib/navigation";
+import { MenuStateType } from "../includes/Process.interface";
+import { PlayerState } from "../includes/Player.interface";
 
-import AggroStudios from '../assets/logos/AggroStudios.png';
-import './NavMenu.scss';
-import XpLabel from './XpLabel';
+import AggroStudios from "../assets/logos/AggroStudios.png";
+import "./NavMenu.scss";
+import XpLabel from "./XpLabel";
 
-const StyledLinkItemButton = styled(ListItemButton)<typeof ListItemButton>(({ theme }) => ({
-    '&.Mui-selected': {
-        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.16)' : 'rgba(0, 0, 0, 0.08)',
-    },
-    '&.Mui-selected:hover': {
-        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.16)' : 'rgba(0, 0, 0, 0.08)',
-    },
-}));
+const StyledLinkItemButton = styled(ListItemButton)<typeof ListItemButton>(
+    ({ theme }) => ({
+        "&.Mui-selected": {
+            backgroundColor:
+                theme.palette.mode === "dark"
+                    ? "rgba(255, 255, 255, 0.16)"
+                    : "rgba(0, 0, 0, 0.08)",
+        },
+        "&.Mui-selected:hover": {
+            backgroundColor:
+                theme.palette.mode === "dark"
+                    ? "rgba(255, 255, 255, 0.16)"
+                    : "rgba(0, 0, 0, 0.08)",
+        },
+    }),
+);
 
 const StyledDrawer = styled(Drawer)<typeof Drawer>(() => ({
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
+    position: "relative",
+    display: "flex",
+    flexDirection: "column",
     top: 0,
     width: 240,
-    height: '100%',
+    height: "100%",
     flexShrink: 0,
-    '.MuiDrawer-paper': {
-        position: 'relative',
+    ".MuiDrawer-paper": {
+        position: "relative",
         width: 240,
-        background: 'rgba(50, 50, 50, 0.85)',
-        alignItems: 'stretch',
-    }
+        background: "rgba(50, 50, 50, 0.85)",
+        alignItems: "stretch",
+    },
 }));
 
-const StyledDrawerContainer = styled('div')(() => ({
-    overflow: 'auto',
-    height: '100%',
-    flexDirection: 'column',
-    display: 'flex',
+const StyledDrawerContainer = styled("div")(() => ({
+    overflow: "auto",
+    height: "100%",
+    flexDirection: "column",
+    display: "flex",
 }));
 
-const StyledDrawerSpacer = styled('div')(() => ({
-    flexGrow: 1
+const StyledDrawerSpacer = styled("div")(() => ({
+    flexGrow: 1,
 }));
 
 const StyledA = styled(A)(() => ({
-    '&:hover': {
-        color: 'white'
-    }
+    "&:hover": {
+        color: "white",
+    },
 }));
 
-function ListItemNavLink(props: { to: string, disabled: boolean, children: Element }) {
+function ListItemNavLink(props: {
+    to: string;
+    disabled: boolean;
+    children: Element;
+}) {
     const location = useLocation();
     return (
         <div class="sideNavContainer">
@@ -85,17 +97,23 @@ function ListItemNavLink(props: { to: string, disabled: boolean, children: Eleme
 }
 
 function MainListItems(props: any) {
-
     return (
         <List>
-            {mainNavigation.map((item, key) =>
-                <ListItemNavLink key={key} disabled={item.locked} to={item.link} {...props}>
+            {mainNavigation.map((item, key) => (
+                <ListItemNavLink
+                    key={key}
+                    disabled={item.locked}
+                    to={item.link}
+                    {...props}
+                >
                     <ListItemIcon>
-                        { item.locked ? <LockTwoToneIcon /> : <item.icon /> }
+                        {item.locked ? <LockTwoToneIcon /> : <item.icon />}
                     </ListItemIcon>
-                    <ListItemText primary={item.locked ? 'Locked' : item.title} />
+                    <ListItemText
+                        primary={item.locked ? "Locked" : item.title}
+                    />
                 </ListItemNavLink>
-            )}
+            ))}
         </List>
     );
 }
@@ -103,14 +121,14 @@ function MainListItems(props: any) {
 function SecondaryListItems(props: any) {
     return (
         <List>
-            {secondaryNavigation.map((item, key) =>
+            {secondaryNavigation.map((item, key) => (
                 <ListItemNavLink key={key} to={item.link} {...props}>
                     <ListItemIcon>
                         <item.icon />
                     </ListItemIcon>
                     <ListItemText primary={item.title} />
                 </ListItemNavLink>
-            )}
+            ))}
         </List>
     );
 }
@@ -118,32 +136,57 @@ function SecondaryListItems(props: any) {
 function PlayerLevel(props: { player: PlayerState }) {
     let xpLabelRef: HTMLElement | undefined = undefined;
     return (
-        <Card ref={el => xpLabelRef = el} class="playerLevelCard centerContent">
+        <Card
+            ref={(el) => (xpLabelRef = el)}
+            class="playerLevelCard centerContent"
+        >
             <CardHeader title={`Level ${props.player.player.level}`} />
             <CardContent>
-            <Box sx={{ width: '100%' }}>
-                <Show when={
-                    props.player.xpLabel?.data?.amount ?
-                        { 
-                            amount: props.player.xpLabel?.data?.amount,
-                            levelUp: props.player.xpLabel?.data?.levelUp
-                        } : null
-                    } keyed>
-                    {(data) => <XpLabel amount={data?.amount} levelUp={data?.levelUp} anchorRef={xpLabelRef} />}
-                </Show>
-                <LinearProgress variant="determinate" value={(props.player.player.experience / props.player.player.nextLevel) * 100} />
-            </Box>
+                <Box sx={{ width: "100%" }}>
+                    <Show
+                        when={
+                            props.player.xpLabel?.data?.amount
+                                ? {
+                                      amount: props.player.xpLabel?.data
+                                          ?.amount,
+                                      levelUp:
+                                          props.player.xpLabel?.data?.levelUp,
+                                  }
+                                : null
+                        }
+                        keyed
+                    >
+                        {(data) => (
+                            <XpLabel
+                                amount={data?.amount}
+                                levelUp={data?.levelUp}
+                                anchorRef={xpLabelRef}
+                            />
+                        )}
+                    </Show>
+                    <LinearProgress
+                        variant="determinate"
+                        value={
+                            (props.player.player.experience /
+                                props.player.player.nextLevel) *
+                            100
+                        }
+                    />
+                </Box>
             </CardContent>
         </Card>
-    )
+    );
 }
 
-const NavMenu: Component<{menuStateStore?: MenuStateType, playerStateStore?: PlayerState}> = (props) => {
+const NavMenu: Component<{
+    menuStateStore?: MenuStateType;
+    playerStateStore?: PlayerState;
+}> = (props) => {
     return (
         <StyledDrawer
             variant="persistent"
             open={true}
-            style={{ display: 'flex' }}
+            style={{ display: "flex" }}
         >
             <StyledDrawerContainer>
                 <Divider />
@@ -156,6 +199,6 @@ const NavMenu: Component<{menuStateStore?: MenuStateType, playerStateStore?: Pla
             </StyledDrawerContainer>
         </StyledDrawer>
     );
-}
+};
 
 export default NavMenu;
