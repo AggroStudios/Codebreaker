@@ -2,9 +2,9 @@
 import { render } from "solid-js/web";
 import { create } from "solid-zustand/store";
 import Layout from "./Layout";
-// import LoadingScreen from './components/LoadingScreen';
+import LoadingScreen from './components/LoadingScreen';
 
-// import { createSignal } from 'solid-js';
+import { createSignal, onMount } from 'solid-js';
 
 import { ThemeProvider, createTheme } from "@suid/material/styles";
 
@@ -18,6 +18,7 @@ import OperatingSystem from "./lib/OperatingSystem";
 
 import "./index.css";
 import { CodiumProcessor } from "./lib/processors";
+import { preloadImages } from "./lib/preloader";
 import { Station } from "./lib/station";
 import { CodiumMemory } from "./lib/memory";
 import { IStorageType } from "./includes/Process.interface";
@@ -213,26 +214,19 @@ const station = new Station(
     network,
 );
 
-// const [loadingProgress, setLoadingProgress] = createSignal<number>(0);
-
-// const interval = setInterval(() => {
-//     if (loadingProgress() < 100) {
-//         setLoadingProgress(loadingProgress() + 10);
-//     }
-//     else {
-//         clearInterval(interval);
-//     }
-// }, 1000);
-
 render(
-    () => (
-        <ThemeProvider theme={darkTheme}>
-            <Layout auth={useStore()} station={station} player={playerStore} />
-            {/* <Router>
-            <Route path="*" component={() => 
-        </Router> */}
-            {/* <LoadingScreen loading={loadingProgress()} /> */}
-        </ThemeProvider>
-    ),
+    () => {
+        const [loadingProgress, setLoadingProgress] = createSignal<number>(0);
+        onMount(() => preloadImages(setLoadingProgress));
+        return (
+            <ThemeProvider theme={darkTheme}>
+                <Layout auth={useStore()} station={station} player={playerStore} />
+                {/* <Router>
+                <Route path="*" component={() =>
+            </Router> */}
+                <LoadingScreen loading={loadingProgress()} />
+            </ThemeProvider>
+        );
+    },
     root!,
 );

@@ -3,6 +3,7 @@ import LinearProgress from "@suid/material/LinearProgress";
 import LoadingImage from "../../assets/CodeBreaker-Logo.jpeg";
 
 import "./LoadingScreen.scss";
+import { Component, createSignal, onMount } from "solid-js";
 
 const BackgroundElement = styled("div")(
     () => `
@@ -21,12 +22,21 @@ const BackgroundElement = styled("div")(
 `,
 );
 
-const Background = (props: { loading: number }) => {
+const LoadingScreen: Component<{ loading: number }> = (props) => {
+
+    const [timerElapsed, setTimerElapsed] = createSignal<boolean>(false);
+    onMount(() => {
+        setTimeout(() => {
+            setTimerElapsed(true);
+        }, 1000);
+    });
+
     return (
         <BackgroundElement
             style={{
-                display: props.loading < 100 ? "block" : "none",
+                display: (props.loading < 100 || !timerElapsed()) ? "block" : "none",
                 overflow: "hidden",
+                'text-align': "center",
             }}
         >
             <img src={LoadingImage} class="logoImage" />
@@ -50,4 +60,4 @@ const Background = (props: { loading: number }) => {
     );
 };
 
-export default Background;
+export default LoadingScreen;
