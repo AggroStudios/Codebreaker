@@ -34,6 +34,11 @@
     animation: errorPulse 1s !important;
 }
 
+.rightAlign {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}   
+
 @keyframes successPulse {
     0% { background-color: rgba(25, 25, 25, 0.8); }
     25% { background-color: rgba(0, 128, 0, 0.8); }

@@ -13,11 +13,16 @@ import {
     DialogActions,
     LinearProgress,
     styled,
-    Typography
+    Typography,
+    CardActions,
+    Table,
+    TableBody,
+    TableRow,
+    TableCell
 } from '@suid/material';
 import type { LinearProgressProps } from '@suid/material/LinearProgress';
 
-import { AddTwoTone, CodeTwoTone, PauseTwoTone, PlayArrowTwoTone } from '@suid/icons-material';
+import { AddTwoTone, CodeTwoTone, InfoTwoTone, PauseTwoTone, PlayArrowTwoTone } from '@suid/icons-material';
 import IconButton from '@suid/material/IconButton';
 
 import Cipher from "../../lib/Cipher";
@@ -74,7 +79,8 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
     const [progress, setProgress] = createSignal<number>(0);
     const [cipherType, setCipherType] = createSignal<ICipherType|undefined>(undefined);
     const [cipherState, setCipherState] = createSignal<CipherState|undefined>(undefined);
-    const [open, setOpen] = createSignal<boolean>(false);
+    const [cancelDialogOpen, setCancelDialogOpen] = createSignal<boolean>(false);
+    const [infoDialogOpen, setInfoDialogOpen] = createSignal<boolean>(false);
 
     const { width, cipher, newCipher, station, onComplete } = props;
 
@@ -117,18 +123,26 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
         });
     });
 
-    const handleOpen = () => {
-        setOpen(true);
+    const handleInfoDialogOpen = () => {
+        setInfoDialogOpen(true);
+    }
+
+    const handleInfoDialogClose = () => {
+        setInfoDialogOpen(false);
+    }
+
+    const handleCancelDialogOpen = () => {
+        setCancelDialogOpen(true);
         cipher?.pause();
     }
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleCancelDialogClose = () => {
+        setCancelDialogOpen(false);
         cipher?.resume();
     }
     
     const cancelCipher = () => {
-        setOpen(false);
+        setCancelDialogOpen(false);
         cipher?.cancel();
     }
 
@@ -150,7 +164,7 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
                         variant: 'h5',
                         noWrap: true,
                     }}
-                    subheader={cipherType()?.name}
+                    subheader={cipherType()?.name ?? 'Idle'}
                     action={
                         <>
                             {([CipherState.BREAKING, CipherState.DOWNLOADING].includes(cipherState()) && cipherState() !== CipherState.PAUSED) &&
@@ -176,21 +190,72 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
                     }}>
                         {grid().map(char => <div class={clsx(char.cssClass)}>{char.character}</div>)}
                     </CipherContainer>}
-                    {[CipherState.BREAKING, CipherState.DOWNLOADING, CipherState.PAUSED].includes(cipherState()) && <Button onClick={handleOpen} variant="contained" color="error">Cancel</Button>}
                 </CardContent>
+                {[CipherState.BREAKING, CipherState.DOWNLOADING, CipherState.PAUSED].includes(cipherState()) && <CardActions disableSpacing>
+                    <Button onClick={handleCancelDialogOpen} variant="contained" color="error" class='rightAlign'>Cancel</Button>
+                    <IconButton onClick={handleInfoDialogOpen}><InfoTwoTone /></IconButton>
+                </CardActions>}
             </Card>
-            <Dialog open={open()} onClose={handleClose}>
+            <Dialog open={cancelDialogOpen()} onClose={handleCancelDialogClose}>
                 <DialogTitle>Cancel Cipher?</DialogTitle>
                 <DialogContent>
                     <Typography>Are you sure you want to cancel this process? You will not be able to recover the data you already downloaded and will not be rewarded any experience or money.</Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={cancelCipher} variant="contained" color="success">Yes</Button>
-                    <Button onClick={handleClose} variant="contained" color="primary">No</Button>
+                    <Button onClick={handleCancelDialogClose} variant="contained" color="primary">No</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={infoDialogOpen()} onClose={handleInfoDialogClose}>
+                <DialogTitle>Cipher Information</DialogTitle>
+                <DialogContent>
+                    <Table sx={{ minWidth: 500 }} size="small">
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>Name</TableCell>
+                                <TableCell sx={{ width: '100%' }}>{cipherType()?.name}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Complexity</TableCell>
+                                <TableCell>{cipherType()?.complexity}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Parallelism</TableCell>
+                                <TableCell>{cipherType()?.parallelism}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Block Size</TableCell>
+                                <TableCell>{cipherType()?.block.size} {cipherType()?.block.unit}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Payout</TableCell>
+                                <TableCell>${cipherType()?.payout}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>XP</TableCell>
+                                <TableCell>{cipherType()?.xp} XP</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleInfoDialogClose} variant="contained" color="primary">Close</Button>
                 </DialogActions>
             </Dialog>
         </>
     )
 }
+
+/*    {
+        name: 'Cipher 1',
+        complexity: 1,
+        parallelism: 1,
+        block: {
+            size: 1024,
+            unit: BlockUnit.megabytes,
+        },
+        payout: 100,
+        xp: 10,
+    },*/
 
 export default CipherBreak;

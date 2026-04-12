@@ -1,4 +1,4 @@
-import { Avatar, Card, CardContent, CardHeader, Typography } from "@suid/material";
+import { Avatar, Card, CardContent, CardHeader, TableBody, Table, TableRow, TableCell } from "@suid/material";
 import { Component } from "solid-js";
 import { StationStoreType } from "../../includes/Process.interface";
 import AnalyticsOutlinedIcon from '@suid/icons-material/AnalyticsOutlined';
@@ -19,10 +19,26 @@ const StationStatistics: Component<{ station: StationStoreType }> = (props) => {
             </Avatar>}
             />
             <CardContent>
-                <Typography variant="body1">CPU: {station.cpu?.toString()}</Typography>
-                <Typography variant="body1">Memory: {station.memory?.capacity} GB</Typography>
-                <Typography variant="body1">Storage: {station.storage?.map(storage => storage.capacity).join(', ')} GB</Typography>
-                <Typography variant="body1">Network: {station.network?.network.toString()}</Typography>
+                <Table sx={{ width: '100%' }} size="small">
+                    <TableBody>
+                        <TableRow>
+                            <TableCell>CPU:</TableCell>
+                            <TableCell sx={{ width: '100%' }}>{station.cpu?.toString()}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>Memory:</TableCell>
+                            <TableCell>{station.memory?.capacity} GB</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>Storage:</TableCell>
+                            <TableCell>{station.storage?.map(storage => storage.capacity).join(', ')} GB</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>Network:</TableCell>
+                            <TableCell>{station.network?.network.toString()}</TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
             </CardContent>
         </Card>
     )

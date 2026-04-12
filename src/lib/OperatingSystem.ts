@@ -1,7 +1,9 @@
 import { PlayerState } from '../includes/Player.interface';
 import Process from '../includes/Process.interface';
+import CpuActivity from './CpuActivity';
 
 import { NotificationLevel } from '../includes/OperatingSystem.interface';
+import { StationStoreType } from '../includes/Process.interface';
 
 const FPS = 60;
 
@@ -19,11 +21,14 @@ export default class OperatingSystem {
     private currentCount: number = 0;
     private currentExponent: number = 1;
     private processes: Array<Process> = [];
-
     private _player: PlayerState;
-
+    private _cpuActivity: CpuActivity | null = null;
+    private _station: StationStoreType | null = null;
+    
     constructor(player: PlayerState) {
         this._player = player;
+        this._cpuActivity = new CpuActivity(100, 50);
+        this.addProcess(this._cpuActivity);
     }
 
     public startGameLoop() {
@@ -34,6 +39,11 @@ export default class OperatingSystem {
         clearInterval(this.interval);
         this.interval = null;
     };
+
+    public set station(station: StationStoreType) {
+        this._station = station;
+        this._cpuActivity.state = station;
+    }
 
     get player() {
         return this._player;
@@ -148,6 +158,13 @@ export default class OperatingSystem {
         if (this.currentFrame > 1) {
             this.currentFrame = 0;
             this.currentCount++;
+        }
+
+        if (this._station && parseFloat((this.currentFrame / 0.1).toFixed(2)) % 1 === 0) {
+            const coreUsage = this.processes.reduce((acc, process) => acc + (process.cores || 0), 0);
+            const coreCount = this._station.cpu?.cores || 1;
+            const cpuUsage = Math.round(coreUsage / coreCount * 100);
+            this._cpuActivity.usage(cpuUsage);
         }
 
         for (const process of this.processes) {

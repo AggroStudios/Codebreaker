@@ -7,6 +7,4 @@ export interface CounterState {
     removeCipher: (cipher: Cipher) => void,
     station: StationStoreType,
     setStation: (station: StationStoreType) => void,
-    cpuActivity: { x: number, y: number }[],
-    setCpuActivity: (cpuActivity: { x: number, y: number }[]) => void,
 };

@@ -57,6 +57,10 @@ export default class Cipher implements Process {
         return `cipher-${this._id}`;
     }
 
+    public get cores() {
+        return this._cipherType.parallelism;
+    }
+
     public get state() {
         return this._state;
     }

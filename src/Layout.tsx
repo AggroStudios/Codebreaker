@@ -5,7 +5,6 @@ import { create } from 'solid-zustand/store';
 
 import AppBar from './components/AppBar';
 
-import App from './Station';
 import { styled } from '@suid/material';
 
 import TerminalController from './lib/terminal';
@@ -15,6 +14,7 @@ import { PlayerState } from './includes/Player.interface';
 
 import NavMenu from './components/NavMenu';
 import { Station } from './lib/station';
+import StationComponent from './Station';
 
 const Login = lazy(() => import('./components/Login'));
 const Background = lazy(async () => await import('./components/Background'));
@@ -63,7 +63,9 @@ const useStationStore = (station: Station) => create<StationStoreType>(set => ({
         state.os.toggleGameLoop();
         console.log(`Game loop is running: ${state.os.isRunning}`);
         return { isRunning: state.os.isRunning };
-    })
+    }),
+    cpuActivity: [],
+    setCpuActivity: (cpuActivity: { x: number, y: number }[]) => set(() => ({ cpuActivity })),
 }));
 
 const useMenuStateStore = create<MenuStateType> (set => ({
@@ -76,6 +78,7 @@ const Layout: Component<LayoutProps> = props => {
     console.log(`Username: ${auth.user?.username}`);
 
     const stationStore = useStationStore(station)();
+    stationStore.os.station = stationStore;
     const menuStateStore = useMenuStateStore();
 
     const terminalController = new TerminalController();
@@ -103,7 +106,7 @@ const Layout: Component<LayoutProps> = props => {
             </>
         }>
             <Route path="/" component={() => <Terminal terminalController={terminalController} operatingSystem={station.operatingSystem} />} />
-            <Route path="/station" component={() => <App stationStore={stationStore} />} />
+            <Route path="/station" component={() => <StationComponent stationStore={stationStore} />} />
             <Route path="/login" component={() => <Login auth={props.auth} />} />
             <Route path="/servers" component={Servers} />
         </Router>

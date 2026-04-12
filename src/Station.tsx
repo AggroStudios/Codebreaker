@@ -21,11 +21,9 @@ const useStore = create<CounterState>(set => ({
     removeCipher: (cipher: Cipher) => set(state => ({ runningCiphers: state.runningCiphers.filter(c => c !== cipher) })),
     setStation: (station: StationStoreType) => set(() => ({ station })),
     station: null,
-    cpuActivity: [],
-    setCpuActivity: (cpuActivity: { x: number, y: number }[]) => set(() => ({ cpuActivity })),
 }));
 
-const App: Component<{ stationStore?: StationStoreType }> = props => {
+const StationComponent: Component<{ stationStore?: StationStoreType }> = props => {
   
     const state = useStore();
     const completeCipher = (cipher: Cipher) => {
@@ -51,7 +49,7 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
                         <StationStatistics station={stationStore} />
                     </Grid>
                     <Grid item xs={8}>
-                        <CpuActivityWidget state={state} title="CPU Activity" />
+                        <CpuActivityWidget stationStore={stationStore} title="CPU Activity" />
                     </Grid>
                 </Grid>
             </div>
@@ -72,4 +70,4 @@ const App: Component<{ stationStore?: StationStoreType }> = props => {
     )
 }
 
-export default App
+export default StationComponent;

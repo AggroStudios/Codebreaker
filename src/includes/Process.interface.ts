@@ -19,6 +19,7 @@ export default interface Process {
     id: string,
     callback: (...args: unknown[]) => unknown,
     pid?: number,
+    cores?: number,
 }
 
 export type StationStoreType = {
@@ -33,6 +34,8 @@ export type StationStoreType = {
     isRunning: boolean,
     callback: (frame: number, count: number, exponent: number) => void,
     toggleGameLoop: () => void,
+    cpuActivity: { x: number, y: number }[],
+    setCpuActivity: (cpuActivity: { x: number, y: number }[]) => void,
 };
 
 export type MenuStateType = {

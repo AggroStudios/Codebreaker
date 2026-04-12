@@ -1,21 +1,15 @@
-import { Component, onMount } from 'solid-js';
+import { Component } from 'solid-js';
 import LineChart from '../LineChart';
-import { CounterState } from '../../includes/Counter.interface';
-import CpuActivity from '../../lib/CpuActivity';
+import { StationStoreType } from '../../includes/Process.interface';
 
-export const CpuActivityWidget: Component<{ state: CounterState, title?: string }> = (props) => {
+export const CpuActivityWidget: Component<{ stationStore: StationStoreType, title?: string }> = (props) => {
 
-    const { state, title } = props;
-    const { station } = state;
-    onMount(() => {
-        const cpuActivity = new CpuActivity(100, 50, state);
-        station?.os?.addProcess(cpuActivity);
-    });
+    const { stationStore, title } = props;
 
     return (
         <LineChart
             title={title}
-            data={state.cpuActivity}
+            data={stationStore.cpuActivity}
             maxDataPoints={50}
             height={300}
             margin={{ top: 20, right: 80, bottom: 40, left: 60 }}
@@ -23,6 +17,8 @@ export const CpuActivityWidget: Component<{ state: CounterState, title?: string 
             yLabel="% Usage"
             strokeColor="#2563eb"
             strokeWidth={2}
+            minValue={0}
+            maxValue={100}
         />
     )
 }

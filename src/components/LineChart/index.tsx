@@ -22,6 +22,8 @@ interface LineChartProps {
     title?: string;
     data: LineChartData;
     maxDataPoints?: number;
+    minValue?: number;
+    maxValue?: number;
     width?: number;
     height?: number;
     margin?: { top: number; right: number; bottom: number; left: number };
@@ -135,19 +137,13 @@ export default function LineChart(props: LineChartProps) {
                 .padding(0.1);
         }
 
-		const extent = d3.extent(allPoints, d => d.y) as [number | undefined, number | undefined];
-		let [yMin, yMax] = extent;
-		if (yMin === undefined || yMax === undefined) {
+		if (props.minValue === undefined || props.maxValue === undefined) {
 			return;
 		}
-		if (yMin === yMax) {
-			const offset = yMin === 0 ? 1 : Math.abs(yMin) * 0.1 || 1;
-			yMin -= offset;
-			yMax += offset;
-		}
+
         const yScale = d3
             .scaleLinear()
-			.domain([yMin, yMax])
+			.domain([props.minValue, props.maxValue])
             .nice()
             .range([innerHeight, 0]);
 
@@ -237,10 +233,10 @@ export default function LineChart(props: LineChartProps) {
 					}
 				})
 				.attr('cy', (d: DataPoint) => yScale(d.y))
-				.attr('r', 4)
+				.attr('r', 2)
 				.attr('fill', color)
 				.attr('stroke', '#fff')
-				.attr('stroke-width', 2);
+				.attr('stroke-width', 1);
 		});
     };
 
