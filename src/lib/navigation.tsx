@@ -88,11 +88,6 @@ export const secondaryNavigation = [
         icon: ForumTwoToneIcon,
     },
     {
-        title: "Talents",
-        link: "/talents",
-        icon: AccountTreeTwoToneIcon,
-    },
-    {
         title: "Perm Upgrades",
         link: "/upgrades",
         icon: PublishTwoToneIcon,

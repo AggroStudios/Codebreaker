@@ -4,7 +4,7 @@ import { create } from "solid-zustand/store";
 import { CounterState } from "./includes/Counter.interface";
 
 import { StationStoreType } from "./includes/Process.interface";
-import { Component } from "solid-js";
+import { Component, createEffect, createSignal, onCleanup } from "solid-js";
 
 import CipherBreak from "./components/Widgets/cipherBreak";
 import StationStatistics from "./components/StationStatistics";
@@ -14,6 +14,12 @@ import Grid from "@suid/material/Grid";
 import Cipher from "./lib/Cipher";
 import { CpuActivityWidget } from "./components/Widgets/cpuActivity";
 import { ICipherType } from "./includes/Cipher.interface";
+import { NotificationLevel } from "./includes/OperatingSystem.interface";
+
+import { toast } from "solid-toast";
+import { Avatar, Card, CardContent, CardHeader, IconButton, LinearProgress } from "@suid/material";
+import { Close, ErrorOutline } from "@suid/icons-material";
+import { red } from "@suid/material/colors";
 
 const useStore = create<CounterState>((set) => ({
     runningCiphers: [],
@@ -26,6 +32,51 @@ const useStore = create<CounterState>((set) => ({
     setStation: (station: StationStoreType) => set(() => ({ station })),
     station: null,
 }));
+
+const showError = (message: string) => {
+    const duration  = 6000
+    toast.custom((t) => {
+    
+      // Start with 100% life
+      const [life, setLife] = createSignal(100);
+      const startTime = Date.now()
+      createEffect(() => {
+        if (t.paused) return;
+        const interval = setInterval(() => {
+          const diff = Date.now() - startTime - t.pauseDuration
+          setLife(100 - (diff/duration * 100));
+        });
+    
+        onCleanup(() => clearInterval(interval));
+      });
+    
+      return (
+        <>
+            <Card>
+                <CardHeader
+                    title="Error!"
+                    subheader={message}
+                    action={
+                        <IconButton onClick={() => toast.dismiss(t.id)}>
+                            <Close />
+                        </IconButton>
+                    }
+                    avatar={
+                        <Avatar sx={{ bgcolor: red[500] }}>
+                            <ErrorOutline color="inherit" />
+                        </Avatar>
+                    }
+                    titleTypographyProps={{ variant: "h5" }} />
+                <CardContent sx={{ paddingTop: 0 }}>
+                    <LinearProgress variant="determinate" color="error" value={life()} sx={{ width: "100%", marginTop: '10px' }} />
+                </CardContent>
+            </Card>
+        </>
+      )
+    }, {
+      duration: duration
+    })    
+}
 
 const StationComponent: Component<{ stationStore?: StationStoreType }> = (
     props,
@@ -43,8 +94,14 @@ const StationComponent: Component<{ stationStore?: StationStoreType }> = (
             "breaking-3",
             "breaking-4",
         ];
-        const c = new Cipher(20, 10, cssClasses, cipherType, stationStore);
-        state.addCipher(c);
+        try {
+            const c = new Cipher(20, 10, cssClasses, cipherType, stationStore);
+            state.addCipher(c);
+        } catch {
+            showError(`Not enough cores available to add process '${cipherType.name}'.`);
+            // toast.error(`Not enough cores available to add process '${cipherType.name}'.`);
+            stationStore.os.sendNotification(`Not enough cores available to add process '${cipherType.name}'.`, NotificationLevel.ERROR);
+        }
     };
 
     const { stationStore } = props;

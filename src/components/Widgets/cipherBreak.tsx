@@ -262,7 +262,7 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
                             onClick={handleCancelDialogOpen}
                             variant="contained"
                             color="error"
-                            class="rightAlign"
+                            class="centerAlign"
                         >
                             Cancel
                         </Button>

@@ -123,6 +123,16 @@ export default class OperatingSystem {
     addProcess(process: Process) {
         // console.log('Adding process!', process);
         // Make sure the process object is valid and you can't duplicate processes
+        const coreUsage = this.processes.reduce(
+            (acc, process) => acc + (process.cores || 0),
+            0,
+        );
+        const coreCount = this._station?.cpu?.cores || 1;
+
+        if (coreUsage + (process.cores || 0) > coreCount) {
+            throw new OperatingSystemError(`Not enough cores available to add process '${process.id}'.`);
+        }
+        
         const processIndex = this.processes.findIndex(
             (i) => i?.["id"] === process?.["id"],
         );
@@ -174,7 +184,7 @@ export default class OperatingSystem {
                 (acc, process) => acc + (process.cores || 0),
                 0,
             );
-            const coreCount = this._station.cpu?.cores || 1;
+            const coreCount = this._station?.cpu?.cores || 1;
             const cpuUsage = Math.round((coreUsage / coreCount) * 100);
             this._cpuActivity.usage(cpuUsage);
         }

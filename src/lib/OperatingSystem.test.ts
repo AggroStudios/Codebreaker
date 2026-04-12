@@ -1,13 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import OperatingSystem, { OperatingSystemError } from "./OperatingSystem";
 import { NotificationLevel } from "../includes/OperatingSystem.interface";
+import { StationStoreType } from "../includes/Process.interface";
+import { PlayerState } from "../includes/Player.interface";
 
-const mockPlayer = () => ({
+const mockPlayer = (): Partial<PlayerState> => ({
     addNotification: vi.fn(),
     addMessage: vi.fn(),
     markMessageAsRead: vi.fn(),
     markNotificationAsRead: vi.fn(),
 });
+
+const mockStation = (cores: number | null) =>
+    ({
+        cpu: cores !== null ? { cores } : null,
+        cpuActivity: [],
+        setCpuActivity: vi.fn(),
+    }) as unknown as StationStoreType;
 
 const mockProcess = {
     id: "proc1",
@@ -92,5 +101,57 @@ describe("OperatingSystem", () => {
         os.addProcess({ ...mockProcess });
         os.update();
         expect(mockProcess.callback).toHaveBeenCalled();
+    });
+});
+
+describe("OperatingSystem CPU core logic", () => {
+    let os: OperatingSystem;
+
+    beforeEach(() => {
+        os = new OperatingSystem(mockPlayer() as PlayerState);
+    });
+
+    it("should allow a process that fills the default 1-core limit", () => {
+        os.addProcess({ id: "p1", callback: vi.fn(), cores: 1 });
+        expect(os.listProcesses()).toHaveLength(1);
+    });
+
+    it("should throw when exceeding the default 1-core limit", () => {
+        os.addProcess({ id: "p1", callback: vi.fn(), cores: 1 });
+        expect(() =>
+            os.addProcess({ id: "p2", callback: vi.fn(), cores: 1 }),
+        ).toThrow(OperatingSystemError);
+    });
+
+    it("should allow processes to fill all cores on a multi-core station", () => {
+        os.station = mockStation(2);
+        os.addProcess({ id: "p1", callback: vi.fn(), cores: 1 });
+        os.addProcess({ id: "p2", callback: vi.fn(), cores: 1 });
+        expect(os.listProcesses()).toHaveLength(2);
+    });
+
+    it("should throw when exceeding the station core count", () => {
+        os.station = mockStation(2);
+        os.addProcess({ id: "p1", callback: vi.fn(), cores: 1 });
+        os.addProcess({ id: "p2", callback: vi.fn(), cores: 1 });
+        expect(() =>
+            os.addProcess({ id: "p3", callback: vi.fn(), cores: 1 }),
+        ).toThrow(OperatingSystemError);
+    });
+
+    it("should allow coreless processes regardless of core count", () => {
+        os.station = mockStation(1);
+        for (let i = 0; i < 5; i++) {
+            os.addProcess({ id: `p${i}`, callback: vi.fn() });
+        }
+        expect(os.listProcesses()).toHaveLength(5);
+    });
+
+    it("should default to 1-core limit when station has null cpu", () => {
+        os.station = mockStation(null);
+        os.addProcess({ id: "p1", callback: vi.fn(), cores: 1 });
+        expect(() =>
+            os.addProcess({ id: "p2", callback: vi.fn(), cores: 1 }),
+        ).toThrow(OperatingSystemError);
     });
 });

@@ -24,6 +24,7 @@ import { CodiumMemory } from "./lib/memory";
 import { IStorageType } from "./includes/Process.interface";
 import { CodiumStorageHdd } from "./lib/storage";
 import { NetworkDSL, Networking } from "./lib/network";
+import { Toaster } from "solid-toast";
 
 const darkTheme = createTheme({
     palette: {
@@ -161,15 +162,18 @@ const playerStore = create<PlayerState>((set) => ({
             };
         }),
     addNotification: (notification) =>
-        set((state) => ({
-            player: {
-                ...state.player,
-                notifications: [
-                    ...state.player.notifications,
-                    { ...notification, unread: true },
-                ],
-            },
-        })),
+        set((state) => {
+            
+            return ({
+                player: {
+                    ...state.player,
+                    notifications: [
+                        ...state.player.notifications,
+                        { ...notification, unread: true },
+                    ],
+                },
+            })}
+        ),
     addMessage: (message) =>
         set((state) => ({
             player: {
@@ -225,6 +229,7 @@ render(
                 <Route path="*" component={() =>
             </Router> */}
                 <LoadingScreen loading={loadingProgress()} />
+                <Toaster position="bottom-center" />
             </ThemeProvider>
         );
     },
