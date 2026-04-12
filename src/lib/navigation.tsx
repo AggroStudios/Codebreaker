@@ -13,8 +13,10 @@ import PeopleTwoToneIcon from "@suid/icons-material/PeopleTwoTone";
 import PestControlTwoToneIcon from "@suid/icons-material/PestControlTwoTone";
 import AccountTreeTwoToneIcon from "@suid/icons-material/AccountTreeTwoTone";
 import TerminalTwoTone from "@suid/icons-material/TerminalTwoTone";
+import { OverridableComponent } from "@suid/material/OverridableComponent";
+import { SvgIconTypeMap } from "@suid/material/SvgIcon";
 
-export const adminNavigation = [
+export const adminNavigation: INavigationItem[] = [
     {
         title: "Players",
         link: "/admin/players",
@@ -32,7 +34,14 @@ export const adminNavigation = [
     },
 ];
 
-export const mainNavigation = [
+export interface INavigationItem {
+    title: string;
+    link: string;
+    icon: OverridableComponent<SvgIconTypeMap<object, "svg">>;
+    locked?: boolean;
+}
+
+export const mainNavigation: INavigationItem[] = [
     {
         title: "Terminal",
         link: "/",
@@ -47,41 +56,35 @@ export const mainNavigation = [
         title: "Servers",
         link: "/servers",
         icon: StorageTwoToneIcon,
-        locked: true,
     },
     {
         title: "Server Racks",
         link: "/racks",
         icon: CalendarViewDayTwoToneIcon,
-        locked: true,
     },
     {
         title: "Data Centers",
         link: "/dataCenters",
         icon: ApartmentTwoToneIcon,
-        locked: true,
     },
     {
         title: "Networks",
         link: "/networks",
         icon: RouterTwoToneIcon,
-        locked: true,
     },
     {
         title: "Dark Web",
         link: "/darkWeb",
         icon: PublicTwoToneIcon,
-        locked: true,
     },
     {
         title: "Neural Net",
         link: "/neuralNet",
         icon: ShareTwoToneIcon,
-        locked: true,
     },
 ];
 
-export const secondaryNavigation = [
+export const secondaryNavigation: INavigationItem[] = [
     {
         title: "Forums",
         link: "/forums",
