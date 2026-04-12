@@ -32,6 +32,7 @@ describe("Terminal", () => {
             addMessage: vi.fn(),
             markMessageAsRead: vi.fn(),
             markNotificationAsRead: vi.fn(),
+            markAllNotificationsAsRead: vi.fn(),
             player: {
                 name: "TestPlayer",
                 money: 0,

@@ -27,6 +27,7 @@ function createMockPlayerState(): PlayerState {
         addMessage: vi.fn(),
         markMessageAsRead: vi.fn(),
         markNotificationAsRead: vi.fn(),
+        markAllNotificationsAsRead: vi.fn(),
     };
 }
 
