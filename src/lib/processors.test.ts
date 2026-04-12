@@ -16,7 +16,7 @@ describe("CodiumProcessor", () => {
     it("should return correct string from toString()", () => {
         const proc = new CodiumProcessor();
         expect(proc.toString()).toBe(
-            "Codium Brkr 1 (risc32) - 4 cores @ 3.2 GHz",
+            "Codium Brkr 1 (risc32)",
         );
     });
 });
@@ -35,7 +35,7 @@ describe("CodiumProcessor64", () => {
     it("should return correct string from toString()", () => {
         const proc = new CodiumProcessor64();
         expect(proc.toString()).toBe(
-            "Codium Brkr64 1 (risc64) - 4 cores @ 3.2 GHz",
+            "Codium Brkr64 1 (risc64)",
         );
     });
 });
