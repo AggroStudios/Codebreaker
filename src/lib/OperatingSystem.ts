@@ -28,7 +28,6 @@ export default class OperatingSystem {
     constructor(player: PlayerState) {
         this._player = player;
         this._cpuActivity = new CpuActivity(100, 50);
-        this.addProcess(this._cpuActivity);
     }
 
     public startGameLoop() {

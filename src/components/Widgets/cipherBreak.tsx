@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Component, createSignal, onMount } from 'solid-js';
+import { Component, createSignal, JSX, onMount } from 'solid-js';
 import {
     Avatar,
     Box,
@@ -18,7 +18,9 @@ import {
     Table,
     TableBody,
     TableRow,
-    TableCell
+    TableCell,
+    Menu,
+    MenuItem
 } from '@suid/material';
 import type { LinearProgressProps } from '@suid/material/LinearProgress';
 
@@ -29,7 +31,7 @@ import Cipher from "../../lib/Cipher";
 
 import './styles.scss';
 import { StationStoreType } from '../../includes/Process.interface';
-import { CipherState, ICipherType } from '../../includes/Cipher.interface';
+import { CipherState, ICipherType, CipherTypes } from '../../includes/Cipher.interface';
 
 const CipherContainer = styled('div')({
     display: 'grid',
@@ -67,7 +69,7 @@ interface CipherBreakOptions {
     station: StationStoreType;
     width: number;
     cipher?: Cipher;
-    newCipher: () => void;
+    newCipher: (cipherType: ICipherType) => void;
     onComplete?: (cipher: Cipher) => void;
 };
 
@@ -81,8 +83,19 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
     const [cipherState, setCipherState] = createSignal<CipherState|undefined>(undefined);
     const [cancelDialogOpen, setCancelDialogOpen] = createSignal<boolean>(false);
     const [infoDialogOpen, setInfoDialogOpen] = createSignal<boolean>(false);
+    const [cipherMenuAnchorEl, setCipherMenuAnchorEl] = createSignal<null | HTMLElement>(null);
 
     const { width, cipher, newCipher, station, onComplete } = props;
+
+    const isCipherMenuOpen = () => Boolean(cipherMenuAnchorEl());
+
+    const handleCipherMenuOpen: JSX.EventHandler<HTMLElement, MouseEvent> = event => {
+        setCipherMenuAnchorEl(event.currentTarget);
+    }
+
+    const handleCipherMenuClose = () => {
+        setCipherMenuAnchorEl(null);
+    }
 
     onMount(() => {
         cipher?.setProgress((p: number, type: ICipherType, state: CipherState) => {
@@ -175,7 +188,7 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
                             <IconButton onClick={resumeCipher}>
                                 <PlayArrowTwoTone />
                             </IconButton>}
-                            <IconButton onClick={newCipher}>
+                            <IconButton onClick={handleCipherMenuOpen}>
                                 <AddTwoTone />
                             </IconButton>
                         </>
@@ -191,7 +204,7 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
                         {grid().map(char => <div class={clsx(char.cssClass)}>{char.character}</div>)}
                     </CipherContainer>}
                 </CardContent>
-                {[CipherState.BREAKING, CipherState.DOWNLOADING, CipherState.PAUSED].includes(cipherState()) && <CardActions disableSpacing>
+                {[CipherState.BREAKING, CipherState.DOWNLOADING, CipherState.PAUSED].includes(cipherState()) && <CardActions disableSpacing sx={{ marginLeft: '40px' }}>
                     <Button onClick={handleCancelDialogOpen} variant="contained" color="error" class='rightAlign'>Cancel</Button>
                     <IconButton onClick={handleInfoDialogOpen}><InfoTwoTone /></IconButton>
                 </CardActions>}
@@ -242,6 +255,18 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
                     <Button onClick={handleInfoDialogClose} variant="contained" color="primary">Close</Button>
                 </DialogActions>
             </Dialog>
+            <Menu
+                anchorEl={cipherMenuAnchorEl()}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                id={`${cipher?.id}-menu`}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                open={isCipherMenuOpen()}
+                onClose={handleCipherMenuClose}
+            >
+                {CipherTypes.map(cipherType => <MenuItem onClick={() => {
+                    newCipher(cipherType);
+                }}>{cipherType.name}</MenuItem>)}
+            </Menu>
         </>
     )
 }
