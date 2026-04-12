@@ -84,7 +84,7 @@ const StationComponent: Component<{ stationStore?: StationStoreType }> = (
     const state = useStore();
     const completeCipher = (cipher: Cipher) => {
         state.removeCipher(cipher);
-        // Add notification
+        stationStore.os.sendNotification(`Cipher '${cipher.cipherType.name}' (${cipher.id}) completed.`, NotificationLevel.INFO);
     };
 
     const addCipher = (cipherType: ICipherType) => {
@@ -99,7 +99,6 @@ const StationComponent: Component<{ stationStore?: StationStoreType }> = (
             state.addCipher(c);
         } catch {
             showError(`Not enough cores available to add process '${cipherType.name}'.`);
-            // toast.error(`Not enough cores available to add process '${cipherType.name}'.`);
             stationStore.os.sendNotification(`Not enough cores available to add process '${cipherType.name}'.`, NotificationLevel.ERROR);
         }
     };

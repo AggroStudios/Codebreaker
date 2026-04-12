@@ -32,17 +32,29 @@ const StationStatistics: Component<{ station: StationStoreType }> = (props) => {
                 <Table sx={{ width: "100%" }} size="small">
                     <TableBody>
                         <TableRow>
-                            <TableCell>CPU:</TableCell>
+                            <TableCell sx={{ whiteSpace: "nowrap" }}>CPU:</TableCell>
                             <TableCell sx={{ width: "100%" }}>
                                 {station.cpu?.toString()}
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell>Memory:</TableCell>
+                            <TableCell sx={{ whiteSpace: "nowrap" }}>CPU Speed:</TableCell>
+                            <TableCell sx={{ width: "100%" }}>
+                                {station.cpu?.speed}
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell sx={{ whiteSpace: "nowrap" }}>Nb Cores:</TableCell>
+                            <TableCell sx={{ width: "100%" }}>
+                                {station.cpu?.cores} Cores
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell sx={{ whiteSpace: "nowrap" }}>Memory:</TableCell>
                             <TableCell>{station.memory?.capacity} GB</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell>Storage:</TableCell>
+                            <TableCell sx={{ whiteSpace: "nowrap" }}>Storage:</TableCell>
                             <TableCell>
                                 {station.storage
                                     ?.map((storage) => storage.capacity)
@@ -51,7 +63,7 @@ const StationStatistics: Component<{ station: StationStoreType }> = (props) => {
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell>Network:</TableCell>
+                            <TableCell sx={{ whiteSpace: "nowrap" }}>Network:</TableCell>
                             <TableCell>
                                 {station.network?.network.toString()}
                             </TableCell>

@@ -200,6 +200,10 @@ const playerStore = create<PlayerState>((set) => ({
             }
             return { player: { ...state.player, notifications } };
         }),
+    markAllNotificationsAsRead: () =>
+        set((state) => {
+            return { player: { ...state.player, notifications: state.player.notifications.map((notification) => ({ ...notification, unread: false })) } };
+        }),
 }))();
 
 const root = document.getElementById("root");

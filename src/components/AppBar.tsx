@@ -110,6 +110,7 @@ const AppBarComponent: Component<{
         MouseEvent
     > = (event) => {
         setNotificationAnchorEl(event.currentTarget);
+        props.playerStateStore?.markAllNotificationsAsRead();
     };
 
     const handleMessageMenuOpen: JSX.EventHandler<HTMLElement, MouseEvent> = (

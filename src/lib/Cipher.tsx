@@ -71,6 +71,10 @@ export default class Cipher implements Process {
         return `cipher-${this._id}`;
     }
 
+    public get cipherType() {
+        return this._cipherType;
+    }
+
     public get cores() {
         return this._cipherType.parallelism;
     }
@@ -181,7 +185,8 @@ export default class Cipher implements Process {
             this.randomizeGrid();
         }
 
-        if (this._progress >= 100) {
+        if (this.unsolvedIndexes.length === 0) {
+            this.randomizeGrid();
             console.log("Cipher breaking completed!");
             this.state = CipherState.SUCCESS;
         }

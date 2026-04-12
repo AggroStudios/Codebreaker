@@ -12,7 +12,7 @@ export class CodiumProcessor implements IProcessorType {
     architecture: ProcessorArchitecture = ProcessorArchitecture.risc32;
 
     toString() {
-        return `${this.manufacturer} ${this.model} (${this.architecture}) - ${this.cores} cores @ ${this.speed}`;
+        return `${this.manufacturer} ${this.model} (${this.architecture})`;
     }
 }
 
