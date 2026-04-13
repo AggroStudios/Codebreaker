@@ -35,6 +35,8 @@ export default class Cipher implements Process {
     private cipherSize: number;
     private _state: CipherState = CipherState.DOWNLOADING;
     private _previousState: CipherState | undefined = undefined;
+    private _paused: boolean = false;
+    private _percentUse: number = 0;
 
     constructor(
         width: number,
@@ -83,7 +85,16 @@ export default class Cipher implements Process {
         return this._state;
     }
 
+    public get paused() {
+        return this._paused;
+    }
+
+    public get percentUse() {
+        return this._percentUse / 100;
+    }
+
     public pause() {
+        this._paused = true;
         if (
             [CipherState.DOWNLOADING, CipherState.BREAKING].includes(
                 this._state,
@@ -95,6 +106,7 @@ export default class Cipher implements Process {
     }
 
     public resume() {
+        this._paused = false;
         if (this._previousState) {
             this.state = this._previousState;
             this._previousState = undefined;
@@ -156,6 +168,7 @@ export default class Cipher implements Process {
     }
 
     private breaking() {
+        this._percentUse = 100;
         const complexity = Math.round(10 * this._cipherType.complexity);
         console.log("Complexity:", complexity);
         if (this.frame > 0 && this.frame % complexity === 0) {
@@ -193,6 +206,7 @@ export default class Cipher implements Process {
     }
 
     private downloading() {
+        this._percentUse = 50;
         if (this.frame > 0 && this.frame % 10 === 0) {
             // calculate the amount of blocks downloaded, divided by the number of processes currently downloading.
             this.downloadedBlocks +=

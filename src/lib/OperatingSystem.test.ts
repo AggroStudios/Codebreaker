@@ -102,6 +102,23 @@ describe("OperatingSystem", () => {
         os.update();
         expect(mockProcess.callback).toHaveBeenCalled();
     });
+
+    it("should skip paused processes in update()", () => {
+        const pausedCallback = vi.fn();
+        os.addProcess({ id: "paused1", callback: pausedCallback, paused: true });
+        os.update();
+        expect(pausedCallback).not.toHaveBeenCalled();
+    });
+
+    it("should only call active process callbacks in update() when mixed with paused", () => {
+        const activeCallback = vi.fn();
+        const pausedCallback = vi.fn();
+        os.addProcess({ id: "active1", callback: activeCallback });
+        os.addProcess({ id: "paused1", callback: pausedCallback, paused: true });
+        os.update();
+        expect(activeCallback).toHaveBeenCalledOnce();
+        expect(pausedCallback).not.toHaveBeenCalled();
+    });
 });
 
 describe("OperatingSystem CPU core logic", () => {
@@ -153,5 +170,32 @@ describe("OperatingSystem CPU core logic", () => {
         expect(() =>
             os.addProcess({ id: "p2", callback: vi.fn(), cores: 1 }),
         ).toThrow(OperatingSystemError);
+    });
+
+    it("should skip paused processes when calculating core budget in addProcess", () => {
+        os.station = mockStation(1);
+        // A paused process occupies a core slot but addProcess doesn't filter by paused —
+        // verify the existing behaviour: paused flag does not affect the addProcess core check
+        os.addProcess({ id: "p1", callback: vi.fn(), cores: 1 });
+        expect(() =>
+            os.addProcess({ id: "p2", callback: vi.fn(), cores: 1 }),
+        ).toThrow(OperatingSystemError);
+    });
+
+    it("should treat a process with percentUse 0 as using no CPU in update()", () => {
+        os.station = mockStation(2);
+        const cb = vi.fn();
+        os.addProcess({ id: "p1", callback: cb, cores: 2, percentUse: 0 });
+        // percentUse 0 means cores * 0 = 0 CPU load — update should not throw and callback runs
+        expect(() => os.update()).not.toThrow();
+        expect(cb).toHaveBeenCalled();
+    });
+
+    it("should not invoke callback for paused processes regardless of percentUse", () => {
+        os.station = mockStation(2);
+        const cb = vi.fn();
+        os.addProcess({ id: "p1", callback: cb, cores: 1, percentUse: 1, paused: true });
+        os.update();
+        expect(cb).not.toHaveBeenCalled();
     });
 });

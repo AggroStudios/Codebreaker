@@ -180,8 +180,8 @@ export default class OperatingSystem {
             this._station &&
             parseFloat((this.currentFrame / 0.1).toFixed(2)) % 1 === 0
         ) {
-            const coreUsage = this.processes.reduce(
-                (acc, process) => acc + (process.cores || 0),
+            const coreUsage = this.processes.filter((process: Process) => !process.paused).reduce(
+                (acc, process) => acc + (process.cores * (process.percentUse || 0) || 0),
                 0,
             );
             const coreCount = this._station?.cpu?.cores || 1;
@@ -189,7 +189,7 @@ export default class OperatingSystem {
             this._cpuActivity.usage(cpuUsage);
         }
 
-        for (const process of this.processes) {
+        for (const process of this.processes.filter((process: Process) => !process.paused)) {
             process.callback(
                 Number(this.currentFrame.toFixed(3)),
                 this.currentCount,
