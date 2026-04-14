@@ -1,8 +1,25 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from "vitest";
 import OperatingSystem, { OperatingSystemError } from "./OperatingSystem";
 import { NotificationLevel } from "../includes/OperatingSystem.interface";
 import { StationStoreType } from "../includes/Process.interface";
 import { PlayerState } from "../includes/Player.interface";
+
+vi.mock('./worker/OperatingSystem?worker', () => ({
+    default: class MockWorker {
+        onmessage: ((event: any) => void) | null = null;
+        postMessage(msg: { type: string }) {
+            if (msg.type === 'startGameLoop') {
+                this.onmessage?.({ data: { type: 'startGameLoop', data: true } });
+            } else if (msg.type === 'stopGameLoop') {
+                this.onmessage?.({ data: { type: 'stopGameLoop', data: false } });
+            }
+        }
+        terminate() {}
+    }
+}));
+
+beforeAll(() => { vi.stubGlobal('Worker', class {}); });
+afterAll(() => { vi.unstubAllGlobals(); });
 
 const mockPlayer = (): Partial<PlayerState> => ({
     addNotification: vi.fn(),
