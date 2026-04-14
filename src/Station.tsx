@@ -82,9 +82,13 @@ const StationComponent: Component<{ stationStore?: StationStoreType }> = (
     props,
 ) => {
     const state = useStore();
-    const completeCipher = (cipher: Cipher) => {
+    const completeCipher = (cipher: Cipher, cancelled: boolean) => {
+        console.log('Complete cipher callback called!');
+        stationStore.os.sendNotification(`Cipher '${cipher.cipherType.name}' (${cipher.id}) ${cancelled ? 'cancelled' : 'completed'}.`, (cancelled ? NotificationLevel.ERROR : NotificationLevel.INFO));
+    };
+
+    const removeCipher = (cipher: Cipher) => {
         state.removeCipher(cipher);
-        stationStore.os.sendNotification(`Cipher '${cipher.cipherType.name}' (${cipher.id}) completed.`, NotificationLevel.INFO);
     };
 
     const addCipher = (cipherType: ICipherType) => {
@@ -126,13 +130,7 @@ const StationComponent: Component<{ stationStore?: StationStoreType }> = (
                     {(state.runningCiphers.length > 0 &&
                         state.runningCiphers.map((cipher) => (
                             <Grid item xs={4}>
-                                <CipherBreak
-                                    station={state.station}
-                                    width={20}
-                                    cipher={cipher}
-                                    newCipher={addCipher}
-                                    onComplete={completeCipher}
-                                />
+                                <CipherBreak station={state.station} width={20} cipher={cipher} newCipher={addCipher} onComplete={completeCipher} removeCipher={removeCipher} />
                             </Grid>
                         ))) || (
                         <Grid item xs={4}>

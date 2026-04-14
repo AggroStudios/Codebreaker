@@ -25,11 +25,11 @@ const mockProcess = {
 
 describe("OperatingSystem", () => {
     let os: OperatingSystem;
-    let player: any;
+    let player: Partial<PlayerState>;
 
     beforeEach(() => {
         player = mockPlayer();
-        os = new OperatingSystem(player);
+        os = new OperatingSystem(player as PlayerState);
     });
 
     it("should start and stop the game loop", () => {

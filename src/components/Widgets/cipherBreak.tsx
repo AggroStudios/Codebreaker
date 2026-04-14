@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { Component, createSignal, JSX, onMount } from "solid-js";
+import { Component, createSignal, onMount } from "solid-js";
 import {
     Avatar,
     Box,
@@ -21,15 +21,16 @@ import {
     TableCell,
     Menu,
     MenuItem,
+    Select,
 } from "@suid/material";
 import type { LinearProgressProps } from "@suid/material/LinearProgress";
 
 import {
-    AddTwoTone,
     CodeTwoTone,
     InfoTwoTone,
     PauseTwoTone,
     PlayArrowTwoTone,
+    ReplayOutlined,
 } from "@suid/icons-material";
 import IconButton from "@suid/material/IconButton";
 
@@ -42,6 +43,7 @@ import {
     ICipherType,
     CipherTypes,
 } from "../../includes/Cipher.interface";
+import { SelectChangeEvent } from "@suid/material/Select";
 
 const CipherContainer = styled("div")({
     display: "grid",
@@ -86,7 +88,8 @@ interface CipherBreakOptions {
     width: number;
     cipher?: Cipher;
     newCipher: (cipherType: ICipherType) => void;
-    onComplete?: (cipher: Cipher) => void;
+    onComplete?: (cipher: Cipher, cancelled: boolean) => void;
+    removeCipher?: (cipher: Cipher) => void;
 }
 
 const CipherBreak: Component<CipherBreakOptions> = (props) => {
@@ -94,27 +97,15 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
 
     const [grid, setGrid] = createSignal<IGridItem[]>([]);
     const [progress, setProgress] = createSignal<number>(0);
-    const [cipherType, setCipherType] = createSignal<ICipherType | undefined>(
-        undefined,
-    );
-    const [cipherState, setCipherState] = createSignal<CipherState | undefined>(
-        undefined,
-    );
-    const [cancelDialogOpen, setCancelDialogOpen] =
-        createSignal<boolean>(false);
+    const [cipherType, setCipherType] = createSignal<ICipherType | undefined>(undefined);
+    const [cipherState, setCipherState] = createSignal<CipherState | undefined>(undefined);
+    const [cancelDialogOpen, setCancelDialogOpen] =createSignal<boolean>(false);
     const [infoDialogOpen, setInfoDialogOpen] = createSignal<boolean>(false);
-    const [cipherMenuAnchorEl, setCipherMenuAnchorEl] =
-        createSignal<null | HTMLElement>(null);
+    const [cipherMenuAnchorEl, setCipherMenuAnchorEl] = createSignal<null | HTMLElement>(null);
 
-    const { width, cipher, newCipher, station, onComplete } = props;
+    const { width, cipher, newCipher, station, onComplete, removeCipher } = props;
 
     const isCipherMenuOpen = () => Boolean(cipherMenuAnchorEl());
-
-    const handleCipherMenuOpen: JSX.EventHandler<HTMLElement, MouseEvent> = (
-        event,
-    ) => {
-        setCipherMenuAnchorEl(event.currentTarget);
-    };
 
     const handleCipherMenuClose = () => {
         setCipherMenuAnchorEl(null);
@@ -151,14 +142,19 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
                 cardRef?.classList.add("cipher-error");
             }
             setTimeout(() => {
+                setCipherState(CipherState.IDLE);
                 cardRef?.classList.add("background");
                 cardRef?.classList.remove("cipher-success");
                 cardRef?.classList.remove("cipher-error");
-                onComplete?.(c);
-                setCipherType(undefined);
+                setGrid([]);
+                onComplete?.(c, cancelled);
             }, 1000);
         });
     });
+
+    const handleRemoveCipher = () => {
+        removeCipher?.(cipher);
+    };
 
     const handleInfoDialogOpen = () => {
         setInfoDialogOpen(true);
@@ -189,6 +185,20 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
 
     const resumeCipher = () => {
         cipher?.resume();
+    };
+
+    const handleCipherChange = (event: SelectChangeEvent<string>) => {
+        const cType = CipherTypes.find((cipherType) => cipherType.name === event.target.value);
+        if (cType && cType.name !== cipherType()?.name) {
+            removeCipher?.(cipher);
+            newCipher(cType);
+        }
+    };
+    const handleRestartCipher = () => {
+        if (cipher) {
+            removeCipher?.(cipher);
+            newCipher(cipher.cipherType);
+        }
     };
 
     return (
@@ -222,14 +232,33 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
                                     <PlayArrowTwoTone />
                                 </IconButton>
                             )}
-                            <IconButton onClick={handleCipherMenuOpen}>
-                                <AddTwoTone />
-                            </IconButton>
+                            <Select
+                                variant="standard"
+                                class="cipher-select"
+                                displayEmpty
+                                disabled={cipherState() !== CipherState.IDLE}
+                                value={cipherType()?.name ?? ""}
+                                onChange={handleCipherChange}
+                                renderValue={(selected) => {
+                                    if (!selected) {
+                                        return <em>Select</em>;
+                                    }
+                                    return selected;
+                                }}
+                            >
+                                {CipherTypes.map((cipherType) => (
+                                    <MenuItem value={cipherType.name}>{cipherType.name}</MenuItem>
+                                ))}
+                            </Select>
+                            {cipherType()?.name && 
+                            <IconButton onClick={handleRestartCipher} disabled={cipherState() !== CipherState.IDLE}>
+                                <ReplayOutlined />
+                            </IconButton>}
                         </>
                     }
                 />
                 <CardContent class="centerContent">
-                    {cipherState() && (
+                    {cipherState() && cipherState() !== CipherState.IDLE && (
                         <div class="progress">
                             <LinearProgressWithLabel
                                 variant="determinate"
@@ -252,20 +281,14 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
                         </CipherContainer>
                     )}
                 </CardContent>
-                {[
-                    CipherState.BREAKING,
-                    CipherState.DOWNLOADING,
-                    CipherState.PAUSED,
-                ].includes(cipherState()) && (
+                {cipher && [CipherState.BREAKING, CipherState.DOWNLOADING, CipherState.PAUSED, CipherState.IDLE].includes(cipherState()) && (
                     <CardActions disableSpacing sx={{ marginLeft: "40px" }}>
-                        <Button
-                            onClick={handleCancelDialogOpen}
-                            variant="contained"
-                            color="error"
-                            class="centerAlign"
-                        >
+                        {cipherState() !== CipherState.IDLE && <Button onClick={handleCancelDialogOpen} variant="contained" color="error" class="centerAlign">
                             Cancel
-                        </Button>
+                        </Button>}
+                        {cipherState() === CipherState.IDLE && <Button onClick={handleRemoveCipher} variant="contained" color="primary" class="centerAlign">
+                            Delete
+                        </Button>}
                         <IconButton onClick={handleInfoDialogOpen}>
                             <InfoTwoTone />
                         </IconButton>
@@ -318,7 +341,7 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
                             <TableRow>
                                 <TableCell>Parallelism</TableCell>
                                 <TableCell>
-                                    {cipherType()?.parallelism}
+                                    {cipherType()?.parallelism} cores
                                 </TableCell>
                             </TableRow>
                             <TableRow>

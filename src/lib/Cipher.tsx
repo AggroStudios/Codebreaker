@@ -114,6 +114,7 @@ export default class Cipher implements Process {
     }
 
     public cancel() {
+        this._paused = false;
         this.state = CipherState.CANCELLED;
     }
 
@@ -170,7 +171,6 @@ export default class Cipher implements Process {
     private breaking() {
         this._percentUse = 100;
         const complexity = Math.round(10 * this._cipherType.complexity);
-        console.log("Complexity:", complexity);
         if (this.frame > 0 && this.frame % complexity === 0) {
             const solvedIndex =
                 this.unsolvedIndexes[
@@ -226,6 +226,7 @@ export default class Cipher implements Process {
     }
 
     public callback(_: number) {
+        console.log('State:', this._state);
         if (this._state === CipherState.PAUSED) return;
 
         this.frame++;
@@ -241,6 +242,7 @@ export default class Cipher implements Process {
                 this._completeCipher(this, false);
                 break;
             case CipherState.CANCELLED:
+                console.log('Cipher cancelled!');
                 this._stationOs.removeProcess(this);
                 this._stationNet.removeProcess(this);
                 this._completeCipher(this, true);

@@ -102,7 +102,7 @@ function MainListItems(props: any) {
             {mainNavigation.map((item, key) => (
                 <ListItemNavLink
                     key={key}
-                    disabled={item.locked}
+                    disabled={item.locked || false}
                     to={item.link}
                     {...props}
                 >
