@@ -34,8 +34,8 @@ export type StationStoreType = {
     count: number;
     exponent: number;
     isRunning: boolean;
+    setRunning: (running: boolean) => void;
     callback: (frame: number, count: number, exponent: number) => void;
-    toggleGameLoop: () => void;
     cpuActivity: { x: number; y: number }[];
     setCpuActivity: (cpuActivity: { x: number; y: number }[]) => void;
 };

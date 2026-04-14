@@ -62,14 +62,9 @@ const useStationStore = (station: Station) =>
         count: 0,
         exponent: 0,
         isRunning: false,
+        setRunning: (running: boolean) => set(() => ({ isRunning: running })),
         callback: (frame: number, count: number, exponent: number) =>
             set(() => ({ frame, count, exponent })),
-        toggleGameLoop: () =>
-            set((state) => {
-                state.os.toggleGameLoop();
-                console.log(`Game loop is running: ${state.os.isRunning}`);
-                return { isRunning: state.os.isRunning };
-            }),
         cpuActivity: [],
         setCpuActivity: (cpuActivity: { x: number; y: number }[]) =>
             set(() => ({ cpuActivity })),

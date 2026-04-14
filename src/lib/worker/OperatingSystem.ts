@@ -20,14 +20,15 @@ export type OSSetExponentData = {
     exponent: number;
 }
 
-onmessage = (event: MessageEvent<OperatingSystemWorkerMessage>) => {
-    const FPS = 60;
-    
-    let interval: null | NodeJS.Timeout = null;
-    let currentFrame: number = 0;
-    let currentCount: number = 0;
-    let currentExponent: number = 1;
+const FPS = 60;
 
+let interval: null | NodeJS.Timeout = null;
+let currentFrame: number = 0;
+let currentCount: number = 0;
+let currentExponent: number = 1;
+
+onmessage = (event: MessageEvent<OperatingSystemWorkerMessage>) => {
+    
     const { type, data } = event.data;
 
     const startGameLoop = () => {

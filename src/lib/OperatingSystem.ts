@@ -39,6 +39,7 @@ export default class OperatingSystem {
                     case OperatingSystemWorkerMessageType.START_GAME_LOOP:
                     case OperatingSystemWorkerMessageType.STOP_GAME_LOOP:
                         this._isRunning = data as boolean;
+                        this._station?.setRunning(this._isRunning);
                         break;
                     case OperatingSystemWorkerMessageType.UPDATE_GAME_LOOP:
                         this.currentFrame = (data as OSUpdateGameLoopData).frame;
@@ -85,12 +86,12 @@ export default class OperatingSystem {
     }
 
     public toggleGameLoop() {
-        if (this.isRunning) {
+        if (this._isRunning) {
             this.stopGameLoop();
         } else {
             this.startGameLoop();
         }
-        return this.isRunning;
+        return this._isRunning;
     }
 
     public listProcesses() {

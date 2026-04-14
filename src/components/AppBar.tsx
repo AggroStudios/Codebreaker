@@ -375,7 +375,7 @@ const AppBarComponent: Component<{
                                         color="inherit"
                                         style={{ outline: 0 }}
                                         onClick={() =>
-                                            props.stationStore.toggleGameLoop()
+                                            props.stationStore.os.toggleGameLoop()
                                         }
                                     >
                                         {props.stationStore.isRunning ? (
