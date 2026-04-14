@@ -83,13 +83,18 @@ function LinearProgressWithLabel(
     );
 }
 
+export interface CipherBreakFunctions {
+    newCipher: (cipherType: ICipherType) => void;
+    onComplete?: (cipher: Cipher, cancelled: boolean) => void;
+    removeCipher?: (cipher: Cipher) => void;
+    updateCipher?: (cipher: Cipher) => void;
+}
+
 interface CipherBreakOptions {
     station: StationStoreType;
     width: number;
     cipher?: Cipher;
-    newCipher: (cipherType: ICipherType) => void;
-    onComplete?: (cipher: Cipher, cancelled: boolean) => void;
-    removeCipher?: (cipher: Cipher) => void;
+    functions?: CipherBreakFunctions;
 }
 
 const CipherBreak: Component<CipherBreakOptions> = (props) => {
@@ -103,7 +108,8 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
     const [infoDialogOpen, setInfoDialogOpen] = createSignal<boolean>(false);
     const [cipherMenuAnchorEl, setCipherMenuAnchorEl] = createSignal<null | HTMLElement>(null);
 
-    const { width, cipher, newCipher, station, onComplete, removeCipher } = props;
+    const { width, cipher, functions, station } = props;
+    const { newCipher, onComplete, removeCipher, updateCipher } = functions ?? {};
 
     const isCipherMenuOpen = () => Boolean(cipherMenuAnchorEl());
 
@@ -196,8 +202,7 @@ const CipherBreak: Component<CipherBreakOptions> = (props) => {
     };
     const handleRestartCipher = () => {
         if (cipher) {
-            removeCipher?.(cipher);
-            newCipher(cipher.cipherType);
+            updateCipher?.(cipher);
         }
     };
 

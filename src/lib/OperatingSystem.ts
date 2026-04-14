@@ -5,7 +5,8 @@ import CpuActivity from "./CpuActivity";
 import { NotificationLevel } from "../includes/OperatingSystem.interface";
 import { StationStoreType } from "../includes/Process.interface";
 
-const FPS = 60;
+import WorkerOperatingSystem from './worker/OperatingSystem?worker';
+import { OperatingSystemWorkerMessage, OperatingSystemWorkerMessageType, type OSUpdateGameLoopData } from "./worker/OperatingSystem";
 
 function validateProcess(process: any): process is Process {
     return "id" in process && "callback" in process;
@@ -16,7 +17,6 @@ export class OperatingSystemError extends Error {}
 // Exporting main game controller
 export default class OperatingSystem {
     private pid: number = 10;
-    private interval: null | NodeJS.Timeout = null;
     private currentFrame: number = 0;
     private currentCount: number = 0;
     private currentExponent: number = 1;
@@ -24,19 +24,43 @@ export default class OperatingSystem {
     private _player: PlayerState;
     private _cpuActivity: CpuActivity | null = null;
     private _station: StationStoreType | null = null;
+    private _worker: Worker | null = null;
+    private _isRunning: boolean = false;
 
     constructor(player: PlayerState) {
         this._player = player;
         this._cpuActivity = new CpuActivity(100, 50);
+        if (window.Worker) {
+            this._worker = new WorkerOperatingSystem();
+
+            this._worker.onmessage = (event: MessageEvent<OperatingSystemWorkerMessage>) => {  
+                const { type, data } = event.data;
+                switch (type) {
+                    case OperatingSystemWorkerMessageType.START_GAME_LOOP:
+                    case OperatingSystemWorkerMessageType.STOP_GAME_LOOP:
+                        this._isRunning = data as boolean;
+                        break;
+                    case OperatingSystemWorkerMessageType.UPDATE_GAME_LOOP:
+                        this.currentFrame = (data as OSUpdateGameLoopData).frame;
+                        this.currentCount = (data as OSUpdateGameLoopData).count;
+                        this.currentExponent = (data as OSUpdateGameLoopData).exponent;
+                        this.update();
+                        break;
+                }
+            }
+        }
     }
 
     public startGameLoop() {
-        this.interval = setInterval(() => this.update(), 500 / FPS);
+        this._worker?.postMessage({
+            type: OperatingSystemWorkerMessageType.START_GAME_LOOP,
+        });
     }
 
     public stopGameLoop() {
-        clearInterval(this.interval);
-        this.interval = null;
+        this._worker?.postMessage({
+            type: OperatingSystemWorkerMessageType.STOP_GAME_LOOP,
+        });
     }
 
     public set station(station: StationStoreType) {
@@ -49,7 +73,7 @@ export default class OperatingSystem {
     }
 
     get isRunning() {
-        return this.interval !== null;
+        return this._isRunning;
     }
 
     get frame() {
@@ -156,26 +180,24 @@ export default class OperatingSystem {
     }
 
     increaseExponent(amount: number = 1) {
-        this.currentExponent += amount;
+        this.setExponent(this.currentExponent + amount);
     }
 
     decreaseExponent(amount: number = 1) {
-        this.currentExponent -= amount;
+        this.setExponent(this.currentExponent - amount);
     }
 
     setExponent(amount: number) {
         this.currentExponent = amount;
+        this._worker?.postMessage({
+            type: OperatingSystemWorkerMessageType.SET_EXPONENT,
+            data: amount,
+        });
     }
 
     // Main function
     update() {
         // console.debug('[OperatingSystem] - Update');
-        this.currentFrame += 0.001;
-        if (this.currentFrame > 1) {
-            this.currentFrame = 0;
-            this.currentCount++;
-        }
-
         if (
             this._station &&
             parseFloat((this.currentFrame / 0.1).toFixed(2)) % 1 === 0

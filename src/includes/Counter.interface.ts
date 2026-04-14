@@ -5,6 +5,7 @@ export interface CounterState {
     runningCiphers: Cipher[];
     addCipher: (cipher: Cipher) => void;
     removeCipher: (cipher: Cipher) => void;
+    updateCipher: (oldCipher: Cipher, newCipher: Cipher) => void;
     station: StationStoreType;
     setStation: (station: StationStoreType) => void;
 }

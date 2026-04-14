@@ -6,7 +6,7 @@ import { CounterState } from "./includes/Counter.interface";
 import { StationStoreType } from "./includes/Process.interface";
 import { Component, createEffect, createSignal, onCleanup } from "solid-js";
 
-import CipherBreak from "./components/Widgets/cipherBreak";
+import CipherBreak, { CipherBreakFunctions } from "./components/Widgets/cipherBreak";
 import StationStatistics from "./components/StationStatistics";
 
 import Grid from "@suid/material/Grid";
@@ -29,6 +29,20 @@ const useStore = create<CounterState>((set) => ({
         set((state) => ({
             runningCiphers: state.runningCiphers.filter((c) => c !== cipher),
         })),
+    updateCipher: (oldCipher: Cipher, newCipher: Cipher) =>
+        set((state) => {
+            const oldIndex = state.runningCiphers.indexOf(oldCipher);
+            if (oldIndex === -1) {
+                return state;
+            }
+            return ({
+                runningCiphers: [
+                    ...state.runningCiphers.slice(0, oldIndex),
+                    newCipher,
+                    ...state.runningCiphers.slice(oldIndex + 1),
+                ],
+            })
+        }),
     setStation: (station: StationStoreType) => set(() => ({ station })),
     station: null,
 }));
@@ -78,6 +92,13 @@ const showError = (message: string) => {
     })    
 }
 
+const cssClasses = [
+    "breaking-1",
+    "breaking-2",
+    "breaking-3",
+    "breaking-4",
+];
+
 const StationComponent: Component<{ stationStore?: StationStoreType }> = (
     props,
 ) => {
@@ -92,12 +113,6 @@ const StationComponent: Component<{ stationStore?: StationStoreType }> = (
     };
 
     const addCipher = (cipherType: ICipherType) => {
-        const cssClasses = [
-            "breaking-1",
-            "breaking-2",
-            "breaking-3",
-            "breaking-4",
-        ];
         try {
             const c = new Cipher(20, 10, cssClasses, cipherType, stationStore);
             state.addCipher(c);
@@ -107,8 +122,20 @@ const StationComponent: Component<{ stationStore?: StationStoreType }> = (
         }
     };
 
+    const updateCipher = (cipher: Cipher) => {
+        const newCipher = new Cipher(20, 10, cssClasses, cipher.cipherType, stationStore);
+        state.updateCipher(cipher, newCipher);
+    };
+
     const { stationStore } = props;
     state.setStation(stationStore);
+
+    const functions: CipherBreakFunctions = {
+        newCipher: addCipher,
+        onComplete: completeCipher,
+        removeCipher: removeCipher,
+        updateCipher: updateCipher,
+    };
 
     return (
         <>
@@ -130,17 +157,17 @@ const StationComponent: Component<{ stationStore?: StationStoreType }> = (
                     {(state.runningCiphers.length > 0 &&
                         state.runningCiphers.map((cipher) => (
                             <Grid item xs={4}>
-                                <CipherBreak station={state.station} width={20} cipher={cipher} newCipher={addCipher} onComplete={completeCipher} removeCipher={removeCipher} />
+                                <CipherBreak station={state.station} width={20} cipher={cipher} functions={functions} />
                             </Grid>
-                        ))) || (
-                        <Grid item xs={4}>
-                            <CipherBreak
-                                station={state.station}
-                                width={20}
-                                newCipher={addCipher}
-                            />
-                        </Grid>
+                        ))
                     )}
+                    <Grid item xs={4}>
+                        <CipherBreak
+                            station={state.station}
+                            width={20}
+                            functions={functions}
+                        />
+                    </Grid>
                 </Grid>
             </div>
         </>
