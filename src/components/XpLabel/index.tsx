@@ -11,9 +11,11 @@ const XpLabel: Component<{
     let divRef: HTMLDivElement | undefined = undefined;
 
     onMount(() => {
+        const rotation = Math.round(Math.random() * 30 - 15);
         if (anchorRef) {
             const rect = anchorRef.getBoundingClientRect();
             const offset = Math.round(Math.random() * (rect.width / 2));
+            divRef.style.setProperty('--rotation', `${rotation}deg`);
             divRef.style.top = `${rect.top}px`;
             divRef.style.left = `${rect.left + offset}px`;
         } else {
