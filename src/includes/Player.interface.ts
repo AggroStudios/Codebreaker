@@ -23,8 +23,8 @@ export interface PlayerState {
     player: Player;
     moneyLabel: MoneyLabelSpawn | null;
     xpLabel: XpLabelSpawn | null;
-    setMoneyLabel: (amount: number) => void;
-    setXpLabel: (amount: number, levelUp?: boolean) => void;
+    setMoneyLabel: (amount: number | null) => void;
+    setXpLabel: (amount: number | null, levelUp?: boolean) => void;
     earnExperience: (amount: number) => void;
     addMoney: (amount: number) => void;
     removeMoney: (amount: number) => void;

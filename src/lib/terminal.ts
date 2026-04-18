@@ -6,7 +6,7 @@ import {
     purple,
     grey,
     brown,
-} from "@suid/material/colors";
+} from "@mui/material/colors";
 
 import {
     isArray,
@@ -62,6 +62,7 @@ export default class Terminal {
     private loaderChar: string = "";
     private fs: FileSystem;
 
+    private _initialized: boolean = false;
     private _osController: OperatingSystem;
 
     private _stdin: (
@@ -91,6 +92,10 @@ export default class Terminal {
         this.fs = new FileSystem(terminalApps);
     }
 
+    get initialized() {
+        return this._initialized;
+    }
+
     get prompt() {
         return `${this.fs.cwd} ${this.defaultPrompt}`;
     }
@@ -111,7 +116,12 @@ export default class Terminal {
         return this._osController;
     }
 
+    reset() {
+        this._initialized = false;
+    }
+
     async initialize() {
+        this._initialized = true;
         const welcomeScreenLine1 = String.raw`
    _____    ________  _________________ ________
   /  _  \  /  _____/ /  _____|______   \\_____  \

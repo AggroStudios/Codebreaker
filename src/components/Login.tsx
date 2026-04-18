@@ -1,31 +1,26 @@
-import { Component, createSignal } from "solid-js";
+import { useState, type ChangeEvent } from 'react';
 import {
-    Button,
-    TextField,
-    Card,
-    CardContent,
-    CardActions,
-    CardHeader,
     Avatar,
-} from "@suid/material";
-import { red } from "@suid/material/colors";
+    Button,
+    Card,
+    CardActions,
+    CardContent,
+    CardHeader,
+    TextField,
+} from '@mui/material';
+import { red } from '@mui/material/colors';
 
-import { AuthenticationState } from "../includes/Authentication.interface";
+import { useAuthStore } from '../stores/auth';
 
-const Counter: Component<{ auth: AuthenticationState }> = (props) => {
-    const state = props.auth;
+export default function Login() {
+    const login = useAuthStore((s) => s.login);
 
-    const [username, setUsername] = createSignal<string>("");
-    const [password, setPassword] = createSignal<string>("");
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
 
     const handleLogin = () => {
-        state.login(username(), password());
+        login(username, password);
     };
-
-    const handleFieldChange =
-        (setter: (value: unknown) => void) => (_: Event, value: string) => {
-            setter(value);
-        };
 
     return (
         <Card sx={{ minWidth: 275 }}>
@@ -38,13 +33,19 @@ const Counter: Component<{ auth: AuthenticationState }> = (props) => {
                 <TextField
                     fullWidth
                     label="Username"
-                    onChange={handleFieldChange(setUsername)}
+                    value={username}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setUsername(e.target.value)
+                    }
                 />
                 <TextField
                     fullWidth
                     type="password"
                     label="Password"
-                    onChange={handleFieldChange(setPassword)}
+                    value={password}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setPassword(e.target.value)
+                    }
                 />
             </CardContent>
             <CardActions>
@@ -54,6 +55,4 @@ const Counter: Component<{ auth: AuthenticationState }> = (props) => {
             </CardActions>
         </Card>
     );
-};
-
-export default Counter;
+}

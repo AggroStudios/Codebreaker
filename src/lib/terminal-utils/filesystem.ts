@@ -1,4 +1,4 @@
-import { lightBlue, lightGreen } from "@suid/material/colors";
+import { lightBlue, lightGreen } from "@mui/material/colors";
 
 import minimist from "minimist";
 

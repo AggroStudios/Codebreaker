@@ -1,37 +1,34 @@
-import { Component, onMount } from "solid-js";
-import "./styles.scss";
+import { useEffect, useRef } from 'react';
+import { useAnchors } from '../AnchorsContext';
+import './styles.scss';
 
-const MoneyLabel: Component<{ amount: number; anchorRef?: HTMLElement }> = (
-    props,
-) => {
-    const { amount, anchorRef } = props;
+export default function MoneyLabel({ amount }: { amount: number }) {
+    const divRef = useRef<HTMLDivElement | null>(null);
+    const { moneyAnchorRef } = useAnchors();
 
-    let divRef: HTMLDivElement | undefined = undefined;
-
-    onMount(() => {
-        const rotation = Math.round(Math.random() * 30 - 15);
-        if (anchorRef) {
-            const rect = anchorRef.getBoundingClientRect();
-            const offset = Math.round(Math.random() * rect.width);
-            divRef.style.setProperty('--rotation', `${rotation}deg`);
-            divRef.style.top = `${rect.top}px`;
-            divRef.style.left = `${rect.left + offset}px`;
-        } else {
-            divRef.style.top = "100px";
-            divRef.style.left = "100px";
-        }
-        const el = divRef;
+    useEffect(() => {
+        const el = divRef.current;
         if (!el) return;
+        const rotation = Math.round(Math.random() * 30 - 15);
+        const anchor = moneyAnchorRef.current;
+        if (anchor) {
+            const rect = anchor.getBoundingClientRect();
+            const offset = Math.round(Math.random() * rect.width);
+            el.style.setProperty('--rotation', `${rotation}deg`);
+            el.style.top = `${rect.top}px`;
+            el.style.left = `${rect.left + offset}px`;
+        } else {
+            el.style.top = '100px';
+            el.style.left = '100px';
+        }
         requestAnimationFrame(() => {
-            el.classList.add(amount < 0 ? "expense" : "income");
+            el.classList.add(amount < 0 ? 'expense' : 'income');
         });
-    });
+    }, [amount, moneyAnchorRef]);
 
     return (
-        <div ref={(el) => (divRef = el)} class="glow">
+        <div ref={divRef} className="glow">
             ${amount}
         </div>
     );
-};
-
-export default MoneyLabel;
+}

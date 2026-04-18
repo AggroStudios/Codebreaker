@@ -1,17 +1,13 @@
-import { Component } from "solid-js";
-import LineChart from "../LineChart";
-import { StationStoreType } from "../../includes/Process.interface";
+import LineChart from '../LineChart';
+import { useStationState } from '../../stores/stationContext';
 
-export const CpuActivityWidget: Component<{
-    stationStore: StationStoreType;
-    title?: string;
-}> = (props) => {
-    const { stationStore, title } = props;
+export function CpuActivityWidget({ title }: { title?: string }) {
+    const cpuActivity = useStationState((s) => s.cpuActivity);
 
     return (
         <LineChart
             title={title}
-            data={stationStore.cpuActivity}
+            data={cpuActivity}
             maxDataPoints={50}
             height={300}
             margin={{ top: 20, right: 80, bottom: 40, left: 60 }}
@@ -23,4 +19,4 @@ export const CpuActivityWidget: Component<{
             maxValue={100}
         />
     );
-};
+}

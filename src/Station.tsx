@@ -1,169 +1,110 @@
-import "./App.css";
-import { create } from "solid-zustand/store";
+import './App.css';
+import { useEffect } from 'react';
+import Grid from '@mui/material/Grid';
 
-import { CounterState } from "./includes/Counter.interface";
+import CipherBreak, {
+    CipherBreakFunctions,
+} from './components/Widgets/cipherBreak';
+import StationStatistics from './components/StationStatistics';
+import { CpuActivityWidget } from './components/Widgets/cpuActivity';
 
-import { StationStoreType } from "./includes/Process.interface";
-import { Component, createEffect, createSignal, onCleanup } from "solid-js";
+import Cipher from './lib/Cipher';
+import { ICipherType } from './includes/Cipher.interface';
+import { NotificationLevel } from './includes/OperatingSystem.interface';
 
-import CipherBreak, { CipherBreakFunctions } from "./components/Widgets/cipherBreak";
-import StationStatistics from "./components/StationStatistics";
+import { useCipherStore } from './stores/cipher';
+import { useStationContext } from './stores/stationContext';
+import { useNotifier } from './components/Notifier';
 
-import Grid from "@suid/material/Grid";
+const cssClasses = ['breaking-1', 'breaking-2', 'breaking-3', 'breaking-4'];
 
-import Cipher from "./lib/Cipher";
-import { CpuActivityWidget } from "./components/Widgets/cpuActivity";
-import { ICipherType } from "./includes/Cipher.interface";
-import { NotificationLevel } from "./includes/OperatingSystem.interface";
+export default function StationComponent() {
+    const { stationProxy } = useStationContext();
+    const { notify } = useNotifier();
 
-import { toast } from "solid-toast";
-import { Avatar, Card, CardContent, CardHeader, IconButton, LinearProgress } from "@suid/material";
-import { Close, ErrorOutline } from "@suid/icons-material";
-import { red } from "@suid/material/colors";
+    const runningCiphers = useCipherStore((s) => s.runningCiphers);
+    const addCipher = useCipherStore((s) => s.addCipher);
+    const removeCipher = useCipherStore((s) => s.removeCipher);
+    const updateCipher = useCipherStore((s) => s.updateCipher);
+    const setStation = useCipherStore((s) => s.setStation);
 
-const useStore = create<CounterState>((set) => ({
-    runningCiphers: [],
-    addCipher: (cipher: Cipher) =>
-        set((state) => ({ runningCiphers: [...state.runningCiphers, cipher] })),
-    removeCipher: (cipher: Cipher) =>
-        set((state) => ({
-            runningCiphers: state.runningCiphers.filter((c) => c !== cipher),
-        })),
-    updateCipher: (oldCipher: Cipher, newCipher: Cipher) =>
-        set((state) => {
-            const oldIndex = state.runningCiphers.indexOf(oldCipher);
-            if (oldIndex === -1) {
-                return state;
-            }
-            return ({
-                runningCiphers: [
-                    ...state.runningCiphers.slice(0, oldIndex),
-                    newCipher,
-                    ...state.runningCiphers.slice(oldIndex + 1),
-                ],
-            })
-        }),
-    setStation: (station: StationStoreType) => set(() => ({ station })),
-    station: null,
-}));
+    useEffect(() => {
+        setStation(stationProxy);
+    }, [setStation, stationProxy]);
 
-const showError = (message: string) => {
-    const duration  = 6000
-    toast.custom((t) => {
-    
-      // Start with 100% life
-      const [life, setLife] = createSignal(100);
-      const startTime = Date.now()
-      createEffect(() => {
-        if (t.paused) return;
-        const interval = setInterval(() => {
-          const diff = Date.now() - startTime - t.pauseDuration
-          setLife(100 - (diff/duration * 100));
-        });
-    
-        onCleanup(() => clearInterval(interval));
-      });
-    
-      return (
-        <>
-            <Card>
-                <CardHeader
-                    title="Error!"
-                    subheader={message}
-                    action={
-                        <IconButton onClick={() => toast.dismiss(t.id)}>
-                            <Close />
-                        </IconButton>
-                    }
-                    avatar={
-                        <Avatar sx={{ bgcolor: red[500] }}>
-                            <ErrorOutline color="inherit" />
-                        </Avatar>
-                    }
-                    titleTypographyProps={{ variant: "h5" }} />
-                <CardContent sx={{ paddingTop: 0 }}>
-                    <LinearProgress variant="determinate" color="error" value={life()} sx={{ width: "100%", marginTop: '10px' }} />
-                </CardContent>
-            </Card>
-        </>
-      )
-    }, {
-      duration: duration
-    })    
-}
-
-const cssClasses = [
-    "breaking-1",
-    "breaking-2",
-    "breaking-3",
-    "breaking-4",
-];
-
-const StationComponent: Component<{ stationStore?: StationStoreType }> = (
-    props,
-) => {
-    const state = useStore();
     const completeCipher = (cipher: Cipher, cancelled: boolean) => {
-        console.log('Complete cipher callback called!');
-        stationStore.os.sendNotification(`Cipher '${cipher.cipherType.name}' (${cipher.id}) ${cancelled ? 'cancelled' : 'completed'}.`, (cancelled ? NotificationLevel.ERROR : NotificationLevel.INFO));
+        stationProxy.os?.sendNotification(
+            `Cipher '${cipher.cipherType.name}' (${cipher.id}) ${
+                cancelled ? 'cancelled' : 'completed'
+            }.`,
+            cancelled ? NotificationLevel.ERROR : NotificationLevel.INFO,
+        );
     };
 
-    const removeCipher = (cipher: Cipher) => {
-        state.removeCipher(cipher);
+    const handleRemoveCipher = (cipher: Cipher) => {
+        removeCipher(cipher);
     };
 
-    const addCipher = (cipherType: ICipherType) => {
+    const handleAddCipher = (cipherType: ICipherType) => {
         try {
-            const c = new Cipher(20, 10, cssClasses, cipherType, stationStore);
-            state.addCipher(c);
+            const c = new Cipher(20, 10, cssClasses, cipherType, stationProxy);
+            addCipher(c);
         } catch {
-            showError(`Not enough cores available to add process '${cipherType.name}'.`);
-            stationStore.os.sendNotification(`Not enough cores available to add process '${cipherType.name}'.`, NotificationLevel.ERROR);
+            const message = `Not enough cores available to add process '${cipherType.name}'.`;
+            notify({ level: 'error', message });
+            stationProxy.os?.sendNotification(
+                message,
+                NotificationLevel.ERROR,
+            );
         }
     };
 
-    const updateCipher = (cipher: Cipher) => {
-        const newCipher = new Cipher(20, 10, cssClasses, cipher.cipherType, stationStore);
-        state.updateCipher(cipher, newCipher);
+    const handleUpdateCipher = (cipher: Cipher) => {
+        const newCipher = new Cipher(
+            20,
+            10,
+            cssClasses,
+            cipher.cipherType,
+            stationProxy,
+        );
+        updateCipher(cipher, newCipher);
     };
 
-    const { stationStore } = props;
-    state.setStation(stationStore);
-
     const functions: CipherBreakFunctions = {
-        newCipher: addCipher,
+        newCipher: handleAddCipher,
         onComplete: completeCipher,
-        removeCipher: removeCipher,
-        updateCipher: updateCipher,
+        removeCipher: handleRemoveCipher,
+        updateCipher: handleUpdateCipher,
     };
 
     return (
         <>
-            <div class="card">
+            <div className="card">
                 <Grid container spacing={2}>
-                    <Grid item xs={4}>
-                        <StationStatistics station={stationStore} />
+                    <Grid size={4}>
+                        <StationStatistics station={stationProxy} />
                     </Grid>
-                    <Grid item xs={8}>
-                        <CpuActivityWidget
-                            stationStore={stationStore}
-                            title="CPU Activity"
-                        />
+                    <Grid size={8}>
+                        <CpuActivityWidget title="CPU Activity" />
                     </Grid>
                 </Grid>
             </div>
-            <div class="card">
+            <div className="card">
                 <Grid container spacing={2}>
-                    {(state.runningCiphers.length > 0 &&
-                        state.runningCiphers.map((cipher) => (
-                            <Grid item xs={4}>
-                                <CipherBreak station={state.station} width={20} cipher={cipher} functions={functions} />
+                    {runningCiphers.length > 0 &&
+                        runningCiphers.map((cipher) => (
+                            <Grid size={4} key={cipher.id}>
+                                <CipherBreak
+                                    station={stationProxy}
+                                    width={20}
+                                    cipher={cipher}
+                                    functions={functions}
+                                />
                             </Grid>
-                        ))
-                    )}
-                    <Grid item xs={4}>
+                        ))}
+                    <Grid size={4}>
                         <CipherBreak
-                            station={state.station}
+                            station={stationProxy}
                             width={20}
                             functions={functions}
                         />
@@ -172,6 +113,4 @@ const StationComponent: Component<{ stationStore?: StationStoreType }> = (
             </div>
         </>
     );
-};
-
-export default StationComponent;
+}

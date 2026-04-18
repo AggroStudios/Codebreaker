@@ -1,7 +1,3 @@
-import { Component } from "solid-js";
-
-const Servers: Component = () => {
+export default function Servers() {
     return <>Change me!</>;
-};
-
-export default Servers;
+}

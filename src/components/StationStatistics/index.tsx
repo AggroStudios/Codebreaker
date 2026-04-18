@@ -3,25 +3,25 @@ import {
     Card,
     CardContent,
     CardHeader,
-    TableBody,
     Table,
-    TableRow,
+    TableBody,
     TableCell,
-} from "@suid/material";
-import { Component } from "solid-js";
-import { StationStoreType } from "../../includes/Process.interface";
-import AnalyticsOutlinedIcon from "@suid/icons-material/AnalyticsOutlined";
+    TableRow,
+} from '@mui/material';
+import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined';
 
-const StationStatistics: Component<{ station: StationStoreType }> = (props) => {
-    const { station } = props;
+import { StationStoreType } from '../../includes/Process.interface';
 
+export default function StationStatistics({
+    station,
+}: {
+    station: StationStoreType;
+}) {
     return (
-        <Card class="background">
+        <Card className="background">
             <CardHeader
                 title="Station Statistics"
-                titleTypographyProps={{
-                    variant: "h5",
-                }}
+                slotProps={{ title: { variant: 'h5' } }}
                 avatar={
                     <Avatar>
                         <AnalyticsOutlinedIcon />
@@ -29,41 +29,55 @@ const StationStatistics: Component<{ station: StationStoreType }> = (props) => {
                 }
             />
             <CardContent>
-                <Table sx={{ width: "100%" }} size="small">
+                <Table sx={{ width: '100%' }} size="small">
                     <TableBody>
                         <TableRow>
-                            <TableCell sx={{ whiteSpace: "nowrap" }}>CPU:</TableCell>
-                            <TableCell sx={{ width: "100%" }}>
+                            <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                                CPU:
+                            </TableCell>
+                            <TableCell sx={{ width: '100%' }}>
                                 {station.cpu?.toString()}
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell sx={{ whiteSpace: "nowrap" }}>CPU Speed:</TableCell>
-                            <TableCell sx={{ width: "100%" }}>
+                            <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                                CPU Speed:
+                            </TableCell>
+                            <TableCell sx={{ width: '100%' }}>
                                 {station.cpu?.speed}
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell sx={{ whiteSpace: "nowrap" }}>Nb Cores:</TableCell>
-                            <TableCell sx={{ width: "100%" }}>
+                            <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                                Nb Cores:
+                            </TableCell>
+                            <TableCell sx={{ width: '100%' }}>
                                 {station.cpu?.cores} Cores
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell sx={{ whiteSpace: "nowrap" }}>Memory:</TableCell>
-                            <TableCell>{station.memory?.capacity} GB</TableCell>
+                            <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                                Memory:
+                            </TableCell>
+                            <TableCell>
+                                {station.memory?.capacity} GB
+                            </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell sx={{ whiteSpace: "nowrap" }}>Storage:</TableCell>
+                            <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                                Storage:
+                            </TableCell>
                             <TableCell>
                                 {station.storage
                                     ?.map((storage) => storage.capacity)
-                                    .join(", ")}{" "}
+                                    .join(', ')}{' '}
                                 GB
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell sx={{ whiteSpace: "nowrap" }}>Network:</TableCell>
+                            <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                                Network:
+                            </TableCell>
                             <TableCell>
                                 {station.network?.network.toString()}
                             </TableCell>
@@ -73,6 +87,4 @@ const StationStatistics: Component<{ station: StationStoreType }> = (props) => {
             </CardContent>
         </Card>
     );
-};
-
-export default StationStatistics;
+}

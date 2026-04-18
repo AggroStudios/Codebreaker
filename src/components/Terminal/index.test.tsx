@@ -1,14 +1,16 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, fireEvent, waitFor } from "@solidjs/testing-library";
-import Terminal from "./index";
-import TerminalController from "../../lib/terminal";
-import OperatingSystem from "../../lib/OperatingSystem";
-import type { PlayerState } from "../../includes/Player.interface";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import Terminal from './index';
+import TerminalController from '../../lib/terminal';
+import OperatingSystem from '../../lib/OperatingSystem';
+import type { PlayerState } from '../../includes/Player.interface';
+import { useTerminalStore } from '../../stores/terminal';
 
 function createMockPlayerState(): PlayerState {
     return {
         player: {
-            name: "TestPlayer",
+            name: 'TestPlayer',
             money: 0,
             experience: 0,
             level: 1,
@@ -31,60 +33,68 @@ function createMockPlayerState(): PlayerState {
     };
 }
 
-describe("Terminal Component", () => {
-    it("renders without crashing", () => {
-        const terminalController = new TerminalController();
-        const operatingSystem = new OperatingSystem(createMockPlayerState());
-        const { getByText } = render(() => (
-            <Terminal
-                terminalController={terminalController}
-                operatingSystem={operatingSystem}
-            />
-        ));
-        expect(getByText("Terminal")).toBeDefined();
+describe('Terminal Component', () => {
+    beforeEach(() => {
+        useTerminalStore.setState({ terminalLines: [] });
     });
 
-    it("renders input field and focuses it", () => {
+    it('renders without crashing', () => {
         const terminalController = new TerminalController();
         const operatingSystem = new OperatingSystem(createMockPlayerState());
-        const { container } = render(() => (
+        const { getByText } = render(
             <Terminal
                 terminalController={terminalController}
                 operatingSystem={operatingSystem}
-            />
-        ));
+            />,
+        );
+        expect(getByText('Terminal')).toBeDefined();
+    });
+
+    it('renders input field and focuses it', () => {
+        const terminalController = new TerminalController();
+        const operatingSystem = new OperatingSystem(createMockPlayerState());
+        const { container } = render(
+            <Terminal
+                terminalController={terminalController}
+                operatingSystem={operatingSystem}
+            />,
+        );
         const input = container.querySelector(
-            "input.input",
+            'input.input',
         ) as HTMLInputElement;
         expect(input).toBeDefined();
         input.focus();
         expect(document.activeElement).toBe(input);
     });
 
-    it("handles input and Enter key", async () => {
+    it('handles input and Enter key', async () => {
         const terminalController = new TerminalController();
         terminalController.command = async () => ({
-            command: "",
-            value: "output",
+            command: '',
+            value: 'output',
         });
         const operatingSystem = new OperatingSystem(createMockPlayerState());
-        const { container } = render(() => (
+        const { container } = render(
             <Terminal
                 terminalController={terminalController}
                 operatingSystem={operatingSystem}
-            />
-        ));
+            />,
+        );
         const input = container.querySelector(
-            "input.input",
+            'input.input',
         ) as HTMLInputElement;
+        await waitFor(
+            () => {
+                expect(container.textContent).toContain('/ $ ');
+            },
+            { timeout: 5000 },
+        );
+        const user = userEvent.setup();
+        await user.click(input);
+        await user.type(input, 'test');
+        await user.keyboard('{Enter}');
         await waitFor(() => {
-            expect(container.textContent).toContain("/ $ ");
-        });
-        input.value = "test";
-        fireEvent.input(input);
-        fireEvent.keyUp(input, { key: "Enter" });
-        await waitFor(() => {
-            expect(container.textContent).toContain("test");
+            expect(container.textContent).toContain('test');
         });
     });
 });
