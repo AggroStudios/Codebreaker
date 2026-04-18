@@ -86,31 +86,20 @@ export default function App() {
                             >
                                 <Routes>
                                     <Route element={<Layout />}>
-                                        <Route
-                                            index
-                                            element={
-                                                <TerminalRoute
-                                                    terminalController={
-                                                        terminalController
-                                                    }
-                                                    operatingSystem={
-                                                        station.operatingSystem
-                                                    }
-                                                />
-                                            }
-                                        />
-                                        <Route
-                                            path="station"
-                                            element={<StationRoute />}
-                                        />
-                                        <Route
-                                            path="login"
-                                            element={<LoginRoute />}
-                                        />
-                                        <Route
-                                            path="servers"
-                                            element={<ServersRoute />}
-                                        />
+                                        <Route index element={
+                                            <TerminalRoute
+                                                terminalController={
+                                                    terminalController
+                                                }
+                                                operatingSystem={
+                                                    station.operatingSystem
+                                                }
+                                            />
+                                        } />
+                                        <Route path="station" element={<StationRoute />} />
+                                        <Route path="login" element={<LoginRoute />} />
+                                        <Route path="servers" element={<ServersRoute />} />
+                                        <Route path="*" />
                                     </Route>
                                 </Routes>
                             </Suspense>
