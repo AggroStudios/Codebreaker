@@ -1,11 +1,9 @@
-import Cipher from "../lib/Cipher";
 import { StationStoreType } from "./Process.interface";
 
 export interface CounterState {
-    runningCiphers: Cipher[];
-    addCipher: (cipher: Cipher) => void;
-    removeCipher: (cipher: Cipher) => void;
-    updateCipher: (oldCipher: Cipher, newCipher: Cipher) => void;
+    runningProcesses: string[];
+    addProcess: (id: string) => void;
+    removeProcess: (id: string) => void;
     station: StationStoreType;
     setStation: (station: StationStoreType) => void;
 }

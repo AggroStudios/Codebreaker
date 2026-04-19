@@ -34,7 +34,7 @@ import {
     ReplayOutlined,
 } from '@mui/icons-material';
 
-import Cipher from '../../lib/Cipher';
+import Cipher, { CipherDelegate } from '../../lib/Cipher';
 
 import './styles.scss';
 import { StationStoreType } from '../../includes/Process.interface';
@@ -43,6 +43,8 @@ import {
     CipherTypes,
     ICipherType,
 } from '../../includes/Cipher.interface';
+import { NotificationLevel } from '../../includes/OperatingSystem.interface';
+import { useNotifier } from '../Notifier';
 
 const CipherContainer = styled('div')({
     display: 'grid',
@@ -83,36 +85,33 @@ function LinearProgressWithLabel(
 }
 
 export interface CipherBreakFunctions {
-    newCipher: (cipherType: ICipherType) => void;
-    onComplete?: (cipher: Cipher, cancelled: boolean) => void;
-    removeCipher?: (cipher: Cipher) => void;
-    updateCipher?: (cipher: Cipher) => void;
+    addProcess?: (id: string) => void;
+    removeProcess?: (id: string) => void;
 }
 
 interface CipherBreakOptions {
     station: StationStoreType;
     width: number;
-    cipher?: Cipher;
+    id?: string;
     functions?: CipherBreakFunctions;
 }
+
+const cssClasses = ['breaking-1', 'breaking-2', 'breaking-3', 'breaking-4'];
 
 export default memo(function CipherBreak(props: CipherBreakOptions) {
     const cardRef = useRef<HTMLDivElement | null>(null);
 
     const [grid, setGrid] = useState<IGridItem[]>([]);
     const [progress, setProgress] = useState(0);
-    const [cipherType, setCipherType] = useState<ICipherType | undefined>(
-        undefined,
-    );
-    const [cipherState, setCipherState] = useState<CipherState | undefined>(
-        undefined,
-    );
+    const [cipher, setCipher] = useState<Cipher | undefined>(undefined);
+    const [cipherType, setCipherType] = useState<ICipherType | undefined>(undefined);
+    const [cipherState, setCipherState] = useState<CipherState | undefined>(undefined);
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [infoDialogOpen, setInfoDialogOpen] = useState(false);
 
-    const { width, cipher, functions, station } = props;
-    const { newCipher, onComplete, removeCipher, updateCipher } =
-        functions ?? {};
+    const { width, functions, station, id } = props;
+    const { addProcess, removeProcess } = functions;
+    const { notify } = useNotifier();
 
     // Keep current cipherType available to the completion callback without
     // re-subscribing every render.
@@ -121,20 +120,16 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
         cipherTypeRef.current = cipherType;
     }, [cipherType]);
 
-    useEffect(() => {
-        if (!cipher) return;
-
-        cipher.setProgress((p, type, state) => {
-            setProgress((prev) => (p !== prev ? p : prev));
+    const cipherDelegate: CipherDelegate = {
+        setGrid: (grid: IGridItem[]) => {
+            setGrid(grid);
+        },
+        setProgress: (progress: number, type: ICipherType, state: CipherState) => {
+            setProgress((prev) => (progress !== prev ? progress : prev));
             setCipherType((prev) => (type !== prev ? type : prev));
             setCipherState((prev) => (state !== prev ? state : prev));
-        });
-
-        cipher.setGrid((next: IGridItem[]) => {
-            setGrid(next);
-        });
-
-        cipher.setCompleteCipher((c: Cipher, cancelled: boolean) => {
+        },
+        completeCipher: (cancelled: boolean) => {
             cardRef.current?.classList.remove('background');
             if (!cancelled) {
                 setCipherState(CipherState.SUCCESS);
@@ -155,13 +150,28 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
                 cardRef.current?.classList.remove('cipher-success');
                 cardRef.current?.classList.remove('cipher-error');
                 setGrid([]);
-                onComplete?.(c, cancelled);
             }, 1000);
-        });
-    }, [cipher, onComplete, station]);
+        },
+    };
+
+    const handleAddCipher = (cipherType: ICipherType) => {
+        try {
+            const c = new Cipher(20, 10, cssClasses, cipherType, station, cipherDelegate);
+            console.log('Cipher:', c);
+            setCipher(c);
+            !id && addProcess?.(crypto.randomUUID());
+        } catch {
+            const message = `Not enough cores available to add process '${cipherType.name}'.`;
+            notify({ level: 'error', message });
+            station.os?.sendNotification(
+                message,
+                NotificationLevel.ERROR,
+            );
+        }
+    };
 
     const handleRemoveCipher = () => {
-        if (cipher) removeCipher?.(cipher);
+        removeProcess?.(id);
     };
 
     const handleInfoDialogOpen = () => setInfoDialogOpen(true);
@@ -186,17 +196,12 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
     const resumeCipher = () => cipher?.resume();
 
     const handleCipherChange = (event: SelectChangeEvent<string>) => {
-        const cType = CipherTypes.find(
-            (t) => t.name === event.target.value,
-        );
-        if (cType && cType.name !== cipherType?.name) {
-            if (cipher) removeCipher?.(cipher);
-            newCipher(cType);
-        }
+        console.log('Cipher type:', event.target.value);
+        handleAddCipher(CipherTypes.find(t => t.name === event.target.value) as ICipherType);
     };
 
     const handleRestartCipher = () => {
-        if (cipher) updateCipher?.(cipher);
+        handleAddCipher(cipherType as ICipherType);
     };
 
     const isBreakingOrDownloading =

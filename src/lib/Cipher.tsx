@@ -1,31 +1,30 @@
-import { CipherState, ICipherType } from "../includes/Cipher.interface";
-import Process, { StationStoreType } from "../includes/Process.interface";
-import OperatingSystem from "../lib/OperatingSystem";
-import { Networking } from "./network";
-import { dataSizeFromSuffix } from "./utils";
+import { CipherState, ICipherType } from '../includes/Cipher.interface';
+import Process, { StationStoreType } from '../includes/Process.interface';
+import OperatingSystem from '../lib/OperatingSystem';
+import { Networking } from './network';
+import { dataSizeFromSuffix } from './utils';
 
 interface IGridItem {
     character: string;
     cssClass: string;
 }
 
+export interface CipherDelegate {
+    setGrid: (grid: IGridItem[]) => void;
+    setProgress: (progress: number, type: ICipherType, state: CipherState) => void;
+    completeCipher: (cancelled: boolean) => void;
+}
+
 export default class Cipher implements Process {
     private readonly characters =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()/\\-=+,.<>;:";
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()/\\-=+,.<>;:';
     private _characterGrid: IGridItem[] = [];
-    private _setGrid: (grid: IGridItem[]) => void = () => {};
-    private _setProgress: (
-        progress: number,
-        type: ICipherType,
-        state: CipherState,
-    ) => void = () => {};
+    private delegate: CipherDelegate;
     private unsolvedIndexes: Set<number> = new Set();
     private width: number;
     private height: number;
     private cssClasses: string[];
     private _id: string;
-    private _completeCipher: (cipher: Cipher, cancelled: boolean) => void =
-        () => {};
     private _progress: number = 0;
     private downloadedBlocks: number = 0;
     private frame: number = 0;
@@ -44,6 +43,7 @@ export default class Cipher implements Process {
         cssClasses: string[],
         cipherType: ICipherType,
         station: StationStoreType,
+        delegate: CipherDelegate
     ) {
         this.width = width;
         this.height = height;
@@ -56,6 +56,7 @@ export default class Cipher implements Process {
             size: cipherType.block.size,
             unit: cipherType.block.unit,
         });
+        this.delegate = delegate;
 
         for (let i = 0; i < this.width * this.height; i++) {
             this.unsolvedIndexes.add(i);
@@ -120,12 +121,12 @@ export default class Cipher implements Process {
 
     private set state(value: CipherState) {
         this._state = value;
-        this._setProgress(this._progress, this._cipherType, value);
+        this.delegate.setProgress(this._progress, this._cipherType, value);
     }
 
     private set progress(value: number) {
         this._progress = value;
-        this._setProgress(value, this._cipherType, this._state);
+        this.delegate.setProgress(value, this._cipherType, this._state);
     }
 
     private generateGrid(): IGridItem[] {
@@ -150,22 +151,7 @@ export default class Cipher implements Process {
     }
 
     private randomizeGrid() {
-        this._setGrid(this.generateGrid());
-    }
-
-    public setCompleteCipher(fn: (cipher: Cipher, cancelled: boolean) => void) {
-        this._completeCipher = fn;
-    }
-
-    public setGrid(fn: (grid: IGridItem[]) => void) {
-        this._setGrid = fn;
-    }
-
-    public setProgress(
-        fn: (progress: number, type: ICipherType, state: CipherState) => void,
-    ) {
-        this._setProgress = fn;
-        this._setProgress(this._progress, this._cipherType, this._state);
+        this.delegate.setGrid(this.generateGrid());
     }
 
     private breaking() {
@@ -179,7 +165,7 @@ export default class Cipher implements Process {
 
             this._characterGrid[solvedIndex] = {
                 character: solvedValue.toString(),
-                cssClass: "broken",
+                cssClass: 'broken',
             };
 
             this.unsolvedIndexes.delete(solvedIndex);
@@ -196,7 +182,7 @@ export default class Cipher implements Process {
 
         if (this.unsolvedIndexes.size === 0) {
             this.randomizeGrid();
-            console.log("Cipher breaking completed!");
+            console.log('Cipher breaking completed!');
             this.state = CipherState.SUCCESS;
         }
     }
@@ -214,7 +200,7 @@ export default class Cipher implements Process {
         }
 
         if (this.downloadedBlocks >= this.cipherSize) {
-            console.log("Cipher downloaded! Starting breaking...");
+            console.log('Cipher downloaded! Starting breaking...');
             this.state = CipherState.BREAKING;
             this.progress = 0;
             this._stationNet.removeProcess(this);
@@ -234,16 +220,16 @@ export default class Cipher implements Process {
                 break;
             case CipherState.SUCCESS:
                 this._stationOs.removeProcess(this);
-                this._completeCipher(this, false);
+                this.delegate.completeCipher(false);
                 break;
             case CipherState.CANCELLED:
                 console.log('Cipher cancelled!');
                 this._stationOs.removeProcess(this);
                 this._stationNet.removeProcess(this);
-                this._completeCipher(this, true);
+                this.delegate.completeCipher(true);
                 break;
             case CipherState.FAILURE:
-                throw new Error("Cipher failed!");
+                throw new Error('Cipher failed!');
         }
     }
 }

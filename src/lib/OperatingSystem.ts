@@ -154,6 +154,9 @@ export default class OperatingSystem {
         );
         const coreCount = this._station?.cpu?.cores || 1;
 
+        console.log('coreUsage', coreUsage);
+        console.log('coreCount', coreCount);
+
         if (coreUsage + (process.cores || 0) > coreCount) {
             throw new OperatingSystemError(`Not enough cores available to add process '${process.id}'.`);
         }
