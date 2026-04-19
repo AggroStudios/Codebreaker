@@ -32,6 +32,7 @@ import './AppBar.scss';
 import { NotificationLevel } from '../includes/OperatingSystem.interface';
 import MoneyLabel from './MoneyLabel';
 import Settings from './Settings';
+import About from './About';
 import { usePlayerStore } from '../stores/player';
 import { useStationContext } from '../stores/stationContext';
 import { useAnchors } from './AnchorsContext';
@@ -150,6 +151,7 @@ export default function AppBarComponent() {
         null,
     );
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const [aboutOpen, setAboutOpen] = useState(false);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileAnchorEl);
@@ -186,6 +188,13 @@ export default function AppBarComponent() {
         setSettingsOpen(true);
     };
     const handleSettingsClose = () => setSettingsOpen(false);
+
+    const handleAboutOpen = () => {
+        setAnchorEl(null);
+        setMobileAnchorEl(null);
+        setAboutOpen(true);
+    };
+    const handleAboutClose = () => setAboutOpen(false);
 
     const menuId = 'primary-search-account-menu';
     const notificationId = 'primary-search-notification-menu';
@@ -316,9 +325,16 @@ export default function AppBarComponent() {
                     </ListItemIcon>
                     <ListItemText primary="Settings" />
                 </MenuItem>
+                <MenuItem onClick={handleAboutOpen}>
+                    <ListItemIcon>
+                        <InfoTwoTone fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="About" />
+                </MenuItem>
             </Menu>
 
             <Settings open={settingsOpen} onClose={handleSettingsClose} />
+            <About open={aboutOpen} onClose={handleAboutClose} />
 
             <Menu
                 anchorEl={mobileAnchorEl}
