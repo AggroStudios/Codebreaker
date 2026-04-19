@@ -1,17 +1,12 @@
-import { CipherState, ICipherType } from '../includes/Cipher.interface';
+import { CipherState, ICipherType, IGridItem } from '../includes/Cipher.interface';
 import Process, { StationStoreType } from '../includes/Process.interface';
 import OperatingSystem from '../lib/OperatingSystem';
 import { Networking } from './network';
 import { dataSizeFromSuffix } from './utils';
 
-interface IGridItem {
-    character: string;
-    cssClass: string;
-}
-
 export interface CipherDelegate {
     setGrid: (grid: IGridItem[]) => void;
-    setProgress: (progress: number, type: ICipherType, state: CipherState) => void;
+    setProgress: (progress: number) => void;
     completeCipher: (cancelled: boolean) => void;
 }
 
@@ -25,7 +20,6 @@ export default class Cipher implements Process {
     private height: number;
     private cssClasses: string[];
     private _id: string;
-    private _progress: number = 0;
     private downloadedBlocks: number = 0;
     private frame: number = 0;
     private _stationOs: OperatingSystem;
@@ -121,12 +115,10 @@ export default class Cipher implements Process {
 
     private set state(value: CipherState) {
         this._state = value;
-        this.delegate.setProgress(this._progress, this._cipherType, value);
     }
 
     private set progress(value: number) {
-        this._progress = value;
-        this.delegate.setProgress(value, this._cipherType, this._state);
+        this.delegate.setProgress(value);
     }
 
     private generateGrid(): IGridItem[] {

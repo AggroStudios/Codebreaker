@@ -45,16 +45,12 @@ import {
 } from '../../includes/Cipher.interface';
 import { NotificationLevel } from '../../includes/OperatingSystem.interface';
 import { useNotifier } from '../Notifier';
+import { useCipherBreakStore } from '../../stores/cipher';
 
 const CipherContainer = styled('div')({
     display: 'grid',
     marginBottom: '12px',
 });
-
-interface IGridItem {
-    character: string;
-    cssClass: string;
-}
 
 function LinearProgressWithLabel(
     props: LinearProgressProps & { value: number; label?: string },
@@ -85,7 +81,7 @@ function LinearProgressWithLabel(
 }
 
 export interface CipherBreakFunctions {
-    addProcess?: (id: string) => void;
+    addProcess?: (id: string, type: ICipherType) => void;
     removeProcess?: (id: string) => void;
 }
 
@@ -93,6 +89,7 @@ interface CipherBreakOptions {
     station: StationStoreType;
     width: number;
     id?: string;
+    type?: ICipherType;
     functions?: CipherBreakFunctions;
 }
 
@@ -100,66 +97,81 @@ const cssClasses = ['breaking-1', 'breaking-2', 'breaking-3', 'breaking-4'];
 
 export default memo(function CipherBreak(props: CipherBreakOptions) {
     const cardRef = useRef<HTMLDivElement | null>(null);
+    const { width, functions, station, id, type } = props;
+    const cipher = useCipherBreakStore((s) => (id ? s.ciphers[id] : undefined));
+    const grid = useCipherBreakStore((s) => (id ? s.grids[id] : undefined)) ?? [];
+    const progress = useCipherBreakStore((s) => (id ? s.progress[id] : undefined)) ?? 0;
+    const cipherType = useCipherBreakStore((s) => (id ? s.types[id] : undefined));
+    const setCipher = useCipherBreakStore((s) => s.setCipher);
+    const setGrid = useCipherBreakStore((s) => s.setGrid);
+    const setProgress = useCipherBreakStore((s) => s.setProgress);
+    const setType = useCipherBreakStore((s) => s.setType);
 
-    const [grid, setGrid] = useState<IGridItem[]>([]);
-    const [progress, setProgress] = useState(0);
-    const [cipher, setCipher] = useState<Cipher | undefined>(undefined);
-    const [cipherType, setCipherType] = useState<ICipherType | undefined>(undefined);
-    const [cipherState, setCipherState] = useState<CipherState | undefined>(undefined);
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [infoDialogOpen, setInfoDialogOpen] = useState(false);
 
-    const { width, functions, station, id } = props;
     const { addProcess, removeProcess } = functions;
     const { notify } = useNotifier();
 
-    // Keep current cipherType available to the completion callback without
-    // re-subscribing every render.
-    const cipherTypeRef = useRef<ICipherType | undefined>(undefined);
+    // Bootstrap a cipher for this slot if one isn't already tracked in the
+    // store. This runs on first mount AND on remount after tab switches, but
+    // the `!cipher` guard ensures we don't recreate an in-flight cipher.
     useEffect(() => {
-        cipherTypeRef.current = cipherType;
-    }, [cipherType]);
+        if (!cipher && id && type) {
+            handleAddCipher(type);
+        }
+    }, [id, type]);
 
-    const cipherDelegate: CipherDelegate = {
-        setGrid: (grid: IGridItem[]) => {
-            setGrid(grid);
-        },
-        setProgress: (progress: number, type: ICipherType, state: CipherState) => {
-            setProgress((prev) => (progress !== prev ? progress : prev));
-            setCipherType((prev) => (type !== prev ? type : prev));
-            setCipherState((prev) => (state !== prev ? state : prev));
-        },
-        completeCipher: (cancelled: boolean) => {
-            cardRef.current?.classList.remove('background');
-            if (!cancelled) {
-                setCipherState(CipherState.SUCCESS);
-                cardRef.current?.classList.add('cipher-success');
-                station.os?.player.earnExperience(
-                    cipherTypeRef.current?.xp ?? 0,
-                );
-                station.os?.player.addMoney(
-                    cipherTypeRef.current?.payout ?? 0,
-                );
-            } else {
-                setCipherState(CipherState.CANCELLED);
-                cardRef.current?.classList.add('cipher-error');
-            }
-            setTimeout(() => {
-                setCipherState(CipherState.IDLE);
-                cardRef.current?.classList.add('background');
-                cardRef.current?.classList.remove('cipher-success');
-                cardRef.current?.classList.remove('cipher-error');
-                setGrid([]);
-            }, 1000);
-        },
-    };
+    // Drive the success/error/idle card animations from the cipher state.
+    // Keeping this here (rather than in the cipher delegate) means the
+    // animations are re-applied correctly when the component remounts after
+    // a tab switch.
+    useEffect(() => {
+        const state = cipher?.state;
+        const card = cardRef.current;
+        if (!card) return;
+        if (state === CipherState.SUCCESS) {
+            card.classList.remove('background');
+            card.classList.add('cipher-success');
+            card.classList.remove('cipher-error');
+        } else if (state === CipherState.CANCELLED) {
+            card.classList.remove('background');
+            card.classList.remove('cipher-success');
+            card.classList.add('cipher-error');
+        } else {
+            card.classList.add('background');
+            card.classList.remove('cipher-success');
+            card.classList.remove('cipher-error');
+        }
+    }, [cipher?.state, progress]);
 
     const handleAddCipher = (cipherType: ICipherType) => {
+        if (!id) return;
+        // Build the delegate using the store's stable setters (via
+        // `getState()`), not React state setters. The cipher lives longer
+        // than any single mount of this component (tab switches remount it),
+        // so the delegate must not close over setState functions that belong
+        // to an unmounted instance.
+        const delegate: CipherDelegate = {
+            setGrid: (g) => setGrid(id, g),
+            setProgress: (p) =>
+                setProgress(id, p),
+            completeCipher: (cancelled: boolean) => {
+                if (!cancelled) {
+                    station.os?.player.earnExperience(cipherType.xp);
+                    station.os?.player.addMoney(cipherType.payout);
+                }
+                setTimeout(() => {
+                    setCipher(id, undefined);
+                    setGrid(id, []);
+                    setProgress(id, 0);
+                }, 1000);
+            },
+        };
         try {
-            const c = new Cipher(20, 10, cssClasses, cipherType, station, cipherDelegate);
-            console.log('Cipher:', c);
-            setCipher(c);
-            !id && addProcess?.(crypto.randomUUID());
+            const c = new Cipher(20, 10, cssClasses, cipherType, station, delegate);
+            setCipher(id, c);
+            setType(id, cipherType);
         } catch {
             const message = `Not enough cores available to add process '${cipherType.name}'.`;
             notify({ level: 'error', message });
@@ -196,26 +208,31 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
     const resumeCipher = () => cipher?.resume();
 
     const handleCipherChange = (event: SelectChangeEvent<string>) => {
-        console.log('Cipher type:', event.target.value);
-        handleAddCipher(CipherTypes.find(t => t.name === event.target.value) as ICipherType);
+        const type = CipherTypes.find(t => t.name === event.target.value);
+        if (id) {
+            handleAddCipher(type);
+        }
+        else {
+            addProcess?.(crypto.randomUUID(), type);
+        }
     };
 
     const handleRestartCipher = () => {
-        handleAddCipher(cipherType as ICipherType);
+        handleAddCipher(cipherType);
     };
 
     const isBreakingOrDownloading =
-        cipherState !== undefined &&
-        [CipherState.BREAKING, CipherState.DOWNLOADING].includes(cipherState);
+        cipher?.state !== undefined &&
+        [CipherState.BREAKING, CipherState.DOWNLOADING].includes(cipher?.state);
 
     const canShowActions =
-        cipherState !== undefined &&
+        cipher?.state !== undefined &&
         [
             CipherState.BREAKING,
             CipherState.DOWNLOADING,
             CipherState.PAUSED,
             CipherState.IDLE,
-        ].includes(cipherState);
+        ].includes(cipher?.state);
 
     return (
         <>
@@ -234,12 +251,12 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
                     action={
                         <>
                             {isBreakingOrDownloading &&
-                                cipherState !== CipherState.PAUSED && (
+                                cipher?.state !== CipherState.PAUSED && (
                                     <IconButton onClick={pauseCipher}>
                                         <PauseTwoTone />
                                     </IconButton>
                                 )}
-                            {cipherState === CipherState.PAUSED && (
+                            {cipher?.state === CipherState.PAUSED && (
                                 <IconButton onClick={resumeCipher}>
                                     <PlayArrowTwoTone />
                                 </IconButton>
@@ -248,7 +265,7 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
                                 variant="standard"
                                 className="cipher-select"
                                 displayEmpty
-                                disabled={cipherState !== CipherState.IDLE}
+                                disabled={cipher?.state !== CipherState.IDLE}
                                 value={cipherType?.name ?? ''}
                                 onChange={handleCipherChange}
                                 renderValue={(selected) => {
@@ -268,7 +285,7 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
                                 <IconButton
                                     onClick={handleRestartCipher}
                                     disabled={
-                                        cipherState !== CipherState.IDLE
+                                        cipher?.state !== CipherState.IDLE
                                     }
                                 >
                                     <ReplayOutlined />
@@ -278,12 +295,12 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
                     }
                 />
                 <CardContent className="centerContent">
-                    {cipherState && cipherState !== CipherState.IDLE && (
+                    {cipher?.state && cipher?.state !== CipherState.IDLE && (
                         <div className="progress">
                             <LinearProgressWithLabel
                                 variant="determinate"
                                 value={progress}
-                                label={cipherState?.toString()}
+                                label={cipher?.state?.toString()}
                             />
                         </div>
                     )}
@@ -306,7 +323,7 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
                         disableSpacing
                         sx={{ marginLeft: '40px' }}
                     >
-                        {cipherState !== CipherState.IDLE && (
+                        {cipher?.state !== CipherState.IDLE && (
                             <Button
                                 onClick={handleCancelDialogOpen}
                                 variant="contained"
@@ -316,7 +333,7 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
                                 Cancel
                             </Button>
                         )}
-                        {cipherState === CipherState.IDLE && (
+                        {cipher?.state === CipherState.IDLE && (
                             <Button
                                 onClick={handleRemoveCipher}
                                 variant="contained"

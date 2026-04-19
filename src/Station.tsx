@@ -35,11 +35,12 @@ export default function StationComponent() {
             <div className="card">
                 <Grid container spacing={2}>
                     {runningProcesses.length > 0 &&
-                        runningProcesses.map((id) => (
+                        runningProcesses.map(({id, type}) => (
                             <Grid size={4} key={id}>
                                 <CipherBreak
                                     station={stationProxy}
                                     id={id}
+                                    type={type}
                                     width={20}
                                     functions={{ removeProcess }}
                                 />

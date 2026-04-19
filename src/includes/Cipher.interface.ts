@@ -1,3 +1,5 @@
+import Cipher from "../lib/Cipher";
+
 export enum CipherState {
     IDLE = undefined,
     DOWNLOADING = "Download",
@@ -32,6 +34,22 @@ export interface ICipherType {
     };
     payout: number;
     xp: number;
+}
+
+export interface IGridItem {
+    character: string;
+    cssClass: string;
+}
+
+export interface CipherBreakState {
+    ciphers: Record<string, Cipher | undefined>;
+    grids: Record<string, IGridItem[] | undefined>;
+    progress: Record<string, number | undefined>;
+    types: Record<string, ICipherType | undefined>;
+    setCipher: (id: string, cipher: Cipher | undefined) => void;
+    setGrid: (id: string, grid: IGridItem[]) => void;
+    setProgress: (id: string, progress: number) => void;
+    setType: (id: string, type: ICipherType) => void;
 }
 
 export const CipherTypes: ICipherType[] = [
