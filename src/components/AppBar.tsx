@@ -1,4 +1,4 @@
-import { useState, type MouseEvent as ReactMouseEvent } from 'react';
+import { memo, useCallback, useState, type MouseEvent as ReactMouseEvent } from 'react';
 
 import {
     Box,
@@ -86,13 +86,38 @@ const notificationIcon = (level: NotificationLevel) => {
     }
 };
 
-export default function AppBarComponent() {
+const GameFrameCounter = memo(function GameFrameCounter() {
     const { stationProxy, useStationStore } = useStationContext();
     const frame = useStationStore((s) => s.frame);
     const count = useStationStore((s) => s.count);
     const exponent = useStationStore((s) => s.exponent);
     const isRunning = useStationStore((s) => s.isRunning);
+    const handleToggle = useCallback(
+        () => stationProxy.os?.toggleGameLoop(),
+        [stationProxy],
+    );
+    return (
+        <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ display: { xs: 'none', sm: 'block' } }}
+        >
+            Frame: {frame.toFixed(3)} | Count: {count} | Exponent: {exponent}
+            <IconButton
+                size="large"
+                aria-label="Start/Stop Game Timer"
+                color="inherit"
+                style={{ outline: 0 }}
+                onClick={handleToggle}
+            >
+                {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
+            </IconButton>
+        </Typography>
+    );
+});
 
+export default function AppBarComponent() {
     const player = usePlayerStore((s) => s.player);
     const moneyLabel = usePlayerStore((s) => s.moneyLabel);
     const markAllNotificationsAsRead = usePlayerStore(
@@ -184,26 +209,7 @@ export default function AppBarComponent() {
                         />
                     </Search>
                     <Box sx={{ flexGrow: 1 }} className="centerContent">
-                        <Typography
-                            variant="h6"
-                            noWrap
-                            component="div"
-                            sx={{ display: { xs: 'none', sm: 'block' } }}
-                        >
-                            Frame: {frame.toFixed(3)} | Count: {count} |
-                            Exponent: {exponent}
-                            <IconButton
-                                size="large"
-                                aria-label="Start/Stop Game Timer"
-                                color="inherit"
-                                style={{ outline: 0 }}
-                                onClick={() =>
-                                    stationProxy.os?.toggleGameLoop()
-                                }
-                            >
-                                {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
-                            </IconButton>
-                        </Typography>
+                        <GameFrameCounter />
                     </Box>
                     <Box
                         ref={(el: HTMLElement | null) => {

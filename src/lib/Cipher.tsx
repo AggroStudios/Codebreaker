@@ -19,7 +19,7 @@ export default class Cipher implements Process {
         type: ICipherType,
         state: CipherState,
     ) => void = () => {};
-    private unsolvedIndexes: number[] = [];
+    private unsolvedIndexes: Set<number> = new Set();
     private width: number;
     private height: number;
     private cssClasses: string[];
@@ -58,7 +58,7 @@ export default class Cipher implements Process {
         });
 
         for (let i = 0; i < this.width * this.height; i++) {
-            this.unsolvedIndexes.push(i);
+            this.unsolvedIndexes.add(i);
         }
 
         this._stationOs.addProcess(this);
@@ -131,7 +131,7 @@ export default class Cipher implements Process {
     private generateGrid(): IGridItem[] {
         const rndGrid = [];
         for (let i = 0; i < this.width * this.height; i++) {
-            if (this.unsolvedIndexes.includes(i)) {
+            if (this.unsolvedIndexes.has(i)) {
                 const cssClassIndex = Math.floor(
                     Math.random() * this.cssClasses.length,
                 );
@@ -172,10 +172,9 @@ export default class Cipher implements Process {
         this._percentUse = 100;
         const complexity = Math.round(10 * this._cipherType.complexity);
         if (this.frame > 0 && this.frame % complexity === 0) {
+            const unsolvedArr = [...this.unsolvedIndexes];
             const solvedIndex =
-                this.unsolvedIndexes[
-                    Math.floor(Math.random() * this.unsolvedIndexes.length)
-                ];
+                unsolvedArr[Math.floor(Math.random() * unsolvedArr.length)];
             const solvedValue = Math.round(Math.random());
 
             this._characterGrid[solvedIndex] = {
@@ -183,12 +182,9 @@ export default class Cipher implements Process {
                 cssClass: "broken",
             };
 
-            this.unsolvedIndexes.splice(
-                this.unsolvedIndexes.indexOf(solvedIndex),
-                1,
-            );
+            this.unsolvedIndexes.delete(solvedIndex);
             this.progress = Math.floor(
-                ((this.width * this.height - this.unsolvedIndexes.length) /
+                ((this.width * this.height - this.unsolvedIndexes.size) /
                     (this.width * this.height)) *
                     100,
             );
@@ -198,7 +194,7 @@ export default class Cipher implements Process {
             this.randomizeGrid();
         }
 
-        if (this.unsolvedIndexes.length === 0) {
+        if (this.unsolvedIndexes.size === 0) {
             this.randomizeGrid();
             console.log("Cipher breaking completed!");
             this.state = CipherState.SUCCESS;
@@ -226,7 +222,6 @@ export default class Cipher implements Process {
     }
 
     public callback(_: number) {
-        console.log('State:', this._state);
         if (this._state === CipherState.PAUSED) return;
 
         this.frame++;

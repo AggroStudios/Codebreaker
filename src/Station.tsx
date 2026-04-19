@@ -1,5 +1,5 @@
 import './App.css';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import Grid from '@mui/material/Grid';
 
 import CipherBreak, {
@@ -32,20 +32,20 @@ export default function StationComponent() {
         setStation(stationProxy);
     }, [setStation, stationProxy]);
 
-    const completeCipher = (cipher: Cipher, cancelled: boolean) => {
+    const completeCipher = useCallback((cipher: Cipher, cancelled: boolean) => {
         stationProxy.os?.sendNotification(
             `Cipher '${cipher.cipherType.name}' (${cipher.id}) ${
                 cancelled ? 'cancelled' : 'completed'
             }.`,
             cancelled ? NotificationLevel.ERROR : NotificationLevel.INFO,
         );
-    };
+    }, [stationProxy]);
 
-    const handleRemoveCipher = (cipher: Cipher) => {
+    const handleRemoveCipher = useCallback((cipher: Cipher) => {
         removeCipher(cipher);
-    };
+    }, [removeCipher]);
 
-    const handleAddCipher = (cipherType: ICipherType) => {
+    const handleAddCipher = useCallback((cipherType: ICipherType) => {
         try {
             const c = new Cipher(20, 10, cssClasses, cipherType, stationProxy);
             addCipher(c);
@@ -57,9 +57,9 @@ export default function StationComponent() {
                 NotificationLevel.ERROR,
             );
         }
-    };
+    }, [addCipher, notify, stationProxy]);
 
-    const handleUpdateCipher = (cipher: Cipher) => {
+    const handleUpdateCipher = useCallback((cipher: Cipher) => {
         const newCipher = new Cipher(
             20,
             10,
@@ -68,14 +68,14 @@ export default function StationComponent() {
             stationProxy,
         );
         updateCipher(cipher, newCipher);
-    };
+    }, [updateCipher, stationProxy]);
 
-    const functions: CipherBreakFunctions = {
+    const functions = useMemo<CipherBreakFunctions>(() => ({
         newCipher: handleAddCipher,
         onComplete: completeCipher,
         removeCipher: handleRemoveCipher,
         updateCipher: handleUpdateCipher,
-    };
+    }), [handleAddCipher, completeCipher, handleRemoveCipher, handleUpdateCipher]);
 
     return (
         <>

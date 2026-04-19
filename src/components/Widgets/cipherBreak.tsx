@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import {
     Avatar,
     Box,
@@ -96,7 +96,7 @@ interface CipherBreakOptions {
     functions?: CipherBreakFunctions;
 }
 
-export default function CipherBreak(props: CipherBreakOptions) {
+export default memo(function CipherBreak(props: CipherBreakOptions) {
     const cardRef = useRef<HTMLDivElement | null>(null);
 
     const [grid, setGrid] = useState<IGridItem[]>([]);
@@ -407,4 +407,4 @@ export default function CipherBreak(props: CipherBreakOptions) {
             </Dialog>
         </>
     );
-}
+});
