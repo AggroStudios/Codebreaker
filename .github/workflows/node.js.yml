@@ -13,6 +13,22 @@ on:
     branches: [ "master" ]
 
 jobs:
+
+  bump-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v5
+    - name: Configure Git
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+    - name: Increment Version
+      run: npm version patch -m "Bump version to %s [skip ci]"
+    - name: Commit Changes
+      run: git push --follow-tags
+
   build:
 
     runs-on: ubuntu-latest
