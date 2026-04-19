@@ -76,6 +76,16 @@ export default function About({ open, onClose }: AboutProps) {
 
                 <Typography
                     component="div"
+                    variant="body2"
+                    color="text.secondary"
+                    gutterBottom
+                    sx={{ display: 'block' }}
+                >
+                    Code Breaker - Version {import.meta.env.VITE_APP_VERSION}<br />
+                </Typography>
+
+                <Typography
+                    component="div"
                     variant="overline"
                     color="text.secondary"
                     gutterBottom
@@ -137,7 +147,7 @@ export default function About({ open, onClose }: AboutProps) {
                         pointerEvents: 'none',
                     }}
                 >
-                    Copyright © {new Date().getFullYear()} Aggro Studios.
+                    Copyright © {new Date().getFullYear()} AGGRO Studios.
                 </Typography>
                 <Button onClick={onClose} sx={{ outline: 0 }}>
                     Close
