@@ -22,6 +22,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import MoreIcon from '@mui/icons-material/More';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import SettingsIcon from '@mui/icons-material/Settings';
 import InfoTwoTone from '@mui/icons-material/InfoTwoTone';
 import WarningTwoTone from '@mui/icons-material/WarningTwoTone';
 import ErrorTwoTone from '@mui/icons-material/ErrorTwoTone';
@@ -30,9 +31,11 @@ import CodeBreakerLogo from '../assets/logos/codebreaker-logo.png';
 import './AppBar.scss';
 import { NotificationLevel } from '../includes/OperatingSystem.interface';
 import MoneyLabel from './MoneyLabel';
+import Settings from './Settings';
 import { usePlayerStore } from '../stores/player';
 import { useStationContext } from '../stores/stationContext';
 import { useAnchors } from './AnchorsContext';
+import { useMusicPlayerStore } from '../stores/musicPlayer';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -92,8 +95,15 @@ const GameFrameCounter = memo(function GameFrameCounter() {
     const count = useStationStore((s) => s.count);
     const exponent = useStationStore((s) => s.exponent);
     const isRunning = useStationStore((s) => s.isRunning);
+    const playing = useMusicPlayerStore((s) => s.playing);
+    const playMusic = useMusicPlayerStore((s) => s.play);
     const handleToggle = useCallback(
-        () => stationProxy.os?.toggleGameLoop(),
+        () => {
+            stationProxy.os?.toggleGameLoop();
+            if (!playing) {
+                playMusic();
+            }
+        },
         [stationProxy],
     );
     return (
@@ -139,6 +149,7 @@ export default function AppBarComponent() {
     const [messageAnchorEl, setMessageAnchorEl] = useState<HTMLElement | null>(
         null,
     );
+    const [settingsOpen, setSettingsOpen] = useState(false);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileAnchorEl);
@@ -168,6 +179,13 @@ export default function AppBarComponent() {
     const handleMobileMenuClose = () => setMobileAnchorEl(null);
     const handleNotificationMenuClose = () => setNotificationAnchorEl(null);
     const handleMessageMenuClose = () => setMessageAnchorEl(null);
+
+    const handleSettingsOpen = () => {
+        setAnchorEl(null);
+        setMobileAnchorEl(null);
+        setSettingsOpen(true);
+    };
+    const handleSettingsClose = () => setSettingsOpen(false);
 
     const menuId = 'primary-search-account-menu';
     const notificationId = 'primary-search-notification-menu';
@@ -292,7 +310,15 @@ export default function AppBarComponent() {
             >
                 <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
                 <MenuItem onClick={handleMenuClose}>My Account</MenuItem>
+                <MenuItem onClick={handleSettingsOpen}>
+                    <ListItemIcon>
+                        <SettingsIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="Settings" />
+                </MenuItem>
             </Menu>
+
+            <Settings open={settingsOpen} onClose={handleSettingsClose} />
 
             <Menu
                 anchorEl={mobileAnchorEl}

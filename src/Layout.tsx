@@ -4,6 +4,7 @@ import { styled } from '@mui/material/styles';
 
 import AppBar from './components/AppBar';
 import NavMenu from './components/NavMenu';
+import MusicPlayer from './components/MusicPlayer';
 
 const backgroundModules = import.meta.glob<string>(
     './assets/backgrounds/*_bg.png',
@@ -54,6 +55,7 @@ export default function Layout() {
     const location = useLocation();
     return (
         <>
+            <MusicPlayer />
             <AppBar />
             <MainContainer background={getBackground(location.pathname)}>
                 <NavMenu />

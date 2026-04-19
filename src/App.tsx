@@ -1,4 +1,4 @@
-import { lazy, useEffect, useMemo, useState } from 'react';
+import { lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -11,6 +11,7 @@ import { darkTheme } from './theme';
 import { playerStoreProxy } from './stores/player';
 import { createStationStore, makeStationProxy } from './stores/station';
 import { StationStoreProvider } from './stores/stationContext';
+import { useMusicPlayerStore } from './stores/musicPlayer';
 
 import OperatingSystem from './lib/OperatingSystem';
 import { CodiumProcessor } from './lib/processors';
@@ -76,6 +77,10 @@ export default function App() {
     const { station, useStationStore, stationProxy, terminalController } =
         bootstrap;
 
+    const handleLoadingHidden = useCallback(() => {
+        useMusicPlayerStore.getState().play();
+    }, []);
+
     return (
         <ThemeProvider theme={darkTheme}>
             <CssBaseline />
@@ -108,7 +113,10 @@ export default function App() {
                     </StationStoreProvider>
                 </AnchorsProvider>
             </NotifierProvider>
-            <LoadingScreen loading={loadingProgress} />
+            <LoadingScreen
+                loading={loadingProgress}
+                onHidden={handleLoadingHidden}
+            />
         </ThemeProvider>
     );
 }

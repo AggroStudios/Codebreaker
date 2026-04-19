@@ -196,10 +196,7 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
         const delegate: CipherDelegate = {
             setGrid: (g) => setGrid(id, g),
             setProgress: (p) => setProgress(id, p),
-            setState: (s) => {
-                setState(id, s);
-                console.log('cipherState set:', id, s);
-            },
+            setState: (s) => setState(id, s),
             completeCipher: (cipher: Cipher, cancelled: boolean) => {
                 if (!cancelled) {
                     station.os?.player.earnExperience(cipherType.xp);

@@ -38,19 +38,22 @@ describe('Terminal Component', () => {
         useTerminalStore.setState({ terminalLines: [] });
     });
 
-    it('renders without crashing', () => {
+    it('renders without crashing', async () => {
         const terminalController = new TerminalController();
         const operatingSystem = new OperatingSystem(createMockPlayerState());
-        const { getByText } = render(
+        const { getByText, container } = render(
             <Terminal
                 terminalController={terminalController}
                 operatingSystem={operatingSystem}
             />,
         );
         expect(getByText('Terminal')).toBeDefined();
+        await waitFor(() => {
+            expect(container.textContent).toContain('/ $ ');
+        }, { timeout: 5000 });
     });
 
-    it('renders input field and focuses it', () => {
+    it('renders input field and focuses it', async () => {
         const terminalController = new TerminalController();
         const operatingSystem = new OperatingSystem(createMockPlayerState());
         const { container } = render(
@@ -65,6 +68,9 @@ describe('Terminal Component', () => {
         expect(input).toBeDefined();
         input.focus();
         expect(document.activeElement).toBe(input);
+        await waitFor(() => {
+            expect(container.textContent).toContain('/ $ ');
+        }, { timeout: 5000 });
     });
 
     it('handles input and Enter key', async () => {
@@ -93,8 +99,11 @@ describe('Terminal Component', () => {
         await user.click(input);
         await user.type(input, 'test');
         await user.keyboard('{Enter}');
+        // Wait for the command to complete and a new prompt line to appear,
+        // confirming all post-Enter state updates (setCommandLoaded, newLine) have settled
         await waitFor(() => {
-            expect(container.textContent).toContain('test');
-        });
+            const promptMatches = container.textContent?.match(/\/ \$ /g);
+            expect(promptMatches?.length).toBeGreaterThanOrEqual(2);
+        }, { timeout: 5000 });
     });
 });
