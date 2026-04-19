@@ -35,7 +35,7 @@ describe('OperatingSystem Worker', () => {
         it('should start posting UPDATE_GAME_LOOP messages on each interval tick', () => {
             trigger(OperatingSystemWorkerMessageType.START_GAME_LOOP);
             postMessageMock.mockClear();
-            vi.advanceTimersByTime(Math.ceil(500 / 60));
+            vi.advanceTimersByTime(Math.ceil(1000 / 60));
             expect(postMessageMock).toHaveBeenCalledWith(
                 expect.objectContaining({
                     type: OperatingSystemWorkerMessageType.UPDATE_GAME_LOOP,
@@ -70,7 +70,7 @@ describe('OperatingSystem Worker', () => {
             trigger(OperatingSystemWorkerMessageType.SET_EXPONENT, { exponent: 5 });
             trigger(OperatingSystemWorkerMessageType.START_GAME_LOOP);
             postMessageMock.mockClear();
-            vi.advanceTimersByTime(Math.ceil(500 / 60));
+            vi.advanceTimersByTime(Math.ceil(1000 / 60));
             expect(postMessageMock).toHaveBeenCalledWith(
                 expect.objectContaining({
                     type: OperatingSystemWorkerMessageType.UPDATE_GAME_LOOP,
@@ -85,9 +85,9 @@ describe('OperatingSystem Worker', () => {
             trigger(OperatingSystemWorkerMessageType.START_GAME_LOOP);
             postMessageMock.mockClear();
 
-            // Each tick adds 0.001 to frame; rollover happens after 1001 ticks.
-            // Advance enough time to guarantee it.
-            vi.advanceTimersByTime(15000);
+            // Each tick (1000/60 ms) adds 0.001 to frame; rollover happens after >1000 ticks.
+            // At 60 FPS that's >16.68s of simulated time. Advance enough to guarantee it.
+            vi.advanceTimersByTime(20000);
 
             const updateCalls = postMessageMock.mock.calls.filter(
                 ([msg]) => msg.type === OperatingSystemWorkerMessageType.UPDATE_GAME_LOOP,
