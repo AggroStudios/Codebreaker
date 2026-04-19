@@ -10,9 +10,11 @@ import {
     Box,
     Divider,
     Tooltip,
+    ToggleButton,
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import VolumeDownIcon from '@mui/icons-material/VolumeDown';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
@@ -30,10 +32,12 @@ export default function Settings({ open, onClose }: SettingsProps) {
     const playing = useMusicPlayerStore((s) => s.playing);
     const volume = useMusicPlayerStore((s) => s.volume);
     const muted = useMusicPlayerStore((s) => s.muted);
+    const shuffle = useMusicPlayerStore((s) => s.shuffle);
     const currentTrackIndex = useMusicPlayerStore((s) => s.currentTrackIndex);
     const toggle = useMusicPlayerStore((s) => s.toggle);
     const setVolume = useMusicPlayerStore((s) => s.setVolume);
     const toggleMuted = useMusicPlayerStore((s) => s.toggleMuted);
+    const toggleShuffle = useMusicPlayerStore((s) => s.toggleShuffle);
 
     const currentTrack = getTrack(currentTrackIndex);
 
@@ -127,6 +131,20 @@ export default function Settings({ open, onClose }: SettingsProps) {
                             {playing ? 'Now playing' : 'Paused'}
                         </Typography>
                     </Box>
+                    <Tooltip title={shuffle ? 'Shuffle on' : 'Shuffle off'}>
+                        <ToggleButton
+                            value="shuffle"
+                            selected={shuffle}
+                            onChange={toggleShuffle}
+                            aria-label="Toggle shuffle"
+                            aria-pressed={shuffle}
+                            size="small"
+                            color="primary"
+                            sx={{ outline: 0, border: 0 }}
+                        >
+                            <ShuffleIcon />
+                        </ToggleButton>
+                    </Tooltip>
                 </Box>
 
                 <Divider sx={{ mb: 2 }} />

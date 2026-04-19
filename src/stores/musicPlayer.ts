@@ -5,6 +5,7 @@ export interface MusicPlayerState {
     volume: number;
     muted: boolean;
     currentTrackIndex: number;
+    shuffle: boolean;
     loop: boolean;
     play: () => void;
     pause: () => void;
@@ -15,6 +16,8 @@ export interface MusicPlayerState {
     setTrackIndex: (index: number) => void;
     nextTrack: (trackCount: number) => void;
     prevTrack: (trackCount: number) => void;
+    setShuffle: (shuffle: boolean) => void;
+    toggleShuffle: () => void;
     setLoop: (loop: boolean) => void;
 }
 
@@ -28,6 +31,9 @@ export const useMusicPlayerStore = create<MusicPlayerState>((set) => ({
     volume: 0.1,
     muted: false,
     currentTrackIndex: 0,
+    shuffle: true,
+    setShuffle: (shuffle: boolean) => set(() => ({ shuffle })),
+    toggleShuffle: () => set((state) => ({ shuffle: !state.shuffle })),
     loop: true,
     play: () => set(() => ({ playing: true })),
     pause: () => set(() => ({ playing: false })),
@@ -42,15 +48,27 @@ export const useMusicPlayerStore = create<MusicPlayerState>((set) => ({
         set((state) => ({
             currentTrackIndex:
                 trackCount > 0
-                    ? (state.currentTrackIndex + 1) % trackCount
+                    ? state.shuffle
+                        ? selectRandomTrack(trackCount, state.currentTrackIndex)
+                        : (state.currentTrackIndex + 1) % trackCount
                     : 0,
         })),
     prevTrack: (trackCount: number) =>
         set((state) => ({
             currentTrackIndex:
                 trackCount > 0
-                    ? (state.currentTrackIndex - 1 + trackCount) % trackCount
+                    ? state.shuffle
+                        ? selectRandomTrack(trackCount, state.currentTrackIndex)
+                        : (state.currentTrackIndex - 1 + trackCount) % trackCount
                     : 0,
         })),
     setLoop: (loop: boolean) => set(() => ({ loop })),
 }));
+
+const selectRandomTrack = (trackCount: number, currentTrackIndex: number) => {
+    const randomIndex = Math.floor(Math.random() * trackCount);
+    if (randomIndex === currentTrackIndex) {
+        return selectRandomTrack(trackCount, currentTrackIndex);
+    }
+    return randomIndex;
+};
