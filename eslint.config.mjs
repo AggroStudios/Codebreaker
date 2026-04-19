@@ -14,6 +14,7 @@ export default tseslint.config(
         { argsIgnorePattern: '^_' }
       ],
       'no-async-promise-executor': 'off',
+      'quotes': ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
     }
   }
 );

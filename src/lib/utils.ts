@@ -1,16 +1,16 @@
-import isEmpty from "lodash/isEmpty";
+import isEmpty from 'lodash/isEmpty';
 
 export const dataSizeSuffixes = [
-    "B",
-    "KB",
-    "MB",
-    "GB",
-    "TB",
-    "PB",
-    "EB",
-    "ZB",
-    "YB",
-    "BB",
+    'B',
+    'KB',
+    'MB',
+    'GB',
+    'TB',
+    'PB',
+    'EB',
+    'ZB',
+    'YB',
+    'BB',
 ];
 
 export const dataSizeFromSuffix = ({ size, unit }) => {
@@ -38,12 +38,12 @@ export const dataSizeSuffix = (value: number, startPoint: number = 0) => {
 
 export const path = class Path {
     static extname(path: string) {
-        const exploded = path.split(".");
-        if (exploded[0] === "") exploded.shift();
+        const exploded = path.split('.');
+        if (exploded[0] === '') exploded.shift();
         if (exploded.length > 1) {
             return `.${exploded.pop()}`;
         } else {
-            return "";
+            return '';
         }
     }
 
@@ -51,24 +51,24 @@ export const path = class Path {
         if (isEmpty(path)) return;
 
         return path
-            .split("/")
+            .split('/')
             .reduce((acc: string[], cur: string) => {
-                if (cur === "..") {
+                if (cur === '..') {
                     acc.pop();
-                } else if (cur !== ".") {
+                } else if (cur !== '.') {
                     acc.push(cur);
                 }
                 return acc;
             }, [])
-            .join("/");
+            .join('/');
     }
 
     static parse(path: string) {
-        path = this.normalize(path) || "";
-        const root = "/";
-        const parts = path.split("/").slice(1);
-        const base = parts.pop() || "";
-        const dir = root + parts.join("/");
+        path = this.normalize(path) || '';
+        const root = '/';
+        const parts = path.split('/').slice(1);
+        const base = parts.pop() || '';
+        const dir = root + parts.join('/');
         const ext = this.extname(base);
         const name = base.slice(0, base.length - ext.length);
 
@@ -85,24 +85,24 @@ export const path = class Path {
         return Path.parse(path).dir;
     }
 
-    static basename(path: string, excludeExt: string = "") {
+    static basename(path: string, excludeExt: string = '') {
         const { name, ext, base } = this.parse(path);
         return ext === excludeExt ? name : base;
     }
 
     static isAbsolute(path: string) {
-        return path.startsWith("/");
+        return path.startsWith('/');
     }
 
     static join(...paths: string[]) {
-        return this.normalize(paths.join("/"));
+        return this.normalize(paths.join('/'));
     }
 
     static format(pathObject: { dir: string; base: string }) {
         return (
             `${pathObject.dir}/${pathObject.base}`
-                .replaceAll("//", "/")
-                .replace(/(.*?)\/$/, "$1") || "/"
+                .replaceAll('//', '/')
+                .replace(/(.*?)\/$/, '$1') || '/'
         );
     }
 };

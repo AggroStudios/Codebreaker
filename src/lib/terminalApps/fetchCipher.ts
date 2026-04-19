@@ -1,5 +1,5 @@
-import Terminal from "../terminal";
-import { TerminalApp } from "../../includes/Terminal.interface";
+import Terminal from '../terminal';
+import { TerminalApp } from '../../includes/Terminal.interface';
 
 class FetchCipher extends TerminalApp {
     constructor(terminal: Terminal) {
@@ -25,14 +25,14 @@ class FetchCipher extends TerminalApp {
     }
 
     private async captureAnswer() {
-        return await this.terminal.readLine("Enter decrypted solution: ");
+        return await this.terminal.readLine('Enter decrypted solution: ');
     }
 
     async run() {
-        const stringToEncrypt = this.rot13("Hello World");
+        const stringToEncrypt = this.rot13('Hello World');
         let tries = 3;
 
-        this.terminal.stdout("Fetch Cipher...");
+        this.terminal.stdout('Fetch Cipher...');
         this.terminal.showLoader();
         await new Promise((resolve) => setTimeout(resolve, 1000));
         this.terminal.hideLoader();
@@ -51,7 +51,7 @@ class FetchCipher extends TerminalApp {
                     `Incorrect solution. You have ${tries} tries left.`,
                 );
             } catch {
-                this.terminal.stderr("^C");
+                this.terminal.stderr('^C');
                 return;
             }
         }

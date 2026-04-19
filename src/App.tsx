@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { lazy, useEffect, useMemo, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -66,6 +66,11 @@ export default function App() {
 
     useEffect(() => {
         preloadImages(setLoadingProgress);
+        // Preload all route chunks in the background so navigation is instant
+        import('./Station');
+        import('./components/Login');
+        import('./Servers');
+        import('./components/Terminal');
     }, []);
 
     const { station, useStationStore, stationProxy, terminalController } =
@@ -81,28 +86,24 @@ export default function App() {
                         stationProxy={stationProxy}
                     >
                         <BrowserRouter>
-                            <Suspense
-                                fallback={<LoadingScreen loading={0} />}
-                            >
-                                <Routes>
-                                    <Route element={<Layout />}>
-                                        <Route index element={
-                                            <TerminalRoute
-                                                terminalController={
-                                                    terminalController
-                                                }
-                                                operatingSystem={
-                                                    station.operatingSystem
-                                                }
-                                            />
-                                        } />
-                                        <Route path="station" element={<StationRoute />} />
-                                        <Route path="login" element={<LoginRoute />} />
-                                        <Route path="servers" element={<ServersRoute />} />
-                                        <Route path="*" />
-                                    </Route>
-                                </Routes>
-                            </Suspense>
+                            <Routes>
+                                <Route element={<Layout />}>
+                                    <Route index element={
+                                        <TerminalRoute
+                                            terminalController={
+                                                terminalController
+                                            }
+                                            operatingSystem={
+                                                station.operatingSystem
+                                            }
+                                        />
+                                    } />
+                                    <Route path="station" element={<StationRoute />} />
+                                    <Route path="login" element={<LoginRoute />} />
+                                    <Route path="servers" element={<ServersRoute />} />
+                                    <Route path="*" />
+                                </Route>
+                            </Routes>
                         </BrowserRouter>
                     </StationStoreProvider>
                 </AnchorsProvider>

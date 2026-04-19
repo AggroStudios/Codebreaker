@@ -1,5 +1,5 @@
-import { IDomain } from "../../includes/Domain.interface";
-import allDomains from "./domains";
+import { IDomain } from '../../includes/Domain.interface';
+import allDomains from './domains';
 
 export class HackingScenarios {
     static getAllDomains(): string[] {

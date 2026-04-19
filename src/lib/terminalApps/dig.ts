@@ -1,6 +1,6 @@
-import { HackingScenarios } from "../hackingScenarios";
-import Terminal from "../terminal";
-import { TerminalApp } from "../../includes/Terminal.interface";
+import { HackingScenarios } from '../hackingScenarios';
+import Terminal from '../terminal';
+import { TerminalApp } from '../../includes/Terminal.interface';
 
 class Dig extends TerminalApp {
     constructor(terminal: Terminal) {
@@ -9,7 +9,7 @@ class Dig extends TerminalApp {
 
     async run(argc: number, argv: string[]) {
         if (argc < 1) {
-            this.terminal.stderr("Usage: dig <domain>");
+            this.terminal.stderr('Usage: dig <domain>');
             return;
         }
         const domain = argv[0];

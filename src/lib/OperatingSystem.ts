@@ -1,15 +1,15 @@
-import { PlayerState } from "../includes/Player.interface";
-import Process from "../includes/Process.interface";
-import CpuActivity from "./CpuActivity";
+import { PlayerState } from '../includes/Player.interface';
+import Process from '../includes/Process.interface';
+import CpuActivity from './CpuActivity';
 
-import { NotificationLevel } from "../includes/OperatingSystem.interface";
-import { StationStoreType } from "../includes/Process.interface";
+import { NotificationLevel } from '../includes/OperatingSystem.interface';
+import { StationStoreType } from '../includes/Process.interface';
 
 import WorkerOperatingSystem from './worker/OperatingSystem?worker';
-import { OperatingSystemWorkerMessage, OperatingSystemWorkerMessageType, type OSUpdateGameLoopData } from "./worker/OperatingSystem";
+import { OperatingSystemWorkerMessage, OperatingSystemWorkerMessageType, type OSUpdateGameLoopData } from './worker/OperatingSystem';
 
 function validateProcess(process: any): process is Process {
-    return "id" in process && "callback" in process;
+    return 'id' in process && 'callback' in process;
 }
 
 export class OperatingSystemError extends Error {}
@@ -154,15 +154,12 @@ export default class OperatingSystem {
         );
         const coreCount = this._station?.cpu?.cores || 1;
 
-        console.log('coreUsage', coreUsage);
-        console.log('coreCount', coreCount);
-
         if (coreUsage + (process.cores || 0) > coreCount) {
             throw new OperatingSystemError(`Not enough cores available to add process '${process.id}'.`);
         }
         
         const processIndex = this.processes.findIndex(
-            (i) => i?.["id"] === process?.["id"],
+            (i) => i?.['id'] === process?.['id'],
         );
         process.pid = this.pid++;
         if (validateProcess(process) && processIndex === -1) {
@@ -175,7 +172,7 @@ export default class OperatingSystem {
 
     removeProcess(process: Process) {
         this.processes = this.processes.filter(
-            (p) => p?.["id"] !== process?.["id"],
+            (p) => p?.['id'] !== process?.['id'],
         );
     }
 
@@ -204,7 +201,7 @@ export default class OperatingSystem {
         // console.debug('[OperatingSystem] - Update');
         if (
             this._station &&
-            parseFloat((this.currentFrame / 0.1).toFixed(2)) % 1 === 0
+            Math.round(this.currentFrame * 1000) % 100 === 0
         ) {
             const coreUsage = this.processes.filter((process: Process) => !process.paused).reduce(
                 (acc, process) => acc + (process.cores * (process.percentUse || 0) || 0),

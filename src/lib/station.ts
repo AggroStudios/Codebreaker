@@ -2,9 +2,9 @@ import {
     IMemoryType,
     IProcessorType,
     IStorageType,
-} from "../includes/Process.interface";
-import { Networking } from "./network";
-import OperatingSystem from "./OperatingSystem";
+} from '../includes/Process.interface';
+import { Networking } from './network';
+import OperatingSystem from './OperatingSystem';
 
 export class Station {
     private _processor: IProcessorType;

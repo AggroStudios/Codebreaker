@@ -1,12 +1,12 @@
-import { Networking } from "../lib/network";
-import OperatingSystem from "../lib/OperatingSystem";
+import { Networking } from '../lib/network';
+import OperatingSystem from '../lib/OperatingSystem';
 
 export enum NetworkConnectionType {
-    dsl = "DSL",
-    cable = "Cable",
-    fiber = "Fiber",
-    cellular = "Cellular",
-    satellite = "Satellite",
+    dsl = 'DSL',
+    cable = 'Cable',
+    fiber = 'Fiber',
+    cellular = 'Cellular',
+    satellite = 'Satellite',
 }
 
 export interface INetworkType {
@@ -46,31 +46,31 @@ export type MenuStateType = {
 };
 
 export enum ProcessorArchitecture {
-    risc32 = "risc32",
-    risc64 = "risc64",
-    sca32 = "sca32",
-    sca64 = "sca64",
-    mca32 = "mca32",
-    mca64 = "mca64",
+    risc32 = 'risc32',
+    risc64 = 'risc64',
+    sca32 = 'sca32',
+    sca64 = 'sca64',
+    mca32 = 'mca32',
+    mca64 = 'mca64',
 }
 
 export enum MemoryType {
-    sdram = "SDRAM",
-    ddr = "DDR",
-    ddr2 = "DDR-2",
-    ddr3 = "DDR-3",
-    ddr4 = "DDR-4",
-    ddr5 = "DDR-5",
+    sdram = 'SDRAM',
+    ddr = 'DDR',
+    ddr2 = 'DDR-2',
+    ddr3 = 'DDR-3',
+    ddr4 = 'DDR-4',
+    ddr5 = 'DDR-5',
 }
 
 export enum StorageType {
-    hdd = "hdd",
-    ssd = "ssd",
-    nvme = "nvme",
-    tape = "tape",
-    floppy = "floppy",
-    optical = "optical",
-    fiberChannel = "Fiber Channel",
+    hdd = 'hdd',
+    ssd = 'ssd',
+    nvme = 'nvme',
+    tape = 'tape',
+    floppy = 'floppy',
+    optical = 'optical',
+    fiberChannel = 'Fiber Channel',
 }
 
 export interface IProcessorType {

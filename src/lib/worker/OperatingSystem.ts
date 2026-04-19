@@ -1,8 +1,8 @@
 export enum OperatingSystemWorkerMessageType {
-    START_GAME_LOOP = "startGameLoop",
-    STOP_GAME_LOOP = "stopGameLoop",
-    UPDATE_GAME_LOOP = "updateGameLoop",
-    SET_EXPONENT = "setExponent",
+    START_GAME_LOOP = 'startGameLoop',
+    STOP_GAME_LOOP = 'stopGameLoop',
+    UPDATE_GAME_LOOP = 'updateGameLoop',
+    SET_EXPONENT = 'setExponent',
 }
 
 export interface OperatingSystemWorkerMessage {
@@ -32,7 +32,7 @@ onmessage = (event: MessageEvent<OperatingSystemWorkerMessage>) => {
     const { type, data } = event.data;
 
     const startGameLoop = () => {
-        interval = setInterval(() => update(), 500 / FPS);
+        interval = setInterval(() => update(), 1000 / FPS);
         postMessage({
             type: OperatingSystemWorkerMessageType.START_GAME_LOOP,
             data: true

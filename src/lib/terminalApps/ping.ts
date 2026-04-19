@@ -1,5 +1,5 @@
-import Terminal from "../terminal";
-import { TerminalApp } from "../../includes/Terminal.interface";
+import Terminal from '../terminal';
+import { TerminalApp } from '../../includes/Terminal.interface';
 
 export default class Ping extends TerminalApp {
     private defaultPingSteps: number;
@@ -17,27 +17,27 @@ export default class Ping extends TerminalApp {
         Example:
         - ping google.com 10
         `
-            .split("\n")
+            .split('\n')
             .forEach((line) => this.terminal.stdout(line));
     }
 
     async run(argc: number, argv: string[]) {
         let host = argv[0];
         if (argc < 0) {
-            this.terminal.stderr("Error: Host is undefined.\n");
+            this.terminal.stderr('Error: Host is undefined.\n');
             this.help();
             return;
         }
 
         const options = argv.slice(1);
 
-        if (host === "help" || host === "-h" || host === "-?") {
+        if (host === 'help' || host === '-h' || host === '-?') {
             this.help();
             return;
         }
 
         if (!host) {
-            host = await this.terminal.readLine("Host: ");
+            host = await this.terminal.readLine('Host: ');
         }
 
         return await new Promise<void>(async (resolve) => {
@@ -57,9 +57,9 @@ export default class Ping extends TerminalApp {
 
             this.terminal.stdin(
                 (char: string) => {
-                    if (char === "^C") {
+                    if (char === '^C') {
                         shouldBreak = true;
-                        this.terminal.stderr("^C", { characterMode: true });
+                        this.terminal.stderr('^C', { characterMode: true });
                     }
                 },
                 { characterMode: true },

@@ -1,7 +1,7 @@
 import Process, {
     INetworkType,
     NetworkConnectionType,
-} from "../includes/Process.interface";
+} from '../includes/Process.interface';
 
 export class NetworkDSL implements INetworkType {
     connectionType: NetworkConnectionType = NetworkConnectionType.dsl;

@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import Terminal from "./terminal";
-import OperatingSystem from "./OperatingSystem";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import Terminal from './terminal';
+import OperatingSystem from './OperatingSystem';
 
 const mockStd = () => ({
     stdin: vi.fn(),
@@ -8,7 +8,7 @@ const mockStd = () => ({
     stderr: vi.fn(),
 });
 
-describe("Terminal", () => {
+describe('Terminal', () => {
     let term: Terminal;
     let std: any;
 
@@ -18,11 +18,11 @@ describe("Terminal", () => {
         term.attachTerminal(std);
     });
 
-    it("should initialize with default prompt", () => {
-        expect(term.prompt.endsWith("$ ")).toBe(true);
+    it('should initialize with default prompt', () => {
+        expect(term.prompt.endsWith('$ ')).toBe(true);
     });
 
-    it("should attach operating system", () => {
+    it('should attach operating system', () => {
         const os = new OperatingSystem({
             moneyLabel: null,
             xpLabel: null,
@@ -34,7 +34,7 @@ describe("Terminal", () => {
             markNotificationAsRead: vi.fn(),
             markAllNotificationsAsRead: vi.fn(),
             player: {
-                name: "TestPlayer",
+                name: 'TestPlayer',
                 money: 0,
                 experience: 0,
                 level: 1,
@@ -50,17 +50,17 @@ describe("Terminal", () => {
         expect(term.operatingSystem).toBe(os);
     });
 
-    it("should add history and limit size", () => {
+    it('should add history and limit size', () => {
         for (let i = 0; i < 7; i++) {
             term.addHistory(`cmd${i}`, i);
         }
         expect(term.history.length).toBe(5);
-        expect(term.history[0].command).toBe("cmd6");
+        expect(term.history[0].command).toBe('cmd6');
     });
 
-    it("should show and hide loader", () => {
+    it('should show and hide loader', () => {
         std.stdout.mockClear();
-        term.showLoader(["|", "/"]);
+        term.showLoader(['|', '/']);
         // Loader should call stdout with loader characters
         expect(std.stdout).toHaveBeenCalled();
         term.hideLoader();
@@ -68,8 +68,8 @@ describe("Terminal", () => {
         expect(std.stdout).toHaveBeenCalled();
     });
 
-    it("should log primitives and objects", () => {
-        term.log("test");
+    it('should log primitives and objects', () => {
+        term.log('test');
         term.log(123);
         term.log(true);
         term.log(undefined);
@@ -79,22 +79,22 @@ describe("Terminal", () => {
         expect(std.stdout).toHaveBeenCalled();
     });
 
-    it("should add to history after command", async () => {
+    it('should add to history after command', async () => {
         std.stdout.mockImplementation(() => {});
         std.stderr.mockImplementation(() => {});
-        await term.command("ls");
-        expect(term.history[0].command).toBe("ls");
+        await term.command('ls');
+        expect(term.history[0].command).toBe('ls');
     });
 
-    it("should handle unknown command", async () => {
+    it('should handle unknown command', async () => {
         std.stdout.mockImplementation(() => {});
         std.stderr.mockImplementation(() => {});
-        await term.command("unknowncmd");
+        await term.command('unknowncmd');
         expect(std.stderr).toHaveBeenCalled();
     });
 });
 
-describe("readLine", () => {
+describe('readLine', () => {
     let term: Terminal;
     let std: any;
 
@@ -104,34 +104,34 @@ describe("readLine", () => {
         term.attachTerminal(std);
     });
 
-    it("should resolve with input buffer on newline", async () => {
+    it('should resolve with input buffer on newline', async () => {
         std.stdin.mockImplementationOnce((cb: (char: string) => void) => {
-            cb("hello");
-            cb("\n");
+            cb('hello');
+            cb('\n');
         });
-        const result = await term.readLine("> ");
-        expect(result).toBe("hello");
+        const result = await term.readLine('> ');
+        expect(result).toBe('hello');
     });
 
-    it("should reject on ^C", async () => {
+    it('should reject on ^C', async () => {
         std.stdin.mockImplementationOnce((cb: (char: string) => void) => {
-            cb("^C");
+            cb('^C');
         });
-        await expect(term.readLine("> ")).rejects.toBe("> ^C");
+        await expect(term.readLine('> ')).rejects.toBe('> ^C');
     });
 
-    it("should mask characters with characterOverride", async () => {
+    it('should mask characters with characterOverride', async () => {
         std.stdin.mockImplementationOnce((cb: (char: string) => void) => {
-            cb("abc");
-            cb("\n");
+            cb('abc');
+            cb('\n');
         });
-        const result = await term.readLine("> ", "*");
-        expect(result).toBe("abc");
-        expect(std.stdout).toHaveBeenCalledWith("> ***", { updateMode: true });
+        const result = await term.readLine('> ', '*');
+        expect(result).toBe('abc');
+        expect(std.stdout).toHaveBeenCalledWith('> ***', { updateMode: true });
     });
 });
 
-describe("readSecure", () => {
+describe('readSecure', () => {
     let term: Terminal;
     let std: any;
 
@@ -141,20 +141,20 @@ describe("readSecure", () => {
         term.attachTerminal(std);
     });
 
-    it("should mask input with * and resolve correctly", async () => {
+    it('should mask input with * and resolve correctly', async () => {
         std.stdin.mockImplementationOnce((cb: (char: string) => void) => {
-            cb("secret");
-            cb("\n");
+            cb('secret');
+            cb('\n');
         });
-        const result = await term.readSecure("Password: ");
-        expect(result).toBe("secret");
-        expect(std.stdout).toHaveBeenCalledWith("Password: ******", {
+        const result = await term.readSecure('Password: ');
+        expect(result).toBe('secret');
+        expect(std.stdout).toHaveBeenCalledWith('Password: ******', {
             updateMode: true,
         });
     });
 });
 
-describe("readChar", () => {
+describe('readChar', () => {
     let term: Terminal;
     let std: any;
 
@@ -164,61 +164,61 @@ describe("readChar", () => {
         term.attachTerminal(std);
     });
 
-    it("should resolve with any character when no limitedCharacters", async () => {
+    it('should resolve with any character when no limitedCharacters', async () => {
         std.stdin.mockImplementationOnce((cb: (char: string) => void) => {
-            cb("x");
+            cb('x');
         });
-        expect(await term.readChar()).toBe("x");
+        expect(await term.readChar()).toBe('x');
     });
 
-    it("should resolve with defaultCharacter on newline when no limitedCharacters", async () => {
+    it('should resolve with defaultCharacter on newline when no limitedCharacters', async () => {
         std.stdin.mockImplementationOnce((cb: (char: string) => void) => {
-            cb("\n");
+            cb('\n');
         });
-        expect(await term.readChar([], "y")).toBe("y");
+        expect(await term.readChar([], 'y')).toBe('y');
     });
 
-    it("should resolve with matching character from limitedCharacters", async () => {
+    it('should resolve with matching character from limitedCharacters', async () => {
         std.stdin.mockImplementationOnce((cb: (char: string) => void) => {
-            cb("n");
+            cb('n');
         });
-        expect(await term.readChar(["y", "n"])).toBe("n");
+        expect(await term.readChar(['y', 'n'])).toBe('n');
     });
 
-    it("should ignore non-matching characters and wait for a valid one", async () => {
+    it('should ignore non-matching characters and wait for a valid one', async () => {
         let capturedCb: ((char: string) => void) | null = null;
         std.stdin.mockImplementation((cb: ((char: string) => void) | null) => {
             if (cb !== null) capturedCb = cb;
         });
-        const promise = term.readChar(["y", "n"]);
-        capturedCb!("x"); // not in set, ignored
-        capturedCb!("y"); // valid
-        expect(await promise).toBe("y");
+        const promise = term.readChar(['y', 'n']);
+        capturedCb!('x'); // not in set, ignored
+        capturedCb!('y'); // valid
+        expect(await promise).toBe('y');
     });
 
-    it("should resolve with defaultCharacter on newline when limitedCharacters set", async () => {
+    it('should resolve with defaultCharacter on newline when limitedCharacters set', async () => {
         std.stdin.mockImplementationOnce((cb: (char: string) => void) => {
-            cb("\n");
+            cb('\n');
         });
-        expect(await term.readChar(["y", "n"], "y")).toBe("y");
+        expect(await term.readChar(['y', 'n'], 'y')).toBe('y');
     });
 
-    it("should match case-insensitively when caseSensitive is false", async () => {
+    it('should match case-insensitively when caseSensitive is false', async () => {
         std.stdin.mockImplementationOnce((cb: (char: string) => void) => {
-            cb("Y");
+            cb('Y');
         });
-        expect(await term.readChar(["y", "n"], "", false)).toBe("Y");
+        expect(await term.readChar(['y', 'n'], '', false)).toBe('Y');
     });
 
-    it("should reject on ^C", async () => {
+    it('should reject on ^C', async () => {
         std.stdin.mockImplementationOnce((cb: (char: string) => void) => {
-            cb("^C");
+            cb('^C');
         });
-        await expect(term.readChar()).rejects.toContain("^C");
+        await expect(term.readChar()).rejects.toContain('^C');
     });
 });
 
-describe("progressBar", () => {
+describe('progressBar', () => {
     let term: Terminal;
     let std: any;
 
@@ -233,14 +233,14 @@ describe("progressBar", () => {
         vi.useRealTimers();
     });
 
-    it("should resolve after completing all steps", async () => {
+    it('should resolve after completing all steps', async () => {
         std.stdin.mockImplementation(() => {});
         const promise = term.progressBar(3, 100);
         await vi.runAllTimersAsync();
         await expect(promise).resolves.toBeUndefined();
     });
 
-    it("should render the initial bar and update on each step", async () => {
+    it('should render the initial bar and update on each step', async () => {
         std.stdin.mockImplementation(() => {});
         const promise = term.progressBar(2, 100);
         await vi.runAllTimersAsync();
@@ -249,13 +249,13 @@ describe("progressBar", () => {
         expect(std.stdout).toHaveBeenCalledTimes(3);
     });
 
-    it("should reject on ^C", async () => {
+    it('should reject on ^C', async () => {
         let capturedCb: ((char: string) => void) | null = null;
         std.stdin.mockImplementation((cb: ((char: string) => void) | null) => {
             if (cb !== null) capturedCb = cb;
         });
         const promise = term.progressBar(100, 100);
-        capturedCb!("^C");
+        capturedCb!('^C');
         await expect(promise).rejects.toBeDefined();
     });
 });

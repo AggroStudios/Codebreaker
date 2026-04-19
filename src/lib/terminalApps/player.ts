@@ -1,6 +1,6 @@
-import Terminal from "../terminal";
-import { TerminalApp } from "../../includes/Terminal.interface";
-import { NotificationLevel } from "../../includes/OperatingSystem.interface";
+import Terminal from '../terminal';
+import { TerminalApp } from '../../includes/Terminal.interface';
+import { NotificationLevel } from '../../includes/OperatingSystem.interface';
 
 class FetchPlayer extends TerminalApp {
     constructor(terminal: Terminal) {
@@ -27,19 +27,19 @@ class FetchPlayer extends TerminalApp {
         - player help
         - player give 40
         `
-            .split("\n")
+            .split('\n')
             .forEach((line) => this.terminal.stdout(line));
     }
 
     async run(argc: number, argv: string[]) {
         if (argc < 1) {
-            this.terminal.stdout("Fetch Player...");
+            this.terminal.stdout('Fetch Player...');
             this.terminal.log(this.terminal.operatingSystem.player);
         } else {
             switch (argv[0]) {
-                case "give": {
+                case 'give': {
                     if (argc < 2) {
-                        this.terminal.stderr("Error: Amount is undefined.\n");
+                        this.terminal.stderr('Error: Amount is undefined.\n');
                         this.help();
                         break;
                     }
@@ -48,9 +48,9 @@ class FetchPlayer extends TerminalApp {
                     this.terminal.stdout(`Gave player ${giveAmount} money.`);
                     break;
                 }
-                case "take": {
+                case 'take': {
                     if (argc < 2) {
-                        this.terminal.stderr("Error: Amount is undefined.\n");
+                        this.terminal.stderr('Error: Amount is undefined.\n');
                         this.help();
                         break;
                     }
@@ -63,9 +63,9 @@ class FetchPlayer extends TerminalApp {
                     );
                     break;
                 }
-                case "xp": {
+                case 'xp': {
                     if (argc < 2) {
-                        this.terminal.stderr("Error: Amount is undefined.\n");
+                        this.terminal.stderr('Error: Amount is undefined.\n');
                         this.help();
                         break;
                     }
@@ -76,60 +76,60 @@ class FetchPlayer extends TerminalApp {
                     this.terminal.stdout(`Gave player ${xpAmount} experience.`);
                     break;
                 }
-                case "message":
+                case 'message':
                     if (argc < 2) {
-                        this.terminal.stderr("Error: Message is undefined.\n");
+                        this.terminal.stderr('Error: Message is undefined.\n');
                         this.help();
                         break;
                     }
                     this.terminal.operatingSystem.sendMessage(
-                        "System <system@codebreaker>",
-                        argv.slice(1).join(" "),
+                        'System <system@codebreaker>',
+                        argv.slice(1).join(' '),
                     );
-                    this.terminal.stdout("Message sent.");
+                    this.terminal.stdout('Message sent.');
                     break;
-                case "notifyInfo":
+                case 'notifyInfo':
                     if (argc < 2) {
-                        this.terminal.stderr("Error: Message is undefined.\n");
+                        this.terminal.stderr('Error: Message is undefined.\n');
                         this.help();
                         break;
                     }
                     this.terminal.operatingSystem.sendNotification(
-                        argv.slice(1).join(" "),
+                        argv.slice(1).join(' '),
                         NotificationLevel.INFO,
                     );
-                    this.terminal.stdout("Info notification sent.");
+                    this.terminal.stdout('Info notification sent.');
                     break;
-                case "notifyWarning":
+                case 'notifyWarning':
                     if (argc < 2) {
-                        this.terminal.stderr("Error: Message is undefined.\n");
+                        this.terminal.stderr('Error: Message is undefined.\n');
                         this.help();
                         break;
                     }
                     this.terminal.operatingSystem.sendNotification(
-                        argv.slice(1).join(" "),
+                        argv.slice(1).join(' '),
                         NotificationLevel.WARNING,
                     );
-                    this.terminal.stdout("Warning notification sent.");
+                    this.terminal.stdout('Warning notification sent.');
                     break;
-                case "notifyError":
+                case 'notifyError':
                     if (argc < 2) {
-                        this.terminal.stderr("Error: Message is undefined.\n");
+                        this.terminal.stderr('Error: Message is undefined.\n');
                         this.help();
                         break;
                     }
                     this.terminal.operatingSystem.sendNotification(
-                        argv.slice(1).join(" "),
+                        argv.slice(1).join(' '),
                         NotificationLevel.ERROR,
                     );
-                    this.terminal.stdout("Error notification sent.");
+                    this.terminal.stdout('Error notification sent.');
                     break;
                 default:
                     if (
-                        argv[0] === "-h" ||
-                        argv[0] === "--help" ||
-                        argv[0] === "help" ||
-                        argv[0] === "-?"
+                        argv[0] === '-h' ||
+                        argv[0] === '--help' ||
+                        argv[0] === 'help' ||
+                        argv[0] === '-?'
                     ) {
                         this.help();
                         break;

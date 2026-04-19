@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router';
 import { styled } from '@mui/material/styles';
 
@@ -57,7 +58,9 @@ export default function Layout() {
             <MainContainer background={getBackground(location.pathname)}>
                 <NavMenu />
                 <GameContainer>
-                    <Outlet />
+                    <Suspense fallback={null}>
+                        <Outlet />
+                    </Suspense>
                 </GameContainer>
             </MainContainer>
         </>

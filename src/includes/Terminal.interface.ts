@@ -1,4 +1,4 @@
-import Terminal from "../lib/terminal";
+import Terminal from '../lib/terminal';
 
 export interface ITerminalApp {
     run(argc: number, argv: string[]): void;
@@ -25,10 +25,10 @@ export class TerminalApp implements ITerminalApp {
     async processScript(script: ITerminalScript) {
         for (const step of script.steps) {
             switch (step.action) {
-                case "output":
+                case 'output':
                     this.terminal.stdout(step.message);
                     break;
-                case "showLoader":
+                case 'showLoader':
                     this.terminal.showLoader();
                     await new Promise((resolve) =>
                         setTimeout(resolve, step.delay),
@@ -40,7 +40,7 @@ export class TerminalApp implements ITerminalApp {
     }
 
     async run(_?: number, __?: string[]): Promise<unknown> {
-        throw new Error("Not Implemented.");
+        throw new Error('Not Implemented.');
     }
 }
 

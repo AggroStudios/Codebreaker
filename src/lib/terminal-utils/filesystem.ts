@@ -1,14 +1,14 @@
-import { lightBlue, lightGreen } from "@mui/material/colors";
+import { lightBlue, lightGreen } from '@mui/material/colors';
 
-import minimist from "minimist";
+import minimist from 'minimist';
 
-import { filter, isEmpty, uniq, uniqBy } from "lodash";
+import { filter, isEmpty, uniq, uniqBy } from 'lodash';
 
-import { colorizeString, decolorizeString } from "./display";
+import { colorizeString, decolorizeString } from './display';
 
-import { path } from "../utils";
+import { path } from '../utils';
 
-import { IApplication, TerminalApp } from "../../includes/Terminal.interface";
+import { IApplication, TerminalApp } from '../../includes/Terminal.interface';
 
 export interface IDirectory {
     path: string;
@@ -41,7 +41,7 @@ class Permissions {
         const perm = [this.owner, this.group, this.all];
         permission
             .toString()
-            .split("")
+            .split('')
             .forEach((v, k) => {
                 if (parseInt(v) & 4) {
                     perm[k].read = true;
@@ -62,7 +62,7 @@ class Permissions {
     }
 
     private permissionToString(permission: IPermission) {
-        return `${permission.read ? "r" : "-"}${permission.write ? "w" : "-"}${permission.execute ? "x" : "-"}`;
+        return `${permission.read ? 'r' : '-'}${permission.write ? 'w' : '-'}${permission.execute ? 'x' : '-'}`;
     }
 
     toString(): string {
@@ -75,9 +75,9 @@ interface IPermission {
     execute: boolean;
 }
 
-const stripLastSlash = (path: string) => path.replace(/\/$/, "");
+const stripLastSlash = (path: string) => path.replace(/\/$/, '');
 function stripTrailingSlashes(path: string) {
-    while (path.endsWith("/")) {
+    while (path.endsWith('/')) {
         path = stripLastSlash(path);
     }
     return path;
@@ -87,21 +87,21 @@ const directoryRegex = (path: string) =>
     new RegExp(`^${stripLastSlash(path)}/([a-zA-Z-_]+)$`);
 
 const getSubDirectories = (path: string, apps: IApplication[]) =>
-    uniqBy(apps, "path")
+    uniqBy(apps, 'path')
         .filter((app: IApplication) => app.path.match(directoryRegex(path)))
         .map(
             (app: IApplication): IDirectory => ({
-                path: app.path.split("/").pop(),
+                path: app.path.split('/').pop(),
                 absolutePath: path,
-                owner: "root",
-                group: "admin",
+                owner: 'root',
+                group: 'admin',
                 permissions: new Permissions(644),
                 directory: true,
             }),
         );
 
 export default class FileSystem {
-    private _cwd: string = "/";
+    private _cwd: string = '/';
     private apps: IApplication[];
 
     constructor(apps: IApplication[]) {
@@ -114,46 +114,46 @@ export default class FileSystem {
 
     cat([passedPath]: string[]) {
         if (isEmpty(passedPath)) {
-            throw new Error("Path is empty.");
+            throw new Error('Path is empty.');
         }
         const file = this.apps.find(
-            (app) => app.cmd === passedPath && app.contentType === "text/plain",
+            (app) => app.cmd === passedPath && app.contentType === 'text/plain',
         );
         if (isEmpty(file)) {
             throw new Error(`File not found: ${passedPath}`);
         }
         const outputArray = [];
 
-        for (const line of file.content.split("\r\n")) {
-            outputArray.push(line.replaceAll(" ", "\u00a0"));
+        for (const line of file.content.split('\r\n')) {
+            outputArray.push(line.replaceAll(' ', '\u00a0'));
         }
         return outputArray;
     }
 
     changeDirectory([passedPath]: string[]) {
         if (isEmpty(passedPath)) {
-            throw new Error("Path is empty.");
+            throw new Error('Path is empty.');
         }
 
         let destinationPath = stripTrailingSlashes(passedPath);
         switch (passedPath) {
-            case ".":
+            case '.':
                 // Do nothing, it's a valid path, but doesn't go anywhere.
                 break;
-            case "..":
+            case '..':
                 destinationPath =
-                    this._cwd.split("/").slice(0, -1).join("/") || "/";
+                    this._cwd.split('/').slice(0, -1).join('/') || '/';
                 break;
             default: {
                 // Create a new path to match the path you're going to.
                 let newPath = passedPath;
                 // This means we're resolving from a relative path
-                if (!newPath.startsWith("/")) {
+                if (!newPath.startsWith('/')) {
                     newPath = `${stripLastSlash(this._cwd)}/${passedPath}`;
                 }
                 // Find directories in the current working directory to find
                 const directories = uniq([
-                    "/",
+                    '/',
                     ...this.apps.map((app) => app.path),
                 ]);
                 // If the new path is a directory and it's the list of directories inside the current working directory, go ahead and move to it.
@@ -176,13 +176,13 @@ export default class FileSystem {
 
     resolvePath(command: string): typeof TerminalApp {
         if (isEmpty(command)) {
-            throw new Error("Path is empty.");
+            throw new Error('Path is empty.');
         }
 
         let resolvedPath = command;
 
         // This means we're resolving from a relative path
-        if (!command.startsWith("/")) {
+        if (!command.startsWith('/')) {
             resolvedPath = `${stripLastSlash(this._cwd)}/${command}`;
         }
 
@@ -203,17 +203,17 @@ export default class FileSystem {
     listDirectory(args: string[]) {
         const opts = {
             alias: {
-                a: "all",
-                l: "list",
+                a: 'all',
+                l: 'list',
             },
-            boolean: ["all", "list"],
+            boolean: ['all', 'list'],
         };
 
         const parsedArgs = minimist(args, opts);
 
         let resolvedPath = parsedArgs._[0] || this._cwd;
 
-        if (!resolvedPath.startsWith("/")) {
+        if (!resolvedPath.startsWith('/')) {
             resolvedPath = `${stripLastSlash(this._cwd)}/${resolvedPath}`;
         }
 
@@ -221,9 +221,9 @@ export default class FileSystem {
 
         const colorizePathType = (entry: IDirectory) => {
             if (entry.directory) {
-                return `${colorizeString(entry.path, lightBlue["500"])}/`;
+                return `${colorizeString(entry.path, lightBlue['500'])}/`;
             } else if (entry.permissions.isExecutable) {
-                return `${colorizeString(entry.path, lightGreen["500"])}`;
+                return `${colorizeString(entry.path, lightGreen['500'])}`;
             } else {
                 return entry.path;
             }
@@ -242,9 +242,9 @@ export default class FileSystem {
                         .map((entry) => {
                             const extraSpace =
                                 entry.length - decolorizeString(entry).length;
-                            return `${entry.padEnd(maxWidth + extraSpace, "\u00a0")}`;
+                            return `${entry.padEnd(maxWidth + extraSpace, '\u00a0')}`;
                         })
-                        .join("\u00a0\u00a0"),
+                        .join('\u00a0\u00a0'),
                 ];
             }
 
@@ -258,24 +258,24 @@ export default class FileSystem {
             return dir.map((entry) => {
                 const permissions = entry.permissions.toString();
                 const path = colorizePathType(entry);
-                return `${entry.directory ? "d" : "-"}${permissions}\u00a0\u00a0${entry.owner.padEnd(maxOwnerWidth, "\u00a0")}\u00a0\u00a0${entry.group.padEnd(maxGroupWidth, "\u00a0")}\u00a0\u00a0\u00a0${path}`;
+                return `${entry.directory ? 'd' : '-'}${permissions}\u00a0\u00a0${entry.owner.padEnd(maxOwnerWidth, '\u00a0')}\u00a0\u00a0${entry.group.padEnd(maxGroupWidth, '\u00a0')}\u00a0\u00a0\u00a0${path}`;
             });
         };
 
         const defaultDir: IDirectory[] = [
             {
-                path: ".",
+                path: '.',
                 hidden: true,
-                owner: "root",
-                group: "admin",
+                owner: 'root',
+                group: 'admin',
                 permissions: new Permissions(644),
                 directory: true,
             },
             {
-                path: "..",
+                path: '..',
                 hidden: true,
-                owner: "root",
-                group: "admin",
+                owner: 'root',
+                group: 'admin',
                 permissions: new Permissions(644),
                 directory: true,
             },
@@ -286,7 +286,7 @@ export default class FileSystem {
 
         const directory = path.format(parsed);
         const filteredDirs = getSubDirectories(directory, this.apps);
-        const foundDir = uniq(["/", ...this.apps.map((app) => app.path)]).find(
+        const foundDir = uniq(['/', ...this.apps.map((app) => app.path)]).find(
             (o) => o === directory,
         );
 
@@ -294,31 +294,31 @@ export default class FileSystem {
             dirToList = directory;
         } else {
             const reserved = [
-                "\\",
-                ".",
-                "+",
-                "?",
-                "[",
-                "^",
-                "]",
-                "$",
-                "(",
-                ")",
-                "{",
-                "}",
-                "=",
-                "!",
-                "<",
-                ">",
-                "|",
-                ":",
-                "-",
+                '\\',
+                '.',
+                '+',
+                '?',
+                '[',
+                '^',
+                ']',
+                '$',
+                '(',
+                ')',
+                '{',
+                '}',
+                '=',
+                '!',
+                '<',
+                '>',
+                '|',
+                ':',
+                '-',
             ];
             const escaped = reserved.reduce(
                 (acc, cur) => acc.replaceAll(cur, `\\${cur}`),
                 parsed.base,
             );
-            searchPattern = new RegExp(`^${escaped.replaceAll("*", "(.*)")}$`);
+            searchPattern = new RegExp(`^${escaped.replaceAll('*', '(.*)')}$`);
             dirToList = parsed.dir;
         }
 
@@ -329,8 +329,8 @@ export default class FileSystem {
                 if (cur.path === dirToList) {
                     acc.push({
                         path: cur.cmd,
-                        owner: "root",
-                        group: "admin",
+                        owner: 'root',
+                        group: 'admin',
                         permissions: new Permissions(cur.permissions),
                         directory: false,
                     });

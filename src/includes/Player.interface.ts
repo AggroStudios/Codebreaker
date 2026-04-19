@@ -1,4 +1,4 @@
-import { Notification, Message } from "./OperatingSystem.interface";
+import { Notification, Message } from './OperatingSystem.interface';
 
 export const experienceForLevel = (level: number) =>
     Math.floor(100 * Math.pow(2.5, level - 1));

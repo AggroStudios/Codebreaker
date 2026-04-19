@@ -1,4 +1,4 @@
-import Process, { StationStoreType } from "../includes/Process.interface";
+import Process, { StationStoreType } from '../includes/Process.interface';
 
 export default class CpuActivity implements Process {
     private maxDataPoints: number;
@@ -45,7 +45,7 @@ export default class CpuActivity implements Process {
     }
 
     public get id() {
-        return "cpuActivity";
+        return 'cpuActivity';
     }
 
     public set state(state: StationStoreType) {

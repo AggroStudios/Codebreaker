@@ -1,7 +1,7 @@
-import Terminal from "../terminal";
-import { TerminalApp } from "../../includes/Terminal.interface";
+import Terminal from '../terminal';
+import { TerminalApp } from '../../includes/Terminal.interface';
 
-import sequence from "../campaignScenarios/boot.json";
+import sequence from '../campaignScenarios/boot.json';
 
 class BootSequence extends TerminalApp {
     constructor(terminal: Terminal) {
@@ -27,11 +27,11 @@ class BootSequence extends TerminalApp {
     }
 
     private async captureAnswer() {
-        return await this.terminal.readLine("Solution: ");
+        return await this.terminal.readLine('Solution: ');
     }
 
     async run(_: number, __: string[]) {
-        const answer = "There can not be light without darkness";
+        const answer = 'There can not be light without darkness';
         let tryCount = 3;
 
         await this.processScript(sequence);
@@ -40,21 +40,21 @@ class BootSequence extends TerminalApp {
 
         while (tryCount > 0) {
             if ((await this.captureAnswer()) === answer) {
-                this.terminal.stdout("");
-                this.terminal.stdout(">> Decryption successful.");
+                this.terminal.stdout('');
+                this.terminal.stdout('>> Decryption successful.');
                 this.terminal.stdout(
                     ">> Welcome, Operative. You've passed the first test.",
                 );
                 this.terminal.stdout(
-                    ">> Objective unlocked: Solve 5 encrypted messages.",
+                    '>> Objective unlocked: Solve 5 encrypted messages.',
                 );
                 return;
             } else {
-                this.terminal.stderr("Decryption failed. Try again!");
+                this.terminal.stderr('Decryption failed. Try again!');
                 tryCount--;
             }
         }
-        this.terminal.stderr(">> Decryption failed. Boot sequence aborted.");
+        this.terminal.stderr('>> Decryption failed. Boot sequence aborted.');
         return;
     }
 }

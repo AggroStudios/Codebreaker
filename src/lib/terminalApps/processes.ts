@@ -1,6 +1,6 @@
-import Terminal from "../terminal";
-import { TerminalApp } from "../../includes/Terminal.interface";
-import OperatingSystem from "../OperatingSystem";
+import Terminal from '../terminal';
+import { TerminalApp } from '../../includes/Terminal.interface';
+import OperatingSystem from '../OperatingSystem';
 
 class Processes extends TerminalApp {
     private operatingSystem: OperatingSystem;
@@ -19,38 +19,38 @@ class Processes extends TerminalApp {
                     this.terminal.operatingSystem.listProcesses(),
                 );
                 break;
-            case "start":
+            case 'start':
                 if (this.operatingSystem.isRunning) {
                     this.terminal.stderr(
-                        "Operating system is already running.",
+                        'Operating system is already running.',
                     );
                 } else {
-                    this.terminal.stdout("Starting operating system...");
+                    this.terminal.stdout('Starting operating system...');
                     this.operatingSystem.startGameLoop();
                 }
                 break;
-            case "stop":
+            case 'stop':
                 if (!this.operatingSystem.isRunning) {
-                    this.terminal.stderr("Operating system is not running.");
+                    this.terminal.stderr('Operating system is not running.');
                 } else {
-                    this.terminal.stdout("Stopping operating system...");
+                    this.terminal.stdout('Stopping operating system...');
                     this.operatingSystem.stopGameLoop();
                 }
                 break;
-            case "toggle":
-                this.terminal.stdout("Toggling operating system...");
+            case 'toggle':
+                this.terminal.stdout('Toggling operating system...');
                 this.operatingSystem.toggleGameLoop();
                 break;
-            case "reset":
+            case 'reset':
                 if (this.operatingSystem.isRunning) {
                     this.operatingSystem.stopGameLoop();
                 }
                 this.operatingSystem.resetProcesses();
-                this.terminal.stdout("Stopping operating reset.");
+                this.terminal.stdout('Stopping operating reset.');
                 break;
-            case "status":
+            case 'status':
                 this.terminal.stdout(
-                    `Stopping operating Status: Frame: ${this.operatingSystem.frame.toFixed(3)}, Exponent: ${this.operatingSystem.exponent}, Running? ${this.operatingSystem.isRunning ? "Yes" : "No"}`,
+                    `Stopping operating Status: Frame: ${this.operatingSystem.frame.toFixed(3)}, Exponent: ${this.operatingSystem.exponent}, Running? ${this.operatingSystem.isRunning ? 'Yes' : 'No'}`,
                 );
                 break;
             default:

@@ -1,5 +1,5 @@
-import { ICipherType } from "./Cipher.interface";
-import { StationStoreType } from "./Process.interface";
+import { ICipherType } from './Cipher.interface';
+import { StationStoreType } from './Process.interface';
 
 export interface CounterState {
     runningProcesses: {id: string, type: ICipherType}[];

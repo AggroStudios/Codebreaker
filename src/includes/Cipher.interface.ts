@@ -1,13 +1,13 @@
-import Cipher from "../lib/Cipher";
+import Cipher from '../lib/Cipher';
 
 export enum CipherState {
-    IDLE = undefined,
-    DOWNLOADING = "Download",
-    BREAKING = "Breaking",
-    SUCCESS = "Success",
-    CANCELLED = "Cancelled",
-    FAILURE = "Failure",
-    PAUSED = "Paused",
+    IDLE = 'Idle',
+    DOWNLOADING = 'Download',
+    BREAKING = 'Breaking',
+    SUCCESS = 'Success',
+    CANCELLED = 'Cancelled',
+    FAILURE = 'Failure',
+    PAUSED = 'Paused',
 }
 
 export type CipherProps = {
@@ -16,12 +16,12 @@ export type CipherProps = {
 };
 
 export enum BlockUnit {
-    bytes = "B",
-    kilobytes = "KB",
-    megabytes = "MB",
-    gigabytes = "GB",
-    terabytes = "TB",
-    petabytes = "PB",
+    bytes = 'B',
+    kilobytes = 'KB',
+    megabytes = 'MB',
+    gigabytes = 'GB',
+    terabytes = 'TB',
+    petabytes = 'PB',
 }
 
 export interface ICipherType {
@@ -46,15 +46,17 @@ export interface CipherBreakState {
     grids: Record<string, IGridItem[] | undefined>;
     progress: Record<string, number | undefined>;
     types: Record<string, ICipherType | undefined>;
+    states: Record<string, CipherState | undefined>;
     setCipher: (id: string, cipher: Cipher | undefined) => void;
     setGrid: (id: string, grid: IGridItem[]) => void;
     setProgress: (id: string, progress: number) => void;
     setType: (id: string, type: ICipherType) => void;
+    setState: (id: string, state: CipherState) => void;
 }
 
 export const CipherTypes: ICipherType[] = [
     {
-        name: "Cipher 1",
+        name: 'Cipher 1',
         complexity: 1,
         parallelism: 1,
         block: {
@@ -65,7 +67,7 @@ export const CipherTypes: ICipherType[] = [
         xp: 10,
     },
     {
-        name: "Cipher 2",
+        name: 'Cipher 2',
         complexity: 1.8,
         parallelism: 2,
         block: {
@@ -76,7 +78,7 @@ export const CipherTypes: ICipherType[] = [
         xp: 12,
     },
     {
-        name: "Cipher 3",
+        name: 'Cipher 3',
         complexity: 2.5,
         parallelism: 3,
         block: {

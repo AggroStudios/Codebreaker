@@ -1,7 +1,7 @@
-import Terminal from "../terminal";
-import { TerminalApp } from "../../includes/Terminal.interface";
-import { HackingScenarios } from "../hackingScenarios";
-import { isEmpty } from "lodash";
+import Terminal from '../terminal';
+import { TerminalApp } from '../../includes/Terminal.interface';
+import { HackingScenarios } from '../hackingScenarios';
+import { isEmpty } from 'lodash';
 
 export default class ScanVulnerabilities extends TerminalApp {
     constructor(terminal: Terminal) {
@@ -16,25 +16,25 @@ export default class ScanVulnerabilities extends TerminalApp {
         Example:
         - scan 10.0.0.1
         `
-            .split("\n")
+            .split('\n')
             .forEach((line) => this.terminal.stdout(line));
     }
 
     async run(argc: number, argv: string[]) {
         const ipAddress = argv[0];
         if (argc < 1) {
-            this.terminal.stderr("Error: IP Address is undefined.\n");
+            this.terminal.stderr('Error: IP Address is undefined.\n');
             this.help();
             return;
         }
 
-        if (ipAddress === "help" || ipAddress === "-h" || ipAddress === "-?") {
+        if (ipAddress === 'help' || ipAddress === '-h' || ipAddress === '-?') {
             this.help();
             return;
         }
 
         if (isEmpty(ipAddress)) {
-            this.terminal.stdout("Error: IP Address is undefined.\n");
+            this.terminal.stdout('Error: IP Address is undefined.\n');
             this.help();
             return;
         }

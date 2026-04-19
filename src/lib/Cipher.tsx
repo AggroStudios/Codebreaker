@@ -7,7 +7,8 @@ import { dataSizeFromSuffix } from './utils';
 export interface CipherDelegate {
     setGrid: (grid: IGridItem[]) => void;
     setProgress: (progress: number) => void;
-    completeCipher: (cancelled: boolean) => void;
+    setState: (state: CipherState) => void;
+    completeCipher: (cipher: Cipher, cancelled: boolean) => void;
 }
 
 export default class Cipher implements Process {
@@ -58,6 +59,7 @@ export default class Cipher implements Process {
 
         this._stationOs.addProcess(this);
         this._stationNet.addProcess(this);
+        this.state = this._state;
     }
 
     public get characterGrid() {
@@ -88,6 +90,12 @@ export default class Cipher implements Process {
         return this._percentUse / 100;
     }
 
+    public reset() {
+        this.delegate.setGrid([]);
+        this.delegate.setProgress(0);
+        this.state = CipherState.IDLE;
+    }
+
     public pause() {
         this._paused = true;
         if (
@@ -115,6 +123,7 @@ export default class Cipher implements Process {
 
     private set state(value: CipherState) {
         this._state = value;
+        this.delegate.setState(value);
     }
 
     private set progress(value: number) {
@@ -168,13 +177,12 @@ export default class Cipher implements Process {
             );
         }
 
-        if (this.frame > 0 && this.frame % 10 === 0) {
+        if (this.frame > 0 && this.frame % 5 === 0) {
             this.randomizeGrid();
         }
 
         if (this.unsolvedIndexes.size === 0) {
             this.randomizeGrid();
-            console.log('Cipher breaking completed!');
             this.state = CipherState.SUCCESS;
         }
     }
@@ -192,7 +200,6 @@ export default class Cipher implements Process {
         }
 
         if (this.downloadedBlocks >= this.cipherSize) {
-            console.log('Cipher downloaded! Starting breaking...');
             this.state = CipherState.BREAKING;
             this.progress = 0;
             this._stationNet.removeProcess(this);
@@ -212,13 +219,12 @@ export default class Cipher implements Process {
                 break;
             case CipherState.SUCCESS:
                 this._stationOs.removeProcess(this);
-                this.delegate.completeCipher(false);
+                this.delegate.completeCipher(this, false);
                 break;
             case CipherState.CANCELLED:
-                console.log('Cipher cancelled!');
                 this._stationOs.removeProcess(this);
                 this._stationNet.removeProcess(this);
-                this.delegate.completeCipher(true);
+                this.delegate.completeCipher(this, true);
                 break;
             case CipherState.FAILURE:
                 throw new Error('Cipher failed!');

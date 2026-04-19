@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { CounterState } from '../includes/Counter.interface';
 import { StationStoreType } from '../includes/Process.interface';
-import { CipherBreakState, ICipherType, IGridItem } from '../includes/Cipher.interface';
+import { CipherBreakState, CipherState, ICipherType, IGridItem } from '../includes/Cipher.interface';
 import Cipher from '../lib/Cipher';
 
 export const useCipherStore = create<CounterState>((set) => ({
@@ -25,6 +25,7 @@ export const useCipherBreakStore = create<CipherBreakState>((set) => ({
     grids: {},
     progress: {},
     types: {},
+    states: {},
     setCipher: (id: string, cipher: Cipher | undefined) =>
         set((state) => ({
             ciphers: { ...state.ciphers, [id]: cipher },
@@ -40,5 +41,9 @@ export const useCipherBreakStore = create<CipherBreakState>((set) => ({
     setType: (id: string, type: ICipherType) =>
         set((state) => ({
             types: { ...state.types, [id]: type },
+        })),
+    setState: (id: string, state: CipherState) =>
+        set((s) => ({
+            states: { ...s.states, [id]: state },
         })),
 }));
