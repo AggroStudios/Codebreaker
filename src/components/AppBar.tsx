@@ -1,4 +1,4 @@
-import { memo, useCallback, useState, type MouseEvent as ReactMouseEvent } from 'react';
+import { memo, useCallback, useEffect, useState, type MouseEvent as ReactMouseEvent } from 'react';
 
 import {
     Box,
@@ -92,12 +92,23 @@ const notificationIcon = (level: NotificationLevel) => {
 
 const GameFrameCounter = memo(function GameFrameCounter() {
     const { stationProxy, useStationStore } = useStationContext();
-    const frame = useStationStore((s) => s.frame);
-    const count = useStationStore((s) => s.count);
-    const exponent = useStationStore((s) => s.exponent);
     const isRunning = useStationStore((s) => s.isRunning);
     const playing = useMusicPlayerStore((s) => s.playing);
     const playMusic = useMusicPlayerStore((s) => s.play);
+
+    const [display, setDisplay] = useState(() => {
+        const s = useStationStore.getState();
+        return { frame: s.frame, count: s.count, exponent: s.exponent };
+    });
+
+    useEffect(() => {
+        const id = setInterval(() => {
+            const { frame, count, exponent } = useStationStore.getState();
+            setDisplay({ frame, count, exponent });
+        }, 100);
+        return () => clearInterval(id);
+    }, [useStationStore]);
+
     const handleToggle = useCallback(
         () => {
             stationProxy.os?.toggleGameLoop();
@@ -105,7 +116,7 @@ const GameFrameCounter = memo(function GameFrameCounter() {
                 playMusic();
             }
         },
-        [stationProxy],
+        [stationProxy, playing, playMusic],
     );
     return (
         <Typography
@@ -114,7 +125,7 @@ const GameFrameCounter = memo(function GameFrameCounter() {
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' } }}
         >
-            Frame: {frame.toFixed(3)} | Count: {count} | Exponent: {exponent}
+            Frame: {display.frame.toFixed(3)} | Count: {display.count} | Exponent: {display.exponent}
             <IconButton
                 size="large"
                 aria-label="Start/Stop Game Timer"
@@ -129,7 +140,9 @@ const GameFrameCounter = memo(function GameFrameCounter() {
 });
 
 export default function AppBarComponent() {
-    const player = usePlayerStore((s) => s.player);
+    const money = usePlayerStore((s) => s.player.money);
+    const messages = usePlayerStore((s) => s.player.messages);
+    const notifications = usePlayerStore((s) => s.player.notifications);
     const moneyLabel = usePlayerStore((s) => s.moneyLabel);
     const markAllNotificationsAsRead = usePlayerStore(
         (s) => s.markAllNotificationsAsRead,
@@ -201,8 +214,8 @@ export default function AppBarComponent() {
     const messageId = 'primary-search-message-menu';
     const mobileMenuId = 'primary-search-account-menu-mobile';
 
-    const unreadMessages = player.messages.filter((m) => m.unread).length;
-    const unreadNotifications = player.notifications.filter(
+    const unreadMessages = messages.filter((m) => m.unread).length;
+    const unreadNotifications = notifications.filter(
         (n) => n.unread,
     ).length;
 
@@ -250,7 +263,7 @@ export default function AppBarComponent() {
                                 amount={moneyLabel.amount}
                             />
                         )}
-                        $: {player.money.toFixed(2)}
+                        $: {money.toFixed(2)}
                     </Box>
                     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                         <IconButton
@@ -396,8 +409,8 @@ export default function AppBarComponent() {
                 open={isNotificationMenuOpen}
                 onClose={handleNotificationMenuClose}
             >
-                {player.notifications.length > 0 ? (
-                    player.notifications.map((notification, index) => (
+                {notifications.length > 0 ? (
+                    notifications.map((notification, index) => (
                         <MenuItem
                             key={index}
                             onClick={() => markNotificationAsRead(index)}
@@ -434,8 +447,8 @@ export default function AppBarComponent() {
                 open={isMessageMenuOpen}
                 onClose={handleMessageMenuClose}
             >
-                {player.messages.length > 0 ? (
-                    player.messages.map((message, index) => (
+                {messages.length > 0 ? (
+                    messages.map((message, index) => (
                         <MenuItem
                             key={index}
                             onClick={() => markMessageAsRead(index)}

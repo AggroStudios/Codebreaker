@@ -1,6 +1,8 @@
 import {
+    memo,
     useCallback,
     useEffect,
+    useMemo,
     useRef,
     useState,
     type KeyboardEvent as ReactKeyboardEvent,
@@ -41,6 +43,57 @@ type TerminalOutputOptions = {
 };
 
 const terminalTheme = createTheme();
+
+function displayPrompt(prompt: string, error = false) {
+    return <span className={clsx(error ? 'error' : 'prompt')}>{prompt}</span>;
+}
+
+function displayLine(line: string) {
+    const colorRegex = /\^\[(.*?);(.*?)\^\]/g;
+    const matches = [...line.matchAll(colorRegex)];
+    if (isEmpty(matches)) {
+        return <span>{line}</span>;
+    }
+    const elements: { text: string; color?: string }[] = [];
+    let remainder = line;
+    matches.forEach((match) => {
+        const [original, color, text] = match;
+        const split = remainder.split(original, 2);
+        if (!isEmpty(split[0])) {
+            elements.push({ text: split[0] });
+        }
+        elements.push({ color, text });
+        remainder = split[1];
+    });
+    if (!isEmpty(remainder)) {
+        elements.push({ text: remainder });
+    }
+
+    return elements.map((element, idx) =>
+        element.color ? (
+            <span key={idx} style={{ color: element.color }}>
+                {element.text}
+            </span>
+        ) : (
+            <span key={idx}>{element.text}</span>
+        ),
+    );
+}
+
+const TerminalHistoryLine = memo(function TerminalHistoryLine({
+    line,
+}: {
+    line: TerminalLine;
+}) {
+    return (
+        <div>
+            <span className={clsx(line.error ? 'commandError' : '')}>
+                {line.prompt && displayPrompt(line.prompt, line.error)}
+                {displayLine(line.value)}
+            </span>
+        </div>
+    );
+});
 
 export default function Terminal({
     terminalController,
@@ -218,14 +271,17 @@ export default function Terminal({
         }
     }, [commandLoaded]);
 
-    const terminalFunctions: Record<string, () => void> = {
-        clear: () => clearTerminal(),
-        reboot: () => {
-            terminalController.reset();
-            setTerminalLoaded(false);
-            clearTerminal();
-        },
-    };
+    const terminalFunctions = useMemo<Record<string, () => void>>(
+        () => ({
+            clear: () => clearTerminal(),
+            reboot: () => {
+                terminalController.reset();
+                setTerminalLoaded(false);
+                clearTerminal();
+            },
+        }),
+        [clearTerminal, terminalController],
+    );
 
     const handleKeyUp = async (event: ReactKeyboardEvent<HTMLInputElement>) => {
         const target = event.currentTarget;
@@ -382,42 +438,6 @@ export default function Terminal({
         }
     };
 
-    const displayPrompt = (prompt: string, error = false) => (
-        <span className={clsx(error ? 'error' : 'prompt')}>{prompt}</span>
-    );
-
-    const displayLine = (line: string) => {
-        const colorRegex = /\^\[(.*?);(.*?)\^\]/g;
-        const matches = [...line.matchAll(colorRegex)];
-        if (isEmpty(matches)) {
-            return <span>{line}</span>;
-        }
-        const elements: { text: string; color?: string }[] = [];
-        let remainder = line;
-        matches.forEach((match) => {
-            const [original, color, text] = match;
-            const split = remainder.split(original, 2);
-            if (!isEmpty(split[0])) {
-                elements.push({ text: split[0] });
-            }
-            elements.push({ color, text });
-            remainder = split[1];
-        });
-        if (!isEmpty(remainder)) {
-            elements.push({ text: remainder });
-        }
-
-        return elements.map((element, idx) =>
-            element.color ? (
-                <span key={idx} style={{ color: element.color }}>
-                    {element.text}
-                </span>
-            ) : (
-                <span key={idx}>{element.text}</span>
-            ),
-        );
-    };
-
     const displayLineWithCursor = (line: string) => {
         const pos = cursorPosition + cursorOffset;
         return (
@@ -458,30 +478,22 @@ export default function Terminal({
                             tabIndex={-1}
                             onKeyUp={() => inputRef.current?.focus()}
                         >
-                            {terminalLines.map(
+                            {terminalLines.slice(0, -1).map(
                                 (line: TerminalLine, index: number) => (
-                                    <div key={index}>
-                                        <span
-                                            className={clsx(
-                                                line.error
-                                                    ? 'commandError'
-                                                    : '',
-                                            )}
-                                        >
-                                            {line.prompt &&
-                                                displayPrompt(
-                                                    line.prompt,
-                                                    line.error,
-                                                )}
-                                            {index < terminalLines.length - 1
-                                                ? displayLine(line.value)
-                                                : displayLineWithCursor(
-                                                      line.value,
-                                                  )}
-                                        </span>
-                                    </div>
+                                    <TerminalHistoryLine key={index} line={line} />
                                 ),
                             )}
+                            {terminalLines.length > 0 && (() => {
+                                const activeLine = terminalLines[terminalLines.length - 1];
+                                return (
+                                    <div key={terminalLines.length - 1}>
+                                        <span className={clsx(activeLine.error ? 'commandError' : '')}>
+                                            {activeLine.prompt && displayPrompt(activeLine.prompt, activeLine.error)}
+                                            {displayLineWithCursor(activeLine.value)}
+                                        </span>
+                                    </div>
+                                );
+                            })()}
                         </Content>
                     </div>
                 </div>
