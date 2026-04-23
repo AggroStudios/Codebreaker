@@ -31,6 +31,8 @@ export interface PlayerState {
     addNotification: (notification: Notification) => void;
     addMessage: (message: Message) => void;
     markMessageAsRead: (index: number) => void;
-    markNotificationAsRead: (index: number) => void;    
+    markNotificationAsRead: (index: number) => void;
     markAllNotificationsAsRead: () => void;
+    deleteNotification: (index: number) => void;
+    deleteAllNotifications: () => void;
 }

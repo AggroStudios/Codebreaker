@@ -201,6 +201,16 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
                 if (!cancelled) {
                     station.os?.player.earnExperience(cipherType.xp);
                     station.os?.player.addMoney(cipherType.payout);
+                    station.os?.sendNotification(
+                        `You have earned ${cipherType.xp} XP and $${cipherType.payout}.`,
+                        NotificationLevel.INFO,
+                    );
+                }
+                else {
+                    station.os?.sendNotification(
+                        `You have cancelled the cipher.`,
+                        NotificationLevel.WARNING,
+                    );
                 }
                 setTimeout(() => {
                     cipher.reset();

@@ -137,6 +137,19 @@ export const usePlayerStore = create<PlayerState>((set) => ({
                 })),
             },
         })),
+    deleteNotification: (index: number) =>
+        set((state) => ({
+            player: {
+                ...state.player,
+                notifications: state.player.notifications.filter(
+                    (_, i) => i !== index,
+                ),
+            },
+        })),
+    deleteAllNotifications: () =>
+        set((state) => ({
+            player: { ...state.player, notifications: [] },
+        })),
 }));
 
 /**

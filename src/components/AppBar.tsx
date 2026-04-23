@@ -12,6 +12,13 @@ import {
     Badge,
     ListItemIcon,
     ListItemText,
+    Divider,
+    Tooltip,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
 } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 
@@ -26,6 +33,10 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import InfoTwoTone from '@mui/icons-material/InfoTwoTone';
 import WarningTwoTone from '@mui/icons-material/WarningTwoTone';
 import ErrorTwoTone from '@mui/icons-material/ErrorTwoTone';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import CheckIcon from '@mui/icons-material/Check';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import CodeBreakerLogo from '../assets/logos/codebreaker-logo.png';
 import './AppBar.scss';
@@ -151,6 +162,10 @@ export default function AppBarComponent() {
     const markNotificationAsRead = usePlayerStore(
         (s) => s.markNotificationAsRead,
     );
+    const deleteNotification = usePlayerStore((s) => s.deleteNotification);
+    const deleteAllNotifications = usePlayerStore(
+        (s) => s.deleteAllNotifications,
+    );
 
     const { moneyAnchorRef } = useAnchors();
 
@@ -165,6 +180,9 @@ export default function AppBarComponent() {
     );
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [aboutOpen, setAboutOpen] = useState(false);
+    const [deleteConfirm, setDeleteConfirm] = useState<
+        { mode: 'one'; index: number } | { mode: 'all' } | null
+    >(null);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileAnchorEl);
@@ -183,7 +201,6 @@ export default function AppBarComponent() {
         event: ReactMouseEvent<HTMLElement>,
     ) => {
         setNotificationAnchorEl(event.currentTarget);
-        markAllNotificationsAsRead();
     };
 
     const handleMessageMenuOpen = (event: ReactMouseEvent<HTMLElement>) => {
@@ -410,26 +427,84 @@ export default function AppBarComponent() {
                 onClose={handleNotificationMenuClose}
             >
                 {notifications.length > 0 ? (
-                    notifications.map((notification, index) => (
+                    [
+                        ...notifications.map((notification, index) => (
+                            <MenuItem key={index} disableRipple sx={{ gap: 1 }}>
+                                <ListItemIcon>
+                                    {notificationIcon(notification.level)}
+                                </ListItemIcon>
+                                <ListItemText
+                                    primary={notification.message}
+                                    sx={{
+                                        mr: 1,
+                                        '& .MuiListItemText-primary': {
+                                            fontWeight: notification.unread ? 700 : 400,
+                                        },
+                                    }}
+                                />
+                                <Tooltip title="Mark as read">
+                                    <span>
+                                        <IconButton
+                                            size="small"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                markNotificationAsRead(index);
+                                            }}
+                                            disabled={!notification.unread}
+                                            sx={{ outline: 0 }}
+                                        >
+                                            <CheckIcon fontSize="small" />
+                                        </IconButton>
+                                    </span>
+                                </Tooltip>
+                                <Tooltip title="Delete">
+                                    <IconButton
+                                        size="small"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDeleteConfirm({ mode: 'one', index });
+                                        }}
+                                        sx={{ outline: 0 }}
+                                    >
+                                        <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                            </MenuItem>
+                        )),
+                        <Divider key="__divider" />,
                         <MenuItem
-                            key={index}
-                            onClick={() => markNotificationAsRead(index)}
+                            key="__actions"
+                            disableRipple
+                            sx={{
+                                justifyContent: 'flex-end',
+                                gap: 0.5,
+                                py: 0.5,
+                                '&:hover': { backgroundColor: 'transparent' },
+                            }}
                         >
-                            <ListItemIcon>
-                                {notificationIcon(notification.level)}
-                            </ListItemIcon>
-                            <ListItemText
-                                style={{
-                                    fontWeight: notification.unread
-                                        ? 'bold'
-                                        : 'normal',
-                                }}
-                                primary={notification.message}
-                            >
-                                {notification.message}
-                            </ListItemText>
-                        </MenuItem>
-                    ))
+                            <Tooltip title="Mark all as read">
+                                <span>
+                                    <IconButton
+                                        size="small"
+                                        onClick={markAllNotificationsAsRead}
+                                        disabled={notifications.every((n) => !n.unread)}
+                                        sx={{ outline: 0 }}
+                                    >
+                                        <DoneAllIcon fontSize="small" />
+                                    </IconButton>
+                                </span>
+                            </Tooltip>
+                            <Tooltip title="Delete all">
+                                <IconButton
+                                    size="small"
+                                    onClick={() => setDeleteConfirm({ mode: 'all' })}
+                                    sx={{ outline: 0 }}
+                                >
+                                    <DeleteSweepIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        </MenuItem>,
+                    ]
                 ) : (
                     <MenuItem onClick={handleNotificationMenuClose}>
                         <span style={{ fontWeight: 'bold' }}>
@@ -438,6 +513,39 @@ export default function AppBarComponent() {
                     </MenuItem>
                 )}
             </Menu>
+
+            <Dialog
+                open={deleteConfirm !== null}
+                onClose={() => setDeleteConfirm(null)}
+                maxWidth="xs"
+                fullWidth
+            >
+                <DialogTitle>Delete notification{deleteConfirm?.mode === 'all' ? 's' : ''}?</DialogTitle>
+                <DialogContent>
+                    {deleteConfirm?.mode === 'all'
+                        ? 'This will permanently delete all notifications.'
+                        : 'This will permanently delete this notification.'}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteConfirm(null)} sx={{ outline: 0 }}>
+                        Cancel
+                    </Button>
+                    <Button
+                        color="error"
+                        onClick={() => {
+                            if (deleteConfirm?.mode === 'all') {
+                                deleteAllNotifications();
+                            } else if (deleteConfirm?.mode === 'one') {
+                                deleteNotification(deleteConfirm.index);
+                            }
+                            setDeleteConfirm(null);
+                        }}
+                        sx={{ outline: 0 }}
+                    >
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Menu
                 anchorEl={messageAnchorEl}

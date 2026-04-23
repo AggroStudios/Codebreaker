@@ -45,6 +45,8 @@ describe('Terminal', () => {
             earnExperience: vi.fn(),
             addMoney: vi.fn(),
             removeMoney: vi.fn(),
+            deleteNotification: vi.fn(),
+            deleteAllNotifications: vi.fn(),
         });
         term.attachOperatingSystem(os);
         expect(term.operatingSystem).toBe(os);
