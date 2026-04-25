@@ -151,6 +151,7 @@ function PlayerLevel() {
 
     return (
         <Card
+            sx={{ flexShrink: 0, flexGrow: 0 }}
             ref={(el: HTMLElement | null) => {
                 xpAnchorRef.current = el;
             }}
@@ -186,13 +187,15 @@ export default function NavMenu() {
             style={{ display: 'flex' }}
         >
             <StyledDrawerContainer>
-                <Divider />
-                <MainListItems />
-                <Divider />
-                <SecondaryListItems />
-                <StyledDrawerSpacer />
+                <Box sx={{ flexShrink: 1, flexGrow: 1, overflow: 'auto' }}>
+                    <Divider />
+                    <MainListItems />
+                    <Divider />
+                    <SecondaryListItems />
+                    <StyledDrawerSpacer />
+                </Box>
                 <PlayerLevel />
-                <img src={AggroStudios} className="aggroLogo" />
+                <img src={AggroStudios} className="aggroLogo" style={{ flexShrink: 0, flexGrow: 0 }} />
             </StyledDrawerContainer>
         </StyledDrawer>
     );
