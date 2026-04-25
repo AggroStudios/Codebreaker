@@ -159,14 +159,11 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
     const { addProcess, removeProcess } = functions;
     const { notify } = useNotifier();
 
-    // Bootstrap a cipher for this slot if one isn't already tracked in the
-    // store. This runs on first mount AND on remount after tab switches, but
-    // the `!cipher` guard ensures we don't recreate an in-flight cipher.
-    useEffect(() => {
-        if (!cipher && id && type) {
-            handleAddCipher(type);
-        }
-    }, [id, type]);
+    // Always points to the latest completeCipher so delegates created once
+    // (on cipher construction) never call a stale closure.
+    const completeCipherRef = useRef<(cipher: Cipher, cancelled: boolean) => void>(
+        () => {},
+    );
 
     const handleAutoCipherChange = (event: ChangeEvent<HTMLInputElement>) => {
         setAutoCipher(event.target.checked);
@@ -194,17 +191,18 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
         }
     }, [cipherState]);
 
+    // Read cipherType from the store at call time, not from the closure, so
+    // this is always correct even when called from a long-lived delegate.
     const completeCipher = (cipher: Cipher, cancelled: boolean) => {
+        const currentType = useCipherBreakStore.getState().types[id ?? ''];
         if (!cancelled) {
-            console.log('Cipher Type:', cipherType);
-            station.os?.player.earnExperience(cipherType?.xp);
-            station.os?.player.addMoney(cipherType?.payout);
+            station.os?.player.earnExperience(currentType?.xp);
+            station.os?.player.addMoney(currentType?.payout);
             station.os?.sendNotification(
-                `You have earned ${cipherType?.xp} XP and $${cipherType?.payout}.`,
+                `You have earned ${currentType?.xp} XP and $${currentType?.payout}.`,
                 NotificationLevel.INFO,
             );
-        }
-        else {
+        } else {
             station.os?.sendNotification(
                 `You have cancelled the cipher.`,
                 NotificationLevel.WARNING,
@@ -213,10 +211,17 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
         setTimeout(() => {
             cipher.reset();
             if (autoCipher && !cancelled) {
-                handleAddCipher(cipherType);
+                const refreshType = useCipherBreakStore.getState().types[id ?? ''];
+                handleAddCipher(refreshType);
             }
         }, 1000);
     };
+
+    // Keep the ref in sync whenever the cipher type changes so delegates
+    // always call the latest version without needing to be recreated.
+    useEffect(() => {
+        completeCipherRef.current = completeCipher;
+    }, [cipherType]);
 
     const handleAddCipher = (cipherType: ICipherType) => {
         if (!id) return;
@@ -225,11 +230,13 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
         // than any single mount of this component (tab switches remount it),
         // so the delegate must not close over setState functions that belong
         // to an unmounted instance.
+        // completeCipher is called through the ref so the delegate never
+        // captures a stale closure regardless of when the cipher finishes.
         const delegate: CipherDelegate = {
             setGrid: (g) => setGrid(id, g),
             setProgress: (p) => setProgress(id, p),
             setState: (s) => setState(id, s),
-            completeCipher,
+            completeCipher: (c, cancelled) => completeCipherRef.current(c, cancelled),
         };
 
         try {
@@ -247,16 +254,17 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
         }
     };
 
+    // Bootstrap a cipher for this slot if one isn't already tracked in the
+    // store. This runs on first mount AND on remount after tab switches, but
+    // the `!cipher` guard ensures we don't recreate an in-flight cipher.
+    useEffect(() => {
+        if (!cipher && id && type) {
+            handleAddCipher(type);
+        }
+    }, [id, type]);
+
     useEffect(() => {
         setAutoCipher(enableAutoCipher);
-        if (cipher) {
-            cipher.delegate = {
-                setGrid: (g) => setGrid(id, g),
-                setProgress: (p) => setProgress(id, p),
-                setState: (s) => setState(id, s),
-                completeCipher,
-            };
-        }
     }, [enableAutoCipher]);
 
     const handleRemoveCipher = () => {
