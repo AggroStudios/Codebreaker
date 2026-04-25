@@ -47,6 +47,8 @@ describe('Terminal', () => {
             removeMoney: vi.fn(),
             deleteNotification: vi.fn(),
             deleteAllNotifications: vi.fn(),
+            purchasedUpgrades: [],
+            purchaseUpgrade: vi.fn(),
         });
         term.attachOperatingSystem(os);
         expect(term.operatingSystem).toBe(os);

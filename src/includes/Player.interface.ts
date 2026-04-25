@@ -35,4 +35,6 @@ export interface PlayerState {
     markAllNotificationsAsRead: () => void;
     deleteNotification: (index: number) => void;
     deleteAllNotifications: () => void;
+    purchasedUpgrades: string[];
+    purchaseUpgrade: (upgrade: string, cost: number) => void;
 }

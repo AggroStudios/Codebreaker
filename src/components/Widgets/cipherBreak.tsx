@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { memo, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, memo, useEffect, useRef, useState } from 'react';
 import {
     Avatar,
     Box,
@@ -8,10 +8,12 @@ import {
     CardActions,
     CardContent,
     CardHeader,
+    Checkbox,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
+    FormControlLabel,
     IconButton,
     LinearProgress,
     MenuItem,
@@ -46,6 +48,7 @@ import {
 import { NotificationLevel } from '../../includes/OperatingSystem.interface';
 import { useNotifier } from '../Notifier';
 import { useCipherBreakStore } from '../../stores/cipher';
+import { usePlayerStore } from '../../stores/player';
 
 const CipherContainer = styled('div')({
     display: 'grid',
@@ -147,6 +150,8 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
     const setProgress = useCipherBreakStore((s) => s.setProgress);
     const setType = useCipherBreakStore((s) => s.setType);
     const setState = useCipherBreakStore((s) => s.setState);
+    const enableAutoCipher = usePlayerStore((s) => s.purchasedUpgrades.includes('auto-cipher'));
+    const [autoCipher, setAutoCipher] = useState(enableAutoCipher);
 
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [infoDialogOpen, setInfoDialogOpen] = useState(false);
@@ -163,12 +168,15 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
         }
     }, [id, type]);
 
+    const handleAutoCipherChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setAutoCipher(event.target.checked);
+    };
+
     // Drive the success/error/idle card animations from the cipher state.
     // Keeping this here (rather than in the cipher delegate) means the
     // animations are re-applied correctly when the component remounts after
     // a tab switch.
     useEffect(() => {
-        if (id) console.log('cipherState changed:', id, cipherState);
         const card = cardRef.current;
         if (!card) return;
         if (cipherState === CipherState.SUCCESS) {
@@ -186,6 +194,30 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
         }
     }, [cipherState]);
 
+    const completeCipher = (cipher: Cipher, cancelled: boolean) => {
+        if (!cancelled) {
+            console.log('Cipher Type:', cipherType);
+            station.os?.player.earnExperience(cipherType?.xp);
+            station.os?.player.addMoney(cipherType?.payout);
+            station.os?.sendNotification(
+                `You have earned ${cipherType?.xp} XP and $${cipherType?.payout}.`,
+                NotificationLevel.INFO,
+            );
+        }
+        else {
+            station.os?.sendNotification(
+                `You have cancelled the cipher.`,
+                NotificationLevel.WARNING,
+            );
+        }
+        setTimeout(() => {
+            cipher.reset();
+            if (autoCipher && !cancelled) {
+                handleAddCipher(cipherType);
+            }
+        }, 1000);
+    };
+
     const handleAddCipher = (cipherType: ICipherType) => {
         if (!id) return;
         // Build the delegate using the store's stable setters (via
@@ -197,26 +229,9 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
             setGrid: (g) => setGrid(id, g),
             setProgress: (p) => setProgress(id, p),
             setState: (s) => setState(id, s),
-            completeCipher: (cipher: Cipher, cancelled: boolean) => {
-                if (!cancelled) {
-                    station.os?.player.earnExperience(cipherType.xp);
-                    station.os?.player.addMoney(cipherType.payout);
-                    station.os?.sendNotification(
-                        `You have earned ${cipherType.xp} XP and $${cipherType.payout}.`,
-                        NotificationLevel.INFO,
-                    );
-                }
-                else {
-                    station.os?.sendNotification(
-                        `You have cancelled the cipher.`,
-                        NotificationLevel.WARNING,
-                    );
-                }
-                setTimeout(() => {
-                    cipher.reset();
-                }, 1000);
-            },
+            completeCipher,
         };
+
         try {
             const c = new Cipher(20, 10, cssClasses, cipherType, station, delegate);
             setCipher(id, c);
@@ -231,6 +246,18 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
             );
         }
     };
+
+    useEffect(() => {
+        setAutoCipher(enableAutoCipher);
+        if (cipher) {
+            cipher.delegate = {
+                setGrid: (g) => setGrid(id, g),
+                setProgress: (p) => setProgress(id, p),
+                setState: (s) => setState(id, s),
+                completeCipher,
+            };
+        }
+    }, [enableAutoCipher]);
 
     const handleRemoveCipher = () => {
         removeProcess?.(id);
@@ -352,36 +379,57 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
                         </>
                     )}
                 </CardContent>
-                {id && canShowActions && (
-                    <CardActions
-                        disableSpacing
-                        sx={{ marginLeft: '40px' }}
-                    >
-                        {cipherState !== CipherState.IDLE && (
-                            <Button
-                                onClick={handleCancelDialogOpen}
-                                variant="contained"
-                                color="error"
-                                className="centerAlign"
-                            >
-                                Cancel
-                            </Button>
-                        )}
-                        {cipherState === CipherState.IDLE && (
-                            <Button
-                                onClick={handleRemoveCipher}
-                                variant="contained"
-                                color="primary"
-                                className="centerAlign"
-                            >
-                                Delete
-                            </Button>
-                        )}
-                        <IconButton onClick={handleInfoDialogOpen}>
-                            <InfoTwoTone />
-                        </IconButton>
-                    </CardActions>
-                )}
+                <CardActions disableSpacing sx={{
+                    display: 'flex',
+                    flexWrap: 'nowrap',
+                    alignItems: 'stretch',
+                    alignContent: 'space-between',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between'
+                }}>
+                    {id && (
+                        <>
+                            <FormControlLabel
+                                sx={{ textAlign: 'left', flex: '1 1 0', justifyContent: 'flex-start', m: 0 }}
+                                control={<Checkbox disabled={!enableAutoCipher} onChange={handleAutoCipherChange} checked={autoCipher} />}
+                                label="Auto Restart"
+                            />
+                            {canShowActions && (
+                                <>
+                                    {cipherState !== CipherState.IDLE && (
+                                        <Box sx={{ flex: '0 0 auto', textAlign: 'center' }}>
+                                            <Button
+                                                onClick={handleCancelDialogOpen}
+                                                variant="contained"
+                                                color="error"
+                                                className="centerAlign"
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </Box>
+                                    )}
+                                    {cipherState === CipherState.IDLE && (
+                                        <Box sx={{ flex: '0 0 auto', textAlign: 'center' }}>
+                                            <Button
+                                                onClick={handleRemoveCipher}
+                                                variant="contained"
+                                                color="primary"
+                                                className="centerAlign"
+                                            >
+                                                Delete
+                                            </Button>
+                                        </Box>
+                                    )}
+                                    <Box sx={{ textAlign: 'right', flex: '1 1 0' }}>
+                                        <IconButton onClick={handleInfoDialogOpen}>
+                                            <InfoTwoTone />
+                                        </IconButton>
+                                    </Box>
+                                </>
+                            )}
+                        </>
+                    )}
+                </CardActions>
             </Card>
             <Dialog
                 open={cancelDialogOpen}

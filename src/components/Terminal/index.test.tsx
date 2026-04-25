@@ -32,6 +32,8 @@ function createMockPlayerState(): PlayerState {
         markAllNotificationsAsRead: vi.fn(),
         deleteNotification: vi.fn(),
         deleteAllNotifications: vi.fn(),
+        purchasedUpgrades: [],
+        purchaseUpgrade: vi.fn(),
     };
 }
 

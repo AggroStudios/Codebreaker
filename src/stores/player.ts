@@ -23,6 +23,13 @@ const animationWrapper = (
     }, 990);
 };
 
+export interface Upgrade {
+    name: string;
+    description: string;
+    cost: number;
+    tags: string[];
+}
+
 export const usePlayerStore = create<PlayerState>((set) => ({
     player: {
         name: 'Player',
@@ -35,6 +42,12 @@ export const usePlayerStore = create<PlayerState>((set) => ({
     } as Player,
     moneyLabel: null,
     xpLabel: null,
+    purchasedUpgrades: [] as string[],
+    purchaseUpgrade: (upgrade: string, cost: number) =>
+        set((state) => {
+            state.removeMoney(cost);
+            return { purchasedUpgrades: [...state.purchasedUpgrades, upgrade] }
+        }),
     setXpLabel: (amount: number | null, levelUp?: boolean) =>
         set(() => ({ xpLabel: { data: { amount, levelUp }, id: Date.now() } })),
     earnExperience: (amount: number) =>

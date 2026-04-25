@@ -15,7 +15,7 @@ export default class Cipher implements Process {
     private readonly characters =
         'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()/\\-=+,.<>;:';
     private _characterGrid: IGridItem[] = [];
-    private delegate: CipherDelegate;
+    private _delegate: CipherDelegate;
     private unsolvedIndexes: Set<number> = new Set();
     private width: number;
     private height: number;
@@ -51,7 +51,7 @@ export default class Cipher implements Process {
             size: cipherType.block.size,
             unit: cipherType.block.unit,
         });
-        this.delegate = delegate;
+        this._delegate = delegate;
 
         for (let i = 0; i < this.width * this.height; i++) {
             this.unsolvedIndexes.add(i);
@@ -90,9 +90,13 @@ export default class Cipher implements Process {
         return this._percentUse / 100;
     }
 
+    public set delegate(value: CipherDelegate) {
+        this._delegate = value;
+    }
+
     public reset() {
-        this.delegate.setGrid([]);
-        this.delegate.setProgress(0);
+        this._delegate.setGrid([]);
+        this._delegate.setProgress(0);
         this.state = CipherState.IDLE;
     }
 
@@ -123,11 +127,11 @@ export default class Cipher implements Process {
 
     private set state(value: CipherState) {
         this._state = value;
-        this.delegate.setState(value);
+        this._delegate.setState(value);
     }
 
     private set progress(value: number) {
-        this.delegate.setProgress(value);
+        this._delegate.setProgress(value);
     }
 
     private generateGrid(): IGridItem[] {
@@ -152,7 +156,7 @@ export default class Cipher implements Process {
     }
 
     private randomizeGrid() {
-        this.delegate.setGrid(this.generateGrid());
+        this._delegate.setGrid(this.generateGrid());
     }
 
     private breaking() {
@@ -219,12 +223,12 @@ export default class Cipher implements Process {
                 break;
             case CipherState.SUCCESS:
                 this._stationOs.removeProcess(this);
-                this.delegate.completeCipher(this, false);
+                this._delegate.completeCipher(this, false);
                 break;
             case CipherState.CANCELLED:
                 this._stationOs.removeProcess(this);
                 this._stationNet.removeProcess(this);
-                this.delegate.completeCipher(this, true);
+                this._delegate.completeCipher(this, true);
                 break;
             case CipherState.FAILURE:
                 throw new Error('Cipher failed!');
