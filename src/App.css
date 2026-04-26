@@ -1,3 +1,26 @@
+/*
+ * CODEBREAKER DESIGN SYSTEM — Colors & Typography
+ * AGGRO Studios
+ * Source: Codebreaker codebase (React/MUI dark theme)
+ */
+
+/* ─── FONTS ──────────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600;700&display=swap');
+
+@font-face {
+    font-family: 'ibm_vga';
+    src: url('./fonts/WebPlus_IBM_VGA_8x16.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'ibm_vga_2x';
+    src: url('./fonts/WebPlus_IBM_VGA_8x16-2x.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 #root {
     margin: 0 auto;
 }
@@ -29,29 +52,6 @@
 
 .background {
     background-color: rgba(25, 25, 25, 0.8) !important;
-}
-
-/*
- * CODEBREAKER DESIGN SYSTEM — Colors & Typography
- * AGGRO Studios
- * Source: Codebreaker codebase (React/MUI dark theme)
- */
-
-/* ─── FONTS ──────────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600;700&display=swap');
-
-@font-face {
-    font-family: 'ibm_vga';
-    src: url('./fonts/WebPlus_IBM_VGA_8x16.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'ibm_vga_2x';
-    src: url('./fonts/WebPlus_IBM_VGA_8x16-2x.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
 }
 
 /* ─── BASE COLOR PALETTE ──────────────────────────────────────────────────── */

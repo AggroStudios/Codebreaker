@@ -26,7 +26,7 @@ export default memo(function Upgrade(props: { upgrade: IUpgradeItem }) {
     }, [playerStore.purchasedUpgrades]);
 
     return (
-        <Card className={clsx("upgrade", !isOwned && 'disabled')}>
+        <Card className={clsx('upgrade', !isOwned && 'disabled')}>
             <CardHeader
                 sx={{ paddingBottom: '8px' }}
                 title={upgrade.name}
