@@ -92,7 +92,7 @@ export default memo(function UpgradesComponent() {
                 </Box>
                 <Box className="upgrades-content">
                     <div className="upgrades-content-label">{filter} Upgrades - {(displayedUpgrades.filter((upg) => !purchasedUpgrades.includes(upg.key))).length} available</div>
-                    <Grid container spacing={2} sx={{ overflowY: 'auto' }}>
+                    <Grid className="upgrades-content-grid" columns={{ xs: 1, sm: 4, md: 6, lg: 9, xl: 12 }} container spacing={2}>
                         {displayedUpgrades.map((upg) => (
                             <Upgrade key={upg.key} upgrade={upg} />
                         ))}
