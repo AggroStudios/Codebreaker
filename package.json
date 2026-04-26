@@ -5,11 +5,11 @@
   "type": "module",
   "main": "dist-electron/main.cjs",
   "scripts": {
-    "dev": "NODE_ENV=LOCAL_DEV vite --open",
-    "dev:electron": "NODE_ENV=LOCAL_DEV ELECTRON=true vite",
+    "dev": "cross-env NODE_ENV=LOCAL_DEV vite --open",
+    "dev:electron": "cross-env NODE_ENV=LOCAL_DEV ELECTRON=true vite",
     "build": "tsc && vite build",
-    "build:electron": "tsc && ELECTRON=true vite build && electron-builder",
-    "electron:preview": "ELECTRON=true vite build && electron .",
+    "build:electron": "tsc && cross-env ELECTRON=true vite build && electron-builder",
+    "electron:preview": "cross-env ELECTRON=true vite build && electron .",
     "preview": "vite preview",
     "test": "vitest run --reporter verbose",
     "lint": "eslint ./src --ext .ts,.tsx,.js,.jsx",
@@ -27,13 +27,35 @@
       "dist-electron/**/*"
     ],
     "win": {
-      "target": [{ "target": "nsis", "arch": ["x64"] }]
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
     },
     "mac": {
-      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }]
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
     },
     "linux": {
-      "target": [{ "target": "AppImage", "arch": ["x64"] }]
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
     }
   },
   "engines": {
@@ -68,6 +90,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "config": "^4.4.1",
+    "cross-env": "^10.1.0",
     "electron": "^41.3.0",
     "electron-builder": "^26.8.1",
     "eslint": "^10.2.1",
