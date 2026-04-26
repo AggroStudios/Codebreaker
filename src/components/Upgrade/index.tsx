@@ -60,7 +60,7 @@ export default memo(function Upgrade(props: { upgrade: IUpgradeItem }) {
 
     return (
         <Grid size={2} sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Card sx={{ position: 'relative', flex: 1 }} className={clsx('upgrade', isOwned && 'disabled')}>
+            <Card sx={{ position: 'relative', flex: 1 }} className="upgrade">
                 {isOwned && 
                 <Box sx={{
                     position: 'absolute',
@@ -71,11 +71,11 @@ export default memo(function Upgrade(props: { upgrade: IUpgradeItem }) {
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     zIndex: 1,
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     justifyContent: 'center',
                 }} />}
                 <CardHeader
-                    sx={{ paddingBottom: '8px' }}
+                    sx={{ paddingBottom: '8px', alignItems: 'flex-start' }}
                     title={upgrade.name}
                     subheader={<div className="upgrade-category">{upgrade.category}</div>}
                     avatar={

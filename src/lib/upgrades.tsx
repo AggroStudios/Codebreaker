@@ -110,6 +110,6 @@ export const UpgradeList: IUpgradeItem[] = [
         cost: 3000,
         category: 'network',
         icon: HubIcon,
-        tags: ['nardware', 'passive', 'network']
+        tags: ['hardware', 'passive', 'network']
     }
 ];
