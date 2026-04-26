@@ -83,6 +83,7 @@
     --color-bg-selected:    rgba(255, 255, 255, 0.16);
     --color-bg-input:       rgba(255, 255, 255, 0.15);
     --color-bg-input-hover: rgba(255, 255, 255, 0.25);
+    --color-bg-cant-afford: rgba(244,67,54,0.12);
 
     /* Foreground / Text */
     --color-fg:             rgba(255, 255, 255, 0.87);

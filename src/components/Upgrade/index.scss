@@ -23,6 +23,13 @@
     color: var(--color-fg-secondary);
 }
 
+.active {
+    background-color: var(--accent-dim);
+    border-color: var(--color-border-hi);
+    color: var(--accent);
+    // box-shadow: 0 0 10px rgba(10, 245, 176, 0.5);
+}
+
 .upgrade {
     border: 1px solid var(--color-border);
     border-radius: 8px;
@@ -38,6 +45,13 @@
     justify-content: space-between;
 }
 
+.upgrade.disabled {
+    &:hover {
+        border-color: var(--color-border);
+        box-shadow: none;
+    }
+}
+
 .upgrade .MuiCardContent-root {
     flex-grow: 1;
 }
@@ -46,12 +60,16 @@
     user-select: none;
 }
 
-.owned {
+.owned-chip {
     background-color: var(--accent-dim);
-    color: var(--accent);
 }
 
-.owned.MuiChip-root {
+.upgrade-cost.owned {
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(10, 245, 176, 0.5);
+}
+
+.owned-chip.MuiChip-root {
     padding: 0;
     font-size: 12px;
     border:  1px solid var(--color-border);
@@ -61,14 +79,14 @@
     height: 16px;
 }
 
-.owned.MuiChip-root.active {
+.upgrade.MuiChip-root.active {
     background-color: var(--accent-dim);
     border-color: var(--color-border-hi);
     color: var(--accent);
-    box-shadow: 0 0 10px rgba(10, 245, 176, 0.5);
+    // box-shadow: 0 0 10px rgba(10, 245, 176, 0.5);
 }
 
-.owned .MuiChip-label {
+.owned-chip .MuiChip-label {
     padding: 0 6px;
     font-family: var(--font-code);
     text-transform: uppercase;
@@ -133,13 +151,42 @@
     color: var(--accent);
     font-family: var(--font-code);
     text-shadow: 0 0 10px rgba(10, 245, 176, 0.5);
+    user-select: none;
 }
 
-.button-purchase {
+.upgrade-button {
     font-size: 13px;
     font-weight: 800;
-    background-color: var(--accent);
-    color: var(--color-fg-on-accent);
     text-transform: capitalize;
     padding: 2px 8px;
+}
+
+.upgrade-button.purchase {
+    background-color: var(--accent);
+    color: var(--color-fg-on-accent) !important;
+}
+
+.upgrade-button.cant-afford {
+    background-color: var(--color-bg-cant-afford);
+    color: var(--color-expense) !important;
+}
+
+.upgrade-actions .owned {
+    color: var(--color-fg-secondary) !important;
+}
+
+.upgrade-cost.owned {
+    text-shadow: 0 0 10px var(--color-border-hover);
+}
+
+.upgrade-button.owned {
+    background-color: var(--color-bg);
+}
+
+.purchase {
+    color: var(--accent);
+}
+
+.cant-afford {
+    color: var(--color-expense);
 }

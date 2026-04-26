@@ -1,7 +1,7 @@
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 
-import { UpgradeList } from '../../lib/upgrades';
+import { UpgradeList, type IUpgradeItem } from '../../lib/upgrades';
 
 import { usePlayerStore } from '../../stores/player';
 import { memo, useState } from 'react';
@@ -21,13 +21,26 @@ import clsx from 'clsx';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Upgrade from '../../components/Upgrade';
+import { useEffect } from 'react';
 
 export default memo(function UpgradesComponent() {
     const playerStore = usePlayerStore();
 
+    const purchasedUpgrades = usePlayerStore((s) => s.purchasedUpgrades);
+
     const [cantAffordDialogOpen, setCantAffordDialogOpen] = useState(false);
+    const [displayedUpgrades, setDisplayedUpgrades] = useState<IUpgradeItem[]>(UpgradeList);
     const [filter, setFilter] = useState<string>('all');
     const [showOwned, setShowOwned] = useState(true);
+
+    useEffect(() => {
+        if (filter !== 'all') {
+            setDisplayedUpgrades(UpgradeList.filter((upg) => upg.tags.includes(filter) && (showOwned || !purchasedUpgrades.includes(upg.key))));
+        }
+        else {
+            setDisplayedUpgrades(UpgradeList.filter((upg) => showOwned || !purchasedUpgrades.includes(upg.key)));
+        }
+    }, [showOwned, filter]);
 
     const handleShowOwnedChange = () => {
         setShowOwned((prev) => !prev);
@@ -54,7 +67,7 @@ export default memo(function UpgradesComponent() {
                             <span className="material-icons"><PublishTwoToneIcon /></span>
                             <span>Permanent Upgrades</span>
                         </div>
-                        <div className="subtitle">1 of 10 upgrades unlocked</div>
+                        <div className="subtitle">{purchasedUpgrades.length} of {UpgradeList.length} upgrades unlocked</div>
                     </div>
                     <div className="balance-display">
                         <div className="balance-display-label">Available Balance</div>
@@ -78,12 +91,10 @@ export default memo(function UpgradesComponent() {
                     />} label="Show Owned" />
                 </Box>
                 <Box className="upgrades-content">
-                    <div className="upgrades-content-label">{filter} Upgrades - 10 available</div>
+                    <div className="upgrades-content-label">{filter} Upgrades - {(displayedUpgrades.filter((upg) => !purchasedUpgrades.includes(upg.key))).length} available</div>
                     <Grid container spacing={2} sx={{ overflowY: 'auto' }}>
-                        {UpgradeList.map((upg, key) => (
-                            <Grid size={2} key={key}>
-                                <Upgrade upgrade={upg} />
-                            </Grid>
+                        {displayedUpgrades.map((upg) => (
+                            <Upgrade key={upg.key} upgrade={upg} />
                         ))}
                     </Grid>
                 </Box>
