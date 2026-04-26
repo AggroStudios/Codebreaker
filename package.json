@@ -3,13 +3,38 @@
   "private": true,
   "version": "0.5.40",
   "type": "module",
+  "main": "dist-electron/main.cjs",
   "scripts": {
     "dev": "NODE_ENV=LOCAL_DEV vite --open",
+    "dev:electron": "NODE_ENV=LOCAL_DEV ELECTRON=true vite",
     "build": "tsc && vite build",
+    "build:electron": "tsc && ELECTRON=true vite build && electron-builder",
+    "electron:preview": "ELECTRON=true vite build && electron .",
     "preview": "vite preview",
     "test": "vitest run --reporter verbose",
     "lint": "eslint ./src --ext .ts,.tsx,.js,.jsx",
     "prepare": "husky"
+  },
+  "build": {
+    "appId": "com.aggrostudios.codebreaker",
+    "productName": "Code Breaker",
+    "icon": "public/favicon.png",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }]
+    },
+    "mac": {
+      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }]
+    },
+    "linux": {
+      "target": [{ "target": "AppImage", "arch": ["x64"] }]
+    }
   },
   "engines": {
     "node": ">=24.0.0"
@@ -43,6 +68,8 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "config": "^4.4.1",
+    "electron": "^41.3.0",
+    "electron-builder": "^26.8.1",
     "eslint": "^10.2.1",
     "husky": "^9.1.7",
     "js-yaml": "^4.1.1",
@@ -51,6 +78,7 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.8",
+    "vite-plugin-electron": "^0.29.1",
     "vitest": "^4.1.4"
   }
 }

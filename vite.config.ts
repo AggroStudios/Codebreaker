@@ -1,16 +1,43 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import electron from 'vite-plugin-electron/simple';
 import config from 'config';
 import pkg from './package.json';
+
+const cjsOutput = {
+    rollupOptions: {
+        output: { format: 'cjs' as const, entryFileNames: '[name].cjs' },
+    },
+};
 
 export default defineConfig({
     define: {
         $config: JSON.stringify(config.get('frontend') || {}),
         'import.meta.env.VITE_APP_VERSION': JSON.stringify(pkg.version),
     },
-    plugins: [react()],
+    plugins: [
+        react(),
+        // Only active when building/running for Electron
+        ...(process.env.ELECTRON === 'true'
+            ? [
+                  electron({
+                      main: {
+                          entry: 'electron/main.ts',
+                          vite: { build: cjsOutput },
+                      },
+                      preload: {
+                          input: 'electron/preload.ts',
+                          vite: { build: cjsOutput },
+                      },
+                  }),
+              ]
+            : []),
+    ],
     build: {
         target: 'esnext',
         minify: 'oxc',
+        // Relative paths required for Electron's file:// protocol
+        ...(process.env.ELECTRON === 'true' ? { outDir: 'dist' } : {}),
     },
+    base: process.env.ELECTRON === 'true' ? './' : '/',
 });

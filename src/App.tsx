@@ -1,5 +1,9 @@
 import { lazy, useCallback, useEffect, useMemo, useState } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { BrowserRouter, HashRouter, Route, Routes } from 'react-router';
+
+// Electron loads the app via file://, which breaks history-based routing
+const isElectron = window.navigator.userAgent.includes('Electron');
+const Router = isElectron ? HashRouter : BrowserRouter;
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -92,7 +96,7 @@ export default function App() {
                         useStationStore={useStationStore}
                         stationProxy={stationProxy}
                     >
-                        <BrowserRouter>
+                        <Router>
                             <Routes>
                                 <Route element={<Layout />}>
                                     <Route index element={
@@ -112,7 +116,7 @@ export default function App() {
                                     <Route path="*" />
                                 </Route>
                             </Routes>
-                        </BrowserRouter>
+                        </Router>
                     </StationStoreProvider>
                 </AnchorsProvider>
             </NotifierProvider>
