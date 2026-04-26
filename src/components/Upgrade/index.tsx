@@ -59,8 +59,8 @@ export default memo(function Upgrade(props: { upgrade: IUpgradeItem }) {
     };
 
     return (
-        <Grid size={2}>
-            <Card sx={{ position: 'relative' }} className={clsx('upgrade', isOwned && 'disabled')}>
+        <Grid size={2} sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Card sx={{ position: 'relative', flex: 1 }} className={clsx('upgrade', isOwned && 'disabled')}>
                 {isOwned && 
                 <Box sx={{
                     position: 'absolute',

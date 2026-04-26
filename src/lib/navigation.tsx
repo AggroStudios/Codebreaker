@@ -91,7 +91,7 @@ export const secondaryNavigation: INavigationItem[] = [
         icon: ForumTwoToneIcon,
     },
     {
-        title: 'Perm Upgrades',
+        title: 'Upgrades',
         link: '/upgrades',
         icon: PublishTwoToneIcon,
     },

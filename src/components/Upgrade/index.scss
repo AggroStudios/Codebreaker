@@ -39,7 +39,8 @@
         border-color: var(--color-border-hi);
         box-shadow: 0 0 10px rgba(10, 245, 176, 0.5);
     }
-    min-height: 240px ;
+    min-height: 240px;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

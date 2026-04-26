@@ -65,7 +65,7 @@ export default memo(function UpgradesComponent() {
                         <div className="breadcrumbs">CODEBREAKER · UPGRADES</div>
                         <div className="title">
                             <span className="material-icons"><PublishTwoToneIcon /></span>
-                            <span>Permanent Upgrades</span>
+                            <span>Upgrade Packages</span>
                         </div>
                         <div className="subtitle">{purchasedUpgrades.length} of {UpgradeList.length} upgrades unlocked</div>
                     </div>
