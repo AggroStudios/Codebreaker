@@ -32,7 +32,7 @@ const StationRoute = lazy(() => import('./Station'));
 const LoginRoute = lazy(() => import('./components/Login'));
 const ServersRoute = lazy(() => import('./Servers'));
 const TerminalRoute = lazy(() => import('./components/Terminal'));
-const UpgradesRoute = lazy(() => import('./Upgrades'));
+const UpgradesRoute = lazy(() => import('./pages/Upgrades'));
 
 export default function App() {
     const [loadingProgress, setLoadingProgress] = useState(0);
@@ -73,7 +73,7 @@ export default function App() {
         import('./components/Login');
         import('./Servers');
         import('./components/Terminal');
-        import('./Upgrades');
+        import('./pages/Upgrades');
     }, []);
 
     const { station, useStationStore, stationProxy, terminalController } =

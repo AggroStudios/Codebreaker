@@ -13,6 +13,13 @@ export const dataSizeSuffixes = [
     'BB',
 ];
 
+export const formatMoney = (money: number, decimalPlaces: number = 2) => {
+    return money.toLocaleString('en-US', {
+        minimumFractionDigits: decimalPlaces,
+        maximumFractionDigits: decimalPlaces,
+    });
+}
+
 export const dataSizeFromSuffix = ({ size, unit }) => {
     const index = dataSizeSuffixes.indexOf(unit);
     if (index === -1) {

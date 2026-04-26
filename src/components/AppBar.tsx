@@ -48,6 +48,7 @@ import { usePlayerStore } from '../stores/player';
 import { useStationContext } from '../stores/stationContext';
 import { useAnchors } from './AnchorsContext';
 import { useMusicPlayerStore } from '../stores/musicPlayer';
+import { formatMoney } from '../lib/utils';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -134,6 +135,7 @@ const GameFrameCounter = memo(function GameFrameCounter() {
             variant="h6"
             noWrap
             component="div"
+            className="gameFrameCounter"
             sx={{ display: { xs: 'none', sm: 'block' } }}
         >
             Frame: {display.frame.toFixed(3)} | Count: {display.count} | Exponent: {display.exponent}
@@ -280,7 +282,9 @@ export default function AppBarComponent() {
                                 amount={moneyLabel.amount}
                             />
                         )}
-                        $: {money.toFixed(2)}
+                        <Typography variant="body2" className="moneyLabel">
+                            ${formatMoney(money)}
+                        </Typography>
                     </Box>
                     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                         <IconButton

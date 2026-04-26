@@ -1,0 +1,23 @@
+.playerLevelCard {
+    background-color: rgba(255, 255, 255, 0.04);
+    box-shadow: none !important;
+    border: 1px solid var(--color-border);
+    padding: 12px 14px;
+    border-radius: var(--r-card);
+    margin: 12px;
+}
+
+.playerLevelCardHeader {
+    font-family: var(--font-ui) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--fg);
+    margin-bottom: 6px !important;
+}
+
+.playerLevelCardFooter {
+    font-size: 10px !important;
+    color: var(--fg-3) !important;
+    margin-top: 4px !important;
+    font-family: var(--font-code) !important;
+}

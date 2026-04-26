@@ -5,11 +5,7 @@ import {
     ListItemText,
     Drawer,
     Divider,
-    Card,
-    CardHeader,
-    CardContent,
     Box,
-    LinearProgress,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Link, useLocation } from 'react-router';
@@ -18,24 +14,26 @@ import { forwardRef, type ReactNode, type Ref } from 'react';
 import LockTwoToneIcon from '@mui/icons-material/LockTwoTone';
 
 import { mainNavigation, secondaryNavigation } from '../lib/navigation';
-import { usePlayerStore } from '../stores/player';
 
 import AggroStudios from '../assets/logos/AggroStudios.png';
 import './NavMenu.scss';
-import XpLabel from './XpLabel';
-import { useAnchors } from './AnchorsContext';
+import PlayerLevel from './Widgets/PlayerLevel';
 
 const StyledLinkItemButton = styled(ListItemButton)(({ theme }) => ({
     '&.Mui-selected': {
+        color: 'var(--accent)',
         backgroundColor:
             theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.16)'
+                ? 'rgba(10,245,176,0.08)'
                 : 'rgba(0, 0, 0, 0.08)',
+    },
+    '&.Mui-selected svg': {
+        color: 'var(--accent)',
     },
     '&.Mui-selected:hover': {
         backgroundColor:
             theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.16)'
+                ? 'rgba(121, 239, 204, 0.08)'
                 : 'rgba(0, 0, 0, 0.08)',
     },
 }));
@@ -141,41 +139,6 @@ function SecondaryListItems() {
                 );
             })}
         </List>
-    );
-}
-
-function PlayerLevel() {
-    const player = usePlayerStore((s) => s.player);
-    const xpLabel = usePlayerStore((s) => s.xpLabel);
-    const { xpAnchorRef } = useAnchors();
-
-    return (
-        <Card
-            sx={{ flexShrink: 0, flexGrow: 0 }}
-            ref={(el: HTMLElement | null) => {
-                xpAnchorRef.current = el;
-            }}
-            className="playerLevelCard centerContent"
-        >
-            <CardHeader title={`Level ${player.level}`} />
-            <CardContent>
-                <Box sx={{ width: '100%' }}>
-                    {xpLabel?.data?.amount != null && (
-                        <XpLabel
-                            key={xpLabel.id}
-                            amount={xpLabel.data.amount}
-                            levelUp={xpLabel.data.levelUp}
-                        />
-                    )}
-                    <LinearProgress
-                        variant="determinate"
-                        value={
-                            (player.experience / player.nextLevel) * 100
-                        }
-                    />
-                </Box>
-            </CardContent>
-        </Card>
     );
 }
 
