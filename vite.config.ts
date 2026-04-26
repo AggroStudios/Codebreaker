@@ -4,12 +4,6 @@ import electron from 'vite-plugin-electron/simple';
 import config from 'config';
 import pkg from './package.json';
 
-const cjsOutput = {
-    rollupOptions: {
-        output: { format: 'cjs' as const, entryFileNames: '[name].cjs' },
-    },
-};
-
 export default defineConfig({
     define: {
         $config: JSON.stringify(config.get('frontend') || {}),
@@ -23,11 +17,9 @@ export default defineConfig({
                   electron({
                       main: {
                           entry: 'electron/main.ts',
-                          vite: { build: cjsOutput },
                       },
                       preload: {
                           input: 'electron/preload.ts',
-                          vite: { build: cjsOutput },
                       },
                   }),
               ]

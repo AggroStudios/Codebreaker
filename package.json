@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.5.40",
   "type": "module",
-  "main": "dist-electron/main.cjs",
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=LOCAL_DEV vite --open",
     "dev:electron": "cross-env NODE_ENV=LOCAL_DEV ELECTRON=true vite",

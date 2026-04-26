@@ -1,8 +1,8 @@
 import { app, BrowserWindow, shell } from 'electron';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-// __dirname is a CJS global — no need to derive it from import.meta.url
-declare const __dirname: string;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Injected by vite-plugin-electron in dev mode
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
@@ -14,7 +14,7 @@ function createWindow() {
         minWidth: 1024,
         minHeight: 600,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.cjs'),
+            preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
             nodeIntegration: false,
         },
