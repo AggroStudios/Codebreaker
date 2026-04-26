@@ -150,6 +150,7 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
     const setProgress = useCipherBreakStore((s) => s.setProgress);
     const setType = useCipherBreakStore((s) => s.setType);
     const setState = useCipherBreakStore((s) => s.setState);
+    const removeEntry = useCipherBreakStore((s) => s.removeEntry);
     const enableAutoCipher = usePlayerStore((s) => s.purchasedUpgrades.includes('auto-cipher'));
     const [autoCipher, setAutoCipher] = useState(enableAutoCipher);
 
@@ -246,6 +247,7 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
         } catch {
             const message = `Not enough cores available to add process '${cipherType.name}'.`;
             notify({ level: 'error', message });
+            removeEntry(id);
             removeProcess?.(id);
             station.os?.sendNotification(
                 message,
@@ -268,6 +270,7 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
     }, [enableAutoCipher]);
 
     const handleRemoveCipher = () => {
+        if (id) removeEntry(id);
         removeProcess?.(id);
     };
 

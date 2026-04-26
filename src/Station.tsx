@@ -30,10 +30,6 @@ export default function StationComponent() {
                     <Grid size={8}>
                         <CpuActivityWidget title="CPU Activity" />
                     </Grid>
-                </Grid>
-            </div>
-            <div className="card">
-                <Grid container spacing={2}>
                     {runningProcesses.length > 0 &&
                         runningProcesses.map(({id, type}) => (
                             <Grid size={4} key={id}>

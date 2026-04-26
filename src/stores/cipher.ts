@@ -46,4 +46,18 @@ export const useCipherBreakStore = create<CipherBreakState>((set) => ({
         set((s) => ({
             states: { ...s.states, [id]: state },
         })),
+    removeEntry: (id: string) =>
+        set((s) => {
+            const ciphers = { ...s.ciphers };
+            const grids = { ...s.grids };
+            const progress = { ...s.progress };
+            const types = { ...s.types };
+            const states = { ...s.states };
+            delete ciphers[id];
+            delete grids[id];
+            delete progress[id];
+            delete types[id];
+            delete states[id];
+            return { ciphers, grids, progress, types, states };
+        }),
 }));

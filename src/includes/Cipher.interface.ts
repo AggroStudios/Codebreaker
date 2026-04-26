@@ -52,6 +52,7 @@ export interface CipherBreakState {
     setProgress: (id: string, progress: number) => void;
     setType: (id: string, type: ICipherType) => void;
     setState: (id: string, state: CipherState) => void;
+    removeEntry: (id: string) => void;
 }
 
 export const CipherTypes: ICipherType[] = [
