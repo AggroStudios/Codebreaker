@@ -62,7 +62,7 @@ const CipherGrid = memo(function CipherGrid({
     id: string;
     width: number;
 }) {
-    const grid = useCipherBreakStore((s) => s.grids[id]) ?? [];
+    const grid = useCipherBreakStore((s) => s.entries[id]?.grid) ?? [];
     const gridTemplateColumns = `repeat(${width}, ${100 / width}%)`;
     if (grid.length === 0) return null;
     return (
@@ -83,7 +83,7 @@ const CipherProgressBar = memo(function CipherProgressBar({
     id: string;
     cipherState: CipherState | undefined;
 }) {
-    const progress = useCipherBreakStore((s) => s.progress[id]) ?? 0;
+    const progress = useCipherBreakStore((s) => s.entries[id]?.progress) ?? 0;
     if (!cipherState || cipherState === CipherState.IDLE) return null;
     return (
         <div className="progress">
@@ -142,17 +142,12 @@ const cssClasses = ['breaking-1', 'breaking-2', 'breaking-3', 'breaking-4'];
 export default memo(function CipherBreak(props: CipherBreakOptions) {
     const cardRef = useRef<HTMLDivElement | null>(null);
     const { width, functions, station, id, type } = props;
-    const cipher = useCipherBreakStore((s) => (id ? s.ciphers[id] : undefined));
-    const cipherType = useCipherBreakStore((s) => (id ? s.types[id] : undefined));
-    const cipherState = useCipherBreakStore((s) => (id ? s.states[id] : undefined));
-    const setCipher = useCipherBreakStore((s) => s.setCipher);
-    const setGrid = useCipherBreakStore((s) => s.setGrid);
-    const setProgress = useCipherBreakStore((s) => s.setProgress);
-    const setType = useCipherBreakStore((s) => s.setType);
-    const setState = useCipherBreakStore((s) => s.setState);
+    const cipher = useCipherBreakStore((s) => (id ? s.entries[id]?.cipher : undefined));
+    const cipherType = useCipherBreakStore((s) => (id ? s.entries[id]?.type : undefined));
+    const cipherState = useCipherBreakStore((s) => (id ? s.entries[id]?.state : undefined));
+    const autoCipher = useCipherBreakStore((s) => s.entries[id ?? '']?.autoCipher ?? false);
     const removeEntry = useCipherBreakStore((s) => s.removeEntry);
     const enableAutoCipher = usePlayerStore((s) => s.purchasedUpgrades.includes('auto-cipher'));
-    const [autoCipher, setAutoCipher] = useState(enableAutoCipher);
 
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [infoDialogOpen, setInfoDialogOpen] = useState(false);
@@ -167,7 +162,7 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
     );
 
     const handleAutoCipherChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setAutoCipher(event.target.checked);
+        useCipherBreakStore.getState().update(id ?? '', { autoCipher: event.target.checked });
     };
 
     // Drive the success/error/idle card animations from the cipher state.
@@ -192,15 +187,15 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
         }
     }, [cipherState]);
 
-    // Read cipherType from the store at call time, not from the closure, so
-    // this is always correct even when called from a long-lived delegate.
+    // Reads everything from the store at call time — no stale closure risk
+    // regardless of when the cipher finishes or when upgrades are purchased.
     const completeCipher = (cipher: Cipher, cancelled: boolean) => {
-        const currentType = useCipherBreakStore.getState().types[id ?? ''];
+        const entry = useCipherBreakStore.getState().entries[id ?? ''];
         if (!cancelled) {
-            station.os?.player.earnExperience(currentType?.xp);
-            station.os?.player.addMoney(currentType?.payout);
+            station.os?.player.earnExperience(entry?.type?.xp);
+            station.os?.player.addMoney(entry?.type?.payout);
             station.os?.sendNotification(
-                `You have earned ${currentType?.xp} XP and $${currentType?.payout}.`,
+                `You have earned ${entry?.type?.xp} XP and $${entry?.type?.payout}.`,
                 NotificationLevel.INFO,
             );
         } else {
@@ -211,48 +206,35 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
         }
         setTimeout(() => {
             cipher.reset();
-            if (autoCipher && !cancelled) {
-                const refreshType = useCipherBreakStore.getState().types[id ?? ''];
-                handleAddCipher(refreshType);
+            const currentEntry = useCipherBreakStore.getState().entries[id ?? ''];
+            if (currentEntry?.autoCipher && !cancelled) {
+                handleAddCipher(currentEntry.type);
             }
         }, 1000);
     };
 
-    // Keep the ref in sync whenever the cipher type changes so delegates
-    // always call the latest version without needing to be recreated.
-    useEffect(() => {
-        completeCipherRef.current = completeCipher;
-    }, [cipherType]);
+    completeCipherRef.current = completeCipher;
 
     const handleAddCipher = (cipherType: ICipherType) => {
         if (!id) return;
-        // Build the delegate using the store's stable setters (via
-        // `getState()`), not React state setters. The cipher lives longer
-        // than any single mount of this component (tab switches remount it),
-        // so the delegate must not close over setState functions that belong
-        // to an unmounted instance.
-        // completeCipher is called through the ref so the delegate never
-        // captures a stale closure regardless of when the cipher finishes.
+        // Delegate writes directly to the store via getState() so it never
+        // captures stale React closure values.
         const delegate: CipherDelegate = {
-            setGrid: (g) => setGrid(id, g),
-            setProgress: (p) => setProgress(id, p),
-            setState: (s) => setState(id, s),
+            setGrid: (g) => useCipherBreakStore.getState().update(id, { grid: g }),
+            setProgress: (p) => useCipherBreakStore.getState().update(id, { progress: p }),
+            setState: (s) => useCipherBreakStore.getState().update(id, { state: s }),
             completeCipher: (c, cancelled) => completeCipherRef.current(c, cancelled),
         };
 
         try {
             const c = new Cipher(20, 10, cssClasses, cipherType, station, delegate);
-            setCipher(id, c);
-            setType(id, cipherType);
+            useCipherBreakStore.getState().update(id, { cipher: c, type: cipherType });
         } catch {
             const message = `Not enough cores available to add process '${cipherType.name}'.`;
             notify({ level: 'error', message });
             removeEntry(id);
             removeProcess?.(id);
-            station.os?.sendNotification(
-                message,
-                NotificationLevel.ERROR,
-            );
+            station.os?.sendNotification(message, NotificationLevel.ERROR);
         }
     };
 
@@ -266,8 +248,8 @@ export default memo(function CipherBreak(props: CipherBreakOptions) {
     }, [id, type]);
 
     useEffect(() => {
-        setAutoCipher(enableAutoCipher);
-    }, [enableAutoCipher]);
+        useCipherBreakStore.getState().update(id ?? '', { autoCipher: enableAutoCipher });
+    }, [enableAutoCipher, id]);
 
     const handleRemoveCipher = () => {
         if (id) removeEntry(id);

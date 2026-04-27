@@ -41,17 +41,18 @@ export interface IGridItem {
     cssClass: string;
 }
 
+export interface CipherEntry {
+    cipher?: Cipher;
+    grid: IGridItem[];
+    progress: number;
+    type?: ICipherType;
+    state?: CipherState;
+    autoCipher: boolean;
+}
+
 export interface CipherBreakState {
-    ciphers: Record<string, Cipher | undefined>;
-    grids: Record<string, IGridItem[] | undefined>;
-    progress: Record<string, number | undefined>;
-    types: Record<string, ICipherType | undefined>;
-    states: Record<string, CipherState | undefined>;
-    setCipher: (id: string, cipher: Cipher | undefined) => void;
-    setGrid: (id: string, grid: IGridItem[]) => void;
-    setProgress: (id: string, progress: number) => void;
-    setType: (id: string, type: ICipherType) => void;
-    setState: (id: string, state: CipherState) => void;
+    entries: Record<string, CipherEntry>;
+    update: (id: string, partial: Partial<CipherEntry>) => void;
     removeEntry: (id: string) => void;
 }
 

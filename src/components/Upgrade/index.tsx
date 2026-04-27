@@ -18,6 +18,50 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
 import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+
+interface ConfirmDialogProps {
+    open: boolean;
+    upgrade: IUpgradeItem | null;
+    onConfirm: () => void;
+    onCancel: () => void;
+}
+
+const ConfirmDialog = memo(function ConfirmDialog({
+    open,
+    upgrade,
+    onConfirm,
+    onCancel,
+}: ConfirmDialogProps) {
+    return (
+        <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth>
+            <DialogTitle>Confirm Purchase</DialogTitle>
+            <DialogContent>
+                {upgrade && (
+                    <Typography variant="body2" color="text.secondary">
+                        Purchase{' '}
+                        <Box component="span" sx={{ color: 'text.primary', fontWeight: 600 }}>
+                            {upgrade.name}
+                        </Box>{' '}
+                        for{' '}
+                        <Box component="span" sx={{ color: 'primary.main', fontWeight: 700 }}>
+                            ${upgrade.cost.toLocaleString()}
+                        </Box>
+                        ?
+                    </Typography>
+                )}
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onCancel} color="inherit" sx={{ outline: 0 }}>
+                    Cancel
+                </Button>
+                <Button onClick={onConfirm} variant="contained" color="primary" sx={{ outline: 0 }}>
+                    Purchase
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+});
 
 export default memo(function Upgrade(props: { upgrade: IUpgradeItem }) {
     const { upgrade } = props;
@@ -102,16 +146,12 @@ export default memo(function Upgrade(props: { upgrade: IUpgradeItem }) {
                     </div>
                 </CardActions>
             </Card>
-            <Dialog open={confirmPurchaseDialogOpen} onClose={handleConfirmPurchaseDialogClose}>
-                <DialogTitle>Confirm Purchase Upgrade</DialogTitle>
-                <DialogContent>
-                    Are you sure you want to purchase this upgrade?
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleConfirmPurchase}>Purchase</Button>
-                    <Button onClick={handleConfirmPurchaseDialogClose}>Cancel</Button>
-                </DialogActions>
-            </Dialog>
+            <ConfirmDialog
+                open={confirmPurchaseDialogOpen}
+                upgrade={upgrade}
+                onConfirm={handleConfirmPurchase}
+                onCancel={handleConfirmPurchaseDialogClose}
+            />
         </Grid>
     );
 }); 
