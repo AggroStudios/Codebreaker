@@ -1,4 +1,3 @@
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 
 import { UpgradeList, type IUpgradeItem } from '../../lib/upgrades';
@@ -20,7 +19,7 @@ import { formatMoney } from '../../lib/utils';
 import clsx from 'clsx';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Upgrade from '../../components/Upgrade';
+import UpgradeComponent from '../../components/Upgrade';
 import { useEffect } from 'react';
 import { capitalize } from '@mui/material/utils';
 
@@ -89,8 +88,8 @@ export default function UpgradesComponent() {
                 </Box>
                 <Box className="upgrades-filter-bar">
                     <span className="filter-label">Filter</span>
-                    {filterLabels.map((label) => (
-                        <Chip label={capitalize(label)} className={clsx(filter === label && 'active')} onClick={() => handleFilterClick(label)} variant="outlined" />
+                    {filterLabels.map((label, idx: number) => (
+                        <Chip key={'filter-label-' + idx.toString()} label={capitalize(label)} className={clsx(filter === label && 'active')} onClick={() => handleFilterClick(label)} variant="outlined" />
                     ))}
                     <FormControlLabel className="show-owned" control={
                         <Switch
@@ -101,11 +100,11 @@ export default function UpgradesComponent() {
                 </Box>
                 <Box className="upgrades-content">
                     <div className="upgrades-content-label">{filter} Upgrades - {(displayedUpgrades.filter((upg) => !purchasedUpgrades.includes(upg.key))).length} available</div>
-                    <Grid className="upgrades-content-grid" columns={{ xs: 1, sm: 4, md: 6, lg: 9, xl: 12 }} container spacing={2}>
-                        {displayedUpgrades.map((upg) => (
-                            <Upgrade key={upg.key} upgrade={upg} />
+                    <Box className="upgrades-content-grid" sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 2 }}>
+                        {displayedUpgrades.map((upg, idx: number) => (
+                            <UpgradeComponent key={'upgrade-' + idx.toString()} upgrade={upg} />
                         ))}
-                    </Grid>
+                    </Box>
                 </Box>
             </Box>
             <Dialog open={cantAffordDialogOpen} onClose={handleCantAffordDialogClose}>

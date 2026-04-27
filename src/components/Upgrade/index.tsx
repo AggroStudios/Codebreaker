@@ -17,7 +17,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Dialog from '@mui/material/Dialog';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 
 interface ConfirmDialogProps {
@@ -63,7 +62,7 @@ function ConfirmDialog({
     );
 }
 
-export default function Upgrade(props: { upgrade: IUpgradeItem }) {
+export default function UpgradeComponent(props: { upgrade: IUpgradeItem }) {
     const { upgrade } = props;
 
     const purchasedUpgrades = usePlayerStore((s) => s.purchasedUpgrades);
@@ -103,7 +102,7 @@ export default function Upgrade(props: { upgrade: IUpgradeItem }) {
     };
 
     return (
-        <Grid size={2} sx={{ display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Card sx={{ position: 'relative', flex: 1 }} className="upgrade">
                 {isOwned && 
                 <Box sx={{
@@ -136,8 +135,8 @@ export default function Upgrade(props: { upgrade: IUpgradeItem }) {
                 </CardContent>
                 <CardActions sx={{ display: 'flex', flexDirection: 'column', gap: 1, padding: '12px' }}>
                     <div className="upgrade-tags">
-                        {upgrade.tags.map((tag) => (
-                            <Chip label={tag} variant="outlined" className={tag} />
+                        {upgrade.tags.map((tag, idx: number) => (
+                            <Chip key={'upgrade-tag-' + idx.toString()} label={tag} variant="outlined" className={tag} />
                         ))}
                     </div>
                     <div className="upgrade-actions">
@@ -152,6 +151,6 @@ export default function Upgrade(props: { upgrade: IUpgradeItem }) {
                 onConfirm={handleConfirmPurchase}
                 onCancel={handleConfirmPurchaseDialogClose}
             />
-        </Grid>
+        </Box>
     );
 }
