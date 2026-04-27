@@ -1,130 +1,130 @@
 .upgrade-container {
-    border-radius: 12px;
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
+    border-radius: 12px !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
 }
 
 .upgrades-page-header {
-    display: flex;
-    padding: 20px 24px 0;
-    align-items: flex-end;
-    justify-content: space-between;
-    flex-shrink: 0;
-    background-color: var(--color-bg-card);
+    display: flex !important;
+    padding: 20px 24px 0 !important;
+    align-items: flex-end !important;
+    justify-content: space-between !important;
+    flex-shrink: 0 !important;
+    background-color: var(--color-bg-card) !important;
 }
 
 .breadcrumbs {
     font-family: var(--font-code) !important;
-    font-size: 11px;
+    font-size: 11px !important;
     color: var(--color-fg-secondary) !important;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    margin-bottom: 4px !important;
 }
 
 .title {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--color-fg);
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    color: var(--color-fg) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
     line-height: 1 !important;
 }
 
 .title .material-icons {
     font-size: 24px !important;
-    color: var(--accent);
-    margin-top: 4px;
+    color: var(--accent) !important;
+    margin-top: 4px !important;
 }
 
 .subtitle {
-    font-size: 12px;
-    color: var(--color-fg-secondary);
-    margin-top: 2px;
+    font-size: 12px !important;
+    color: var(--color-fg-secondary) !important;
+    margin-top: 2px !important;
 }
 
 .balance-display {
-    text-align: right;
+    text-align: right !important;
 }
 
 .balance-display-label {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-fg-secondary);
+    font-size: 10px !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--color-fg-secondary) !important;
 }
 
 .balance-display-amount {
-    font-size: 20px;
-    font-weight: 700;
-    font-family: var(--font-code);
-    color: var(--accent);
-    text-shadow: 0 0 10px rgba(10, 245, 176, 0.5);
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    font-family: var(--font-code) !important;
+    color: var(--accent) !important;
+    text-shadow: 0 0 10px rgba(10, 245, 176, 0.5) !important;
 }
 
 .upgrades-filter-bar {
-    padding: 16px 24px 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-    background-color: var(--color-bg-card);
+    padding: 16px 24px 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+    flex-wrap: wrap !important;
+    background-color: var(--color-bg-card) !important;
 }
 
 .filter-label {
-    font-size: 11px;
-    color: var(--color-fg-secondary);
-    letter-spacing: 0.08em;
-    margin-right: 4px;
-    text-transform: uppercase;
+    font-size: 11px !important;
+    color: var(--color-fg-secondary) !important;
+    letter-spacing: 0.08em !important;
+    margin-right: 4px !important;
+    text-transform: uppercase !important;
 }
 
 .upgrades-filter-bar .MuiChip-root {
-    padding: 4px 4px;
-    font-size: 12px;
+    padding: 4px 4px !important;
+    font-size: 12px !important;
     border:  1px solid var(--color-border);
-    cursor: pointer;
-    color: var(--color-fg-secondary);
-    height: 24px;
+    cursor: pointer !important;
+    color: var(--color-fg-secondary) !important;
+    height: 24px !important;
 }
 
 .upgrades-filter-bar .MuiChip-root:hover {
-    color: var(--color-fg);
+    color: var(--color-fg) !important;
 }
 
 .upgrades-filter-bar .MuiChip-root.active {
-    background-color: var(--accent-dim);
-    border-color: var(--color-border-hi);
-    color: var(--accent);
-    box-shadow: 0 0 10px rgba(10, 245, 176, 0.5);
+    background-color: var(--accent-dim) !important;
+    border-color: var(--color-border-hi) !important;
+    color: var(--accent) !important;
+    box-shadow: 0 0 10px rgba(10, 245, 176, 0.5) !important;
 }
 
 .show-owned .MuiFormControlLabel-label {
-    font-size: 12px;
-    color: var(--color-fg-secondary);
-    user-select: none;
+    font-size: 12px !important;
+    color: var(--color-fg-secondary) !important;
+    user-select: none !important;
 }
 
 .show-owned {
-    margin-left: auto;
-    display: flex;
-    gap: 6px;
-    align-items: center;
+    margin-left: auto !important;
+    display: flex !important;
+    gap: 6px !important;
+    align-items: center !important;
     margin-right: 0 !important;
 }
 
 .show-owned .MuiSwitch-root {
-    padding: 8px;
+    padding: 8px !important;
 }
 
 .show-owned .MuiSwitch-track {
-    background-color: var(--color-border-hi);
-    border-radius: 14px;
+    background-color: var(--color-border-hi) !important;
+    border-radius: 14px !important;
 }
 
 .show-owned .Mui-checked+.MuiSwitch-track {
@@ -136,37 +136,37 @@
 }
 
 .upgrades-content {
-    padding: 0 24px 24px;
-    flex: 1 1 0;
-    min-height: 0;
-    background-color: var(--color-bg-card);
-    display: flex;
-    flex-direction: column;
+    padding: 0 24px 24px !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    background-color: var(--color-bg-card) !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 .upgrades-content-label {
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-fg-secondary);
-    font-family: var(--font-code);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    font-size: 10px !important;
+    letter-spacing: 0.14em !important;
+    text-transform: uppercase !important;
+    color: var(--color-fg-secondary) !important;
+    font-family: var(--font-code) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 10px !important;
 }
 
 .upgrades-content-label::after {
     content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--color-border);
+    flex: 1 !important;
+    height: 1px !important;
+    background: var(--color-border) !important;
 }
 
 .upgrades-content-grid {
-    flex: 1 1 0;
-    min-height: 0;
-    overflow-y: auto;
-    align-content: flex-start;
-    align-items: stretch;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    align-content: flex-start !important;
+    align-items: stretch !important;
 }
