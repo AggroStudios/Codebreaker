@@ -1,7 +1,6 @@
 import {
     createContext,
     useContext,
-    useMemo,
     useRef,
     type MutableRefObject,
     type ReactNode,
@@ -17,10 +16,7 @@ const AnchorsContext = createContext<AnchorsContextValue | null>(null);
 export function AnchorsProvider({ children }: { children: ReactNode }) {
     const moneyAnchorRef = useRef<HTMLElement | null>(null);
     const xpAnchorRef = useRef<HTMLElement | null>(null);
-    const value = useMemo(
-        () => ({ moneyAnchorRef, xpAnchorRef }),
-        [],
-    );
+    const value = { moneyAnchorRef, xpAnchorRef };
     return (
         <AnchorsContext.Provider value={value}>
             {children}

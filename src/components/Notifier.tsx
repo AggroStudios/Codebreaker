@@ -1,9 +1,7 @@
 import {
     createContext,
-    useCallback,
     useContext,
     useEffect,
-    useMemo,
     useRef,
     useState,
     type ReactNode,
@@ -136,11 +134,11 @@ export function NotifierProvider({ children }: { children: ReactNode }) {
     const [queue, setQueue] = useState<ActiveNotification[]>([]);
     const idRef = useRef(0);
 
-    const dismiss = useCallback((id: number) => {
+    const dismiss = (id: number) => {
         setQueue((q) => q.filter((n) => n.id !== id));
-    }, []);
+    };
 
-    const notify = useCallback((options: NotifyOptions) => {
+    const notify = (options: NotifyOptions) => {
         const id = ++idRef.current;
         const full: ActiveNotification = {
             id,
@@ -151,9 +149,9 @@ export function NotifierProvider({ children }: { children: ReactNode }) {
         };
         setQueue((q) => [...q, full]);
         return id;
-    }, []);
+    };
 
-    const value = useMemo(() => ({ notify, dismiss }), [notify, dismiss]);
+    const value = { notify, dismiss };
 
     return (
         <NotifierContext.Provider value={value}>

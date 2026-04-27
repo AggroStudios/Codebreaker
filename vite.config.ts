@@ -8,7 +8,13 @@ export default defineConfig({
         $config: JSON.stringify(config.get('frontend') || {}),
         'import.meta.env.VITE_APP_VERSION': JSON.stringify(pkg.version),
     },
-    plugins: [react()],
+    plugins: [
+        react({
+            babel: {
+                plugins: [['babel-plugin-react-compiler']],
+            },
+        }),
+    ],
     build: {
         target: 'esnext',
         minify: 'oxc',

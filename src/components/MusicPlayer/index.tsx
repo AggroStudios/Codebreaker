@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
 import { getTrack, musicTracks } from '../../lib/musicTracks';
 
@@ -14,10 +14,7 @@ export default function MusicPlayer() {
     const pause = useMusicPlayerStore((s) => s.pause);
 
     const trackCount = musicTracks.length;
-    const currentSrc = useMemo(
-        () => getTrack(currentTrackIndex)?.src,
-        [currentTrackIndex],
-    );
+    const currentSrc = getTrack(currentTrackIndex)?.src;
 
     useEffect(() => {
         const audio = audioRef.current;

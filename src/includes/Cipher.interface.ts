@@ -36,14 +36,8 @@ export interface ICipherType {
     xp: number;
 }
 
-export interface IGridItem {
-    character: string;
-    cssClass: string;
-}
-
 export interface CipherEntry {
     cipher?: Cipher;
-    grid: IGridItem[];
     progress: number;
     type?: ICipherType;
     state?: CipherState;

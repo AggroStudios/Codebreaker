@@ -1,5 +1,5 @@
 import { IUpgradeItem } from '../../lib/upgrades';
-import { memo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -27,7 +27,7 @@ interface ConfirmDialogProps {
     onCancel: () => void;
 }
 
-const ConfirmDialog = memo(function ConfirmDialog({
+function ConfirmDialog({
     open,
     upgrade,
     onConfirm,
@@ -61,9 +61,9 @@ const ConfirmDialog = memo(function ConfirmDialog({
             </DialogActions>
         </Dialog>
     );
-});
+}
 
-export default memo(function Upgrade(props: { upgrade: IUpgradeItem }) {
+export default function Upgrade(props: { upgrade: IUpgradeItem }) {
     const { upgrade } = props;
 
     const purchasedUpgrades = usePlayerStore((s) => s.purchasedUpgrades);
@@ -154,4 +154,4 @@ export default memo(function Upgrade(props: { upgrade: IUpgradeItem }) {
             />
         </Grid>
     );
-}); 
+}

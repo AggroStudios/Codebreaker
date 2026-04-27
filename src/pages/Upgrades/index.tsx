@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import { UpgradeList, type IUpgradeItem } from '../../lib/upgrades';
 
 import { usePlayerStore } from '../../stores/player';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 
 import Dialog from '@mui/material/Dialog';
@@ -24,7 +24,7 @@ import Upgrade from '../../components/Upgrade';
 import { useEffect } from 'react';
 import { capitalize } from '@mui/material/utils';
 
-export default memo(function UpgradesComponent() {
+export default function UpgradesComponent() {
     const playerStore = usePlayerStore();
 
     const purchasedUpgrades = usePlayerStore((s) => s.purchasedUpgrades);
@@ -126,4 +126,4 @@ export default memo(function UpgradesComponent() {
 
         </div>
     );
-});
+}

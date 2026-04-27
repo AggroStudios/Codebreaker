@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState, type MouseEvent as ReactMouseEvent } from 'react';
+import { useEffect, useState, type MouseEvent as ReactMouseEvent } from 'react';
 
 import {
     Box,
@@ -102,7 +102,7 @@ const notificationIcon = (level: NotificationLevel) => {
     }
 };
 
-const GameFrameCounter = memo(function GameFrameCounter() {
+function GameFrameCounter() {
     const { stationProxy, useStationStore } = useStationContext();
     const isRunning = useStationStore((s) => s.isRunning);
     const playing = useMusicPlayerStore((s) => s.playing);
@@ -121,15 +121,12 @@ const GameFrameCounter = memo(function GameFrameCounter() {
         return () => clearInterval(id);
     }, [useStationStore]);
 
-    const handleToggle = useCallback(
-        () => {
-            stationProxy.os?.toggleGameLoop();
-            if (!playing) {
-                playMusic();
-            }
-        },
-        [stationProxy, playing, playMusic],
-    );
+    const handleToggle = () => {
+        stationProxy.os?.toggleGameLoop();
+        if (!playing) {
+            playMusic();
+        }
+    };
     return (
         <Typography
             variant="h6"
@@ -150,7 +147,7 @@ const GameFrameCounter = memo(function GameFrameCounter() {
             </IconButton>
         </Typography>
     );
-});
+}
 
 export default function AppBarComponent() {
     const money = usePlayerStore((s) => s.player.money);

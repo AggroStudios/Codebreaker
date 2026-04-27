@@ -1,8 +1,5 @@
 import {
-    memo,
-    useCallback,
     useEffect,
-    useMemo,
     useRef,
     useState,
     type KeyboardEvent as ReactKeyboardEvent,
@@ -80,7 +77,7 @@ function displayLine(line: string) {
     );
 }
 
-const TerminalHistoryLine = memo(function TerminalHistoryLine({
+function TerminalHistoryLine({
     line,
 }: {
     line: TerminalLine;
@@ -93,7 +90,7 @@ const TerminalHistoryLine = memo(function TerminalHistoryLine({
             </span>
         </div>
     );
-});
+}
 
 export default function Terminal({
     terminalController,
@@ -130,80 +127,68 @@ export default function Terminal({
     const codeRef = useRef<HTMLElement | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
 
-    const newLine = useCallback(() => {
+    const newLine = () => {
         addLine({ prompt: terminalController.prompt, value: '' });
         setCursorPosition(0);
         setCursorOffset(0);
-    }, [addLine, terminalController]);
+    };
 
-    const terminalOutput = useCallback(
-        (
-            data: string,
-            stream: string,
-            {
-                prompt = '',
-                lineIndex = -1,
-                characterMode = false,
-                updateMode = false,
-                caretAtEnd = true,
-                color = null,
-                replaceRange = [],
-            }: TerminalOutputOptions = {},
-        ) => {
-            const error = stream === 'stderr';
+    const terminalOutput = (
+        data: string,
+        stream: string,
+        {
+            prompt = '',
+            lineIndex = -1,
+            characterMode = false,
+            updateMode = false,
+            caretAtEnd = true,
+            color = null,
+            replaceRange = [],
+        }: TerminalOutputOptions = {},
+    ) => {
+        const error = stream === 'stderr';
 
-            if (!caretAtEnd) {
-                setCursorOffset(data.length);
-            }
+        if (!caretAtEnd) {
+            setCursorOffset(data.length);
+        }
 
-            let payload = data;
-            if (color) {
-                payload = `^[${color};${data}^]`;
-            }
+        let payload = data;
+        if (color) {
+            payload = `^[${color};${data}^]`;
+        }
 
-            if (characterMode) {
-                appendLine(payload, lineIndex);
-            } else if (replaceRange.length > 0) {
-                const [start, end] = replaceRange;
-                replaceCharsForRange(
-                    { prompt, value: payload, error, start, end },
-                    lineIndex,
-                );
-            } else if (updateMode) {
-                updateLine({ prompt, value: payload, error }, lineIndex);
-            } else {
-                addLine({ prompt, value: payload, error });
-            }
-        },
-        [addLine, appendLine, replaceCharsForRange, updateLine],
-    );
+        if (characterMode) {
+            appendLine(payload, lineIndex);
+        } else if (replaceRange.length > 0) {
+            const [start, end] = replaceRange;
+            replaceCharsForRange(
+                { prompt, value: payload, error, start, end },
+                lineIndex,
+            );
+        } else if (updateMode) {
+            updateLine({ prompt, value: payload, error }, lineIndex);
+        } else {
+            addLine({ prompt, value: payload, error });
+        }
+    };
 
-    const handleStdIn = useCallback(
-        (
-            callback: StdInCallback,
-            {
-                characterMode = false,
-            }: Pick<TerminalAttachmentOptions, 'characterMode'> = {},
-        ) => {
-            stdInCharacterModeRef.current = characterMode;
-            stdInCallbackRef.current = callback;
-        },
-        [],
-    );
+    const handleStdIn = (
+        callback: StdInCallback,
+        {
+            characterMode = false,
+        }: Pick<TerminalAttachmentOptions, 'characterMode'> = {},
+    ) => {
+        stdInCharacterModeRef.current = characterMode;
+        stdInCallbackRef.current = callback;
+    };
 
-    const handleStdOut = useCallback(
-        (data: string, options: TerminalOutputOptions) => {
-            terminalOutput(data, 'stdout', options);
-        },
-        [terminalOutput],
-    );
+    const handleStdOut = (data: string, options: TerminalOutputOptions) => {
+        terminalOutput(data, 'stdout', options);
+    };
 
-    const handleStdErr = useCallback(
-        (data: string, options: TerminalOutputOptions) => {
-            terminalOutput(data, 'stderr', { ...options, prompt: '\u2718 ' });
-        },
-        [terminalOutput],
-    );
+    const handleStdErr = (data: string, options: TerminalOutputOptions) => {
+        terminalOutput(data, 'stderr', { ...options, prompt: '\u2718 ' });
+    };
 
     useEffect(() => {
         terminalController.attachTerminal({
@@ -271,17 +256,14 @@ export default function Terminal({
         }
     }, [commandLoaded]);
 
-    const terminalFunctions = useMemo<Record<string, () => void>>(
-        () => ({
-            clear: () => clearTerminal(),
-            reboot: () => {
-                terminalController.reset();
-                setTerminalLoaded(false);
-                clearTerminal();
-            },
-        }),
-        [clearTerminal, terminalController],
-    );
+    const terminalFunctions: Record<string, () => void> = {
+        clear: () => clearTerminal(),
+        reboot: () => {
+            terminalController.reset();
+            setTerminalLoaded(false);
+            clearTerminal();
+        },
+    };
 
     const handleKeyUp = async (event: ReactKeyboardEvent<HTMLInputElement>) => {
         const target = event.currentTarget;

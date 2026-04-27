@@ -1,4 +1,4 @@
-import { lazy, useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -37,7 +37,7 @@ const UpgradesRoute = lazy(() => import('./pages/Upgrades'));
 export default function App() {
     const [loadingProgress, setLoadingProgress] = useState(0);
 
-    const bootstrap = useMemo(() => {
+    const [bootstrap] = useState(() => {
         const processor = new CodiumProcessor();
         const operatingSystem = new OperatingSystem(playerStoreProxy);
         const memory = new CodiumMemory();
@@ -64,7 +64,7 @@ export default function App() {
         const terminalController = new TerminalController();
 
         return { station, useStationStore, stationProxy, terminalController };
-    }, []);
+    });
 
     useEffect(() => {
         preloadImages(setLoadingProgress);
@@ -79,9 +79,9 @@ export default function App() {
     const { station, useStationStore, stationProxy, terminalController } =
         bootstrap;
 
-    const handleLoadingHidden = useCallback(() => {
+    const handleLoadingHidden = () => {
         useMusicPlayerStore.getState().play();
-    }, []);
+    };
 
     return (
         <ThemeProvider theme={darkTheme}>

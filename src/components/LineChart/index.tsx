@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { Avatar, Card, CardContent, CardHeader } from '@mui/material';
 import { SsidChartOutlined } from '@mui/icons-material';
@@ -58,7 +58,7 @@ export default function LineChart(props: LineChartProps) {
     const strokeColor = props.strokeColor || '#2563eb';
     const strokeWidth = props.strokeWidth || 2;
 
-    const rollingData = useMemo<LineChartData>(() => {
+    const rollingData: LineChartData = (() => {
         const source = props.data;
         const maxPoints = props.maxDataPoints;
 
@@ -83,7 +83,7 @@ export default function LineChart(props: LineChartProps) {
         }
 
         return source.slice(-maxPoints);
-    }, [props.data, props.maxDataPoints]);
+    })();
 
     useEffect(() => {
         const container = containerRef.current;
