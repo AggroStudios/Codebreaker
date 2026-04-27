@@ -10,6 +10,8 @@ export const cipherGridRenderers = new Map<
     (chars: Uint8Array, classes: Uint8Array) => void
 >();
 
+export const downloadTickHandlers = new Map<string, (frame: number) => void>();
+
 export const useCipherStore = create<CounterState>((set) => ({
     runningProcesses: [],
     addProcess: (id: string, type: ICipherType) =>

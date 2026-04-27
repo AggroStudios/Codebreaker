@@ -44,7 +44,7 @@ import {
 } from '../../includes/Cipher.interface';
 import { NotificationLevel } from '../../includes/OperatingSystem.interface';
 import { useNotifier } from '../Notifier';
-import { cipherGridRenderers, useCipherBreakStore } from '../../stores/cipher';
+import { cipherGridRenderers, downloadTickHandlers, useCipherBreakStore } from '../../stores/cipher';
 import { usePlayerStore } from '../../stores/player';
 
 // Must match the CHAR_SET order used in Cipher.tsx (_chars indices)
@@ -243,13 +243,12 @@ function drawGL(res: GLResources, canvas: HTMLCanvasElement) {
 
 function CipherGrid({
     id,
-    cipherState,
+    cipherKey,
 }: {
     id: string;
-    cipherState: CipherState | undefined;
+    cipherKey: string | undefined;
 }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const animRef   = useRef<number>(0);
     const glRef     = useRef<GLResources | null>(null);
 
     // ── Initialize WebGL once ────────────────────────────────────────────────
@@ -283,17 +282,14 @@ function CipherGrid({
         return () => ro.disconnect();
     }, []);
 
-    // ── Download animation ────────────────────────────────────────────────────
+    // ── Download animation — driven by the game loop frame counter ───────────
+    // Registers a handler in downloadTickHandlers keyed on id+cipherKey so each
+    // new cipher instance gets fresh animation state. The handler is called by
+    // the cipher's downloading() method on every game loop frame, so it pauses
+    // automatically whenever the game loop pauses.
     useEffect(() => {
-        cancelAnimationFrame(animRef.current);
-        const canvas = canvasRef.current;
-        const res    = glRef.current;
-        if (!canvas || !res || cipherState !== CipherState.DOWNLOADING) return;
-
-        const { instData } = res;
         const total = CIPHER_COLS * CIPHER_ROWS;
 
-        // Stable per-cell char index and dim color (0-2 only)
         const cellChars = new Uint8Array(total);
         const cellRGB   = new Float32Array(total * 3);
         for (let i = 0; i < total; i++) {
@@ -301,29 +297,27 @@ function CipherGrid({
             const [r, g, b] = CELL_COLORS_RGB[Math.floor(Math.random() * 3)];
             cellRGB[i * 3] = r; cellRGB[i * 3 + 1] = g; cellRGB[i * 3 + 2] = b;
         }
+        const fillOrder       = Array.from({ length: total }, (_, i) => i).sort(() => Math.random() - 0.5);
+        const filled          = new Uint8Array(total);
+        let   prevFilledCount = 0;
+        const colPos          = new Float32Array(CIPHER_COLS).map(() => Math.random() * CIPHER_ROWS);
+        const colSpeed        = new Float32Array(CIPHER_COLS).map(() => 0.06 + Math.random() * 0.1);
+        const colTrail        = new Uint8Array(CIPHER_COLS).map(() => 3 + Math.floor(Math.random() * 5));
 
-        // Random fill order — which cells accumulate first
-        const fillOrder = Array.from({ length: total }, (_, i) => i)
-            .sort(() => Math.random() - 0.5);
+        downloadTickHandlers.set(id, (_frame) => {
+            const canvas = canvasRef.current;
+            const res    = glRef.current;
+            if (!canvas || !res) return;
 
-        const filled        = new Uint8Array(total);
-        let prevFilledCount = 0;
-
-        const colPos   = new Float32Array(CIPHER_COLS).map(() => Math.random() * CIPHER_ROWS);
-        const colSpeed = new Float32Array(CIPHER_COLS).map(() => 0.06 + Math.random() * 0.1);
-        const colTrail = new Uint8Array(CIPHER_COLS).map(() => 3 + Math.floor(Math.random() * 5));
-
-        const draw = () => {
+            const { instData } = res;
             const progress    = useCipherBreakStore.getState().entries[id]?.progress ?? 0;
             const filledCount = Math.round((progress / 100) * total);
 
             for (let i = prevFilledCount; i < filledCount; i++) filled[fillOrder[i]] = 1;
             prevFilledCount = filledCount;
 
-            // Reset all alphas, then write only visible cells
             for (let i = 6; i < instData.length; i += 7) instData[i] = 0;
 
-            // Settled cells
             for (let i = 0; i < filledCount; i++) {
                 const idx  = fillOrder[i];
                 const base = idx * 7;
@@ -334,7 +328,6 @@ function CipherGrid({
                 instData[base + 6] = 1;
             }
 
-            // Rain over unfilled cells
             for (let c = 0; c < CIPHER_COLS; c++) {
                 colPos[c] = (colPos[c] + colSpeed[c]) % CIPHER_ROWS;
                 const headRow = Math.floor(colPos[c]);
@@ -360,17 +353,14 @@ function CipherGrid({
             }
 
             drawGL(res, canvas);
-            animRef.current = requestAnimationFrame(draw);
-        };
+        });
 
-        animRef.current = requestAnimationFrame(draw);
-        return () => cancelAnimationFrame(animRef.current);
-    }, [cipherState]);
+        return () => { downloadTickHandlers.delete(id); };
+    }, [id, cipherKey]);
 
     // ── Breaking-phase renderer ───────────────────────────────────────────────
     useEffect(() => {
         cipherGridRenderers.set(id, (chars, classes) => {
-            cancelAnimationFrame(animRef.current);
             const canvas = canvasRef.current;
             const res    = glRef.current;
             if (!canvas || !res) return;
@@ -472,6 +462,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
     const cardRef = useRef<HTMLDivElement | null>(null);
     const { functions, station, id, type } = props;
     const cipher = useCipherBreakStore((s) => (id ? s.entries[id]?.cipher : undefined));
+    const cipherKey = useCipherBreakStore((s) => (id ? s.entries[id]?.cipher?.id : undefined));
     const cipherType = useCipherBreakStore((s) => (id ? s.entries[id]?.type : undefined));
     const cipherState = useCipherBreakStore((s) => (id ? s.entries[id]?.state : undefined));
     const autoCipher = useCipherBreakStore((s) => s.entries[id ?? '']?.autoCipher ?? false);
@@ -553,6 +544,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
             setProgress: (p) => useCipherBreakStore.getState().update(id, { progress: p }),
             setState: (s) => useCipherBreakStore.getState().update(id, { state: s }),
             completeCipher: (c, cancelled) => completeCipherRef.current(c, cancelled),
+            downloadTick: (frame) => downloadTickHandlers.get(id)?.(frame),
         };
 
         try {
@@ -697,7 +689,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
                     {id && (
                         <>
                             <CipherProgressBar id={id} cipherState={cipherState} />
-                            <CipherGrid id={id} cipherState={cipherState} />
+                            <CipherGrid id={id} cipherKey={cipherKey} />
                         </>
                     )}
                 </CardContent>

@@ -9,6 +9,7 @@ export interface CipherDelegate {
     setProgress: (progress: number) => void;
     setState: (state: CipherState) => void;
     completeCipher: (cipher: Cipher, cancelled: boolean) => void;
+    downloadTick: (frame: number) => void;
 }
 
 export default class Cipher implements Process {
@@ -185,6 +186,7 @@ export default class Cipher implements Process {
 
     private downloading() {
         this._percentUse = 50;
+        this._delegate.downloadTick(this.frame);
         if (this.frame > 0 && this.frame % 10 === 0) {
             this.downloadedBlocks +=
                 this._stationNet.network.speedInBps /
