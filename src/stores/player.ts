@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import {
     experienceForLevel,
     Player,
@@ -30,7 +31,9 @@ export interface Upgrade {
     tags: string[];
 }
 
-export const usePlayerStore = create<PlayerState>((set) => ({
+export const usePlayerStore = create<PlayerState>()(
+  persist(
+    (set) => ({
     player: {
         name: 'Player',
         money: 1000,
@@ -163,7 +166,17 @@ export const usePlayerStore = create<PlayerState>((set) => ({
         set((state) => ({
             player: { ...state.player, notifications: [] },
         })),
-}));
+  }),
+  {
+    name: 'player-store',
+    storage: createJSONStorage(() => localStorage),
+    partialize: (state) => ({
+      player: state.player,
+      purchasedUpgrades: state.purchasedUpgrades,
+    }),
+  },
+  ),
+);
 
 /**
  * Live proxy for non-React callers (game engine classes). Reads always

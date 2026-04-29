@@ -40,6 +40,16 @@
     margin: 0 8px;
 }
 
+.cipher-progress-bar .MuiLinearProgress-root {
+    background-color: var(--accent-dim) !important;
+    height: 8px !important;
+    border-radius: 4px !important;
+    & .MuiLinearProgress-bar {
+        background-color: var(--accent) !important;
+        border-radius: 4px !important;
+    }
+}
+
 @keyframes successPulse {
     0% {
         background-color: rgba(25, 25, 25, 0.8);

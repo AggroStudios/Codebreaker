@@ -30,6 +30,7 @@ export default function PlayerLevel() {
                         />
                     )}
                     <LinearProgress
+                        className="playerLevelProgress"
                         variant="determinate"
                         value={
                             (player.experience / player.nextLevel) * 100

@@ -21,3 +21,14 @@
     margin-top: 4px !important;
     font-family: var(--font-code) !important;
 }
+
+.playerLevelCard .playerLevelProgress.MuiLinearProgress-root {
+    background-color: var(--accent-dim) !important;
+    height: 8px !important;
+    border-radius: 4px !important;
+    margin-bottom: 8px !important;
+    & .MuiLinearProgress-bar {
+        background-color: var(--accent) !important;
+        border-radius: 4px !important;
+    }
+}

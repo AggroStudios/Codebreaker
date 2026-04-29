@@ -1,29 +1,29 @@
-.software {
+.upgrade .software {
     background: rgba(38, 198, 218, 0.12) !important;
     color: #26c6da !important;
 }
 
-.network {
+.upgrade .network {
     background: rgba(103, 58, 183, 0.15) !important;
     color: #9c7fe0 !important;
 }
 
-.hardware {
+.upgrade .hardware {
     background: rgba(255, 152, 0, 0.12) !important;
     color: #ff9800 !important;
 }
 
-.security {
+.upgrade .security {
     background: rgba(255, 0, 0, 0.12) !important;
     color: #ff0000 !important;
 }
 
-.passive {
+.upgrade .passive {
     background: rgba(255, 255, 255, 0.07) !important;
     color: var(--color-fg-secondary) !important;
 }
 
-.active {
+.upgrade .active {
     background-color: var(--accent-dim) !important;
     border-color: var(--color-border-hi) !important;
     color: var(--accent) !important;

@@ -419,7 +419,7 @@ function LinearProgressWithLabel(
     props: LinearProgressProps & { value: number; label?: string },
 ) {
     return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box className="cipher-progress-bar" sx={{ display: 'flex', alignItems: 'center' }}>
             {props.label && (
                 <Box sx={{ minWidth: 75, textAlign: 'left' }}>
                     <Typography

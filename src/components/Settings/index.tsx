@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -21,6 +22,7 @@ import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
+import { usePlayerStore } from '../../stores/player';
 import { getTrack } from '../../lib/musicTracks';
 
 export interface SettingsProps {
@@ -29,6 +31,8 @@ export interface SettingsProps {
 }
 
 export default function Settings({ open, onClose }: SettingsProps) {
+    const [confirmReset, setConfirmReset] = useState(false);
+
     const playing = useMusicPlayerStore((s) => s.playing);
     const volume = useMusicPlayerStore((s) => s.volume);
     const muted = useMusicPlayerStore((s) => s.muted);
@@ -46,6 +50,13 @@ export default function Settings({ open, onClose }: SettingsProps) {
         setVolume(next / 100);
     };
 
+    const handleResetGame = () => {
+        usePlayerStore.persist.clearStorage();
+        // station-store has no exported hook reference here, clear by key directly
+        localStorage.removeItem('station-store');
+        window.location.reload();
+    };
+
     const volumeIcon = muted || volume === 0
         ? <VolumeOffIcon />
         : volume < 0.5
@@ -57,7 +68,7 @@ export default function Settings({ open, onClose }: SettingsProps) {
     return (
         <Dialog
             open={open}
-            onClose={onClose}
+            onClose={() => { setConfirmReset(false); onClose(); }}
             fullWidth
             maxWidth="xs"
             aria-labelledby="settings-dialog-title"
@@ -74,7 +85,7 @@ export default function Settings({ open, onClose }: SettingsProps) {
                 Settings
                 <IconButton
                     aria-label="Close settings"
-                    onClick={onClose}
+                    onClick={() => { setConfirmReset(false); onClose(); }}
                     size="small"
                     sx={{ outline: 0 }}
                 >
@@ -194,10 +205,57 @@ export default function Settings({ open, onClose }: SettingsProps) {
                         {volumePercent}%
                     </Typography>
                 </Box>
+                <Divider sx={{ my: 2 }} />
+
+                <Typography
+                    component="div"
+                    variant="overline"
+                    color="text.secondary"
+                    gutterBottom
+                    sx={{ display: 'block' }}
+                >
+                    Game
+                </Typography>
+
+                {confirmReset ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Typography component="div" variant="body2" color="error">
+                            This will erase all progress and cannot be undone.
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                size="small"
+                                onClick={handleResetGame}
+                                sx={{ outline: 0 }}
+                            >
+                                Confirm Reset
+                            </Button>
+                            <Button
+                                size="small"
+                                onClick={() => setConfirmReset(false)}
+                                sx={{ outline: 0 }}
+                            >
+                                Cancel
+                            </Button>
+                        </Box>
+                    </Box>
+                ) : (
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={() => setConfirmReset(true)}
+                        sx={{ outline: 0 }}
+                    >
+                        Reset Game
+                    </Button>
+                )}
             </DialogContent>
 
             <DialogActions>
-                <Button onClick={onClose} sx={{ outline: 0 }}>
+                <Button onClick={() => { setConfirmReset(false); onClose(); }} sx={{ outline: 0 }}>
                     Close
                 </Button>
             </DialogActions>
