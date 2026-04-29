@@ -46,6 +46,7 @@ import { NotificationLevel } from '../../includes/OperatingSystem.interface';
 import { useNotifier } from '../Notifier';
 import { cipherGridRenderers, downloadTickHandlers, useCipherBreakStore } from '../../stores/cipher';
 import { usePlayerStore } from '../../stores/player';
+import { dataSizeFromSuffix } from '../../lib/utils';
 
 // Must match the CHAR_SET order used in Cipher.tsx (_chars indices)
 const CHAR_SET =
@@ -536,7 +537,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
     completeCipherRef.current = completeCipher;
 
     const handleAddCipher = (cipherType: ICipherType) => {
-        if (!id) return;
+        if (!id) return;        
         // Delegate writes directly to the store via getState() so it never
         // captures stale React closure values.
         const delegate: CipherDelegate = {
@@ -550,8 +551,15 @@ export default function CipherBreak(props: CipherBreakOptions) {
         try {
             const c = new Cipher(20, 10, cssClasses, cipherType, station, delegate);
             useCipherBreakStore.getState().update(id, { cipher: c, type: cipherType });
-        } catch {
-            const message = `Not enough cores available to add process '${cipherType.name}'.`;
+            station.os?.addFile({
+                cmd: `${c.id}.bin`,
+                path: `/${cipherType.name.replace(' ', '-').toLowerCase()}`,
+                contentType: 'application/octet-stream',
+                permissions: 644,
+                size: dataSizeFromSuffix(cipherType.block),
+            });
+        } catch(error) {
+            const message = error.message;
             notify({ level: 'error', message });
             removeEntry(id);
             removeProcess?.(id);

@@ -52,8 +52,8 @@ export default function Settings({ open, onClose }: SettingsProps) {
 
     const handleResetGame = () => {
         usePlayerStore.persist.clearStorage();
-        // station-store has no exported hook reference here, clear by key directly
         localStorage.removeItem('station-store');
+        localStorage.removeItem('storage-store');
         window.location.reload();
     };
 

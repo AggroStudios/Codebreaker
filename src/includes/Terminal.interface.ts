@@ -51,4 +51,5 @@ export interface IApplication {
     permissions: number;
     content?: string;
     contentType?: string;
+    size?: number;
 }

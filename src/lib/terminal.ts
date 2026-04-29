@@ -175,6 +175,7 @@ export default class Terminal {
 
     attachOperatingSystem(os: OperatingSystem) {
         this._osController = os;
+        this.fs.mount(os.storagePath, os);
     }
 
     async readSecure(prompt: string) {

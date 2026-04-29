@@ -31,6 +31,7 @@ interface LineChartProps {
     yLabel?: string;
     strokeColor?: string;
     strokeWidth?: number;
+    markerColor?: string;
 }
 
 const isLineSeriesArray = (data: LineChartData): data is LineSeries[] => {
@@ -300,7 +301,7 @@ export default function LineChart(props: LineChartProps) {
                 .attr('cy', (d: DataPoint) => yScale(d.y))
                 .attr('r', 2)
                 .attr('fill', color)
-                .attr('stroke', '#fff')
+                .attr('stroke', props.markerColor ?? '#fff')
                 .attr('stroke-width', 1);
         });
     }, [

@@ -6,9 +6,10 @@ import { filter, isEmpty, uniq, uniqBy } from 'lodash';
 
 import { colorizeString, decolorizeString } from './display';
 
-import { path } from '../utils';
+import { path, stripLastSlash, stripTrailingSlashes } from '../utils';
 
 import { IApplication, TerminalApp } from '../../includes/Terminal.interface';
+import OperatingSystem from '../OperatingSystem';
 
 export interface IDirectory {
     path: string;
@@ -18,6 +19,11 @@ export interface IDirectory {
     group: string;
     permissions: Permissions;
     directory: boolean;
+}
+
+export interface IMount {
+    path: string;
+    os: OperatingSystem;
 }
 
 class Permissions {
@@ -75,16 +81,8 @@ interface IPermission {
     execute: boolean;
 }
 
-const stripLastSlash = (path: string) => path.replace(/\/$/, '');
-function stripTrailingSlashes(path: string) {
-    while (path.endsWith('/')) {
-        path = stripLastSlash(path);
-    }
-    return path;
-}
-
 const directoryRegex = (path: string) =>
-    new RegExp(`^${stripLastSlash(path)}/([a-zA-Z-_]+)$`);
+    new RegExp(`^${stripLastSlash(path)}/([^/]+)$`);
 
 const getSubDirectories = (path: string, apps: IApplication[]) =>
     uniqBy(apps, 'path')
@@ -102,14 +100,24 @@ const getSubDirectories = (path: string, apps: IApplication[]) =>
 
 export default class FileSystem {
     private _cwd: string = '/';
-    private apps: IApplication[];
+    private _apps: IApplication[];
+    private _mounts: IMount[] = [];
 
     constructor(apps: IApplication[]) {
-        this.apps = apps;
+        this._apps = apps;
+    }
+
+    private get apps(): IApplication[] {
+        const mountedFiles = this._mounts.flatMap((mount) => (mount.os.storedFiles || []).map((file) => ({ ...file, path: stripTrailingSlashes(`${mount.path}/${file.path}`) })));
+        return [...this._apps, ...mountedFiles];
     }
 
     get cwd() {
         return this._cwd;
+    }
+
+    mount(mountPath: string, os: OperatingSystem) {
+        this._mounts.push({ path: mountPath, os });
     }
 
     cat([passedPath]: string[]) {
@@ -326,7 +334,7 @@ export default class FileSystem {
 
         const dir = this.apps
             .reduce((acc: IDirectory[], cur: IApplication) => {
-                if (cur.path === dirToList) {
+                if (cur.path === dirToList && cur.contentType !== 'inode/directory') {
                     acc.push({
                         path: cur.cmd,
                         owner: 'root',

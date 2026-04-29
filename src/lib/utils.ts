@@ -14,7 +14,7 @@ export const dataSizeSuffixes = [
 ];
 
 export const formatMoney = (money: number, decimalPlaces: number = 2) => {
-    return money.toLocaleString('en-US', {
+    return (money || 0).toLocaleString('en-US', {
         minimumFractionDigits: decimalPlaces,
         maximumFractionDigits: decimalPlaces,
     });
@@ -41,6 +41,14 @@ export const dataSizeSuffix = (value: number, startPoint: number = 0) => {
     }
 
     return `${Number(currentValue.toFixed(2))} ${dataSizeSuffixes[index + startPoint]}`;
+};
+
+export const stripLastSlash = (path: string): string => path.replace(/\/$/, '');
+export const stripTrailingSlashes = (path: string): string => {
+    while (path.endsWith('/')) {
+        path = stripLastSlash(path);
+    }
+    return path;
 };
 
 export const path = class Path {

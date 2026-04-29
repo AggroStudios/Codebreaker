@@ -20,8 +20,10 @@ export default interface Process {
     callback: (...args: unknown[]) => unknown;
     pid?: number;
     cores?: number;
+    memoryRequired?: number;
     paused?: boolean;
     percentUse?: number;
+    size?: number;
 }
 
 export type StationStoreType = {

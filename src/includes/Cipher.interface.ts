@@ -28,6 +28,7 @@ export interface ICipherType {
     name: string;
     complexity: number;
     parallelism: number;
+    memoryRequired: number;
     block: {
         size: number;
         unit: BlockUnit;
@@ -55,6 +56,7 @@ export const CipherTypes: ICipherType[] = [
         name: 'Cipher 1',
         complexity: 1,
         parallelism: 1,
+        memoryRequired: 1024,
         block: {
             size: 1024,
             unit: BlockUnit.megabytes,
@@ -66,6 +68,7 @@ export const CipherTypes: ICipherType[] = [
         name: 'Cipher 2',
         complexity: 1.8,
         parallelism: 2,
+        memoryRequired: 2048,
         block: {
             size: 2048,
             unit: BlockUnit.megabytes,
@@ -77,6 +80,7 @@ export const CipherTypes: ICipherType[] = [
         name: 'Cipher 3',
         complexity: 2.5,
         parallelism: 3,
+        memoryRequired: 3072,
         block: {
             size: 3072,
             unit: BlockUnit.megabytes,
