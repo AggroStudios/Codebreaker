@@ -1,0 +1,35 @@
+.cipher-type-select-form-control .MuiInputBase-root::before {
+    border-bottom: 1px solid rgba(10, 245, 176, 0.5);
+}
+
+.cipher-type-select-form-control .MuiInputBase-root::after {
+    border-bottom: 2px solid rgba(10, 245, 176, 0.5);
+}
+
+.cipher-type-select-form-control .MuiInputLabel-root.Mui-focused {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.cipher-add-button {
+    background-color: var(--accent) !important;
+    color: rgb(10, 15, 13) !important;
+    border-color: rgb(10, 15, 13) !important;
+    &:hover {
+        background-color: rgba(10, 245, 176, 0.8) !important;
+        border-color: rgba(10, 245, 176, 0.8) !important;
+    }
+}
+
+#cipher-add-card .MuiCardHeader-title {
+    font-family: var(--font-ui) !important;
+    font-size: 18px !important;
+}
+
+#cipher-add-card .MuiCardHeader-subheader {
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 2px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}

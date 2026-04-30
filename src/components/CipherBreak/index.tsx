@@ -16,15 +16,12 @@ import {
     FormControlLabel,
     IconButton,
     LinearProgress,
-    MenuItem,
-    Select,
     Table,
     TableBody,
     TableCell,
     TableRow,
     Typography,
     type LinearProgressProps,
-    type SelectChangeEvent,
 } from '@mui/material';
 import {
     CodeTwoTone,
@@ -40,7 +37,6 @@ import './styles.scss';
 import { StationStoreType } from '../../includes/Process.interface';
 import {
     CipherState,
-    CipherTypes,
     ICipherType,
 } from '../../includes/Cipher.interface';
 import { NotificationLevel } from '../../includes/OperatingSystem.interface';
@@ -178,7 +174,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [infoDialogOpen, setInfoDialogOpen] = useState(false);
 
-    const { addProcess, removeProcess } = functions;
+    const { removeProcess } = functions;
     const { notify } = useNotifier();
 
     // Always points to the latest completeCipher so delegates created once
@@ -311,16 +307,6 @@ export default function CipherBreak(props: CipherBreakOptions) {
     const pauseCipher = () => cipher?.pause();
     const resumeCipher = () => cipher?.resume();
 
-    const handleCipherChange = (event: SelectChangeEvent<string>) => {
-        const type = CipherTypes.find(t => t.name === event.target.value);
-        if (id) {
-            handleAddCipher(type);
-        }
-        else {
-            addProcess?.(crypto.randomUUID(), type);
-        }
-    };
-
     const handleRestartCipher = () => {
         handleAddCipher(cipherType);
     };
@@ -366,26 +352,6 @@ export default function CipherBreak(props: CipherBreakOptions) {
                                     <PlayArrowTwoTone sx={{ color: '#0af5b0' }} />
                                 </IconButton>
                             )}
-                            {!id &&<Select
-                                variant="standard"
-                                className="cipher-select"
-                                displayEmpty
-                                disabled={id && cipherState !== CipherState.IDLE}
-                                value={cipherType?.name ?? ''}
-                                onChange={handleCipherChange}
-                                renderValue={(selected) => {
-                                    if (!selected) {
-                                        return <em>Select</em>;
-                                    }
-                                    return selected;
-                                }}
-                            >
-                                {CipherTypes.map((type) => (
-                                    <MenuItem key={type.name} value={type.name}>
-                                        {type.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>}
                             {cipherType?.name && (
                                 <IconButton
                                     onClick={handleRestartCipher}

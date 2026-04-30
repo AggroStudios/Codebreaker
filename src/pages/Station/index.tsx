@@ -10,6 +10,7 @@ import { useStationContext } from '../../stores/stationContext';
 
 import '../../App.css';
 import './styles.scss';
+import CipherAdd from '../../components/CipherAdd';
 
 export default function StationComponent() {
     const { stationProxy } = useStationContext();
@@ -45,10 +46,8 @@ export default function StationComponent() {
                             </Grid>
                         ))}
                     <Grid size={3}>
-                        <CipherBreak
-                            station={stationProxy}
-                            width={20}
-                            functions={{ addProcess }}
+                        <CipherAdd
+                            onAdd={addProcess}
                         />
                     </Grid>
                 </Grid>
