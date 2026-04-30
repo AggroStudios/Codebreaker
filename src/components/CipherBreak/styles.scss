@@ -97,6 +97,13 @@
     margin: 0 !important;
 }
 
+.auto-cipher-checkbox.Mui-checked {
+    color: var(--accent) !important;
+    & .MuiCheckbox-root {
+        color: var(--accent) !important;
+    }
+}
+
 .cipher-progress-chip {
     &.idle {
         background-color: rgba(255,255,255,0.15);
@@ -135,6 +142,19 @@
     text-transform: uppercase !important;
     padding: 0 6px !important;
     margin: 0 !important;
+}
+
+.cipher-info-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+    & > div {
+        flex: 1 1 0;
+        text-align: left;
+    }
 }
 
 .cipher-progress-container {

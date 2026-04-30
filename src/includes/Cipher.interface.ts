@@ -2,7 +2,7 @@ import Cipher from '../lib/Cipher';
 
 export enum CipherState {
     IDLE = 'Idle',
-    DOWNLOADING = 'Download',
+    DOWNLOADING = 'Downloading',
     BREAKING = 'Breaking',
     SUCCESS = 'Success',
     CANCELLED = 'Cancelled',
