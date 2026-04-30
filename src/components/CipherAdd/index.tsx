@@ -31,7 +31,7 @@ export default function CipherAdd({ onAdd }: { onAdd: (id: string, cipherType: I
             <TerminalTwoTone fontSize="large" style={{ color: 'rgba(10,245,176,0.6)' }} />
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', maxWidth: 280, lineHeight: 1.5 }}>
               Pick a cipher type to spin up a new break.
-              Larger ciphers pay more but require more cores.
+              Larger ciphers pay more but require more processing power.
             </div>
             <div style={{ width: '100%', maxWidth: 280, display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <FormControl variant="standard" className="cipher-type-select-form-control">

@@ -40,6 +40,19 @@
     margin: 0 8px;
 }
 
+.cipher-progress-complexity {
+    font-size: 12px;
+    margin-left: 12px;
+    color: rgba(255, 255, 255, 0.55);
+    letter-spacing: 0.1em;
+    font-family: var(--font-code) !important;
+}
+
+#cipher-break-card .MuiCardHeader-root {
+    padding-bottom: 10px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
 .cipher-progress-bar .MuiLinearProgress-root, .cipher-progress-container .MuiLinearProgress-root {
     background-color: var(--accent-dim);
     height: 8px;

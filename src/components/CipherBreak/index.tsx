@@ -80,9 +80,11 @@ function CipherInfo({ cipherType }: { cipherType: ICipherType | undefined; }) {
 
 function CipherProgressBar({
     id,
+    cipherType,
     cipherState,
 }: {
     id: string;
+    cipherType: ICipherType | undefined;
     cipherState: CipherState | undefined;
 }) {
     const progress = useCipherBreakStore((s) => s.entries[id]?.progress) ?? 0;
@@ -92,6 +94,7 @@ function CipherProgressBar({
             <LinearProgressWithLabel
                 variant="determinate"
                 value={progress}
+                type={cipherType}
                 status={cipherState}
             />
         </div>
@@ -99,9 +102,9 @@ function CipherProgressBar({
 }
 
 function LinearProgressWithLabel(
-    props: LinearProgressProps & { value: number; status?: CipherState },
+    props: LinearProgressProps & { value: number; type?: ICipherType | undefined; status?: CipherState },
 ) {
-    const { status = CipherState.IDLE } = props;
+    const { status = CipherState.IDLE, type } = props;
 
     let statusClassName = 'idle';
     switch (status) {
@@ -128,6 +131,7 @@ function LinearProgressWithLabel(
                 {status && (
                     <Box sx={{ textAlign: 'left', flex: '1 1 0', justifyContent: 'flex-start', m: 0 }}>
                         <Chip className={clsx('cipher-progress-chip', statusClassName)} label={status.toString()} />
+                        <span className="cipher-progress-complexity">C{type?.complexity} · x{type?.parallelism}</span>
                     </Box>
                 )}
                 <Box sx={{ textAlign: 'right', flex: '1 1 0', justifyContent: 'flex-end', m: 0 }}>
@@ -326,7 +330,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
 
     return (
         <>
-            <Card ref={cardRef} className="background">
+            <Card ref={cardRef} className="background" id="cipher-break-card">
                 <CardHeader
                     className="cipher-card-header"
                     avatar={
@@ -368,7 +372,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
                 <CardContent className="centerContent">
                     {id && (
                         <>
-                            <CipherProgressBar id={id} cipherState={cipherState} />
+                            <CipherProgressBar id={id} cipherType={cipherType} cipherState={cipherState} />
                             <CipherGrid id={id} cipherKey={cipherKey} />
                             <CipherInfo cipherType={cipherType} />
                         </>
