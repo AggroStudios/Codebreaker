@@ -13,11 +13,11 @@ import { forwardRef, type ReactNode, type Ref } from 'react';
 
 import LockTwoToneIcon from '@mui/icons-material/LockTwoTone';
 
-import { mainNavigation, secondaryNavigation } from '../lib/navigation';
+import { mainNavigation, secondaryNavigation } from '../../lib/navigation';
 
-import AggroStudios from '../assets/logos/AggroStudios.png';
-import './NavMenu.scss';
-import PlayerLevel from './Widgets/PlayerLevel';
+import AggroStudios from '../../assets/logos/AggroStudios.png';
+import './styles.scss';
+import PlayerLevel from '../PlayerLevel';
 
 const StyledLinkItemButton = styled(ListItemButton)(({ theme }) => ({
     '&.Mui-selected': {

@@ -8,6 +8,7 @@ import {
     CardContent,
     CardHeader,
     Checkbox,
+    Chip,
     Dialog,
     DialogActions,
     DialogContent,
@@ -47,6 +48,7 @@ import { useNotifier } from '../Notifier';
 import { cipherGridRenderers, downloadTickHandlers, useCipherBreakStore } from '../../stores/cipher';
 import { usePlayerStore } from '../../stores/player';
 import { dataSizeFromSuffix } from '../../lib/utils';
+import clsx from 'clsx';
 
 // Must match the CHAR_SET order used in Cipher.tsx (_chars indices)
 const CHAR_SET =
@@ -391,7 +393,7 @@ function CipherGrid({
             ref={canvasRef}
             width={CIPHER_COLS * CELL_W}
             height={CIPHER_ROWS * CELL_H}
-            style={{ width: '100%', display: 'block', marginBottom: '12px' }}
+            className="cipher-break-canvas"
         />
     );
 }
@@ -410,35 +412,54 @@ function CipherProgressBar({
             <LinearProgressWithLabel
                 variant="determinate"
                 value={progress}
-                label={cipherState.toString()}
+                status={cipherState}
             />
         </div>
     );
 }
 
 function LinearProgressWithLabel(
-    props: LinearProgressProps & { value: number; label?: string },
+    props: LinearProgressProps & { value: number; status?: CipherState },
 ) {
+    const { status = CipherState.IDLE } = props;
+
+    let statusClassName = 'idle';
+    switch (status) {
+        case CipherState.BREAKING:
+            statusClassName = 'breaking';
+            break;
+        case CipherState.DOWNLOADING:
+            statusClassName = 'downloading';
+            break;
+        case CipherState.SUCCESS:
+            statusClassName = 'success';
+            break;
+        case CipherState.CANCELLED:
+            statusClassName = 'cancelled';
+            break;
+        case CipherState.PAUSED:
+            statusClassName = 'paused';
+            break;
+    }
+
     return (
-        <Box className="cipher-progress-bar" sx={{ display: 'flex', alignItems: 'center' }}>
-            {props.label && (
-                <Box sx={{ minWidth: 75, textAlign: 'left' }}>
+        <Box className="cipher-progress-bar-container">
+            <Box className="cipher-progress-header" sx={{ display: 'flex', alignItems: 'center' }}>
+                {status && (
+                    <Box sx={{ textAlign: 'left', flex: '1 1 0', justifyContent: 'flex-start', m: 0 }}>
+                        <Chip className={clsx('cipher-progress-chip', statusClassName)} label={status.toString()} />
+                    </Box>
+                )}
+                <Box sx={{ textAlign: 'right', flex: '1 1 0', justifyContent: 'flex-end', m: 0 }}>
                     <Typography
+                        className="cipher-progress-percentage"
                         variant="body2"
                         sx={{ color: 'text.secondary' }}
-                    >
-                        {props.label}
-                    </Typography>
+                    >{`${Math.round(props.value)}%`}</Typography>
                 </Box>
-            )}
-            <Box sx={{ width: '100%', mr: 1 }}>
-                <LinearProgress variant="determinate" {...props} />
             </Box>
-            <Box sx={{ minWidth: 35 }}>
-                <Typography
-                    variant="body2"
-                    sx={{ color: 'text.secondary' }}
-                >{`${Math.round(props.value)}%`}</Typography>
+            <Box className="cipher-progress-container">
+                <LinearProgress className={clsx('cipher-progress-bar', statusClassName)} variant="determinate" {...props} />
             </Box>
         </Box>
     );
@@ -637,14 +658,15 @@ export default function CipherBreak(props: CipherBreakOptions) {
         <>
             <Card ref={cardRef} className="background">
                 <CardHeader
+                    className="cipher-card-header"
                     avatar={
-                        <Avatar>
+                        <Avatar sx={{ color: '#0af5b0', bgcolor: 'rgba(10,245,176,0.15)' }}>
                             <CodeTwoTone />
                         </Avatar>
                     }
                     title="Cipher Break"
                     slotProps={{
-                        title: { variant: 'h5', noWrap: true },
+                        title: { noWrap: true },
                     }}
                     subheader={cipherState !== CipherState.IDLE ? cipherType?.name : cipherState}
                     action={
@@ -657,10 +679,10 @@ export default function CipherBreak(props: CipherBreakOptions) {
                                 )}
                             {cipherState === CipherState.PAUSED && (
                                 <IconButton onClick={resumeCipher}>
-                                    <PlayArrowTwoTone />
+                                    <PlayArrowTwoTone sx={{ color: '#0af5b0' }} />
                                 </IconButton>
                             )}
-                            <Select
+                            {!id &&<Select
                                 variant="standard"
                                 className="cipher-select"
                                 displayEmpty
@@ -679,7 +701,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
                                         {type.name}
                                     </MenuItem>
                                 ))}
-                            </Select>
+                            </Select>}
                             {cipherType?.name && (
                                 <IconButton
                                     onClick={handleRestartCipher}

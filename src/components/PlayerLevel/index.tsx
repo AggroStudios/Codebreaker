@@ -1,7 +1,7 @@
 import { Card, CardContent, Box, LinearProgress, Typography } from '@mui/material';
-import { usePlayerStore } from '../../../stores/player';
-import { useAnchors } from '../../AnchorsContext';
-import XpLabel from '../../XpLabel';
+import { usePlayerStore } from '../../stores/player';
+import { useAnchors } from '../AnchorsContext';
+import XpLabel from '../XpLabel';
 import './index.scss';
 
 export default function PlayerLevel() {

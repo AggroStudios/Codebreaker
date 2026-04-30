@@ -5,7 +5,7 @@ import {
     type KeyboardEvent as ReactKeyboardEvent,
     type FormEvent,
 } from 'react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import clsx from 'clsx';
 import { isEmpty } from 'lodash';
 
@@ -14,7 +14,6 @@ import TerminalController, {
     type TerminalAttachmentOptions,
 } from '../../lib/terminal';
 
-import { Header, Content } from './components';
 import {
     useTerminalStore,
     type TerminalLine,
@@ -40,6 +39,28 @@ type TerminalOutputOptions = {
 };
 
 const terminalTheme = createTheme();
+
+export const Header = styled('div')(({ theme }) => ({
+    fontSize: '1em',
+    background: 'rgba(66, 66, 66, 1)',
+    borderRadius: `${theme.spacing(1)} ${theme.spacing(1)} 0 0`,
+}));
+
+export const Content = styled('code')(({ theme }) => ({
+    position: 'absolute',
+    top: '0px',
+    left: '0px',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    color: 'white',
+    width: '100%',
+    height: '100%',
+    textAlign: 'left',
+    padding: theme.spacing(2),
+    overflowX: 'hidden',
+    overflowY: 'scroll',
+    wordBreak: 'break-all',
+    boxSizing: 'border-box',
+}));
 
 function displayPrompt(prompt: string, error = false) {
     return <span className={clsx(error ? 'error' : 'prompt')}>{prompt}</span>;

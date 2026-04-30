@@ -38,17 +38,17 @@ import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import CodeBreakerLogo from '../assets/logos/codebreaker-logo.png';
-import './AppBar.scss';
-import { NotificationLevel } from '../includes/OperatingSystem.interface';
-import MoneyLabel from './MoneyLabel';
-import Settings from './Settings';
-import About from './About';
-import { usePlayerStore } from '../stores/player';
-import { useStationContext } from '../stores/stationContext';
-import { useAnchors } from './AnchorsContext';
-import { useMusicPlayerStore } from '../stores/musicPlayer';
-import { formatMoney } from '../lib/utils';
+import CodeBreakerLogo from '../../assets/logos/codebreaker-logo.png';
+import './styles.scss';
+import { NotificationLevel } from '../../includes/OperatingSystem.interface';
+import MoneyLabel from '../MoneyLabel';
+import Settings from '../Settings';
+import About from '../About';
+import { usePlayerStore } from '../../stores/player';
+import { useStationContext } from '../../stores/stationContext';
+import { useAnchors } from '../AnchorsContext';
+import { useMusicPlayerStore } from '../../stores/musicPlayer';
+import { formatMoney } from '../../lib/utils';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',

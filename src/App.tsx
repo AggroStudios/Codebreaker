@@ -28,10 +28,10 @@ import { AnchorsProvider } from './components/AnchorsContext';
 
 import './index.css';
 
-const StationRoute = lazy(() => import('./Station'));
+const StationRoute = lazy(() => import('./pages/Station'));
 const LoginRoute = lazy(() => import('./components/Login'));
-const ServersRoute = lazy(() => import('./Servers'));
-const TerminalRoute = lazy(() => import('./components/Terminal'));
+const ServersRoute = lazy(() => import('./pages/Servers'));
+const TerminalRoute = lazy(() => import('./pages/Terminal'));
 const UpgradesRoute = lazy(() => import('./pages/Upgrades'));
 
 export default function App() {
@@ -69,10 +69,10 @@ export default function App() {
     useEffect(() => {
         preloadImages(setLoadingProgress);
         // Preload all route chunks in the background so navigation is instant
-        import('./Station');
+        import('./pages/Station');
         import('./components/Login');
-        import('./Servers');
-        import('./components/Terminal');
+        import('./pages/Servers');
+        import('./pages/Terminal');
         import('./pages/Upgrades');
     }, []);
 

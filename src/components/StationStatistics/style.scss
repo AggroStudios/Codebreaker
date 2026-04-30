@@ -1,0 +1,53 @@
+#stationStatistics {
+    height: 100%;
+}
+
+#stationStatistics .MuiCardHeader-title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: rgba(255,255,255,0.92);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#stationStatistics .MuiCardHeader-subheader {
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 2px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.04em;
+}
+
+#stationStatistics .MuiCardHeader-root {
+    padding-bottom: 10px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+#stationStatistics .statistics-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    gap: 12px;
+}
+
+#stationStatistics .statistics-row .value-cell {
+    text-align: right;
+    border-bottom: none;
+    font-family: var(--font-code);
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.92);
+}
+
+#stationStatistics .statistics-row .title-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+    border-bottom: none;
+}
