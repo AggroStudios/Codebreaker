@@ -6,12 +6,15 @@ import { Card, CardHeader, Avatar, CardContent, Select, Button, SelectChangeEven
 import { AddCircleOutlineOutlined, PlayArrowTwoTone, TerminalTwoTone } from '@mui/icons-material';
 
 import './styles.scss';
+import { useStationContext } from '../../stores/stationContext';
+import { ProcessorArchitecture } from '../../includes/Process.interface';
 
 export default function CipherAdd({ onAdd }: { onAdd: (id: string, cipherType: ICipherType) => void }) {
     const [picked, setPicked] = useState('');
-    const opts = CipherTypes.map((t) => ({
-      value: t.name, label: t.name, meta: `${formatMoney(t.payout)}`
-    }));
+    const { stationProxy } = useStationContext();
+    const opts = CipherTypes
+      .filter((t) => t.requiredArchitecture.includes(stationProxy.cpu.architecture as ProcessorArchitecture))
+      .map((t) => ({ value: t.name, label: t.name, meta: `${formatMoney(t.payout)}` }));
     return (
       <Card id="cipher-add-card" style={{ borderStyle: 'dotted', borderWidth: 1, borderColor: 'rgba(10,245,176,0.30)', height: '100%' }}>
         <CardHeader

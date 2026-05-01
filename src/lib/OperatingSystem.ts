@@ -81,6 +81,10 @@ export default class OperatingSystem {
         });
     }
 
+    public get station(): StationStoreType | null {
+        return this._station;
+    }
+
     public set station(station: StationStoreType) {
         this._station = station;
         this._cpuActivity.state = station;

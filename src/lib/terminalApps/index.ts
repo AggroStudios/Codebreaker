@@ -10,6 +10,7 @@ import FetchPlayer from './player';
 import { IApplication } from '../../includes/Terminal.interface';
 import BootSequence from './bootSequence';
 import Tutorial from './tutorial';
+import Glow from './glow';
 
 export default Array<IApplication>(
     {
@@ -71,6 +72,12 @@ export default Array<IApplication>(
         cmd: 'scan',
         path: '/bin',
         app: scan,
+        permissions: 755,
+    },
+    {
+        cmd: 'glow',
+        path: '/',
+        app: Glow,
         permissions: 755,
     },
     {

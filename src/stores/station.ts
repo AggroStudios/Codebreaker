@@ -6,7 +6,6 @@ import { NetworkDSL, Networking } from '../lib/network';
 import { CodiumMemory } from '../lib/memory';
 import { CodiumStorageHdd } from '../lib/storage';
 import { CodiumProcessor } from '../lib/processors';
-import OperatingSystem from '../lib/OperatingSystem';
 
 const makeDefaults = () => ({
     cpu: new CodiumProcessor(),
@@ -19,11 +18,11 @@ const makeDefaults = () => ({
  * Creates a zustand hook bound to a specific Station instance. Called once
  * during app bootstrap in `App`.
  */
-export const createStationStore = (os: OperatingSystem) =>
+export const createStationStore = () =>
     create<StationStoreType>()(
         persist(
             (set) => ({
-                os,
+                os: null,
                 ...makeDefaults(),
                 frame: 0,
                 count: 0,
@@ -38,6 +37,8 @@ export const createStationStore = (os: OperatingSystem) =>
                 setNetwork: (network: Networking) => set(() => ({ network })),
                 setProcessor: (cpu: IProcessorType) => set(() => ({ cpu })),
                 reset: () => set(() => ({ ...makeDefaults(), isRunning: false, exponent: 0 })),
+                glowActive: false,
+                setGlowActive: (active: boolean) => set(() => ({ glowActive: active })),
             }),
             {
                 name: 'station-store',

@@ -32,15 +32,25 @@ export default function App() {
     const [loadingProgress, setLoadingProgress] = useState(0);
 
     const [bootstrap] = useState(() => {
-        const operatingSystem = new OperatingSystem(playerStoreProxy);
-        const useStationStore = createStationStore(operatingSystem);
+        const useStationStore = createStationStore();
         const stationProxy = makeStationProxy(useStationStore);
+
+        const operatingSystem = new OperatingSystem(playerStoreProxy);
         operatingSystem.station = stationProxy;
+        stationProxy.os = operatingSystem;
+
+        if (stationProxy.exponent) {
+            operatingSystem.setExponent(stationProxy.exponent);
+        }
 
         operatingSystem.addProcess({
             id: 'main',
             callback: stationProxy.callback,
         });
+
+        if (stationProxy.isRunning) {
+            operatingSystem.startGameLoop();
+        }
 
         const terminalController = new TerminalController();
 

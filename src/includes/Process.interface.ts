@@ -43,6 +43,8 @@ export type StationStoreType = {
     setNetwork: (network: Networking) => void;
     setProcessor: (cpu: IProcessorType) => void;
     reset: () => void;
+    glowActive: boolean;
+    setGlowActive: (active: boolean) => void;
 };
 
 export type MenuStateType = {

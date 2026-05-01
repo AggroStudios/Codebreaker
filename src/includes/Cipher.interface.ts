@@ -1,4 +1,5 @@
 import Cipher from '../lib/Cipher';
+import { ProcessorArchitecture } from './Process.interface';
 
 export enum CipherState {
     IDLE = 'Idle',
@@ -35,6 +36,7 @@ export interface ICipherType {
     };
     payout: number;
     xp: number;
+    requiredArchitecture: ProcessorArchitecture[];
 }
 
 export interface CipherEntry {
@@ -63,6 +65,7 @@ export const CipherTypes: ICipherType[] = [
         },
         payout: 100,
         xp: 10,
+        requiredArchitecture: [ProcessorArchitecture.risc32],
     },
     {
         name: 'Cipher 2',
@@ -75,6 +78,7 @@ export const CipherTypes: ICipherType[] = [
         },
         payout: 200,
         xp: 12,
+        requiredArchitecture: [ProcessorArchitecture.risc32, ProcessorArchitecture.risc64],
     },
     {
         name: 'Cipher 3',
@@ -87,5 +91,19 @@ export const CipherTypes: ICipherType[] = [
         },
         payout: 300,
         xp: 17,
+        requiredArchitecture: [ProcessorArchitecture.risc32, ProcessorArchitecture.risc64],
+    },
+    {
+        name: 'Cipher 4',
+        complexity: 3.2,
+        parallelism: 4,
+        memoryRequired: 4096,
+        block: {
+            size: 4096,
+            unit: BlockUnit.megabytes,
+        },
+        payout: 400,
+        xp: 20,
+        requiredArchitecture: [ProcessorArchitecture.risc64],
     },
 ];

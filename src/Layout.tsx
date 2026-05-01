@@ -5,6 +5,7 @@ import { styled } from '@mui/material/styles';
 import AppBar from './components/AppBar';
 import NavMenu from './components/NavMenu';
 import MusicPlayer from './components/MusicPlayer';
+import ScreenGlow from './components/ScreenGlow';
 
 const backgroundModules = import.meta.glob<string>(
     './assets/backgrounds/*_bg.png',
@@ -55,6 +56,7 @@ export default function Layout() {
     const location = useLocation();
     return (
         <>
+            <ScreenGlow />
             <MusicPlayer />
             <AppBar />
             <MainContainer background={getBackground(location.pathname)}>
