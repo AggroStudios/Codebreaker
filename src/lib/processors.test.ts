@@ -5,7 +5,7 @@ import { ProcessorArchitecture } from '../includes/Process.interface';
 describe('CodiumProcessor', () => {
     it('should have default properties', () => {
         const proc = new CodiumProcessor();
-        expect(proc.flops).toBe(1000000000);
+        expect(proc.gigaflops).toBe(1);
         expect(proc.cores).toBe(4);
         expect(proc.manufacturer).toBe('Codium');
         expect(proc.model).toBe('Brkr 1');
@@ -24,10 +24,10 @@ describe('CodiumProcessor', () => {
 describe('CodiumProcessor64', () => {
     it('should override properties from CodiumProcessor', () => {
         const proc = new CodiumProcessor64();
-        expect(proc.flops).toBe(1300000000);
+        expect(proc.gigaflops).toBe(2);
         expect(proc.model).toBe('Brkr64 1');
         expect(proc.architecture).toBe(ProcessorArchitecture.risc64);
-        expect(proc.cores).toBe(4); // inherited
+        expect(proc.cores).toBe(6); // inherited
         expect(proc.manufacturer).toBe('Codium'); // inherited
         expect(proc.speed).toBe('3.2 GHz'); // inherited
     });

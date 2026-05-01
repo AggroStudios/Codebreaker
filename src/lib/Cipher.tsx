@@ -1,5 +1,5 @@
 import { CipherState, ICipherType } from '../includes/Cipher.interface';
-import Process, { StationStoreType } from '../includes/Process.interface';
+import Process, { IProcessorType, StationStoreType } from '../includes/Process.interface';
 import OperatingSystem from '../lib/OperatingSystem';
 import { Networking } from './network';
 import { dataSizeFromSuffix } from './utils';
@@ -27,6 +27,7 @@ export default class Cipher implements Process {
     private frame: number = 0;
     private _stationOs: OperatingSystem;
     private _stationNet: Networking;
+    private _stationProcessor: IProcessorType;
     private _cipherType: ICipherType;
     private cipherSize: number;
     private _state: CipherState = CipherState.DOWNLOADING;
@@ -48,6 +49,7 @@ export default class Cipher implements Process {
         this._id = crypto.randomUUID();
         this._stationOs = station.os;
         this._stationNet = station.network;
+        this._stationProcessor = station.cpu;
         this._cipherType = cipherType;
         this.cipherSize = dataSizeFromSuffix({
             size: cipherType.block.size,
@@ -150,7 +152,7 @@ export default class Cipher implements Process {
     private breaking() {
         this._percentUse = 100;
         const complexity = Math.round(10 * this._cipherType.complexity);
-        if (this.frame > 0 && this.frame % complexity === 0) {
+        if (this.frame > 0 && this.frame % parseFloat((complexity / this._stationProcessor.gigaflops).toFixed(3)) === 0) {
             const targetPos = Math.floor(
                 Math.random() * this.unsolvedIndexes.size,
             );

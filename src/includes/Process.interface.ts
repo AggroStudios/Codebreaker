@@ -40,6 +40,9 @@ export type StationStoreType = {
     callback: (frame: number, count: number, exponent: number) => void;
     cpuActivity: { x: number; y: number }[];
     setCpuActivity: (cpuActivity: { x: number; y: number }[]) => void;
+    setNetwork: (network: Networking) => void;
+    setProcessor: (cpu: IProcessorType) => void;
+    reset: () => void;
 };
 
 export type MenuStateType = {
@@ -76,7 +79,7 @@ export enum StorageType {
 }
 
 export interface IProcessorType {
-    flops: number;
+    gigaflops: number;
     cores: number;
     manufacturer: string;
     model: string;

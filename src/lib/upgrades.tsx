@@ -10,6 +10,10 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import SpeedIcon from '@mui/icons-material/Speed';
 import DatasetIcon from '@mui/icons-material/Dataset';
 import HubIcon from '@mui/icons-material/Hub';
+import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
+import { NetworkFiber, NetworkCable, Networking } from './network';
+import { StationStoreType } from '../includes/Process.interface';
+import { CodiumProcessor64 } from './processors';
 
 export interface IUpgradeItem {
     key: string;
@@ -19,6 +23,8 @@ export interface IUpgradeItem {
     category: string;
     icon: OverridableComponent<SvgIconTypeMap<object, 'svg'>>;
     tags: string[];
+    requires?: string[];
+    onPurchase?: (stationProxy: StationStoreType) => void;
 }
 
 export const UpgradeList: IUpgradeItem[] = [
@@ -38,7 +44,11 @@ export const UpgradeList: IUpgradeItem[] = [
         cost: 2000,
         category: 'hardware',
         icon: MemoryIcon,
-        tags: ['hardware', 'passive']
+        tags: ['hardware', 'passive'],
+        onPurchase: (stationProxy: StationStoreType) => {
+            const processor = new CodiumProcessor64();
+            stationProxy.setProcessor(processor);
+        },
     },
     {
         key: 'darknet-proxy',
@@ -83,7 +93,8 @@ export const UpgradeList: IUpgradeItem[] = [
         cost: 12000,
         category: 'software',
         icon: PsychologyIcon,
-        tags: ['software', 'active']
+        tags: ['software', 'active'],
+        requires: ['codium-brkr64'],
     },
     {
         key: 'overclock-module',
@@ -92,7 +103,8 @@ export const UpgradeList: IUpgradeItem[] = [
         cost: 4500,
         category: 'hardware',
         icon: SpeedIcon,
-        tags: ['hardware', 'active']
+        tags: ['hardware', 'active'],
+        requires: ['codium-brkr64'],
     },
     {
         key: 'cipher-database',
@@ -101,7 +113,8 @@ export const UpgradeList: IUpgradeItem[] = [
         cost: 2500,
         category: 'software',
         icon: DatasetIcon,
-        tags: ['software', 'passive']
+        tags: ['software', 'passive'],
+        requires: ['auto-cipher'],
     },
     {
         key: 'network-tap',
@@ -110,6 +123,34 @@ export const UpgradeList: IUpgradeItem[] = [
         cost: 3000,
         category: 'network',
         icon: HubIcon,
-        tags: ['hardware', 'passive', 'network']
+        tags: ['hardware', 'passive', 'network'],
+        requires: ['darknet-proxy'],
+    },
+    {
+        key: 'network-connection-cable',
+        name: 'Network Connection - DOCSIS 3.1',
+        description: 'Increases network speed by 100 Mbps.',
+        cost: 50000,
+        category: 'network',
+        icon: LanOutlinedIcon,
+        tags: ['hardware', 'passive', 'network'],
+        onPurchase: (stationProxy: StationStoreType) => {
+            const network = new Networking(new NetworkCable());
+            stationProxy.setNetwork(network);
+        },
+    },
+    {
+        key: 'network-connection-fiber',
+        name: 'Network Connection - Fiber Optic',
+        description: 'Increases network speed by 1 Gbps.',
+        cost: 150000,
+        category: 'network',
+        icon: LanOutlinedIcon,
+        tags: ['hardware', 'passive', 'network'],
+        requires: ['network-connection-cable'],
+        onPurchase: (stationProxy: StationStoreType) => {
+            const network = new Networking(new NetworkFiber());
+            stationProxy.setNetwork(network);
+        },
     }
 ];

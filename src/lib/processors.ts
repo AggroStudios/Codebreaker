@@ -4,7 +4,7 @@ import {
 } from '../includes/Process.interface';
 
 export class CodiumProcessor implements IProcessorType {
-    flops: number = 1000000000;
+    gigaflops: number = 1;
     cores: number = 4;
     manufacturer: string = 'Codium';
     model: string = 'Brkr 1';
@@ -17,7 +17,8 @@ export class CodiumProcessor implements IProcessorType {
 }
 
 export class CodiumProcessor64 extends CodiumProcessor {
-    flops: number = 1300000000;
+    gigaflops: number = 2;
     model: string = 'Brkr64 1';
+    cores: number = 6;
     architecture: ProcessorArchitecture = ProcessorArchitecture.risc64;
 }

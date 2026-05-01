@@ -22,7 +22,6 @@ import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
-import { usePlayerStore } from '../../stores/player';
 import { getTrack } from '../../lib/musicTracks';
 
 export interface SettingsProps {
@@ -42,7 +41,6 @@ export default function Settings({ open, onClose }: SettingsProps) {
     const setVolume = useMusicPlayerStore((s) => s.setVolume);
     const toggleMuted = useMusicPlayerStore((s) => s.toggleMuted);
     const toggleShuffle = useMusicPlayerStore((s) => s.toggleShuffle);
-
     const currentTrack = getTrack(currentTrackIndex);
 
     const handleVolumeChange = (_: Event, value: number | number[]) => {
@@ -51,10 +49,7 @@ export default function Settings({ open, onClose }: SettingsProps) {
     };
 
     const handleResetGame = () => {
-        usePlayerStore.persist.clearStorage();
-        localStorage.removeItem('station-store');
-        localStorage.removeItem('storage-store');
-        localStorage.removeItem('coachmarks-store');
+        sessionStorage.setItem('reset-pending', 'true');
         window.location.reload();
     };
 

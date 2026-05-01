@@ -113,6 +113,23 @@
     user-select: none !important;
 }
 
+.upgrade-requires {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.35);
+    font-family: var(--font-code);
+    letter-spacing: 0.04em;
+
+    &::before {
+        content: 'Requires:';
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.45);
+    }
+}
+
 .upgrade-tags {
     flex-grow: 1 !important;
     width: 100% !important;

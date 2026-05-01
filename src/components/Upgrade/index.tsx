@@ -1,5 +1,5 @@
-import { IUpgradeItem } from '../../lib/upgrades';
-import { useEffect, useState } from 'react';
+import { IUpgradeItem, UpgradeList } from '../../lib/upgrades';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -10,8 +10,11 @@ import Chip from '@mui/material/Chip';
 
 import './index.scss';
 import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
+import { LockOutlined } from '@mui/icons-material';
 import { formatMoney } from '../../lib/utils';
 import { usePlayerStore } from '../../stores/player';
+import { useStationContext } from '../../stores/stationContext';
 import clsx from 'clsx';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
@@ -68,35 +71,31 @@ export default function UpgradeComponent(props: { upgrade: IUpgradeItem }) {
     const purchasedUpgrades = usePlayerStore((s) => s.purchasedUpgrades);
     const purchaseUpgrade = usePlayerStore((s) => s.purchaseUpgrade);
     const money = usePlayerStore((s) => s.player.money);
+    const { stationProxy } = useStationContext();
 
-    const [isOwned, setIsOwned] = useState(false);
-    const [cantAfford, setCantAfford] = useState(false);
-    const [purchaseButtonText, setPurchaseButtonText] = useState('Purchase');
-    const [purchaseClassname, setPurchaseClassname] = useState('purchase');
     const [confirmPurchaseDialogOpen, setConfirmPurchaseDialogOpen] = useState(false);
 
-    useEffect(() => {
-        if (purchasedUpgrades.includes(upgrade.key)) {
-            setIsOwned(true);
-        }
-    }, [purchasedUpgrades]);
+    const isOwned = purchasedUpgrades.includes(upgrade.key);
+    const missingRequirements = (upgrade.requires ?? [])
+        .filter((req) => !purchasedUpgrades.includes(req))
+        .map((req) => UpgradeList.find((u) => u.key === req)?.name ?? req);
+    const isLocked = missingRequirements.length > 0;
+    const cantAfford = upgrade.cost > money;
 
-    useEffect(() => {
-        setCantAfford(upgrade.cost > money);
-        setPurchaseButtonText(isOwned ? 'Purchased' : (upgrade.cost <= money) ? 'Purchase' : 'Cant Afford');
-        setPurchaseClassname(isOwned ? 'owned' : (upgrade.cost <= money) ? 'purchase' : 'cant-afford');
-    }, [isOwned, money]);
+    const purchaseClassname = isOwned ? 'owned' : isLocked ? 'cant-afford' : cantAfford ? 'cant-afford' : 'purchase';
+    const purchaseButtonText = isOwned ? 'Purchased' : isLocked ? 'Locked' : cantAfford ? "Can't Afford" : 'Purchase';
 
     const handleConfirmPurchaseDialogClose = () => {
         setConfirmPurchaseDialogOpen(false);
     };
 
     const handlePurchase = () => {
-        if (isOwned || cantAfford) return;
+        if (isOwned || isLocked || cantAfford) return;
         setConfirmPurchaseDialogOpen(true);
     };
 
     const handleConfirmPurchase = () => {
+        upgrade.onPurchase?.(stationProxy);
         purchaseUpgrade(upgrade.key, upgrade.cost);
         setConfirmPurchaseDialogOpen(false);
     };
@@ -127,11 +126,25 @@ export default function UpgradeComponent(props: { upgrade: IUpgradeItem }) {
                         </Avatar>
                     }
                     action={
-                        isOwned && <Chip label="Owned" className="owned-chip" />
+                        isOwned
+                            ? <Chip label="Owned" className="owned-chip" />
+                            : isLocked
+                                ? (
+                                    <Tooltip title={`Requires: ${missingRequirements.join(', ')}`} placement="top">
+                                        <LockOutlined fontSize="small" sx={{ color: 'rgba(255,255,255,0.3)', mt: 0.5 }} />
+                                    </Tooltip>
+                                )
+                                : null
                     }
                 />
-                <CardContent sx={{ paddingTop: 0}}>
+                <CardContent sx={{ paddingTop: 0 }}>
                     <div className="upgrade-description">{upgrade.description}</div>
+                    {isLocked && (
+                        <div className="upgrade-requires">
+                            <LockOutlined sx={{ fontSize: 11 }} />
+                            {missingRequirements.join(', ')}
+                        </div>
+                    )}
                 </CardContent>
                 <CardActions sx={{ display: 'flex', flexDirection: 'column', gap: 1, padding: '12px' }}>
                     <div className="upgrade-tags">
@@ -141,7 +154,7 @@ export default function UpgradeComponent(props: { upgrade: IUpgradeItem }) {
                     </div>
                     <div className="upgrade-actions">
                         <span className={clsx('upgrade-cost', purchaseClassname)}>${formatMoney(upgrade.cost, 0)}</span>
-                        <Button className={clsx('upgrade-button', purchaseClassname)} disabled={isOwned || cantAfford} variant="contained" color="primary" onClick={handlePurchase}>{purchaseButtonText}</Button>
+                        <Button className={clsx('upgrade-button', purchaseClassname)} disabled={isOwned || isLocked || cantAfford} variant="contained" color="primary" onClick={handlePurchase}>{purchaseButtonText}</Button>
                     </div>
                 </CardActions>
             </Card>

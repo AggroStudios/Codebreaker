@@ -52,7 +52,7 @@ export const usePlayerStore = create<PlayerState>()(
     purchaseUpgrade: (upgrade: string, cost: number) =>
         set((state) => {
             state.removeMoney(cost);
-            return { purchasedUpgrades: [...state.purchasedUpgrades, upgrade] }
+            return { purchasedUpgrades: [...state.purchasedUpgrades, upgrade] };
         }),
     setXpLabel: (amount: number | null, levelUp?: boolean) =>
         set(() => ({ xpLabel: { data: { amount, levelUp }, id: Date.now() } })),

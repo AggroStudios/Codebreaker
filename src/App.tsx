@@ -14,13 +14,7 @@ import { StationStoreProvider } from './stores/stationContext';
 import { useMusicPlayerStore } from './stores/musicPlayer';
 
 import OperatingSystem from './lib/OperatingSystem';
-import { CodiumProcessor } from './lib/processors';
 import { preloadImages } from './lib/preloader';
-import { Station } from './lib/station';
-import { CodiumMemory } from './lib/memory';
-import { CodiumStorageHdd } from './lib/storage';
-import { NetworkDSL, Networking } from './lib/network';
-import type { IStorageType } from './includes/Process.interface';
 
 import TerminalController from './lib/terminal';
 import { NotifierProvider } from './components/Notifier';
@@ -38,21 +32,8 @@ export default function App() {
     const [loadingProgress, setLoadingProgress] = useState(0);
 
     const [bootstrap] = useState(() => {
-        const processor = new CodiumProcessor();
         const operatingSystem = new OperatingSystem(playerStoreProxy);
-        const memory = new CodiumMemory();
-        const storage: IStorageType[] = [new CodiumStorageHdd()];
-        const network = new Networking(new NetworkDSL());
-
-        const station = new Station(
-            processor,
-            operatingSystem,
-            memory,
-            storage,
-            network,
-        );
-
-        const useStationStore = createStationStore(station);
+        const useStationStore = createStationStore(operatingSystem);
         const stationProxy = makeStationProxy(useStationStore);
         operatingSystem.station = stationProxy;
 
@@ -63,7 +44,7 @@ export default function App() {
 
         const terminalController = new TerminalController();
 
-        return { station, useStationStore, stationProxy, terminalController };
+        return { operatingSystem, useStationStore, stationProxy, terminalController };
     });
 
     useEffect(() => {
@@ -76,7 +57,7 @@ export default function App() {
         import('./pages/Upgrades');
     }, []);
 
-    const { station, useStationStore, stationProxy, terminalController } =
+    const { operatingSystem, useStationStore, stationProxy, terminalController } =
         bootstrap;
 
     const handleLoadingHidden = () => {
@@ -101,7 +82,7 @@ export default function App() {
                                                 terminalController
                                             }
                                             operatingSystem={
-                                                station.operatingSystem
+                                                operatingSystem
                                             }
                                         />
                                     } />
