@@ -13,7 +13,7 @@ export default function CipherAdd({ onAdd }: { onAdd: (id: string, cipherType: I
       value: t.name, label: t.name, meta: `${formatMoney(t.payout)}`
     }));
     return (
-      <Card id="cipher-add-card" style={{ borderStyle: 'dotted', borderWidth: 1, borderColor: 'rgba(10,245,176,0.30)' }}>
+      <Card id="cipher-add-card" style={{ borderStyle: 'dotted', borderWidth: 1, borderColor: 'rgba(10,245,176,0.30)', height: '100%' }}>
         <CardHeader
           avatar={<Avatar sx={{ color: '#0af5b0', bgcolor: 'rgba(10,245,176,0.15)' }}><AddCircleOutlineOutlined /></Avatar>}
           title="Queue Cipher Break"

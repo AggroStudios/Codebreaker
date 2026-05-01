@@ -101,8 +101,8 @@ export default function UpgradesComponent() {
                 <Box className="upgrades-content">
                     <div className="upgrades-content-label">{filter} Upgrades - {(displayedUpgrades.filter((upg) => !purchasedUpgrades.includes(upg.key))).length} available</div>
                     <Box className="upgrades-content-grid" sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 2 }}>
-                        {displayedUpgrades.map((upg, idx: number) => (
-                            <UpgradeComponent key={'upgrade-' + idx.toString()} upgrade={upg} />
+                        {displayedUpgrades.map((upg) => (
+                            <UpgradeComponent key={upg.key} upgrade={upg} />
                         ))}
                     </Box>
                 </Box>

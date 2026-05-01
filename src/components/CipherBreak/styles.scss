@@ -46,6 +46,7 @@
     color: rgba(255, 255, 255, 0.55);
     letter-spacing: 0.1em;
     font-family: var(--font-code) !important;
+    white-space: nowrap;
 }
 
 #cipher-break-card .MuiCardHeader-root {

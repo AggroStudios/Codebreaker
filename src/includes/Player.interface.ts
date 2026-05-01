@@ -23,6 +23,9 @@ export interface PlayerState {
     player: Player;
     moneyLabel: MoneyLabelSpawn | null;
     xpLabel: XpLabelSpawn | null;
+    hasSeenTutorial: boolean;
+    markTutorialAsSeen: () => void;
+    resetTutorial: () => void;
     setMoneyLabel: (amount: number | null) => void;
     setXpLabel: (amount: number | null, levelUp?: boolean) => void;
     earnExperience: (amount: number) => void;

@@ -9,6 +9,7 @@ import FetchPlayer from './player';
 
 import { IApplication } from '../../includes/Terminal.interface';
 import BootSequence from './bootSequence';
+import Tutorial from './tutorial';
 
 export default Array<IApplication>(
     {
@@ -70,6 +71,12 @@ export default Array<IApplication>(
         cmd: 'scan',
         path: '/bin',
         app: scan,
+        permissions: 755,
+    },
+    {
+        cmd: 'tutorial',
+        path: '/',
+        app: Tutorial,
         permissions: 755,
     },
     {

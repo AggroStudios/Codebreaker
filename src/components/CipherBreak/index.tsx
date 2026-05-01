@@ -129,7 +129,7 @@ function LinearProgressWithLabel(
         <Box className="cipher-progress-bar-container">
             <Box className="cipher-progress-header" sx={{ display: 'flex', alignItems: 'center' }}>
                 {status && (
-                    <Box sx={{ textAlign: 'left', flex: '1 1 0', justifyContent: 'flex-start', m: 0 }}>
+                    <Box sx={{ textAlign: 'left', flex: '1 1 0', justifyContent: 'flex-start', m: 0, whiteSpace: 'nowrap' }}>
                         <Chip className={clsx('cipher-progress-chip', statusClassName)} label={status.toString()} />
                         <span className="cipher-progress-complexity">C{type?.complexity} · x{type?.parallelism}</span>
                     </Box>

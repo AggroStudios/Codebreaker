@@ -54,6 +54,7 @@ export default function Settings({ open, onClose }: SettingsProps) {
         usePlayerStore.persist.clearStorage();
         localStorage.removeItem('station-store');
         localStorage.removeItem('storage-store');
+        localStorage.removeItem('coachmarks-store');
         window.location.reload();
     };
 

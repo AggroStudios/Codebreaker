@@ -45,6 +45,9 @@ export const usePlayerStore = create<PlayerState>()(
     } as Player,
     moneyLabel: null,
     xpLabel: null,
+    hasSeenTutorial: false,
+    markTutorialAsSeen: () => set({ hasSeenTutorial: true }),
+    resetTutorial: () => set({ hasSeenTutorial: false }),
     purchasedUpgrades: [] as string[],
     purchaseUpgrade: (upgrade: string, cost: number) =>
         set((state) => {
@@ -173,6 +176,7 @@ export const usePlayerStore = create<PlayerState>()(
     partialize: (state) => ({
       player: state.player,
       purchasedUpgrades: state.purchasedUpgrades,
+      hasSeenTutorial: state.hasSeenTutorial,
     }),
   },
   ),

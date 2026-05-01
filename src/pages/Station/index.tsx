@@ -11,6 +11,7 @@ import { useStationContext } from '../../stores/stationContext';
 import '../../App.css';
 import './styles.scss';
 import CipherAdd from '../../components/CipherAdd';
+import Coachmarks from '../../components/Coachmarks';
 
 export default function StationComponent() {
     const { stationProxy } = useStationContext();
@@ -25,12 +26,13 @@ export default function StationComponent() {
 
     return (
         <>
+            <Coachmarks />
             <div className="card">
                 <Grid container spacing={2}>
-                    <Grid size={4}>
+                    <Grid size={4} id="coachmark-statistics">
                         <StationStatistics station={stationProxy} />
                     </Grid>
-                    <Grid size={8}>
+                    <Grid size={8} id="coachmark-cpu-activity">
                         <CpuActivityWidget />
                     </Grid>
                     {runningProcesses.length > 0 &&

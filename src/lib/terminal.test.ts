@@ -26,6 +26,9 @@ describe('Terminal', () => {
         const os = new OperatingSystem({
             moneyLabel: null,
             xpLabel: null,
+            hasSeenTutorial: false,
+            markTutorialAsSeen: vi.fn(),
+            resetTutorial: vi.fn(),
             setMoneyLabel: vi.fn(),
             setXpLabel: vi.fn(),
             addNotification: vi.fn(),
