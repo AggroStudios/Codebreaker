@@ -34,18 +34,27 @@ export default function Settings({ open, onClose }: SettingsProps) {
 
     const playing = useMusicPlayerStore((s) => s.playing);
     const volume = useMusicPlayerStore((s) => s.volume);
+    const sfxVolume = useMusicPlayerStore((s) => s.sfxVolume);
     const muted = useMusicPlayerStore((s) => s.muted);
+    const mutedSfx = useMusicPlayerStore((s) => s.mutedSfx);
     const shuffle = useMusicPlayerStore((s) => s.shuffle);
     const currentTrackIndex = useMusicPlayerStore((s) => s.currentTrackIndex);
     const toggle = useMusicPlayerStore((s) => s.toggle);
     const setVolume = useMusicPlayerStore((s) => s.setVolume);
+    const setSfxVolume = useMusicPlayerStore((s) => s.setSfxVolume);
     const toggleMuted = useMusicPlayerStore((s) => s.toggleMuted);
+    const toggleSfxMuted = useMusicPlayerStore((s) => s.toggleSfxMuted);
     const toggleShuffle = useMusicPlayerStore((s) => s.toggleShuffle);
     const currentTrack = getTrack(currentTrackIndex);
 
     const handleVolumeChange = (_: Event, value: number | number[]) => {
         const next = Array.isArray(value) ? value[0] : value;
         setVolume(next / 100);
+    };
+
+    const handleSfxVolumeChange = (_: Event, value: number | number[]) => {
+        const next = Array.isArray(value) ? value[0] : value;
+        setSfxVolume(next / 100);
     };
 
     const handleResetGame = () => {
@@ -60,6 +69,7 @@ export default function Settings({ open, onClose }: SettingsProps) {
             : <VolumeUpIcon />;
 
     const volumePercent = Math.round(volume * 100);
+    const sfxVolumePercent = Math.round(sfxVolume * 100);
 
     return (
         <Dialog
@@ -162,7 +172,54 @@ export default function Settings({ open, onClose }: SettingsProps) {
                     variant="body2"
                     gutterBottom
                 >
-                    Volume
+                    Sound Effects Volume
+                </Typography>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                    }}
+                >
+                    <Tooltip title={mutedSfx ? 'Unmute' : 'Mute'}>
+                        <IconButton
+                            aria-label={mutedSfx ? 'Unmute' : 'Mute'}
+                            onClick={toggleSfxMuted}
+                            size="small"
+                            sx={{ outline: 0 }}
+                        >
+                            {volumeIcon}
+                        </IconButton>
+                    </Tooltip>
+                    <Slider
+                        aria-labelledby="volume-slider-label"
+                        value={sfxVolumePercent}
+                        onChange={handleSfxVolumeChange}
+                        min={0}
+                        max={100}
+                        step={1}
+                        disabled={mutedSfx}
+                        valueLabelDisplay="auto"
+                        valueLabelFormat={(v) => `${v}%`}
+                    />
+                    <Typography
+                        component="div"
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ minWidth: 40, textAlign: 'right' }}
+                    >
+                        {sfxVolumePercent}%
+                    </Typography>
+                </Box>
+                <Divider sx={{ mb: 2 }} />
+
+                <Typography
+                    id="volume-slider-label"
+                    component="div"
+                    variant="body2"
+                    gutterBottom
+                >
+                    Music Volume
                 </Typography>
                 <Box
                     sx={{

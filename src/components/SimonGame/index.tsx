@@ -2,6 +2,7 @@ import { useRef, useEffect, useCallback } from 'react';
 import './style.scss';
 import { MiniGameProps } from '../../includes/minigame.interfaces';
 import { CIPHER_COLS, CIPHER_ROWS, CELL_W, CELL_H } from '../CipherGrid';
+import { useMusicPlayerStore } from '../../stores/musicPlayer';
 
 const CANVAS_ASPECT = (CIPHER_ROWS * CELL_H) / (CIPHER_COLS * CELL_W);
 
@@ -13,15 +14,16 @@ interface ButtonDef {
   glowColor: string;
   startAngle: number;
   endAngle: number;
+  sound: string;
 }
 
 // Quadrant layout (canvas angles: 0=right, clockwise, Y-down)
 // Green=top-left, Red=top-right, Blue=bottom-right, Yellow=bottom-left
 const BUTTONS: ButtonDef[] = [
-  { dimColor: '#1a4a2e', brightColor: '#2ecc71', glowColor: '#2ecc71', startAngle: -Math.PI,      endAngle: -Math.PI / 2 },
-  { dimColor: '#4a1a1a', brightColor: '#e74c3c', glowColor: '#e74c3c', startAngle: -Math.PI / 2,  endAngle: 0 },
-  { dimColor: '#1a2a4a', brightColor: '#3498db', glowColor: '#3498db', startAngle: 0,              endAngle: Math.PI / 2 },
-  { dimColor: '#4a3a00', brightColor: '#f39c12', glowColor: '#f39c12', startAngle: Math.PI / 2,   endAngle: Math.PI },
+  { dimColor: '#1a4a2e', brightColor: '#2ecc71', glowColor: '#2ecc71', startAngle: -Math.PI,      endAngle: -Math.PI / 2, sound: 'simonSound1.mp3' },
+  { dimColor: '#4a1a1a', brightColor: '#e74c3c', glowColor: '#e74c3c', startAngle: -Math.PI / 2,  endAngle: 0, sound: 'simonSound2.mp3' },
+  { dimColor: '#1a2a4a', brightColor: '#3498db', glowColor: '#3498db', startAngle: 0,              endAngle: Math.PI / 2, sound: 'simonSound3.mp3' },
+  { dimColor: '#4a3a00', brightColor: '#f39c12', glowColor: '#f39c12', startAngle: Math.PI / 2,   endAngle: Math.PI, sound: 'simonSound4.mp3' },
 ];
 
 const GAP = 0.06; // radians gap between segments
@@ -33,6 +35,8 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, chances = 3, on
   const roundRef = useRef(0);
   const inputCountRef = useRef(0);
   const chancesLeftRef = useRef(chances);
+  const sfxVolume = useMusicPlayerStore((s) => s.sfxVolume);
+  const mutedSfx = useMusicPlayerStore((s) => s.mutedSfx);
 
   const drawCanvas = useCallback((activeBtn: number | null, phase: GamePhase, currentRound: number) => {
     const canvas = canvasRef.current;
@@ -52,6 +56,18 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, chances = 3, on
 
     BUTTONS.forEach((btn, i) => {
       const isActive = activeBtn === i;
+      if (isActive) {
+        try {
+          const sound = new Audio(`./src/components/SimonGame/audio/${btn.sound}`);
+          console.log('sfxVolume', sfxVolume);
+          console.log('mutedSfx', mutedSfx);
+          sound.volume = mutedSfx ? 0 : sfxVolume;
+          sound.play();
+        }
+        catch (error) {
+          console.error('Error playing sound:', error);
+        }
+      }
 
       ctx.beginPath();
       ctx.arc(cx, cy, innerR, btn.startAngle + GAP, btn.endAngle - GAP, false);
@@ -134,7 +150,7 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, chances = 3, on
       ctx.font = `700 ${mainSize}px Inter, system-ui, sans-serif`;
       ctx.fillText('FAIL', cx, cy);
     }
-  }, [rounds, chances]);
+  }, [rounds, chances, sfxVolume, mutedSfx]);
 
   const initCanvas = useCallback(() => {
     const canvas = canvasRef.current;

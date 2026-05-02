@@ -43,6 +43,7 @@ import { NotificationLevel } from '../../includes/OperatingSystem.interface';
 import { useNotifier } from '../Notifier';
 import { cipherGridRenderers, downloadTickHandlers, useCipherBreakStore } from '../../stores/cipher';
 import { usePlayerStore } from '../../stores/player';
+import { useMusicPlayerStore } from '../../stores/musicPlayer';
 import { dataSizeFromSuffix, formatMoney } from '../../lib/utils';
 import clsx from 'clsx';
 
@@ -181,6 +182,8 @@ export default function CipherBreak(props: CipherBreakOptions) {
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [infoDialogOpen, setInfoDialogOpen] = useState(false);
     const [miniGameIndex, setMiniGameIndex] = useState(0);
+    const sfxVolume = useMusicPlayerStore((s) => s.sfxVolume);
+    const mutedSfx = useMusicPlayerStore((s) => s.mutedSfx);
 
     const isManualBreaking =
         !!cipherType?.manualMode?.length &&
@@ -196,10 +199,16 @@ export default function CipherBreak(props: CipherBreakOptions) {
     }, [cipherType, miniGameIndex]);
 
     const handleManualWin = useCallback(() => {
+        const audioPlayer = new Audio(`./src/assets/sounds/success.mp3`);
+        audioPlayer.volume = mutedSfx ? 0 : sfxVolume;
+        audioPlayer.play();
         cipher?.manualComplete();
     }, [cipher]);
 
     const handleManualLose = useCallback(() => {
+        const audioPlayer = new Audio(`./src/assets/sounds/failure.mp3`);
+        audioPlayer.volume = mutedSfx ? 0 : sfxVolume;
+        audioPlayer.play();
         cipher?.fail();
     }, [cipher]);
 

@@ -3,7 +3,9 @@ import { create } from 'zustand';
 export interface MusicPlayerState {
     playing: boolean;
     volume: number;
+    sfxVolume: number;
     muted: boolean;
+    mutedSfx: boolean;
     currentTrackIndex: number;
     shuffle: boolean;
     loop: boolean;
@@ -11,8 +13,11 @@ export interface MusicPlayerState {
     pause: () => void;
     toggle: () => void;
     setVolume: (volume: number) => void;
+    setSfxVolume: (volume: number) => void;
     setMuted: (muted: boolean) => void;
+    setSfxMuted: (muted: boolean) => void;
     toggleMuted: () => void;
+    toggleSfxMuted: () => void;
     setTrackIndex: (index: number) => void;
     nextTrack: (trackCount: number) => void;
     prevTrack: (trackCount: number) => void;
@@ -29,7 +34,9 @@ const clampVolume = (value: number): number => {
 export const useMusicPlayerStore = create<MusicPlayerState>((set) => ({
     playing: false,
     volume: 0.1,
+    sfxVolume: 0.5,
     muted: false,
+    mutedSfx: false,
     currentTrackIndex: 0,
     shuffle: true,
     setShuffle: (shuffle: boolean) => set(() => ({ shuffle })),
@@ -63,6 +70,9 @@ export const useMusicPlayerStore = create<MusicPlayerState>((set) => ({
                     : 0,
         })),
     setLoop: (loop: boolean) => set(() => ({ loop })),
+    setSfxVolume: (volume: number) => set(() => ({ sfxVolume: clampVolume(volume) })),
+    setSfxMuted: (muted: boolean) => set(() => ({ mutedSfx: muted })),
+    toggleSfxMuted: () => set((state) => ({ mutedSfx: !state.mutedSfx })),
 }));
 
 const selectRandomTrack = (trackCount: number, currentTrackIndex: number) => {
