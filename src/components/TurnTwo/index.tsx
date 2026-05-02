@@ -8,10 +8,10 @@ const CANVAS_ASPECT = (CIPHER_ROWS * CELL_H) / (CIPHER_COLS * CELL_W);
 const PAD          = 8;
 const GAP          = 5;
 const HEADER_H     = 22;
-const REVEAL_MS    = 750;  // how long mismatched pair stays face-up before flipping back
+const REVEAL_MS    = 750;
 const CARD_RADIUS  = 4;
+const FLIP_MS      = 280;
 
-// One bright + one dim color per pair index
 const BRIGHT: string[] = [
   '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6',
   '#1abc9c', '#e67e22', '#e91e63', '#00bcd4', '#ff7043',
@@ -21,7 +21,6 @@ const DIM: string[] = [
   '#10282a', '#301c0a', '#2a121e', '#00242e', '#301a12',
 ];
 
-// Symbols shown on card faces — one per pair
 const SYMBOLS = ['1','2','3','4','5','6','7','8','9','0'];
 
 type GamePhase = 'idle' | 'playing' | 'won' | 'lost';
@@ -30,6 +29,13 @@ interface Card {
   pairId:  number;
   faceUp:  boolean;
   matched: boolean;
+}
+
+interface CardAnim {
+  from:      boolean;
+  to:        boolean;
+  t:         number;
+  clockwise: boolean;
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -41,10 +47,8 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-// Find the grid dimensions (cols × rows) whose aspect ratio best matches the
-// canvas, penalising wasted empty cells.
 function computeGrid(total: number): { cols: number; rows: number } {
-  const targetRatio = (CIPHER_COLS * CELL_W) / (CIPHER_ROWS * CELL_H); // ≈1.714
+  const targetRatio = (CIPHER_COLS * CELL_W) / (CIPHER_ROWS * CELL_H);
   let bestCols = total, bestRows = 1, bestScore = Infinity;
   for (let cols = 1; cols <= total; cols++) {
     const rows = Math.ceil(total / cols);
@@ -72,19 +76,131 @@ function roundRect(
   ctx.closePath();
 }
 
+// Draws a card mid-flip using perspective projection around the Y axis.
+// `anim.clockwise = true` → right edge comes toward viewer (CW).
+// The card narrows to an edge at t=0.5, then expands showing the new face.
+function drawCardPerspective(
+  ctx: CanvasRenderingContext2D,
+  cx: number, cy: number, cardW: number, cardH: number,
+  card: Card,
+  anim: CardAnim,
+) {
+  const angle = anim.t * Math.PI;
+  const cosA  = Math.cos(angle);
+  const sinA  = Math.sin(angle);
+  const absC  = Math.abs(cosA);
+
+  if (absC * cardW < 0.5) return; // skip when invisible at edge-on
+
+  const showFaceUp = angle < Math.PI / 2 ? anim.from : anim.to;
+
+  // Perspective focal length — larger = less distortion.
+  const f     = cardW * 3;
+  const halfW = cardW / 2;
+  const halfH = cardH / 2;
+  const ctrX  = cx + halfW;
+  const ctrY  = cy + halfH;
+
+  // For CW: right edge is closer (z < 0), left edge farther (z > 0). CCW: reversed.
+  const sign = anim.clockwise ? 1 : -1;
+  const zL   =  sign * halfW * sinA;   // left edge depth
+  const zR   = -sign * halfW * sinA;   // right edge depth
+
+  const sL = f / (f + zL);  // left  edge scale  (< 1 when farther)
+  const sR = f / (f + zR);  // right edge scale  (> 1 when closer)
+
+  // Screen half-widths (absC so both stay positive after the midpoint flip)
+  const xL = absC * halfW * sL;
+  const xR = absC * halfW * sR;
+
+  // 4 corners
+  const tlx = ctrX - xL, tly = ctrY - halfH * sL;
+  const trx = ctrX + xR, trY = ctrY - halfH * sR;
+  const brx = ctrX + xR, bry = ctrY + halfH * sR;
+  const blx = ctrX - xL, bly = ctrY + halfH * sL;
+
+  const pairIdx = card.pairId % BRIGHT.length;
+  const bright  = BRIGHT[pairIdx];
+  const dim     = DIM[pairIdx];
+  const symbol  = SYMBOLS[pairIdx];
+
+  // ── Background ──────────────────────────────────────────────────────
+  ctx.beginPath();
+  ctx.moveTo(tlx, tly);
+  ctx.lineTo(trx, trY);
+  ctx.lineTo(brx, bry);
+  ctx.lineTo(blx, bly);
+  ctx.closePath();
+  ctx.fillStyle = showFaceUp ? dim : '#1a2630';
+  ctx.fill();
+
+  // ── Depth shading gradient ──────────────────────────────────────────
+  const gradW = trx - tlx;
+  if (sinA > 0.02 && gradW > 1) {
+    const grad = ctx.createLinearGradient(tlx, 0, trx, 0);
+    if (anim.clockwise) {
+      grad.addColorStop(0, `rgba(0,0,0,${(0.45 * sinA).toFixed(3)})`);
+      grad.addColorStop(1, `rgba(255,255,255,${(0.18 * sinA).toFixed(3)})`);
+    } else {
+      grad.addColorStop(0, `rgba(255,255,255,${(0.18 * sinA).toFixed(3)})`);
+      grad.addColorStop(1, `rgba(0,0,0,${(0.45 * sinA).toFixed(3)})`);
+    }
+    ctx.beginPath();
+    ctx.moveTo(tlx, tly);
+    ctx.lineTo(trx, trY);
+    ctx.lineTo(brx, bry);
+    ctx.lineTo(blx, bly);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  // ── Border ──────────────────────────────────────────────────────────
+  ctx.beginPath();
+  ctx.moveTo(tlx, tly);
+  ctx.lineTo(trx, trY);
+  ctx.lineTo(brx, bry);
+  ctx.lineTo(blx, bly);
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth   = 1;
+  ctx.stroke();
+
+  // ── Symbol ──────────────────────────────────────────────────────────
+  // The card's 3D center always projects to (ctrX, ctrY). Scale x by absC
+  // so the glyph compresses as the card rotates, as if painted on the surface.
+  if (absC > 0.08) {
+    const fontSize = Math.floor(cardH * 0.44);
+    ctx.save();
+    ctx.translate(ctrX, ctrY);
+    ctx.scale(absC, 1);
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    if (showFaceUp) {
+      ctx.fillStyle = bright;
+      ctx.font      = `700 ${fontSize}px "Fira Code", monospace`;
+      ctx.fillText(symbol, 0, 0);
+    } else {
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.font      = `700 ${fontSize}px Inter, system-ui, sans-serif`;
+      ctx.fillText('?', 0, 0);
+    }
+    ctx.restore();
+  }
+}
+
 function drawCard(
   ctx: CanvasRenderingContext2D,
   x: number, y: number, w: number, h: number,
   card: Card,
 ) {
-  const pairIdx = card.pairId % BRIGHT.length;
-  const bright  = BRIGHT[pairIdx];
-  const dim     = DIM[pairIdx];
-  const symbol  = SYMBOLS[pairIdx];
+  const pairIdx  = card.pairId % BRIGHT.length;
+  const bright   = BRIGHT[pairIdx];
+  const dim      = DIM[pairIdx];
+  const symbol   = SYMBOLS[pairIdx];
   const fontSize = Math.floor(h * 0.44);
 
   if (!card.faceUp && !card.matched) {
-    // ── Back ──────────────────────────────────────────────────────────────
     roundRect(ctx, x, y, w, h, CARD_RADIUS);
     ctx.fillStyle = '#1a2630';
     ctx.fill();
@@ -98,18 +214,17 @@ function drawCard(
     ctx.font         = `700 ${fontSize}px Inter, system-ui, sans-serif`;
     ctx.fillText('?', x + w / 2, y + h / 2);
   } else {
-    // ── Front ─────────────────────────────────────────────────────────────
     roundRect(ctx, x, y, w, h, CARD_RADIUS);
     ctx.fillStyle = dim;
     ctx.fill();
 
     if (card.matched) {
-      ctx.strokeStyle  = bright;
-      ctx.lineWidth    = 2;
-      ctx.shadowColor  = bright;
-      ctx.shadowBlur   = 10;
+      ctx.strokeStyle = bright;
+      ctx.lineWidth   = 2;
+      ctx.shadowColor = bright;
+      ctx.shadowBlur  = 10;
       ctx.stroke();
-      ctx.shadowBlur = 0;
+      ctx.shadowBlur  = 0;
     } else {
       ctx.strokeStyle = 'rgba(255,255,255,0.14)';
       ctx.lineWidth   = 1;
@@ -133,21 +248,25 @@ export const TurnTwo: React.FC<MiniGameProps> = ({
   onLose,
   onProgress,
 }) => {
-  const canvasRef       = useRef<HTMLCanvasElement>(null);
-  const phaseRef        = useRef<GamePhase>('idle');
-  const cardsRef        = useRef<Card[]>([]);
-  const flippedRef      = useRef<number[]>([]);
-  const chancesLeftRef  = useRef(chances);
-  const matchedRef      = useRef(0);
-  const lockedRef       = useRef(false);
+  const canvasRef      = useRef<HTMLCanvasElement>(null);
+  const phaseRef       = useRef<GamePhase>('idle');
+  const cardsRef       = useRef<Card[]>([]);
+  const flippedRef     = useRef<number[]>([]);
+  const chancesLeftRef = useRef(chances);
+  const matchedRef     = useRef(0);
+  const lockedRef      = useRef(false);
 
-  // Keep callbacks stable across renders
+  const cardAnimsRef      = useRef<Map<number, CardAnim>>(new Map());
+  const rafRef            = useRef<number | null>(null);
+  const lastTimeRef       = useRef<number | null>(null);
+  const animOnCompleteRef = useRef<(() => void) | null>(null);
+
   const onWinRef      = useRef(onWin);
   const onLoseRef     = useRef(onLose);
   const onProgressRef = useRef(onProgress);
-  useEffect(() => { onWinRef.current      = onWin;       }, [onWin]);
-  useEffect(() => { onLoseRef.current     = onLose;      }, [onLose]);
-  useEffect(() => { onProgressRef.current = onProgress;  }, [onProgress]);
+  useEffect(() => { onWinRef.current      = onWin;      }, [onWin]);
+  useEffect(() => { onLoseRef.current     = onLose;     }, [onLose]);
+  useEffect(() => { onProgressRef.current = onProgress; }, [onProgress]);
 
   // ── Canvas drawing ──────────────────────────────────────────────────────
   const drawCanvas = useCallback(() => {
@@ -156,16 +275,15 @@ export const TurnTwo: React.FC<MiniGameProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const dpr  = window.devicePixelRatio || 1;
-    const w    = canvas.width  / dpr;
-    const h    = canvas.height / dpr;
+    const dpr   = window.devicePixelRatio || 1;
+    const w     = canvas.width  / dpr;
+    const h     = canvas.height / dpr;
     const phase = phaseRef.current;
 
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = '#080c0a';
     ctx.fillRect(0, 0, w, h);
 
-    // ── Idle / end screens ─────────────────────────────────────────────
     if (phase === 'idle') {
       ctx.textAlign    = 'center';
       ctx.textBaseline = 'middle';
@@ -186,7 +304,11 @@ export const TurnTwo: React.FC<MiniGameProps> = ({
       ctx.shadowColor  = accent;
       ctx.shadowBlur   = 18;
       ctx.font         = `700 ${Math.floor(h * 0.16)}px Inter, system-ui, sans-serif`;
-      ctx.fillText(phase === 'won' ? 'SOLVED!' : 'FAILED', w / 2, h / 2);
+      ctx.fillText(phase === 'won' ? 'WIN!' : 'FAIL', w / 2, h / 2 - h * 0.07);
+      ctx.shadowBlur   = 0;
+      ctx.fillStyle    = 'rgba(255,255,255,0.32)';
+      ctx.font         = `${Math.floor(h * 0.08)}px Inter, system-ui, sans-serif`;
+      ctx.fillText('PLAY AGAIN', w / 2, h / 2 + h * 0.1);
       return;
     }
 
@@ -232,11 +354,59 @@ export const TurnTwo: React.FC<MiniGameProps> = ({
       const row = Math.floor(idx / cols);
       const cx  = PAD + col * (cardW + GAP);
       const cy  = gridTop + row * (cardH + GAP);
-      drawCard(ctx, cx, cy, cardW, cardH, card);
+
+      const anim = cardAnimsRef.current.get(idx);
+      if (anim) {
+        drawCardPerspective(ctx, cx, cy, cardW, cardH, card, anim);
+      } else {
+        drawCard(ctx, cx, cy, cardW, cardH, card);
+      }
     });
   }, [rounds, chances]);
 
-  // ── Canvas sizing (mirrors CipherGrid / SimonGame) ──────────────────────
+  // ── Animation loop ──────────────────────────────────────────────────────
+  const animLoop = useCallback((time: number) => {
+    const dt    = lastTimeRef.current !== null ? (time - lastTimeRef.current) / FLIP_MS : 0;
+    lastTimeRef.current = time;
+
+    const anims = cardAnimsRef.current;
+    for (const [idx, anim] of anims) {
+      anim.t = Math.min(1, anim.t + dt);
+      if (anim.t >= 1) anims.delete(idx);
+    }
+
+    drawCanvas();
+
+    if (anims.size > 0) {
+      rafRef.current = requestAnimationFrame(animLoop);
+    } else {
+      rafRef.current      = null;
+      lastTimeRef.current = null;
+      const cb = animOnCompleteRef.current;
+      animOnCompleteRef.current = null;
+      cb?.();
+    }
+  }, [drawCanvas]);
+
+  // ── Start flip animations ───────────────────────────────────────────────
+  const startFlips = useCallback((
+    indices:   number[],
+    from:      boolean,
+    to:        boolean,
+    clockwise: boolean,
+    onComplete?: () => void,
+  ) => {
+    animOnCompleteRef.current = onComplete ?? null;
+    for (const idx of indices) {
+      cardAnimsRef.current.set(idx, { from, to, t: 0, clockwise });
+    }
+    if (rafRef.current === null) {
+      lastTimeRef.current = null;
+      rafRef.current = requestAnimationFrame(animLoop);
+    }
+  }, [animLoop]);
+
+  // ── Canvas sizing ───────────────────────────────────────────────────────
   const initCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -259,6 +429,12 @@ export const TurnTwo: React.FC<MiniGameProps> = ({
     return () => ro.disconnect();
   }, [initCanvas]);
 
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
   // ── Game logic ──────────────────────────────────────────────────────────
   const startGame = useCallback(() => {
     const pairs: number[] = [];
@@ -273,21 +449,24 @@ export const TurnTwo: React.FC<MiniGameProps> = ({
     drawCanvas();
 
     setTimeout(() => {
+      // Set game state face-down; animation will visually show the fold from face-up
       cardsRef.current = cardsRef.current.map(c => ({ ...c, faceUp: false }));
-      lockedRef.current = false;
-      drawCanvas();
+      const indices = Array.from({ length: cardsRef.current.length }, (_, i) => i);
+      startFlips(indices, true, false, false, () => {
+        lockedRef.current = false;
+      });
     }, 1000);
-  }, [rounds, chances, drawCanvas]);
+  }, [rounds, chances, drawCanvas, startFlips]);
 
   const checkMatch = useCallback(() => {
-    const [i1, i2]  = flippedRef.current;
-    const cards     = cardsRef.current;
+    const [i1, i2] = flippedRef.current;
+    const cards    = cardsRef.current;
 
     setTimeout(() => {
       if (cards[i1].pairId === cards[i2].pairId) {
         // ── Match ──
-        cards[i1] = { ...cards[i1], faceUp: true,  matched: true };
-        cards[i2] = { ...cards[i2], faceUp: true,  matched: true };
+        cards[i1] = { ...cards[i1], faceUp: true, matched: true };
+        cards[i2] = { ...cards[i2], faceUp: true, matched: true };
         flippedRef.current = [];
         matchedRef.current++;
         lockedRef.current  = false;
@@ -301,23 +480,24 @@ export const TurnTwo: React.FC<MiniGameProps> = ({
           onWinRef.current();
         }
       } else {
-        // ── Mismatch ──
+        // ── Mismatch — flip cards back with CCW animation ──
         chancesLeftRef.current--;
         cards[i1] = { ...cards[i1], faceUp: false };
         cards[i2] = { ...cards[i2], faceUp: false };
         flippedRef.current = [];
 
-        if (chancesLeftRef.current <= 0) {
-          phaseRef.current = 'lost';
-          drawCanvas();
-          onLoseRef.current();
-        } else {
-          lockedRef.current = false;
-          drawCanvas();
-        }
+        startFlips([i1, i2], true, false, false, () => {
+          if (chancesLeftRef.current <= 0) {
+            phaseRef.current = 'lost';
+            drawCanvas();
+            onLoseRef.current();
+          } else {
+            lockedRef.current = false;
+          }
+        });
       }
     }, REVEAL_MS);
-  }, [rounds, drawCanvas]);
+  }, [rounds, drawCanvas, startFlips]);
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -332,14 +512,14 @@ export const TurnTwo: React.FC<MiniGameProps> = ({
 
     if (phase !== 'playing' || lockedRef.current) return;
 
-    const rect  = canvas.getBoundingClientRect();
+    const rect   = canvas.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
 
     const cards = cardsRef.current;
     const { cols, rows } = computeGrid(cards.length);
     const gridTop = PAD + HEADER_H + GAP;
-    const gridW   = rect.width - PAD * 2;
+    const gridW   = rect.width  - PAD * 2;
     const gridH   = rect.height - gridTop - PAD;
     const cardW   = (gridW - GAP * (cols - 1)) / cols;
     const cardH   = (gridH - GAP * (rows - 1)) / rows;
@@ -362,15 +542,17 @@ export const TurnTwo: React.FC<MiniGameProps> = ({
     if (card.faceUp || card.matched) return;
     if (flippedRef.current.includes(clickedIdx)) return;
 
+    // Update game state immediately; animation shows the visual transition
     cards[clickedIdx] = { ...card, faceUp: true };
     flippedRef.current = [...flippedRef.current, clickedIdx];
-    drawCanvas();
+
+    startFlips([clickedIdx], false, true, true);
 
     if (flippedRef.current.length === 2) {
       lockedRef.current = true;
       checkMatch();
     }
-  }, [startGame, checkMatch, drawCanvas]);
+  }, [startGame, checkMatch, startFlips]);
 
   return (
     <div className="turntwo-game">
