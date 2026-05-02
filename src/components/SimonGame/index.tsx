@@ -26,12 +26,13 @@ const BUTTONS: ButtonDef[] = [
 
 const GAP = 0.06; // radians gap between segments
 
-export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, onWin, onLose, onProgress }) => {
+export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, chances = 3, onWin, onLose, onProgress }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const phaseRef = useRef<GamePhase>('idle');
   const sequenceRef = useRef<number[]>([]);
   const roundRef = useRef(0);
   const inputCountRef = useRef(0);
+  const chancesLeftRef = useRef(chances);
 
   const drawCanvas = useCallback((activeBtn: number | null, phase: GamePhase, currentRound: number) => {
     const canvas = canvasRef.current;
@@ -77,6 +78,30 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, onWin, onLose, 
     ctx.lineWidth = 1;
     ctx.stroke();
 
+    // Chances dots
+    if (phase === 'showing' || phase === 'input') {
+      const chancesLeft = chancesLeftRef.current;
+      const dotR = Math.max(2, innerR * 0.09);
+      const dotSpacing = dotR * 2.6;
+      const totalDotsW = chances * dotSpacing - (dotSpacing - dotR * 2);
+      const dotStartX = cx - totalDotsW / 2 + dotR;
+      const dotY = cy + innerR * 0.52;
+      for (let i = 0; i < chances; i++) {
+        ctx.beginPath();
+        ctx.arc(dotStartX + i * dotSpacing, dotY, dotR, 0, Math.PI * 2);
+        if (i < chancesLeft) {
+          ctx.fillStyle   = '#0af5b0';
+          ctx.shadowColor = '#0af5b0';
+          ctx.shadowBlur  = 6;
+        } else {
+          ctx.fillStyle  = 'rgba(255,255,255,0.12)';
+          ctx.shadowBlur = 0;
+        }
+        ctx.fill();
+      }
+      ctx.shadowBlur = 0;
+    }
+
     // Center labels
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -93,10 +118,9 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, onWin, onLose, 
     } else if (phase === 'showing' || phase === 'input') {
       ctx.fillStyle = phase === 'input' ? '#0af5b0' : 'rgba(255,255,255,0.55)';
       ctx.font = `600 ${mainSize}px Inter, system-ui, sans-serif`;
-      ctx.fillText(`${currentRound} / ${rounds}`, cx, cy - subSize * 0.45);
-      // ctx.fillStyle = 'rgba(255,255,255,0.32)';
+      ctx.fillText(`${currentRound} / ${rounds}`, cx, cy - subSize * 1.6);
       ctx.font = `${subSize}px Inter, system-ui, sans-serif`;
-      ctx.fillText(phase === 'input' ? 'YOUR TURN' : 'WATCH', cx, cy + subSize * 0.95);
+      ctx.fillText(phase === 'input' ? 'YOUR TURN' : 'WATCH', cx, cy);
     } else if (phase === 'won') {
       ctx.fillStyle = '#2ecc71';
       ctx.shadowColor = '#2ecc71';
@@ -110,7 +134,7 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, onWin, onLose, 
       ctx.font = `700 ${mainSize}px Inter, system-ui, sans-serif`;
       ctx.fillText('FAIL', cx, cy);
     }
-  }, [rounds]);
+  }, [rounds, chances]);
 
   const initCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -165,9 +189,10 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, onWin, onLose, 
     sequenceRef.current = seq;
     roundRef.current = 1;
     inputCountRef.current = 0;
+    chancesLeftRef.current = chances;
     showSequence(seq, 1);
     onProgress(0);
-  }, [rounds, showSequence, onProgress]);
+  }, [rounds, chances, showSequence, onProgress]);
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -186,7 +211,9 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, onWin, onLose, 
 
     const phase = phaseRef.current;
 
-    if (phase === 'idle' || phase === 'won' || phase === 'lost') {
+    if (phase === 'won' || phase === 'lost') return;
+
+    if (phase === 'idle') {
       if (dist <= outerR) startGame();
       return;
     }
@@ -209,12 +236,18 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, onWin, onLose, 
 
     const inputPos = inputCountRef.current;
     if (clicked !== sequenceRef.current[inputPos]) {
-      phaseRef.current = 'lost';
-      setTimeout(() => {
-        drawCanvas(null, 'lost', currentRound);
-        onLose();
-        onProgress(100);
-      }, 220);
+      chancesLeftRef.current--;
+      if (chancesLeftRef.current <= 0) {
+        phaseRef.current = 'lost';
+        setTimeout(() => {
+          drawCanvas(null, 'lost', currentRound);
+          onLose();
+          onProgress(100);
+        }, 220);
+      } else {
+        phaseRef.current = 'showing';
+        setTimeout(() => showSequence(sequenceRef.current, currentRound), 400);
+      }
       return;
     }
 
@@ -235,7 +268,7 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, onWin, onLose, 
         setTimeout(() => showSequence(sequenceRef.current, next), 500);
       }
     }
-  }, [startGame, drawCanvas, rounds, onWin, onLose, showSequence]);
+  }, [startGame, drawCanvas, rounds, onWin, onLose, onProgress, showSequence]);
 
   return (
     <div className="simon-game">

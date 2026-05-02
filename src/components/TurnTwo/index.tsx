@@ -1,0 +1,386 @@
+import { useRef, useEffect, useCallback } from 'react';
+import './style.scss';
+import { MiniGameProps } from '../../includes/minigame.interfaces';
+import { CIPHER_COLS, CIPHER_ROWS, CELL_W, CELL_H } from '../CipherGrid';
+
+const CANVAS_ASPECT = (CIPHER_ROWS * CELL_H) / (CIPHER_COLS * CELL_W);
+
+const PAD          = 8;
+const GAP          = 5;
+const HEADER_H     = 22;
+const REVEAL_MS    = 750;  // how long mismatched pair stays face-up before flipping back
+const CARD_RADIUS  = 4;
+
+// One bright + one dim color per pair index
+const BRIGHT: string[] = [
+  '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6',
+  '#1abc9c', '#e67e22', '#e91e63', '#00bcd4', '#ff7043',
+];
+const DIM: string[] = [
+  '#3a1212', '#121830', '#12301c', '#302800', '#1e1030',
+  '#10282a', '#301c0a', '#2a121e', '#00242e', '#301a12',
+];
+
+// Symbols shown on card faces — one per pair
+const SYMBOLS = ['1','2','3','4','5','6','7','8','9','0'];
+
+type GamePhase = 'idle' | 'playing' | 'won' | 'lost';
+
+interface Card {
+  pairId:  number;
+  faceUp:  boolean;
+  matched: boolean;
+}
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Find the grid dimensions (cols × rows) whose aspect ratio best matches the
+// canvas, penalising wasted empty cells.
+function computeGrid(total: number): { cols: number; rows: number } {
+  const targetRatio = (CIPHER_COLS * CELL_W) / (CIPHER_ROWS * CELL_H); // ≈1.714
+  let bestCols = total, bestRows = 1, bestScore = Infinity;
+  for (let cols = 1; cols <= total; cols++) {
+    const rows = Math.ceil(total / cols);
+    const waste = cols * rows - total;
+    const score = Math.abs(cols / rows - targetRatio) + waste * 0.5;
+    if (score < bestScore) { bestScore = score; bestCols = cols; bestRows = rows; }
+  }
+  return { cols: bestCols, rows: bestRows };
+}
+
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number, w: number, h: number, r: number,
+) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y,     x + w, y + r,     r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x,     y + h, x,     y + h - r, r);
+  ctx.lineTo(x,     y + r);
+  ctx.arcTo(x,     y,     x + r, y,         r);
+  ctx.closePath();
+}
+
+function drawCard(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number, w: number, h: number,
+  card: Card,
+) {
+  const pairIdx = card.pairId % BRIGHT.length;
+  const bright  = BRIGHT[pairIdx];
+  const dim     = DIM[pairIdx];
+  const symbol  = SYMBOLS[pairIdx];
+  const fontSize = Math.floor(h * 0.44);
+
+  if (!card.faceUp && !card.matched) {
+    // ── Back ──────────────────────────────────────────────────────────────
+    roundRect(ctx, x, y, w, h, CARD_RADIUS);
+    ctx.fillStyle = '#1a2630';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle    = 'rgba(255,255,255,0.18)';
+    ctx.font         = `700 ${fontSize}px Inter, system-ui, sans-serif`;
+    ctx.fillText('?', x + w / 2, y + h / 2);
+  } else {
+    // ── Front ─────────────────────────────────────────────────────────────
+    roundRect(ctx, x, y, w, h, CARD_RADIUS);
+    ctx.fillStyle = dim;
+    ctx.fill();
+
+    if (card.matched) {
+      ctx.strokeStyle  = bright;
+      ctx.lineWidth    = 2;
+      ctx.shadowColor  = bright;
+      ctx.shadowBlur   = 10;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    } else {
+      ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+      ctx.lineWidth   = 1;
+      ctx.stroke();
+    }
+
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle    = bright;
+    if (card.matched) { ctx.shadowColor = bright; ctx.shadowBlur = 6; }
+    ctx.font = `700 ${fontSize}px "Fira Code", monospace`;
+    ctx.fillText(symbol, x + w / 2, y + h / 2);
+    ctx.shadowBlur = 0;
+  }
+}
+
+export const TurnTwo: React.FC<MiniGameProps> = ({
+  rounds  = 5,
+  chances = 3,
+  onWin,
+  onLose,
+  onProgress,
+}) => {
+  const canvasRef       = useRef<HTMLCanvasElement>(null);
+  const phaseRef        = useRef<GamePhase>('idle');
+  const cardsRef        = useRef<Card[]>([]);
+  const flippedRef      = useRef<number[]>([]);
+  const chancesLeftRef  = useRef(chances);
+  const matchedRef      = useRef(0);
+  const lockedRef       = useRef(false);
+
+  // Keep callbacks stable across renders
+  const onWinRef      = useRef(onWin);
+  const onLoseRef     = useRef(onLose);
+  const onProgressRef = useRef(onProgress);
+  useEffect(() => { onWinRef.current      = onWin;       }, [onWin]);
+  useEffect(() => { onLoseRef.current     = onLose;      }, [onLose]);
+  useEffect(() => { onProgressRef.current = onProgress;  }, [onProgress]);
+
+  // ── Canvas drawing ──────────────────────────────────────────────────────
+  const drawCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const dpr  = window.devicePixelRatio || 1;
+    const w    = canvas.width  / dpr;
+    const h    = canvas.height / dpr;
+    const phase = phaseRef.current;
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#080c0a';
+    ctx.fillRect(0, 0, w, h);
+
+    // ── Idle / end screens ─────────────────────────────────────────────
+    if (phase === 'idle') {
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle    = 'rgba(255,255,255,0.72)';
+      ctx.font         = `600 ${Math.floor(h * 0.13)}px Inter, system-ui, sans-serif`;
+      ctx.fillText('CLICK TO START', w / 2, h / 2 - h * 0.07);
+      ctx.fillStyle = 'rgba(255,255,255,0.32)';
+      ctx.font      = `${Math.floor(h * 0.08)}px Inter, system-ui, sans-serif`;
+      ctx.fillText(`${rounds} pairs · ${chances} chances`, w / 2, h / 2 + h * 0.08);
+      return;
+    }
+
+    if (phase === 'won' || phase === 'lost') {
+      const accent = phase === 'won' ? '#2ecc71' : '#e74c3c';
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle    = accent;
+      ctx.shadowColor  = accent;
+      ctx.shadowBlur   = 18;
+      ctx.font         = `700 ${Math.floor(h * 0.16)}px Inter, system-ui, sans-serif`;
+      ctx.fillText(phase === 'won' ? 'SOLVED!' : 'FAILED', w / 2, h / 2);
+      return;
+    }
+
+    // ── HUD ────────────────────────────────────────────────────────────
+    const headerMidY  = PAD + HEADER_H / 2;
+    const dotR        = 5;
+    const dotSpacing  = 14;
+    const chancesLeft = chancesLeftRef.current;
+
+    for (let i = 0; i < chances; i++) {
+      ctx.beginPath();
+      ctx.arc(PAD + dotR + i * dotSpacing, headerMidY, dotR, 0, Math.PI * 2);
+      if (i < chancesLeft) {
+        ctx.fillStyle   = '#0af5b0';
+        ctx.shadowColor = '#0af5b0';
+        ctx.shadowBlur  = 8;
+      } else {
+        ctx.fillStyle  = 'rgba(255,255,255,0.1)';
+        ctx.shadowBlur = 0;
+      }
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+
+    const matched = matchedRef.current;
+    ctx.textAlign    = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.font         = `600 ${Math.floor(HEADER_H * 0.6)}px "Fira Code", monospace`;
+    ctx.fillStyle    = matched === rounds ? '#2ecc71' : 'rgba(255,255,255,0.5)';
+    ctx.fillText(`${matched}/${rounds}`, w - PAD, headerMidY);
+
+    // ── Cards ──────────────────────────────────────────────────────────
+    const cards = cardsRef.current;
+    const { cols, rows } = computeGrid(cards.length);
+    const gridTop = PAD + HEADER_H + GAP;
+    const gridW   = w - PAD * 2;
+    const gridH   = h - gridTop - PAD;
+    const cardW   = (gridW - GAP * (cols - 1)) / cols;
+    const cardH   = (gridH - GAP * (rows - 1)) / rows;
+
+    cards.forEach((card, idx) => {
+      const col = idx % cols;
+      const row = Math.floor(idx / cols);
+      const cx  = PAD + col * (cardW + GAP);
+      const cy  = gridTop + row * (cardH + GAP);
+      drawCard(ctx, cx, cy, cardW, cardH, card);
+    });
+  }, [rounds, chances]);
+
+  // ── Canvas sizing (mirrors CipherGrid / SimonGame) ──────────────────────
+  const initCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dpr  = window.devicePixelRatio || 1;
+    const cssW = canvas.clientWidth;
+    if (!cssW) return;
+    const cssH = Math.round(cssW * CANVAS_ASPECT);
+    canvas.style.height = `${cssH}px`;
+    canvas.width        = Math.round(cssW * dpr);
+    canvas.height       = Math.round(cssH * dpr);
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.scale(dpr, dpr);
+    drawCanvas();
+  }, [drawCanvas]);
+
+  useEffect(() => {
+    initCanvas();
+    const ro = new ResizeObserver(initCanvas);
+    if (canvasRef.current) ro.observe(canvasRef.current);
+    return () => ro.disconnect();
+  }, [initCanvas]);
+
+  // ── Game logic ──────────────────────────────────────────────────────────
+  const startGame = useCallback(() => {
+    const pairs: number[] = [];
+    for (let i = 0; i < rounds; i++) pairs.push(i, i);
+    const cards = shuffle(pairs).map(pairId => ({ pairId, faceUp: true, matched: false }));
+    cardsRef.current       = cards;
+    phaseRef.current       = 'playing';
+    flippedRef.current     = [];
+    chancesLeftRef.current = chances;
+    matchedRef.current     = 0;
+    lockedRef.current      = true;
+    drawCanvas();
+
+    setTimeout(() => {
+      cardsRef.current = cardsRef.current.map(c => ({ ...c, faceUp: false }));
+      lockedRef.current = false;
+      drawCanvas();
+    }, 1000);
+  }, [rounds, chances, drawCanvas]);
+
+  const checkMatch = useCallback(() => {
+    const [i1, i2]  = flippedRef.current;
+    const cards     = cardsRef.current;
+
+    setTimeout(() => {
+      if (cards[i1].pairId === cards[i2].pairId) {
+        // ── Match ──
+        cards[i1] = { ...cards[i1], faceUp: true,  matched: true };
+        cards[i2] = { ...cards[i2], faceUp: true,  matched: true };
+        flippedRef.current = [];
+        matchedRef.current++;
+        lockedRef.current  = false;
+
+        onProgressRef.current(Math.round((matchedRef.current / rounds) * 100));
+        drawCanvas();
+
+        if (matchedRef.current === rounds) {
+          phaseRef.current = 'won';
+          drawCanvas();
+          onWinRef.current();
+        }
+      } else {
+        // ── Mismatch ──
+        chancesLeftRef.current--;
+        cards[i1] = { ...cards[i1], faceUp: false };
+        cards[i2] = { ...cards[i2], faceUp: false };
+        flippedRef.current = [];
+
+        if (chancesLeftRef.current <= 0) {
+          phaseRef.current = 'lost';
+          drawCanvas();
+          onLoseRef.current();
+        } else {
+          lockedRef.current = false;
+          drawCanvas();
+        }
+      }
+    }, REVEAL_MS);
+  }, [rounds, drawCanvas]);
+
+  const handleClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const phase = phaseRef.current;
+
+    if (phase === 'idle' || phase === 'won' || phase === 'lost') {
+      startGame();
+      return;
+    }
+
+    if (phase !== 'playing' || lockedRef.current) return;
+
+    const rect  = canvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+
+    const cards = cardsRef.current;
+    const { cols, rows } = computeGrid(cards.length);
+    const gridTop = PAD + HEADER_H + GAP;
+    const gridW   = rect.width - PAD * 2;
+    const gridH   = rect.height - gridTop - PAD;
+    const cardW   = (gridW - GAP * (cols - 1)) / cols;
+    const cardH   = (gridH - GAP * (rows - 1)) / rows;
+
+    let clickedIdx = -1;
+    for (let i = 0; i < cards.length; i++) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x   = PAD + col * (cardW + GAP);
+      const y   = gridTop + row * (cardH + GAP);
+      if (clickX >= x && clickX < x + cardW && clickY >= y && clickY < y + cardH) {
+        clickedIdx = i;
+        break;
+      }
+    }
+
+    if (clickedIdx === -1) return;
+
+    const card = cards[clickedIdx];
+    if (card.faceUp || card.matched) return;
+    if (flippedRef.current.includes(clickedIdx)) return;
+
+    cards[clickedIdx] = { ...card, faceUp: true };
+    flippedRef.current = [...flippedRef.current, clickedIdx];
+    drawCanvas();
+
+    if (flippedRef.current.length === 2) {
+      lockedRef.current = true;
+      checkMatch();
+    }
+  }, [startGame, checkMatch, drawCanvas]);
+
+  return (
+    <div className="turntwo-game">
+      <canvas
+        ref={canvasRef}
+        className="turntwo-game__canvas"
+        onClick={handleClick}
+      />
+    </div>
+  );
+};
+
+export default TurnTwo;

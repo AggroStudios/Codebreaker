@@ -9,7 +9,7 @@ export enum CipherState {
     BREAKING = 'Breaking',
     SUCCESS = 'Success',
     CANCELLED = 'Cancelled',
-    FAILURE = 'Failure',
+    FAILURE = 'Failed',
     PAUSED = 'Paused',
 }
 

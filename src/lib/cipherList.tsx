@@ -1,6 +1,7 @@
 import { BlockUnit, ICipherType } from '../includes/Cipher.interface';
 import { ProcessorArchitecture } from '../includes/Process.interface';
 import { SimonGame } from '../components/SimonGame';
+import { TurnTwo } from '../components/TurnTwo';
 
 export const CipherTypes: ICipherType[] = [
     {
@@ -16,6 +17,20 @@ export const CipherTypes: ICipherType[] = [
         xp: 10,
         requiredArchitecture: [ProcessorArchitecture.risc32, ProcessorArchitecture.risc64],
         manualMode: [SimonGame]
+    },
+    {
+        name: 'TurnTwo Cipher',
+        complexity: 1,
+        parallelism: 1,
+        memoryRequired: 1024,
+        block: {
+            size: 1024,
+            unit: BlockUnit.megabytes,
+        },
+        payout: 100,
+        xp: 10,
+        requiredArchitecture: [ProcessorArchitecture.risc32, ProcessorArchitecture.risc64],
+        manualMode: [TurnTwo]
     },
     {
         name: 'Cipher 1',

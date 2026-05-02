@@ -8,7 +8,7 @@ export interface CipherDelegate {
     setGrid: (chars: Uint8Array, classes: Uint8Array) => void;
     setProgress: (progress: number) => void;
     setState: (state: CipherState) => void;
-    completeCipher: (cipher: Cipher, cancelled: boolean) => void;
+    completeCipher: (cipher: Cipher, state: CipherState) => void;
     downloadTick: (frame: number) => void;
 }
 
@@ -127,6 +127,11 @@ export default class Cipher implements Process {
         this.state = CipherState.CANCELLED;
     }
 
+    public fail() {
+        this._paused = false;
+        this.state = CipherState.FAILURE;
+    }
+
     private set state(value: CipherState) {
         this._state = value;
         this._delegate.setState(value);
@@ -227,15 +232,17 @@ export default class Cipher implements Process {
                 break;
             case CipherState.SUCCESS:
                 this._stationOs.removeProcess(this);
-                this._delegate.completeCipher(this, false);
+                this._delegate.completeCipher(this, CipherState.SUCCESS);
                 break;
             case CipherState.CANCELLED:
                 this._stationOs.removeProcess(this);
                 this._stationNet.removeProcess(this);
-                this._delegate.completeCipher(this, true);
+                this._delegate.completeCipher(this, CipherState.CANCELLED);
                 break;
             case CipherState.FAILURE:
-                throw new Error('Cipher failed!');
+                this._stationOs.removeProcess(this);
+                this._delegate.completeCipher(this, CipherState.FAILURE);
+                break;
         }
     }
 }

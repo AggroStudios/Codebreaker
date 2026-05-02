@@ -120,6 +120,9 @@ function LinearProgressWithLabel(
         case CipherState.CANCELLED:
             statusClassName = 'cancelled';
             break;
+        case CipherState.FAILURE:
+            statusClassName = 'cancelled';
+            break;
         case CipherState.PAUSED:
             statusClassName = 'paused';
             break;
@@ -196,7 +199,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
     }, [cipher]);
 
     const handleManualLose = useCallback(() => {
-        cipher?.cancel();
+        cipher?.fail();
     }, [cipher]);
 
     const handleManualProgress = useCallback((progress: number) => {
@@ -210,7 +213,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
 
     // Always points to the latest completeCipher so delegates created once
     // (on cipher construction) never call a stale closure.
-    const completeCipherRef = useRef<(cipher: Cipher, cancelled: boolean) => void>(
+    const completeCipherRef = useRef<(cipher: Cipher, state: CipherState) => void>(
         () => {},
     );
 
@@ -229,7 +232,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
             card.classList.remove('background');
             card.classList.add('cipher-success');
             card.classList.remove('cipher-error');
-        } else if (cipherState === CipherState.CANCELLED) {
+        } else if (cipherState === CipherState.CANCELLED || cipherState === CipherState.FAILURE) {
             card.classList.remove('background');
             card.classList.remove('cipher-success');
             card.classList.add('cipher-error');
@@ -242,25 +245,30 @@ export default function CipherBreak(props: CipherBreakOptions) {
 
     // Reads everything from the store at call time — no stale closure risk
     // regardless of when the cipher finishes or when upgrades are purchased.
-    const completeCipher = (cipher: Cipher, cancelled: boolean) => {
+    const completeCipher = (cipher: Cipher, state: CipherState) => {
         const entry = useCipherBreakStore.getState().entries[id ?? ''];
-        if (!cancelled) {
+        if (state === CipherState.SUCCESS) {
             station.os?.player.earnExperience(entry?.type?.xp);
             station.os?.player.addMoney(entry?.type?.payout);
             station.os?.sendNotification(
                 `You have earned ${entry?.type?.xp} XP and $${entry?.type?.payout}.`,
                 NotificationLevel.INFO,
             );
-        } else {
+        } else if (state === CipherState.CANCELLED) {
             station.os?.sendNotification(
                 `You have cancelled the cipher.`,
                 NotificationLevel.WARNING,
+            );
+        } else if (state === CipherState.FAILURE) {
+            station.os?.sendNotification(
+                `You have failed the cipher.`,
+                NotificationLevel.ERROR,
             );
         }
         setTimeout(() => {
             cipher.reset();
             const currentEntry = useCipherBreakStore.getState().entries[id ?? ''];
-            if (currentEntry?.autoCipher && !cancelled) {
+            if (currentEntry?.autoCipher && state !== CipherState.CANCELLED) {
                 handleAddCipher(currentEntry.type);
             }
         }, 1000);
@@ -276,7 +284,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
             setGrid: (chars, classes) => cipherGridRenderers.get(id)?.(chars, classes),
             setProgress: (p) => useCipherBreakStore.getState().update(id, { progress: p }),
             setState: (s) => useCipherBreakStore.getState().update(id, { state: s }),
-            completeCipher: (c, cancelled) => completeCipherRef.current(c, cancelled),
+            completeCipher: (c, state) => completeCipherRef.current(c, state),
             downloadTick: (frame) => downloadTickHandlers.get(id)?.(frame),
         };
 
@@ -381,7 +389,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
                     slotProps={{
                         title: { noWrap: true },
                     }}
-                    subheader={cipherState !== CipherState.IDLE ? cipherType?.name : cipherState}
+                    subheader={cipherType?.name}
                     action={
                         <>
                             {isBreakingOrDownloading &&
