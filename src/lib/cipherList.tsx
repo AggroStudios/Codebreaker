@@ -5,6 +5,20 @@ import { TurnTwo } from '../components/TurnTwo';
 
 export const CipherTypes: ICipherType[] = [
     {
+        name: 'Random Manual Cipher',
+        complexity: 1,
+        parallelism: 1,
+        memoryRequired: 1024,
+        block: {
+            size: 1024,
+            unit: BlockUnit.megabytes,
+        },
+        payout: 100,
+        xp: 10,
+        requiredArchitecture: [ProcessorArchitecture.risc32, ProcessorArchitecture.risc64],
+        manualMode: [SimonGame, TurnTwo]
+    },
+    {
         name: 'Simon Cipher',
         complexity: 1,
         parallelism: 1,

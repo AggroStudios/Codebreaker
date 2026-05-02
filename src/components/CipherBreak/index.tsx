@@ -180,6 +180,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
 
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [infoDialogOpen, setInfoDialogOpen] = useState(false);
+    const [miniGameIndex, setMiniGameIndex] = useState(0);
 
     const isManualBreaking =
         !!cipherType?.manualMode?.length &&
@@ -191,8 +192,8 @@ export default function CipherBreak(props: CipherBreakOptions) {
     const MiniGame = useMemo(() => {
         const modes = cipherType?.manualMode;
         if (!modes?.length) return null;
-        return modes[Math.floor(Math.random() * modes.length)];
-    }, [cipherType]);
+        return modes[miniGameIndex];
+    }, [cipherType, miniGameIndex]);
 
     const handleManualWin = useCallback(() => {
         cipher?.manualComplete();
@@ -291,6 +292,9 @@ export default function CipherBreak(props: CipherBreakOptions) {
         try {
             const c = new Cipher(20, 10, cssClasses, cipherType, station, delegate);
             const isNewSlot = !useCipherBreakStore.getState().entries[id]?.cipher;
+            if (cipherType?.manualMode?.length) {
+                setMiniGameIndex(Math.floor(Math.random() * (cipherType?.manualMode?.length ?? 0)));
+            }
             useCipherBreakStore.getState().update(id, {
                 cipher: c,
                 type: cipherType,
