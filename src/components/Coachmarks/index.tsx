@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Box, Button, IconButton, Typography } from '@mui/material';
 import { Close, ArrowBack, ArrowForward, CheckCircleOutlined } from '@mui/icons-material';
 import { usePlayerStore } from '../../stores/player';
+import { useAppReadyStore } from '../../stores/appReady';
 
 import './styles.scss';
 
@@ -119,12 +120,13 @@ function Spotlight({ rect }: SpotlightProps) {
 
 export default function Coachmarks() {
     const { hasSeenTutorial, markTutorialAsSeen } = usePlayerStore();
+    const isAppReady = useAppReadyStore((s) => s.isAppReady);
     const [step, setStep] = useState(0);
 
     const current = STEPS[step];
     const rect = useTargetRect(current.target);
 
-    if (hasSeenTutorial) return null;
+    if (!isAppReady || hasSeenTutorial) return null;
 
     const isFirst = step === 0;
     const isLast = step === STEPS.length - 1;

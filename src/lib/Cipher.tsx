@@ -132,7 +132,7 @@ export default class Cipher implements Process {
         this._delegate.setState(value);
     }
 
-    private set progress(value: number) {
+    public set progress(value: number) {
         this._delegate.setProgress(value);
     }
 
@@ -151,6 +151,10 @@ export default class Cipher implements Process {
 
     private breaking() {
         this._percentUse = 100;
+
+        // Manual-mode ciphers are solved by the player via a minigame
+        if (this._cipherType.manualMode?.length) return;
+
         const complexity = Math.round(10 * this._cipherType.complexity);
         if (this.frame > 0 && this.frame % parseFloat((complexity / this._stationProcessor.gigaflops).toFixed(3)) === 0) {
             const targetPos = Math.floor(
@@ -184,6 +188,11 @@ export default class Cipher implements Process {
             this.randomizeGrid();
             this.state = CipherState.SUCCESS;
         }
+    }
+
+    public manualComplete() {
+        this.progress = 100;
+        this.state = CipherState.SUCCESS;
     }
 
     private downloading() {

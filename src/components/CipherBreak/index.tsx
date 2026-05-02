@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Avatar,
     Box,
@@ -88,7 +88,7 @@ function CipherProgressBar({
     cipherState: CipherState | undefined;
 }) {
     const progress = useCipherBreakStore((s) => s.entries[id]?.progress) ?? 0;
-    if (!cipherState || cipherState === CipherState.IDLE) return null;
+
     return (
         <div className="progress">
             <LinearProgressWithLabel
@@ -178,6 +178,33 @@ export default function CipherBreak(props: CipherBreakOptions) {
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [infoDialogOpen, setInfoDialogOpen] = useState(false);
 
+    const isManualBreaking =
+        !!cipherType?.manualMode?.length &&
+        cipherState !== undefined &&
+        cipherState !== CipherState.IDLE &&
+        cipherState !== CipherState.DOWNLOADING;
+
+    // Pick a random minigame from the cipher type's list; stable per cipherType.
+    const MiniGame = useMemo(() => {
+        const modes = cipherType?.manualMode;
+        if (!modes?.length) return null;
+        return modes[Math.floor(Math.random() * modes.length)];
+    }, [cipherType]);
+
+    const handleManualWin = useCallback(() => {
+        cipher?.manualComplete();
+    }, [cipher]);
+
+    const handleManualLose = useCallback(() => {
+        cipher?.cancel();
+    }, [cipher]);
+
+    const handleManualProgress = useCallback((progress: number) => {
+        if (cipher) {
+            cipher.progress = progress;
+        }
+    }, [cipher]);
+
     const { removeProcess } = functions;
     const { notify } = useNotifier();
 
@@ -255,7 +282,12 @@ export default function CipherBreak(props: CipherBreakOptions) {
 
         try {
             const c = new Cipher(20, 10, cssClasses, cipherType, station, delegate);
-            useCipherBreakStore.getState().update(id, { cipher: c, type: cipherType });
+            const isNewSlot = !useCipherBreakStore.getState().entries[id]?.cipher;
+            useCipherBreakStore.getState().update(id, {
+                cipher: c,
+                type: cipherType,
+                ...(isNewSlot && { autoCipher: enableAutoCipher }),
+            });
             station.os?.addFile({
                 cmd: `${c.id}.bin`,
                 path: `/${cipherType.name.replace(' ', '-').toLowerCase()}`,
@@ -281,8 +313,15 @@ export default function CipherBreak(props: CipherBreakOptions) {
         }
     }, [id, type]);
 
+    // Sync per-cipher autoCipher only when the upgrade is actually toggled at
+    // runtime — not on mount, where the value is already set by handleAddCipher.
+    const prevEnableAutoCipherRef = useRef<boolean | null>(null);
     useEffect(() => {
-        useCipherBreakStore.getState().update(id ?? '', { autoCipher: enableAutoCipher });
+        if (prevEnableAutoCipherRef.current !== null &&
+            prevEnableAutoCipherRef.current !== enableAutoCipher) {
+            useCipherBreakStore.getState().update(id ?? '', { autoCipher: enableAutoCipher });
+        }
+        prevEnableAutoCipherRef.current = enableAutoCipher;
     }, [enableAutoCipher, id]);
 
     const handleRemoveCipher = () => {
@@ -373,7 +412,11 @@ export default function CipherBreak(props: CipherBreakOptions) {
                     {id && (
                         <>
                             <CipherProgressBar id={id} cipherType={cipherType} cipherState={cipherState} />
-                            <CipherGrid id={id} cipherKey={cipherKey} />
+                            {isManualBreaking && MiniGame ? (
+                                <MiniGame rounds={5} onWin={handleManualWin} onLose={handleManualLose} onProgress={handleManualProgress} />
+                            ) : (
+                                <CipherGrid id={id} cipherKey={cipherKey} />
+                            )}
                             <CipherInfo cipherType={cipherType} />
                         </>
                     )}

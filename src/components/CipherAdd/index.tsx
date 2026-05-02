@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ICipherType, CipherTypes } from '../../includes/Cipher.interface';
+import { ICipherType } from '../../includes/Cipher.interface';
 import { formatMoney } from '../../lib/utils';
 import { Card, CardHeader, Avatar, CardContent, Select, Button, SelectChangeEvent, MenuItem, InputLabel, FormControl, ListItemText, Typography, ListItem } from '@mui/material';
 import { AddCircleOutlineOutlined, PlayArrowTwoTone, TerminalTwoTone } from '@mui/icons-material';
@@ -8,6 +8,7 @@ import { AddCircleOutlineOutlined, PlayArrowTwoTone, TerminalTwoTone } from '@mu
 import './styles.scss';
 import { useStationContext } from '../../stores/stationContext';
 import { ProcessorArchitecture } from '../../includes/Process.interface';
+import { CipherTypes } from '../../lib/cipherList';
 
 export default function CipherAdd({ onAdd }: { onAdd: (id: string, cipherType: ICipherType) => void }) {
     const [picked, setPicked] = useState('');

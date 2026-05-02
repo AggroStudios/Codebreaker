@@ -12,6 +12,7 @@ import { playerStoreProxy } from './stores/player';
 import { createStationStore, makeStationProxy } from './stores/station';
 import { StationStoreProvider } from './stores/stationContext';
 import { useMusicPlayerStore } from './stores/musicPlayer';
+import { useAppReadyStore } from './stores/appReady';
 
 import OperatingSystem from './lib/OperatingSystem';
 import { preloadImages } from './lib/preloader';
@@ -72,6 +73,7 @@ export default function App() {
 
     const handleLoadingHidden = () => {
         useMusicPlayerStore.getState().play();
+        useAppReadyStore.getState().setAppReady();
     };
 
     return (

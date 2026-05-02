@@ -12,10 +12,10 @@ const CELL_COLORS_RGB: [number, number, number][] = [
     [0xcc / 255, 0xcc / 255, 0xcc / 255],
     [0x37 / 255, 0xff / 255, 0x37 / 255],
 ];
-const CIPHER_COLS = 20;
-const CIPHER_ROWS = 10;
-const CELL_W = 12;
-const CELL_H = 14;
+export const CIPHER_COLS = 20;
+export const CIPHER_ROWS = 10;
+export const CELL_W = 12;
+export const CELL_H = 14;
 const CANVAS_ASPECT = (CIPHER_ROWS * CELL_H) / (CIPHER_COLS * CELL_W);
 
 // ─── WebGL atlas layout ───────────────────────────────────────────────────────
