@@ -78,7 +78,8 @@ function roundRect(
 
 // Draws a card mid-flip using perspective projection around the Y axis.
 // `anim.clockwise = true` → right edge comes toward viewer (CW).
-// The card narrows to an edge at t=0.5, then expands showing the new face.
+// cosA is used raw (goes negative past 90°) so the corners keep moving in
+// one direction instead of reversing — giving a full continuous rotation.
 function drawCardPerspective(
   ctx: CanvasRenderingContext2D,
   cx: number, cy: number, cardW: number, cardH: number,
@@ -86,38 +87,38 @@ function drawCardPerspective(
   anim: CardAnim,
 ) {
   const angle = anim.t * Math.PI;
-  const cosA  = Math.cos(angle);
-  const sinA  = Math.sin(angle);
+  const cosA  = Math.cos(angle);   // 1 → 0 → -1 (continuous, goes negative)
+  const sinA  = Math.sin(angle);   // 0 → 1 → 0  (always ≥ 0)
   const absC  = Math.abs(cosA);
 
-  if (absC * cardW < 0.5) return; // skip when invisible at edge-on
+  if (absC * cardW < 0.5) return;
 
   const showFaceUp = angle < Math.PI / 2 ? anim.from : anim.to;
 
-  // Perspective focal length — larger = less distortion.
-  const f     = cardW * 3;
+  const f     = cardW * 3;         // perspective focal length
   const halfW = cardW / 2;
   const halfH = cardH / 2;
   const ctrX  = cx + halfW;
   const ctrY  = cy + halfH;
 
-  // For CW: right edge is closer (z < 0), left edge farther (z > 0). CCW: reversed.
+  // CW: right edge closer (zR < 0), left farther (zL > 0). CCW: reversed.
   const sign = anim.clockwise ? 1 : -1;
-  const zL   =  sign * halfW * sinA;   // left edge depth
-  const zR   = -sign * halfW * sinA;   // right edge depth
+  const zL   =  sign * halfW * sinA;
+  const zR   = -sign * halfW * sinA;
 
-  const sL = f / (f + zL);  // left  edge scale  (< 1 when farther)
-  const sR = f / (f + zR);  // right edge scale  (> 1 when closer)
+  const sL = f / (f + zL);
+  const sR = f / (f + zR);
 
-  // Screen half-widths (absC so both stay positive after the midpoint flip)
-  const xL = absC * halfW * sL;
-  const xR = absC * halfW * sR;
+  // Use cosA (not absC): corners cross over past 90° and keep moving forward.
+  // After the midpoint, xL and xR are both negative so TL/TR swap sides —
+  // this is exactly what a real card rotating past edge-on looks like.
+  const xL = cosA * halfW * sL;
+  const xR = cosA * halfW * sR;
 
-  // 4 corners
-  const tlx = ctrX - xL, tly = ctrY - halfH * sL;
-  const trx = ctrX + xR, trY = ctrY - halfH * sR;
-  const brx = ctrX + xR, bry = ctrY + halfH * sR;
-  const blx = ctrX - xL, bly = ctrY + halfH * sL;
+  const tlx = ctrX - xL,  tly = ctrY - halfH * sL;
+  const trx = ctrX + xR,  trY = ctrY - halfH * sR;
+  const brx = ctrX + xR,  bry = ctrY + halfH * sR;
+  const blx = ctrX - xL,  bly = ctrY + halfH * sL;
 
   const pairIdx = card.pairId % BRIGHT.length;
   const bright  = BRIGHT[pairIdx];
@@ -135,15 +136,23 @@ function drawCardPerspective(
   ctx.fill();
 
   // ── Depth shading gradient ──────────────────────────────────────────
-  const gradW = trx - tlx;
+  // After the midpoint, TL and TR have swapped screen sides, so compute
+  // leftX/rightX from min/max and determine which side is brighter.
+  const leftX  = Math.min(tlx, trx);
+  const rightX = Math.max(tlx, trx);
+  const gradW  = rightX - leftX;
   if (sinA > 0.02 && gradW > 1) {
-    const grad = ctx.createLinearGradient(tlx, 0, trx, 0);
-    if (anim.clockwise) {
-      grad.addColorStop(0, `rgba(0,0,0,${(0.45 * sinA).toFixed(3)})`);
-      grad.addColorStop(1, `rgba(255,255,255,${(0.18 * sinA).toFixed(3)})`);
+    const grad = ctx.createLinearGradient(leftX, 0, rightX, 0);
+    // sign * cosA > 0 → closer side is on screen-right → dark left, bright right
+    const darkOnLeft = sign * cosA > 0;
+    const shadow    = (0.45 * sinA).toFixed(3);
+    const highlight = (0.18 * sinA).toFixed(3);
+    if (darkOnLeft) {
+      grad.addColorStop(0, `rgba(0,0,0,${shadow})`);
+      grad.addColorStop(1, `rgba(255,255,255,${highlight})`);
     } else {
-      grad.addColorStop(0, `rgba(255,255,255,${(0.18 * sinA).toFixed(3)})`);
-      grad.addColorStop(1, `rgba(0,0,0,${(0.45 * sinA).toFixed(3)})`);
+      grad.addColorStop(0, `rgba(255,255,255,${highlight})`);
+      grad.addColorStop(1, `rgba(0,0,0,${shadow})`);
     }
     ctx.beginPath();
     ctx.moveTo(tlx, tly);
@@ -167,8 +176,8 @@ function drawCardPerspective(
   ctx.stroke();
 
   // ── Symbol ──────────────────────────────────────────────────────────
-  // The card's 3D center always projects to (ctrX, ctrY). Scale x by absC
-  // so the glyph compresses as the card rotates, as if painted on the surface.
+  // Card's 3D center always projects to (ctrX, ctrY). Scale x by absC so
+  // the glyph compresses with the rotation without mirroring the character.
   if (absC > 0.08) {
     const fontSize = Math.floor(cardH * 0.44);
     ctx.save();
