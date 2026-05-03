@@ -20,6 +20,7 @@
         font-family: var(--font-code);
         color: rgba(255,255,255,0.92);
         text-shadow: none;
+        animation: none !important;
 
         &.accent {
             color: #0af5b0;
@@ -34,7 +35,6 @@
         &.income {
             color: var(--color-income);
             text-shadow: var(--glow-income);
-            animation: none !important;
         }
     }
 }
