@@ -1,27 +1,19 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-    Avatar,
     Box,
     Button,
-    Card,
-    CardActions,
-    CardContent,
-    CardHeader,
     Checkbox,
-    Chip,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
     FormControlLabel,
     IconButton,
-    LinearProgress,
     Table,
     TableBody,
     TableCell,
     TableRow,
     Typography,
-    type LinearProgressProps,
 } from '@mui/material';
 import {
     CodeTwoTone,
@@ -44,116 +36,13 @@ import { useNotifier } from '../Notifier';
 import { cipherGridRenderers, downloadTickHandlers, useCipherBreakStore } from '../../stores/cipher';
 import { usePlayerStore } from '../../stores/player';
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
-import { dataSizeFromSuffix, formatMoney } from '../../lib/utils';
-import clsx from 'clsx';
+import { dataSizeFromSuffix } from '../../lib/utils';
 
 import CipherGrid from '../CipherGrid';
 import successSound from '../../assets/sounds/success.mp3';
 import failureSound from '../../assets/sounds/failure.mp3';
-
-function Stat({ label, value, accent }) {
-    return (
-      <div style={{
-        padding: '10px 12px',
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.06)',
-        borderRadius: 8,
-      }}>
-        <div style={{
-          fontSize: 10, fontWeight: 600, letterSpacing: '0.16em',
-          textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)',
-        }}>{label}</div>
-        <div style={{
-          fontSize: 16, fontWeight: 700, lineHeight: 1.1, marginTop: 4,
-          fontFamily: "'Fira Code', monospace",
-          color: accent ? 'var(--color-income)' : 'rgba(255,255,255,0.92)',
-          textShadow: accent ? '0 0 12px rgba(10,245,176,0.4)' : 'none',
-        }}>{value}</div>
-      </div>
-    );
-  }
-  
-
-function CipherInfo({ cipherType }: { cipherType: ICipherType | undefined; }) {
-    return (<Box className="cipher-info-container">
-        <Stat label="Payout" value={`$${formatMoney(cipherType?.payout)}`} accent={true} />
-        <Stat label="XP" value={`${cipherType?.xp} XP`} accent={false} />
-    </Box>);
-}
-
-function CipherProgressBar({
-    id,
-    cipherType,
-    cipherState,
-}: {
-    id: string;
-    cipherType: ICipherType | undefined;
-    cipherState: CipherState | undefined;
-}) {
-    const progress = useCipherBreakStore((s) => s.entries[id]?.progress) ?? 0;
-
-    return (
-        <div className="progress">
-            <LinearProgressWithLabel
-                variant="determinate"
-                value={progress}
-                type={cipherType}
-                status={cipherState}
-            />
-        </div>
-    );
-}
-
-function LinearProgressWithLabel(
-    props: LinearProgressProps & { value: number; type?: ICipherType | undefined; status?: CipherState },
-) {
-    const { status = CipherState.IDLE, type } = props;
-
-    let statusClassName = 'idle';
-    switch (status) {
-        case CipherState.BREAKING:
-            statusClassName = 'breaking';
-            break;
-        case CipherState.DOWNLOADING:
-            statusClassName = 'downloading';
-            break;
-        case CipherState.SUCCESS:
-            statusClassName = 'success';
-            break;
-        case CipherState.CANCELLED:
-            statusClassName = 'cancelled';
-            break;
-        case CipherState.FAILURE:
-            statusClassName = 'cancelled';
-            break;
-        case CipherState.PAUSED:
-            statusClassName = 'paused';
-            break;
-    }
-
-    return (
-        <Box className="cipher-progress-bar-container">
-            <Box className="cipher-progress-header" sx={{ display: 'flex', alignItems: 'center' }}>
-                {status && (
-                    <Box sx={{ textAlign: 'left', flex: '1 1 0', justifyContent: 'flex-start', m: 0, whiteSpace: 'nowrap' }}>
-                        <Chip className={clsx('cipher-progress-chip', statusClassName)} label={status.toString()} />
-                        <span className="cipher-progress-complexity">C{type?.complexity} · x{type?.parallelism}</span>
-                    </Box>
-                )}
-                <Box sx={{ textAlign: 'right', flex: '1 1 0', justifyContent: 'flex-end', m: 0 }}>
-                    <Typography
-                        className="cipher-progress-percentage"
-                        variant="body2"
-                        sx={{ color: 'text.secondary' }}
-                    >{`${Math.round(props.value)}%`}</Typography>
-                </Box>
-            </Box>
-            <Box className="cipher-progress-container">
-                <LinearProgress className={clsx('cipher-progress-bar', statusClassName)} variant="determinate" {...props} />
-            </Box>
-        </Box>
-    );
-}
+import { CipherInfo, CipherProgressBar } from './components';
+import StationCard, { StationCardAccentType } from '../common/StationCard';
 
 export interface CipherBreakFunctions {
     addProcess?: (id: string, type: ICipherType) => void;
@@ -392,110 +281,92 @@ export default function CipherBreak(props: CipherBreakOptions) {
 
     return (
         <>
-            <Card ref={cardRef} className="background" id="cipher-break-card">
-                <CardHeader
-                    className="cipher-card-header"
-                    avatar={
-                        <Avatar sx={{ color: '#0af5b0', bgcolor: 'rgba(10,245,176,0.15)' }}>
-                            <CodeTwoTone />
-                        </Avatar>
-                    }
-                    title="Cipher Break"
-                    slotProps={{
-                        title: { noWrap: true },
-                    }}
-                    subheader={cipherType?.name}
-                    action={
-                        <>
-                            {isBreakingOrDownloading &&
-                                cipherState !== CipherState.PAUSED && (
-                                    <IconButton onClick={pauseCipher}>
-                                        <PauseTwoTone />
-                                    </IconButton>
-                                )}
-                            {cipherState === CipherState.PAUSED && (
-                                <IconButton onClick={resumeCipher}>
-                                    <PlayArrowTwoTone sx={{ color: '#0af5b0' }} />
+            <StationCard
+                ref={cardRef}
+                id="cipher-break-card"
+                avatar={CodeTwoTone}
+                accent={StationCardAccentType.ACCENT}
+                title="Cipher Break"
+                subheader={cipherType?.name}
+                headerAction={
+                    <>
+                        {isBreakingOrDownloading &&
+                            cipherState !== CipherState.PAUSED && (
+                                <IconButton onClick={pauseCipher}>
+                                    <PauseTwoTone />
                                 </IconButton>
                             )}
-                            {cipherType?.name && (
-                                <IconButton
-                                    onClick={handleRestartCipher}
-                                    disabled={
-                                        cipherState !== CipherState.IDLE
-                                    }
-                                >
-                                    <ReplayOutlined />
+                        {cipherState === CipherState.PAUSED && (
+                            <IconButton onClick={resumeCipher}>
+                                <PlayArrowTwoTone sx={{ color: '#0af5b0' }} />
+                            </IconButton>
+                        )}
+                        {cipherType?.name && (
+                            <IconButton
+                                onClick={handleRestartCipher}
+                                disabled={
+                                    cipherState !== CipherState.IDLE
+                                }
+                            >
+                                <ReplayOutlined />
+                            </IconButton>
+                        )}
+                    </>
+                }
+                content={
+                    <>
+                        <CipherProgressBar id={id} cipherType={cipherType} cipherState={cipherState} />
+                        {isManualBreaking && MiniGame ? (
+                            <MiniGame rounds={5} onWin={handleManualWin} onLose={handleManualLose} onProgress={handleManualProgress} />
+                        ) : (
+                            <CipherGrid id={id} cipherKey={cipherKey} />
+                        )}
+                        <CipherInfo cipherType={cipherType} />
+                    </>
+                }
+                action={
+                    <>
+                    <FormControlLabel
+                        sx={{ textAlign: 'left', flex: '1 1 0', justifyContent: 'flex-start', m: 0 }}
+                        control={<Checkbox className="auto-cipher-checkbox" disabled={!enableAutoCipher} onChange={handleAutoCipherChange} checked={autoCipher} />}
+                        label="Auto Restart"
+                    />
+                    {canShowActions && (
+                        <>
+                            {cipherState !== CipherState.IDLE && (
+                                <Box sx={{ flex: '0 0 auto', textAlign: 'center' }}>
+                                    <Button
+                                        onClick={handleCancelDialogOpen}
+                                        variant="contained"
+                                        color="error"
+                                        className="centerAlign"
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Box>
+                            )}
+                            {cipherState === CipherState.IDLE && (
+                                <Box sx={{ flex: '0 0 auto', textAlign: 'center' }}>
+                                    <Button
+                                        onClick={handleRemoveCipher}
+                                        variant="contained"
+                                        color="primary"
+                                        className="centerAlign"
+                                    >
+                                        Delete
+                                    </Button>
+                                </Box>
+                            )}
+                            <Box sx={{ textAlign: 'right', flex: '1 1 0' }}>
+                                <IconButton onClick={handleInfoDialogOpen}>
+                                    <InfoTwoTone />
                                 </IconButton>
-                            )}
-                        </>
-                    }
-                />
-                <CardContent className="centerContent">
-                    {id && (
-                        <>
-                            <CipherProgressBar id={id} cipherType={cipherType} cipherState={cipherState} />
-                            {isManualBreaking && MiniGame ? (
-                                <MiniGame rounds={5} onWin={handleManualWin} onLose={handleManualLose} onProgress={handleManualProgress} />
-                            ) : (
-                                <CipherGrid id={id} cipherKey={cipherKey} />
-                            )}
-                            <CipherInfo cipherType={cipherType} />
+                            </Box>
                         </>
                     )}
-                </CardContent>
-                <CardActions disableSpacing sx={{
-                    display: 'flex',
-                    flexWrap: 'nowrap',
-                    alignItems: 'stretch',
-                    alignContent: 'space-between',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between'
-                }}>
-                    {id && (
-                        <>
-                            <FormControlLabel
-                                sx={{ textAlign: 'left', flex: '1 1 0', justifyContent: 'flex-start', m: 0 }}
-                                control={<Checkbox className="auto-cipher-checkbox" disabled={!enableAutoCipher} onChange={handleAutoCipherChange} checked={autoCipher} />}
-                                label="Auto Restart"
-                            />
-                            {canShowActions && (
-                                <>
-                                    {cipherState !== CipherState.IDLE && (
-                                        <Box sx={{ flex: '0 0 auto', textAlign: 'center' }}>
-                                            <Button
-                                                onClick={handleCancelDialogOpen}
-                                                variant="contained"
-                                                color="error"
-                                                className="centerAlign"
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </Box>
-                                    )}
-                                    {cipherState === CipherState.IDLE && (
-                                        <Box sx={{ flex: '0 0 auto', textAlign: 'center' }}>
-                                            <Button
-                                                onClick={handleRemoveCipher}
-                                                variant="contained"
-                                                color="primary"
-                                                className="centerAlign"
-                                            >
-                                                Delete
-                                            </Button>
-                                        </Box>
-                                    )}
-                                    <Box sx={{ textAlign: 'right', flex: '1 1 0' }}>
-                                        <IconButton onClick={handleInfoDialogOpen}>
-                                            <InfoTwoTone />
-                                        </IconButton>
-                                    </Box>
-                                </>
-                            )}
-                        </>
-                    )}
-                </CardActions>
-            </Card>
+                </>
+            }
+            />
             <Dialog
                 open={cancelDialogOpen}
                 onClose={handleCancelDialogClose}

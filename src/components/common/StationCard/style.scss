@@ -1,8 +1,8 @@
-#stationStatistics {
+.station-card {
     height: 100%;
 }
 
-#stationStatistics .MuiCardHeader-title {
+.station-card .MuiCardHeader-title {
     font-size: 18px;
     font-weight: 600;
     line-height: 1.25;
@@ -12,7 +12,7 @@
     text-overflow: ellipsis;
 }
 
-#stationStatistics .MuiCardHeader-subheader {
+.station-card .MuiCardHeader-subheader {
     font-size: 12px;
     font-weight: 500;
     margin-top: 2px;
@@ -20,12 +20,12 @@
     letter-spacing: 0.04em;
 }
 
-#stationStatistics .MuiCardHeader-root {
+.station-card .MuiCardHeader-root {
     padding-bottom: 10px !important;
     border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-#stationStatistics .statistics-row {
+.station-card .statistics-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -34,7 +34,7 @@
     gap: 12px;
 }
 
-#stationStatistics .statistics-row .value-cell {
+.station-card .statistics-row .value-cell {
     text-align: right;
     border-bottom: none;
     font-family: var(--font-code);
@@ -43,11 +43,25 @@
     color: rgba(255,255,255,0.92);
 }
 
-#stationStatistics .statistics-row .title-cell {
+.station-card .statistics-row .title-cell {
     display: flex;
     align-items: center;
     gap: 10px;
     color: rgba(255,255,255,0.55);
     font-size: 13px;
     border-bottom: none;
+}
+
+.station-card.highlight {
+    border-style: dotted;
+    border-width: 1px;
+    height: 100%;
+
+    &.accent {
+        border-color: rgba(10,245,176,0.30);
+    }
+
+    &.cyan {
+        border-color: rgba(38,198,218,0.30);
+    }
 }
