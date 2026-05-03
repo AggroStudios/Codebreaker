@@ -1,3 +1,4 @@
+import { ScreenGlowType } from '../components/ScreenGlow';
 import { Networking } from '../lib/network';
 import OperatingSystem from '../lib/OperatingSystem';
 
@@ -45,6 +46,8 @@ export type StationStoreType = {
     reset: () => void;
     glowActive: boolean;
     setGlowActive: (active: boolean) => void;
+    glowType: ScreenGlowType;
+    setGlowType: (type: ScreenGlowType) => void;
 };
 
 export type MenuStateType = {
