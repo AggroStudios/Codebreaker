@@ -3,6 +3,10 @@ import './style.scss';
 import { MiniGameProps } from '../../includes/minigame.interfaces';
 import { CIPHER_COLS, CIPHER_ROWS, CELL_W, CELL_H } from '../CipherGrid';
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
+import simonSound1 from './audio/simonSound1.mp3';
+import simonSound2 from './audio/simonSound2.mp3';
+import simonSound3 from './audio/simonSound3.mp3';
+import simonSound4 from './audio/simonSound4.mp3';
 
 const CANVAS_ASPECT = (CIPHER_ROWS * CELL_H) / (CIPHER_COLS * CELL_W);
 
@@ -20,10 +24,10 @@ interface ButtonDef {
 // Quadrant layout (canvas angles: 0=right, clockwise, Y-down)
 // Green=top-left, Red=top-right, Blue=bottom-right, Yellow=bottom-left
 const BUTTONS: ButtonDef[] = [
-  { dimColor: '#1a4a2e', brightColor: '#2ecc71', glowColor: '#2ecc71', startAngle: -Math.PI,      endAngle: -Math.PI / 2, sound: 'simonSound1.mp3' },
-  { dimColor: '#4a1a1a', brightColor: '#e74c3c', glowColor: '#e74c3c', startAngle: -Math.PI / 2,  endAngle: 0, sound: 'simonSound2.mp3' },
-  { dimColor: '#1a2a4a', brightColor: '#3498db', glowColor: '#3498db', startAngle: 0,              endAngle: Math.PI / 2, sound: 'simonSound3.mp3' },
-  { dimColor: '#4a3a00', brightColor: '#f39c12', glowColor: '#f39c12', startAngle: Math.PI / 2,   endAngle: Math.PI, sound: 'simonSound4.mp3' },
+  { dimColor: '#1a4a2e', brightColor: '#2ecc71', glowColor: '#2ecc71', startAngle: -Math.PI,      endAngle: -Math.PI / 2, sound: simonSound1 },
+  { dimColor: '#4a1a1a', brightColor: '#e74c3c', glowColor: '#e74c3c', startAngle: -Math.PI / 2,  endAngle: 0, sound: simonSound2 },
+  { dimColor: '#1a2a4a', brightColor: '#3498db', glowColor: '#3498db', startAngle: 0,              endAngle: Math.PI / 2, sound: simonSound3 },
+  { dimColor: '#4a3a00', brightColor: '#f39c12', glowColor: '#f39c12', startAngle: Math.PI / 2,   endAngle: Math.PI, sound: simonSound4 },
 ];
 
 const GAP = 0.06; // radians gap between segments
@@ -58,7 +62,7 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, chances = 3, on
       const isActive = activeBtn === i;
       if (isActive) {
         try {
-          const sound = new Audio(`./src/components/SimonGame/audio/${btn.sound}`);
+          const sound = new Audio(btn.sound);
           console.log('sfxVolume', sfxVolume);
           console.log('mutedSfx', mutedSfx);
           sound.volume = mutedSfx ? 0 : sfxVolume;

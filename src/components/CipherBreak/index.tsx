@@ -48,6 +48,8 @@ import { dataSizeFromSuffix, formatMoney } from '../../lib/utils';
 import clsx from 'clsx';
 
 import CipherGrid from '../CipherGrid';
+import successSound from '../../assets/sounds/success.mp3';
+import failureSound from '../../assets/sounds/failure.mp3';
 
 function Stat({ label, value, accent }) {
     return (
@@ -199,14 +201,14 @@ export default function CipherBreak(props: CipherBreakOptions) {
     }, [cipherType, miniGameIndex]);
 
     const handleManualWin = useCallback(() => {
-        const audioPlayer = new Audio(`./src/assets/sounds/success.mp3`);
+        const audioPlayer = new Audio(successSound);
         audioPlayer.volume = mutedSfx ? 0 : sfxVolume;
         audioPlayer.play();
         cipher?.manualComplete();
     }, [cipher]);
 
     const handleManualLose = useCallback(() => {
-        const audioPlayer = new Audio(`./src/assets/sounds/failure.mp3`);
+        const audioPlayer = new Audio(failureSound);
         audioPlayer.volume = mutedSfx ? 0 : sfxVolume;
         audioPlayer.play();
         cipher?.fail();
