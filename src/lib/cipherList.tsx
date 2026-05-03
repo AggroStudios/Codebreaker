@@ -57,7 +57,7 @@ export const CipherTypes: ICipherType[] = [
         },
         payout: 100,
         xp: 10,
-        requiredArchitecture: [ProcessorArchitecture.risc32],
+        requiredArchitecture: [ProcessorArchitecture.risc32, ProcessorArchitecture.risc64],
     },
     {
         name: 'Cipher 2',
