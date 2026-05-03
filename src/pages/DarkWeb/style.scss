@@ -35,7 +35,7 @@
         }
     }
 
-    &.warning {
+    &.error {
         border-color: #ff2828;
         color: #ff2828;
 
@@ -53,5 +53,96 @@
         animation: statusPulse 1.6s ease-in-out infinite;
         flex-shrink: 0;
         display: inline-block;
+    }
+}
+
+.dark-web-container {
+    border-radius: 12px;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    min-height: 0;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 2em;
+}
+
+.dark-web-container .glyph-card-header {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    overflow: hidden;
+
+    &.accent {
+        background: linear-gradient(180deg, #0af5b01f 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    &.cyan {
+        background: linear-gradient(180deg, #26c6da1f 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    &.warning {
+        background: linear-gradient(180deg, #ff98001f 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    &.error {
+        background: linear-gradient(180deg, #ff28281f 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    &.purple {
+        background: linear-gradient(180deg, #9c7fe01f 0%, rgba(0, 0, 0, 0) 100%);
+    }
+}
+
+.dark-web-container .glyph-card-header .MuiAvatar-rounded {
+    border-radius: 8px !important;
+    width: 52px !important;
+    height: 52px !important;
+
+    & svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    &.accent {
+        background: linear-gradient(rgba(10, 245, 176, 0.3), rgba(10, 245, 176, 0.1)) !important;
+        border: 1px solid var(--accent) !important;
+
+        & svg {
+            color: var(--accent) !important;
+        }
+    }
+
+    &.cyan {
+        background: linear-gradient(rgba(38, 198, 218, 0.3), rgba(38, 198, 218, 0.1)) !important;
+        border: 1px solid #26c6da !important;
+
+        & svg {
+            color: #26c6da !important;
+        }
+    }
+
+    &.warning {
+        background: linear-gradient(rgba(255, 152, 0, 0.3), rgba(255, 152, 0, 0.1)) !important;
+        border: 1px solid #ff9800 !important;
+
+        & svg {
+            color: #ff9800 !important;
+        }
+    }
+
+    &.error {
+        background: linear-gradient(rgba(244, 67, 54, 0.3), rgba(244, 67, 54, 0.1)) !important;
+        border: 1px solid #ff2828 !important;
+
+        & svg {
+            color: #ff2828 !important;
+        }
+    }
+
+    &.purple {
+        border: 1px solid #9c7fe0 !important;
+        background: linear-gradient(rgba(156, 127, 224, 0.3), rgba(156, 127, 224, 0.1)) !important;
+
+        & svg {
+            color: #9c7fe0 !important;
+        }
     }
 }

@@ -1,0 +1,28 @@
+.glyph-card-header .MuiCardHeader-title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: rgba(255,255,255,0.92);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.glyph-card-header .MuiCardHeader-subheader {
+    font-size: 12px;
+    font-family: var(--font-code);
+    font-weight: 500;
+    margin-top: 2px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.04em;
+}
+
+.glyph-card-header {
+    position: relative;
+    overflow: hidden;
+
+    .glyph-card-header__header {
+        position: relative;
+        z-index: 1;
+    }
+}
