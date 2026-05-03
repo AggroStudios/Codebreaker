@@ -34,6 +34,7 @@
         &.income {
             color: var(--color-income);
             text-shadow: var(--glow-income);
+            animation: none !important;
         }
     }
 }
