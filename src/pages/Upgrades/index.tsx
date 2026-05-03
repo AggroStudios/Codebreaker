@@ -22,6 +22,8 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import UpgradeComponent from '../../components/Upgrade';
 import { useEffect } from 'react';
 import { capitalize } from '@mui/material/utils';
+import PageHeader from '../../components/common/PageHeader';
+import { Stat } from '../../components/common/Stat';
 
 export default function UpgradesComponent() {
     const playerStore = usePlayerStore();
@@ -67,25 +69,22 @@ export default function UpgradesComponent() {
     };
 
     return (
-        <div
-            className="card"
-            style={{ flex: 1, minHeight: 0, boxSizing: 'border-box' }}
-        >
+        <>
+            <PageHeader
+                title="Upgrades"
+                subtitle={`Upgrade your station to gain new features and improve performance.<br> ${purchasedUpgrades.length} of ${UpgradeList.length} upgrades unlocked`}
+                breadcrumbs={['home', 'upgrades']}
+                actions={
+                    <Stat
+                        className="balance-display"
+                        label="Available Balance"
+                        value={`$${formatMoney(playerStore.player.money)}`}
+                        accent="accent"
+                    />
+                }
+                icon={PublishTwoToneIcon}
+            />
             <Box className="upgrade-container">
-                <Box className="upgrades-page-header">
-                    <div>
-                        <div className="breadcrumbs">CODEBREAKER · UPGRADES</div>
-                        <div className="title">
-                            <span className="material-icons"><PublishTwoToneIcon /></span>
-                            <span>Upgrade Packages</span>
-                        </div>
-                        <div className="subtitle">{purchasedUpgrades.length} of {UpgradeList.length} upgrades unlocked</div>
-                    </div>
-                    <div className="balance-display">
-                        <div className="balance-display-label">Available Balance</div>
-                        <div className="balance-display-amount">${formatMoney(playerStore.player.money)}</div>
-                    </div>
-                </Box>
                 <Box className="upgrades-filter-bar">
                     <span className="filter-label">Filter</span>
                     {filterLabels.map((label, idx: number) => (
@@ -122,7 +121,6 @@ export default function UpgradesComponent() {
                     </Button>
                 </DialogActions>
             </Dialog>
-
-        </div>
+        </>
     );
 }

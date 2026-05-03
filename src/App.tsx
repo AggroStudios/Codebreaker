@@ -23,11 +23,18 @@ import { AnchorsProvider } from './components/AnchorsContext';
 
 import './index.css';
 
+const TerminalRoute = lazy(() => import('./pages/Terminal'));
 const StationRoute = lazy(() => import('./pages/Station'));
 const LoginRoute = lazy(() => import('./components/Login'));
 const ServersRoute = lazy(() => import('./pages/Servers'));
-const TerminalRoute = lazy(() => import('./pages/Terminal'));
+const ServerRacksRoute = lazy(() => import('./pages/ServerRacks'));
+const DataCentersRoute = lazy(() => import('./pages/DataCenters'));
+const NetworksRoute = lazy(() => import('./pages/Networks'));
+const DarkWebRoute = lazy(() => import('./pages/DarkWeb'));
+const NeuralNetRoute = lazy(() => import('./pages/NeuralNet'));
 const UpgradesRoute = lazy(() => import('./pages/Upgrades'));
+const PrestigeRoute = lazy(() => import('./pages/Prestige'));
+const StatisticsRoute = lazy(() => import('./pages/Statistics'));
 
 export default function App() {
     const [loadingProgress, setLoadingProgress] = useState(0);
@@ -61,11 +68,18 @@ export default function App() {
     useEffect(() => {
         preloadImages(setLoadingProgress);
         // Preload all route chunks in the background so navigation is instant
+        import('./pages/Terminal');
         import('./pages/Station');
         import('./components/Login');
         import('./pages/Servers');
-        import('./pages/Terminal');
+        import('./pages/ServerRacks');
+        import('./pages/DataCenters');
+        import('./pages/Networks');
+        import('./pages/DarkWeb');
+        import('./pages/NeuralNet');
         import('./pages/Upgrades');
+        import('./pages/Prestige');
+        import('./pages/Statistics');
     }, []);
 
     const { operatingSystem, useStationStore, stationProxy, terminalController } =
@@ -101,7 +115,14 @@ export default function App() {
                                     <Route path="station" element={<StationRoute />} />
                                     <Route path="login" element={<LoginRoute />} />
                                     <Route path="servers" element={<ServersRoute />} />
+                                    <Route path="racks" element={<ServerRacksRoute />} />
+                                    <Route path="dataCenters" element={<DataCentersRoute />} />
+                                    <Route path="networks" element={<NetworksRoute />} />
+                                    <Route path="darkWeb" element={<DarkWebRoute />} />
+                                    <Route path="neuralNet" element={<NeuralNetRoute />} />
                                     <Route path="upgrades" element={<UpgradesRoute />} />
+                                    <Route path="prestige" element={<PrestigeRoute />} />
+                                    <Route path="stats" element={<StatisticsRoute />} />
                                     <Route path="*" />
                                 </Route>
                             </Routes>

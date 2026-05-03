@@ -5,50 +5,13 @@
     display: flex !important;
     flex-direction: column !important;
     min-height: 0 !important;
-}
-
-.upgrades-page-header {
-    display: flex !important;
-    padding: 20px 24px 0 !important;
-    align-items: flex-end !important;
-    justify-content: space-between !important;
-    flex-shrink: 0 !important;
-    background-color: var(--color-bg-card) !important;
-}
-
-.breadcrumbs {
-    font-family: var(--font-code) !important;
-    font-size: 11px !important;
-    color: var(--color-fg-secondary) !important;
-    letter-spacing: 0.12em !important;
-    text-transform: uppercase !important;
-    margin-bottom: 4px !important;
-}
-
-.title {
-    font-size: 22px !important;
-    font-weight: 700 !important;
-    color: var(--color-fg) !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    line-height: 1 !important;
-}
-
-.title .material-icons {
-    font-size: 24px !important;
-    color: var(--accent) !important;
-    margin-top: 4px !important;
-}
-
-.subtitle {
-    font-size: 12px !important;
-    color: var(--color-fg-secondary) !important;
-    margin-top: 2px !important;
+    margin: 2em;
 }
 
 .balance-display {
     text-align: right !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    border-color: rgba(0, 0, 0, 0.2) !important
 }
 
 .balance-display-label {

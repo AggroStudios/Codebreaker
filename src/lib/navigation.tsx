@@ -8,7 +8,6 @@ import PublishTwoToneIcon from '@mui/icons-material/PublishTwoTone';
 import SettingsBackupRestoreTwoToneIcon from '@mui/icons-material/SettingsBackupRestoreTwoTone';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import ShareTwoToneIcon from '@mui/icons-material/ShareTwoTone';
-import ForumTwoToneIcon from '@mui/icons-material/ForumTwoTone';
 import PeopleTwoToneIcon from '@mui/icons-material/PeopleTwoTone';
 import PestControlTwoToneIcon from '@mui/icons-material/PestControlTwoTone';
 import AccountTreeTwoToneIcon from '@mui/icons-material/AccountTreeTwoTone';
@@ -85,11 +84,6 @@ export const mainNavigation: INavigationItem[] = [
 ];
 
 export const secondaryNavigation: INavigationItem[] = [
-    {
-        title: 'Forums',
-        link: '/forums',
-        icon: ForumTwoToneIcon,
-    },
     {
         title: 'Upgrades',
         link: '/upgrades',

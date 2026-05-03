@@ -1,0 +1,5 @@
+# Import Formatting
+- Use single quotes (`'`) for all import statements.
+- Example: `import { Component } from 'react';`
+
+Use single quotes (') over double-quotes (") in the logic
