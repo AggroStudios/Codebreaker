@@ -6,6 +6,7 @@ import { NetworkDSL, Networking } from '../lib/network';
 import { CodiumMemory } from '../lib/memory';
 import { CodiumStorageHdd } from '../lib/storage';
 import { CodiumProcessor } from '../lib/processors';
+import { ScreenGlowType } from '../components/ScreenGlow';
 
 const makeDefaults = () => ({
     cpu: new CodiumProcessor(),
@@ -39,6 +40,8 @@ export const createStationStore = () =>
                 reset: () => set(() => ({ ...makeDefaults(), isRunning: false, exponent: 0 })),
                 glowActive: false,
                 setGlowActive: (active: boolean) => set(() => ({ glowActive: active })),
+                glowType: ScreenGlowType.ACTIVE,
+                setGlowType: (type: ScreenGlowType) => set(() => ({ glowType: type })),
             }),
             {
                 name: 'station-store',

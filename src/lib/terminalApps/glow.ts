@@ -1,5 +1,6 @@
 import Terminal from '../terminal';
 import { TerminalApp } from '../../includes/Terminal.interface';
+import { ScreenGlowType } from '../../components/ScreenGlow';
 
 export default class Glow extends TerminalApp {
     constructor(terminal: Terminal) {
@@ -14,12 +15,16 @@ export default class Glow extends TerminalApp {
         Commands:
         - <none> : Shows the status of the glow, shown or not.
         - help | -h | --help | -? : Brings up this cool little help text.
-        - on : Turns on the glow.
+        - active : Turns on the glow.
+        - alert : Turns on the alert glow.
+        - overclock : Turns on the overclock glow.
         - off : Turns off the glow.
-        
+
         Example:
         - glow help
-        - glow on
+        - glow active
+        - glow alert
+        - glow overclock
         - glow off
         `
             .split('\n')
@@ -27,14 +32,27 @@ export default class Glow extends TerminalApp {
     }
 
     async run(argc: number, argv: string[]) {
-        console.log(this.terminal.operatingSystem.station);
+        
         if (argc < 1) {
             this.terminal.stdout(`Glow status: ${this.terminal.operatingSystem.station.glowActive}`);
         } else {
             switch (argv[0]) {
-                case 'on': {
+                case 'alert': {
+                    this.terminal.operatingSystem.station.setGlowType(ScreenGlowType.ALERT);
                     this.terminal.operatingSystem.station.setGlowActive(true);
-                    this.terminal.stdout('Glow turned on.');
+                    this.terminal.stdout('Glow turned on. Type: Alert');
+                    break;
+                }
+                case 'overclock': {
+                    this.terminal.operatingSystem.station.setGlowType(ScreenGlowType.OVERCLOCK);
+                    this.terminal.operatingSystem.station.setGlowActive(true);
+                    this.terminal.stdout('Glow turned on. Type: Overclock');
+                    break;
+                }
+                case 'active': {
+                    this.terminal.operatingSystem.station.setGlowType(ScreenGlowType.ACTIVE);
+                    this.terminal.operatingSystem.station.setGlowActive(true);
+                    this.terminal.stdout('Glow turned on. Type: Active');
                     break;
                 }
                 case 'off': {
