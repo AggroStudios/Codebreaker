@@ -7,11 +7,11 @@ import CpuActivityWidget from '../../components/CpuActivity';
 
 import { useCipherStore } from '../../stores/cipher';
 import { useStationContext } from '../../stores/stationContext';
+import { usePlayerStore } from '../../stores/player';
 
 import '../../App.css';
 import './style.scss';
 import CipherAdd from '../../components/CipherAdd';
-import Coachmarks from '../../components/Coachmarks';
 import { Chip } from '@mui/material';
 import { ImportantDevicesOutlined, ScheduleOutlined, ShieldOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
@@ -39,9 +39,14 @@ function StationHeader({ uptime, threats }) {
 
 export default function StationComponent() {
     const { stationProxy } = useStationContext();
+    const { showTutorial } = usePlayerStore();
 
     const setStation = useCipherStore((s) => s.setStation);
     
+    useEffect(() => {
+        showTutorial('station');
+    }, []);
+
     useEffect(() => {
         setStation(stationProxy);
     }, [setStation, stationProxy]);
@@ -50,7 +55,6 @@ export default function StationComponent() {
 
     return (
         <>
-            <Coachmarks />
             <StationHeader uptime="4:00:00" threats={3} />
             <div className="card">
                 <Grid container spacing={2}>

@@ -23,9 +23,14 @@ export interface PlayerState {
     player: Player;
     moneyLabel: MoneyLabelSpawn | null;
     xpLabel: XpLabelSpawn | null;
-    hasSeenTutorial: boolean;
-    markTutorialAsSeen: () => void;
+    hasSeenTutorial: string[];
+    tutorialDisabled: boolean;
+    tutorialStage: string;
+    showTutorial: (stage: string) => void;
+    setHasSeenTutorial: (stage: string) => void;
+    markTutorialAsSeen: (stage: string) => void;
     resetTutorial: () => void;
+    setTutorialDisabled: (disabled: boolean) => void;
     setMoneyLabel: (amount: number | null) => void;
     setXpLabel: (amount: number | null, levelUp?: boolean) => void;
     earnExperience: (amount: number) => void;

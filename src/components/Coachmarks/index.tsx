@@ -1,45 +1,19 @@
 import { useState, useEffect, useCallback, CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, IconButton, Typography } from '@mui/material';
 import { Close, ArrowBack, ArrowForward, CheckCircleOutlined } from '@mui/icons-material';
 import { usePlayerStore } from '../../stores/player';
-import { useAppReadyStore } from '../../stores/appReady';
+import { STEPS } from '../../lib/tutorialSteps';
 
 import './styles.scss';
 
-interface CoachmarkStep {
+export interface CoachmarkStep {
     target: string | null;
     title: string;
     description: string;
+    stage: string[];
     placement: 'top' | 'bottom' | 'left' | 'right' | 'center';
 }
-
-const STEPS: CoachmarkStep[] = [
-    {
-        target: null,
-        title: 'Welcome to your Station',
-        description: "This is your command center. Cipher breaks run here, credits accumulate, and hardware upgrades unlock new capacity. Let's walk through the key parts.",
-        placement: 'center',
-    },
-    {
-        target: '#coachmark-statistics',
-        title: 'Station Statistics',
-        description: 'Monitor CPU cores, memory, and storage in real time. Each cipher break consumes resources — upgrade your hardware to run more processes simultaneously.',
-        placement: 'right',
-    },
-    {
-        target: '#coachmark-cpu-activity',
-        title: 'CPU Activity',
-        description: 'This graph shows processor load across all running processes. Saturating your CPU will throttle cipher break speed.',
-        placement: 'bottom',
-    },
-    {
-        target: '#cipher-add-card',
-        title: 'Queue a Cipher Break',
-        description: 'Select a cipher type and hit Begin Break to start cracking. Larger ciphers pay more credits but consume more CPU and memory.',
-        placement: 'top',
-    },
-];
 
 const SPOTLIGHT_PAD = 12;
 const CALLOUT_WIDTH = 320;
@@ -118,21 +92,43 @@ function Spotlight({ rect }: SpotlightProps) {
     );
 }
 
-export default function Coachmarks() {
-    const { hasSeenTutorial, markTutorialAsSeen } = usePlayerStore();
-    const isAppReady = useAppReadyStore((s) => s.isAppReady);
+interface CoachmarkProps {
+    open: boolean;
+}
+
+export default function Coachmarks({ open }: CoachmarkProps) {
+    const { markTutorialAsSeen, setTutorialDisabled, tutorialStage } = usePlayerStore();
     const [step, setStep] = useState(0);
+    const [disableForever, setDisableForever] = useState(false);
 
-    const current = STEPS[step];
-    const rect = useTargetRect(current.target);
+    useEffect(() => {
+        if (open) {
+            setStep(0);
+            setDisableForever(false);
+        }
+    }, [open]);
 
-    if (!isAppReady || hasSeenTutorial) return null;
+    useEffect(() => {
+        setStep(0);
+    }, [tutorialStage]);
+
+    const stepsForStage = STEPS.filter((s) => s.stage.includes(tutorialStage));
+
+    const current = stepsForStage[step];
+    const rect = useTargetRect(current?.target ?? null);
+
+    if (!open || tutorialStage === '') return null;
 
     const isFirst = step === 0;
-    const isLast = step === STEPS.length - 1;
+    const isLast = step === stepsForStage.length - 1;
+
+    const dismiss = () => {
+        if (disableForever) setTutorialDisabled(true);
+        markTutorialAsSeen(tutorialStage);
+    };
 
     const handleNext = () => {
-        if (isLast) markTutorialAsSeen();
+        if (isLast || disableForever) dismiss();
         else setStep((s) => s + 1);
     };
 
@@ -145,7 +141,7 @@ export default function Coachmarks() {
             <Box className="coachmark-callout" style={{ ...calloutStyle(rect, current.placement), width: CALLOUT_WIDTH }}>
                 <div className="coachmark-callout-header">
                     <Typography className="coachmark-title">{current.title}</Typography>
-                    <IconButton size="small" className="coachmark-close" onClick={markTutorialAsSeen}>
+                    <IconButton size="small" className="coachmark-close" onClick={dismiss}>
                         <Close fontSize="small" />
                     </IconButton>
                 </div>
@@ -153,10 +149,23 @@ export default function Coachmarks() {
                 <Typography className="coachmark-description">{current.description}</Typography>
 
                 <div className="coachmark-dots">
-                    {STEPS.map((_, i) => (
+                    {stepsForStage.map((_, i) => (
                         <span key={i} className={`coachmark-dot${i === step ? ' active' : ''}`} />
                     ))}
                 </div>
+
+                <FormControlLabel
+                    className="coachmark-disable-label"
+                    control={
+                        <Checkbox
+                            size="small"
+                            checked={disableForever}
+                            onChange={(e) => setDisableForever(e.target.checked)}
+                            className="coachmark-disable-checkbox"
+                        />
+                    }
+                    label="Disable Tutorials"
+                />
 
                 <div className="coachmark-actions">
                     <Button

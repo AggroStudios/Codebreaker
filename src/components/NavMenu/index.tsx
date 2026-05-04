@@ -83,12 +83,13 @@ const StyledA = styled(RouterLink)({
 
 function ListItemNavLink(props: {
     to: string;
+    id?: string;
     disabled?: boolean;
     children: ReactNode;
 }) {
     const location = useLocation();
     return (
-        <div className="sideNavContainer">
+        <div className="sideNavContainer" id={props.id}>
             <StyledLinkItemButton
                 disabled={props.disabled}
                 selected={location.pathname === props.to}
@@ -110,6 +111,7 @@ function MainListItems() {
                         key={key}
                         disabled={item.locked || false}
                         to={item.link}
+                        id={`main-nav-item-${item.title.replaceAll(' ', '-').toLowerCase()}`}
                     >
                         <ListItemIcon>
                             {item.locked ? <LockTwoToneIcon /> : <Icon />}

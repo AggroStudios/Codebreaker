@@ -22,6 +22,7 @@ import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
+import { usePlayerStore } from '../../stores/player';
 import { getTrack } from '../../lib/musicTracks';
 
 export interface SettingsProps {
@@ -31,6 +32,10 @@ export interface SettingsProps {
 
 export default function Settings({ open, onClose }: SettingsProps) {
     const [confirmReset, setConfirmReset] = useState(false);
+
+    const hasSeenTutorial = usePlayerStore((s) => s.hasSeenTutorial);
+    const tutorialDisabled = usePlayerStore((s) => s.tutorialDisabled);
+    const resetTutorial = usePlayerStore((s) => s.resetTutorial);
 
     const playing = useMusicPlayerStore((s) => s.playing);
     const volume = useMusicPlayerStore((s) => s.volume);
@@ -60,6 +65,11 @@ export default function Settings({ open, onClose }: SettingsProps) {
     const handleResetGame = () => {
         sessionStorage.setItem('reset-pending', 'true');
         window.location.reload();
+    };
+
+    const handleResetTutorial = () => {
+        onClose();
+        resetTutorial();
     };
 
     const volumeIcon = muted || volume === 0
@@ -269,6 +279,28 @@ export default function Settings({ open, onClose }: SettingsProps) {
                 >
                     Game
                 </Typography>
+
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                    <Box>
+                        <Typography component="div" variant="body2">
+                            Tutorial
+                        </Typography>
+                        <Typography component="div" variant="caption" color="text.secondary">
+                            {tutorialDisabled ? 'Disabled' : hasSeenTutorial.length > 0 ? 'Completed' : 'Active'}
+                        </Typography>
+                    </Box>
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={handleResetTutorial}
+                        disabled={hasSeenTutorial.length === 0 && !tutorialDisabled}
+                        sx={{ outline: 0 }}
+                    >
+                        Re-enable
+                    </Button>
+                </Box>
+
+                <Divider sx={{ mb: 2 }} />
 
                 {confirmReset ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

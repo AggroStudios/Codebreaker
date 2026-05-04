@@ -286,6 +286,57 @@ export default function Terminal({
         },
     };
 
+    const longestCommonPrefix = (strs: string[]): string => {
+        if (strs.length === 0) return '';
+        let prefix = strs[0];
+        for (const s of strs) {
+            while (!s.startsWith(prefix)) {
+                prefix = prefix.slice(0, -1);
+                if (prefix === '') return '';
+            }
+        }
+        return prefix;
+    };
+
+    const handleTab = (target: HTMLInputElement) => {
+        if (stdInCallbackRef.current || !commandLoadedRef.current) return;
+
+        const { completions, replaceFrom } = terminalController.complete(target.value);
+        if (completions.length === 0) return;
+
+        const currentWord = target.value.substring(replaceFrom);
+
+        if (completions.length === 1) {
+            const completion = completions[0];
+            const suffix = completion.endsWith('/') ? '' : ' ';
+            const newValue = target.value.substring(0, replaceFrom) + completion + suffix;
+            target.value = newValue;
+            updateLine({ prompt: terminalController.prompt, value: newValue });
+            setCursorPosition(newValue.length);
+            return;
+        }
+
+        const lcp = longestCommonPrefix(completions);
+        if (lcp.length > currentWord.length) {
+            const newValue = target.value.substring(0, replaceFrom) + lcp;
+            target.value = newValue;
+            updateLine({ prompt: terminalController.prompt, value: newValue });
+            setCursorPosition(newValue.length);
+            return;
+        }
+
+        addLine({ prompt: '', value: completions.join('  ') });
+        addLine({ prompt: terminalController.prompt, value: target.value });
+        setCursorPosition(target.value.length);
+    };
+
+    const handleKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Tab') {
+            event.preventDefault();
+            handleTab(event.currentTarget);
+        }
+    };
+
     const handleKeyUp = async (event: ReactKeyboardEvent<HTMLInputElement>) => {
         const target = event.currentTarget;
         if (!commandLoadedRef.current && !stdInCallbackRef.current) return;
@@ -470,6 +521,7 @@ export default function Terminal({
                             className="input"
                             onFocus={() => setFocus(true)}
                             onBlur={() => setFocus(false)}
+                            onKeyDown={handleKeyDown}
                             onKeyUp={handleKeyUp}
                             onInput={handleChange}
                         />

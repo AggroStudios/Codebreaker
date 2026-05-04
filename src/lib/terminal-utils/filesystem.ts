@@ -260,6 +260,38 @@ export default class FileSystem {
         return foundApp.app;
     }
 
+    resolveAbsoluteDir(rel: string): string {
+        const resolved = rel.startsWith('/')
+            ? rel
+            : `${stripLastSlash(this._cwd)}/${rel}`;
+        const normalized = path.normalize(resolved);
+        if (!normalized) return '/';
+        return stripTrailingSlashes(normalized) || '/';
+    }
+
+    listEntriesAt(absDir: string): { name: string; isDirectory: boolean }[] {
+        const dir = stripTrailingSlashes(absDir) || '/';
+        const childPrefix = dir === '/' ? '/' : `${dir}/`;
+        const subdirNames = uniq(
+            this.apps
+                .map((a) => a.path)
+                .filter((p) => p !== dir && p.startsWith(childPrefix))
+                .map((p) => p.substring(childPrefix.length).split('/')[0])
+                .filter((name) => name !== ''),
+        );
+        const subdirEntries = subdirNames.map((name) => ({ name, isDirectory: true }));
+        const fileEntries = this.apps
+            .filter((a) => a.path === dir && a.contentType !== 'inode/directory')
+            .map((a) => ({ name: a.cmd, isDirectory: false }));
+        return [...subdirEntries, ...fileEntries];
+    }
+
+    getExecutableCommandsAtCwd(): string[] {
+        return this.apps
+            .filter((a) => a.path === this._cwd && new Permissions(a.permissions).isExecutable)
+            .map((a) => a.cmd);
+    }
+
     listDirectory(args: string[]) {
         const opts = {
             alias: {
