@@ -158,6 +158,10 @@ export default class FileSystem {
             const foundApp = this.apps.find(
                 (o) => o.path === parsed.dir && o.cmd === parsed.base,
             );
+
+            if (isEmpty(foundApp)) {
+                throw new Error(`File '${passedPath}' not found.`);
+            }
             const permissions = new Permissions(foundApp.permissions);
 
             if (isEmpty(foundApp) || !permissions.isWritable) {
@@ -172,12 +176,18 @@ export default class FileSystem {
         }
 
         const mount = this._mounts.find((mount) => parsed.dir.startsWith(mount.path))
-        mount?.os.storedFiles
+        const foundFiles = mount?.os.storedFiles
             .map((f) => ({ ...f, path: stripTrailingSlashes(`${mount.path}/${f.path}`) }))
-            .filter((f) => filesToDelete.some((file) => file.path === f.path && file.cmd === f.cmd))
-            .forEach((f) => {
-                mount.os.unlinkFile(f.path.replace(`${mount.path}/`, ''), f.cmd);
+            .filter((f) => filesToDelete.some((file) => file.path === f.path && file.cmd === f.cmd));
+
+        if (foundFiles.length > 0) {
+            foundFiles.forEach((f) => {
+                mount?.os.unlinkFile(f.path.replace(`${mount.path}/`, ''), f.cmd);
             });
+        }
+        else {
+            throw new Error(`File '${passedPath}' not found.`);
+        }
     }
 
     changeDirectory([passedPath]: string[]) {
@@ -393,6 +403,11 @@ export default class FileSystem {
                 }
                 return true;
             });
+
+        if (isEmpty(dir)) {
+            console.log(parsed);
+            throw new Error(`Directory '${resolvedPath}' not found.`);
+        }
 
         if (!parsedArgs.all) {
             return listingOutput(filter(dir, (d) => !d.hidden));

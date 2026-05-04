@@ -202,7 +202,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
             });
             station.os?.addFile({
                 cmd: `${c.id}.bin`,
-                path: `/${cipherType.name.replace(' ', '-').toLowerCase()}`,
+                path: `/${cipherType.name.replaceAll(' ', '-').toLowerCase()}`,
                 contentType: 'application/octet-stream',
                 permissions: 644,
                 size: dataSizeFromSuffix(cipherType.block),
