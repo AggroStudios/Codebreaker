@@ -23,7 +23,7 @@ export default function DarkWeb() {
                 icon={PublicTwoTone}
             />
             <Grid container spacing={2} className="dark-web-container">
-                <Grid size={{xs: 12, md: 6, lg: 4}}>
+                <Grid size={{sm: 12, lg: 6, xl: 4}}>
                     <Card>
                         <GlyphCardHeader
                             className="cyan"
@@ -43,7 +43,7 @@ export default function DarkWeb() {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid size={{xs: 12, md: 6, lg: 4}}>
+                <Grid size={{sm: 12, lg: 6, xl: 4}}>
                     <Card>
                         <GlyphCardHeader
                             className="warning"
@@ -63,7 +63,7 @@ export default function DarkWeb() {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid size={{xs: 12, md: 6, lg: 4}}>
+                <Grid size={{sm: 12, lg: 6, xl: 4}}>
                     <Card>
                         <GlyphCardHeader
                             className="accent"
@@ -83,7 +83,7 @@ export default function DarkWeb() {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid size={{xs: 12, md: 6, lg: 4}}>
+                <Grid size={{sm: 12, lg: 6, xl: 4}}>
                     <Card>
                         <GlyphCardHeader
                             className="error"
@@ -103,7 +103,7 @@ export default function DarkWeb() {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid size={{xs: 12, md: 6, lg: 4}}>
+                <Grid size={{sm: 12, lg: 6, xl: 4}}>
                     <Card>
                         <GlyphCardHeader
                             className="purple"

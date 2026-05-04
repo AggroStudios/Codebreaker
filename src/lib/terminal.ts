@@ -461,6 +461,13 @@ export default class Terminal {
                     this.stderr(err.message);
                 }
                 break;
+            case 'rm':
+                try {
+                    this.fs.rm(args);
+                } catch (err) {
+                    this.stderr(err.message);
+                }
+                break;
             case 'cat':
                 try {
                     this.fs.cat(args).forEach((line) => {

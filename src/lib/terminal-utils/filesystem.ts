@@ -138,6 +138,48 @@ export default class FileSystem {
         return outputArray;
     }
 
+    rm([passedPath]: string[]) {
+        if (isEmpty(passedPath)) {
+            throw new Error('Path is empty.');
+        }
+
+        let resolvedPath = passedPath;
+
+        // This means we're resolving from a relative path
+        if (!passedPath.startsWith('/')) {
+            resolvedPath = `${stripLastSlash(this._cwd)}/${passedPath}`;
+        }
+
+        const parsed = path.parse(resolvedPath);
+
+        const filesToDelete = [];
+
+        if (parsed.base !== '*') {
+            const foundApp = this.apps.find(
+                (o) => o.path === parsed.dir && o.cmd === parsed.base,
+            );
+            const permissions = new Permissions(foundApp.permissions);
+
+            if (isEmpty(foundApp) || !permissions.isWritable) {
+                throw new Error(`Command '${passedPath}' not found.`);
+            }
+
+            filesToDelete.push(foundApp);
+        }
+        else {
+            const filesInDirectory = this.apps.filter((f) => f.path === parsed.dir);
+            filesToDelete.push(...filesInDirectory);
+        }
+
+        const mount = this._mounts.find((mount) => parsed.dir.startsWith(mount.path))
+        mount?.os.storedFiles
+            .map((f) => ({ ...f, path: stripTrailingSlashes(`${mount.path}/${f.path}`) }))
+            .filter((f) => filesToDelete.some((file) => file.path === f.path && file.cmd === f.cmd))
+            .forEach((f) => {
+                mount.os.unlinkFile(f.path.replace(`${mount.path}/`, ''), f.cmd);
+            });
+    }
+
     changeDirectory([passedPath]: string[]) {
         if (isEmpty(passedPath)) {
             throw new Error('Path is empty.');
