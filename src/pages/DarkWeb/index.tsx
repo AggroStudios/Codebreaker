@@ -1,10 +1,11 @@
 import PageHeader from '../../components/common/PageHeader';
-import { Avatar, Card, CardContent, Chip, Grid, Typography } from '@mui/material';
-import { HubOutlined, PublicTwoTone, Memory, SecurityOutlined, GavelRounded, LocalFireDepartmentOutlined, VisibilityOffOutlined } from '@mui/icons-material';
+import { Chip, Grid } from '@mui/material';
+import { HubOutlined, PublicTwoTone } from '@mui/icons-material';
 
-import GlyphCardHeader from '../../components/common/GlyphCardHeader';
+import { darkWebFactions } from '../../lib/darkWebFactions';
 
 import './style.scss';
+import DarkWebCard from '../../components/common/DarkWebCard';
 
 export default function DarkWeb() {
     return (
@@ -23,106 +24,9 @@ export default function DarkWeb() {
                 icon={PublicTwoTone}
             />
             <Grid container spacing={2} className="dark-web-container">
-                <Grid size={{sm: 12, lg: 6, xl: 4}}>
-                    <Card>
-                        <GlyphCardHeader
-                            className="cyan"
-                            title="Null Syndicate"
-                            subheader="@null_syn · NA-EAST"
-                            glyphColor="#26c6da"
-                            avatar={
-                                <Avatar variant="rounded" className="cyan">
-                                    <SecurityOutlined />
-                                </Avatar>
-                            }
-                        />
-                        <CardContent>
-                            <Typography variant="body1">
-                                Meh.
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid size={{sm: 12, lg: 6, xl: 4}}>
-                    <Card>
-                        <GlyphCardHeader
-                            className="warning"
-                            title="Iron Protocol"
-                            subheader="@ironproto · EU-EAST"
-                            glyphColor="#ff9800"
-                            avatar={
-                                <Avatar variant="rounded" className="warning">
-                                    <GavelRounded />
-                                </Avatar>
-                            }
-                        />
-                        <CardContent>
-                            <Typography variant="body1">
-                                Meh.
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid size={{sm: 12, lg: 6, xl: 4}}>
-                    <Card>
-                        <GlyphCardHeader
-                            className="accent"
-                            title="Pale Circuit"
-                            subheader="@pale_circuit · EU-WEST"
-                            glyphColor="#0af5b0"
-                            avatar={
-                                <Avatar variant="rounded" className="accent">
-                                    <Memory />
-                                </Avatar>
-                            }
-                        />
-                        <CardContent>
-                            <Typography variant="body1">
-                                Meh.
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid size={{sm: 12, lg: 6, xl: 4}}>
-                    <Card>
-                        <GlyphCardHeader
-                            className="error"
-                            title="Redline Cartel"
-                            subheader="@redline_cc · SA-SOUTH"
-                            glyphColor="#ff2828"
-                            avatar={
-                                <Avatar variant="rounded" className="error">
-                                    <LocalFireDepartmentOutlined />
-                                </Avatar>
-                            }
-                        />
-                        <CardContent>
-                            <Typography variant="body1">
-                                Meh.
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid size={{sm: 12, lg: 6, xl: 4}}>
-                    <Card>
-                        <GlyphCardHeader
-                            className="purple"
-                            title="Ghost Collective"
-                            subheader="@gh0st_collective · AC-PAC"
-                            glyphColor="#9c7fe0"
-                            avatar={
-                                <Avatar variant="rounded" className="purple">
-                                    <VisibilityOffOutlined />
-                                </Avatar>
-                            }
-                        />
-                        <CardContent>
-                            <Typography variant="body1">
-                                Meh.
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
+                {darkWebFactions.map((faction) => (
+                    <DarkWebCard key={faction.id} {...faction} />
+                ))}
             </Grid>
         </>
     );

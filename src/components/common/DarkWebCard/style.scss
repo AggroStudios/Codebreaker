@@ -1,0 +1,524 @@
+.dark-web-card .glyph-card-header {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    overflow: hidden;
+
+    &.accent {
+        background: linear-gradient(180deg, #0af5b01f 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    &.cyan {
+        background: linear-gradient(180deg, #26c6da1f 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    &.blue {
+        background: linear-gradient(180deg, #61dafb1f 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    &.orange {
+        background: linear-gradient(180deg, #ff98001f 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    &.red {
+        background: linear-gradient(180deg, #ff28281f 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    &.purple {
+        background: linear-gradient(180deg, #9c7fe01f 0%, rgba(0, 0, 0, 0) 100%);
+    }
+}
+
+.dark-web-card .dark-web-card-reputation-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5px;
+    width: 100%;
+
+    font-size: 14px !important;
+    font-family: var(--font-code) !important;
+    color: var(--fg-secondary) !important;
+    text-transform: uppercase;
+    font-weight: 600 !important;
+    letter-spacing: 0.06em !important;
+    line-height: 1 !important;
+
+    & span {
+        margin: 0;
+        font-weight: inherit;
+        line-height: 1.66 !important;
+        letter-spacing: inherit;
+    }
+}
+
+.dark-web-card .dark-web-card-reputation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px !important;
+}
+
+.dark-web-card .dark-web-card-reputation-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 6px !important;
+    font-size: 11px !important;
+}
+
+.dark-web-card .dark-web-card-blurb {
+    min-height: 60px;
+    margin-bottom: 14px !important;
+}
+
+.dark-web-card .dark-web-card-reputation-label {
+    letter-spacing: 0.18em !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    font-family: var(--font-ui) !important;
+
+    & .dark-web-card-reputation-bracket {
+        color: var(--fg-primary) !important;
+    }
+}
+
+.dark-web-card-stats {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    width: 100%;
+    justify-content: space-between;
+    align-items: stretch;
+    margin-top: 12px !important;
+
+    & > div {
+        flex: 1 1 0;
+        text-align: left;
+    }
+
+}
+
+.dark-web-card .dark-web-card-reputation-next-bracket {
+    font-family: var(--font-code) !important;
+    color: var(--fg-secondary) !important;
+    text-transform: uppercase;
+}
+
+.dark-web-card .reputation-progress-bar {
+    height: 8px !important;
+    border-radius: 4px !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    overflow: hidden !important;
+    position: relative !important;
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent 40%, rgba(255, 255, 255, 0.25) 50%, transparent 60%);
+        animation: shimmer 5s linear infinite;
+        pointer-events: none;
+    }
+
+    & .MuiLinearProgress-bar1 {
+        transform: none !important;
+        width: var(--progress, 0%) !important;
+        transition: width 0.4s linear;
+        background-color: transparent !important;
+        border-radius: 4px !important;
+    }
+
+    &.accent .MuiLinearProgress-bar1 {
+        background-image: linear-gradient(90deg, rgba(10, 245, 176, 0.333), rgb(10, 245, 176)) !important;
+    }
+
+    &.blue .MuiLinearProgress-bar1 {
+        background-image: linear-gradient(90deg, rgba(97, 218, 251, 0.333), rgb(97, 218, 251)) !important;
+    }
+
+    &.cyan .MuiLinearProgress-bar1 {
+        background-image: linear-gradient(90deg, rgba(38, 198, 218, 0.33), rgb(38, 198, 218)) !important;
+    }
+
+    &.orange .MuiLinearProgress-bar1 {
+        background-image: linear-gradient(90deg,rgba(255, 183, 77, 0.333), rgb(255, 183, 77)) !important;
+    }
+
+    &.red .MuiLinearProgress-bar1 {
+        background-image: linear-gradient(90deg, rgba(255, 95, 109, 0.333), rgb(255, 95, 109)) !important;
+    }
+
+    &.purple .MuiLinearProgress-bar1 {
+        background-image: linear-gradient(90deg, rgba(155, 140, 255, 0.333), rgb(155, 140, 255)) !important;
+    }
+}
+
+.dark-web-card .dark-web-chip {
+
+    & .MuiChip-label {
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.04em !important;
+        line-height: 1 !important;
+        text-transform: uppercase !important;
+        margin: 2px 9px 2px 2px !important;
+    }
+
+    &.low {
+        background: linear-gradient(rgba(10, 245, 176, 0.3), rgba(10, 245, 176, 0.1)) !important;
+        border: 1px solid var(--accent) !important;
+        color: var(--accent) !important;
+    }
+
+    &.medium {
+        background: linear-gradient(rgba(38, 198, 218, 0.3), rgba(38, 198, 218, 0.1)) !important;
+        border: 1px solid #26c6da !important;
+        color: #26c6da !important;
+    }
+
+    &.high {
+        background: linear-gradient(rgba(255, 152, 0, 0.3), rgba(255, 152, 0, 0.1)) !important;
+        border: 1px solid #ff9800 !important;
+        color: #ff9800 !important;
+    }
+}
+
+.dark-web-card .dark-web-chip-icon {
+    
+    margin-left: 9px !important;
+    
+    &.low {
+        color: var(--accent) !important;
+    }
+
+    &.medium {
+        color: #26c6da !important;
+    }
+
+    &.high {
+        color: #ff9800 !important;
+    }
+
+    & svg {
+        width: 13px;
+        height: 13px;
+    }
+}
+
+.dark-web-card-reputation-value, .dark-web-card-offer-cipher-icon {
+
+    &.accent {
+        color: var(--accent) !important;
+    }
+
+    &.blue {
+        color: #61dafb !important;
+    }
+
+    &.cyan {
+        color: #26c6da !important;
+    }
+
+    &.orange {
+        color: #ff9800 !important;
+    }
+
+    &.red {
+        color: #ff2828 !important;
+    }
+
+    &.purple {
+        color: #9c7fe0 !important;
+    }
+}
+
+.dark-web-card .glyph-card-header .MuiAvatar-rounded {
+    border-radius: 8px !important;
+    width: 52px !important;
+    height: 52px !important;
+
+    & svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    &.accent {
+        background: linear-gradient(rgba(10, 245, 176, 0.3), rgba(10, 245, 176, 0.1)) !important;
+        border: 1px solid var(--accent) !important;
+
+        & svg {
+            color: var(--accent) !important;
+        }
+    }
+
+    &.cyan {
+        background: linear-gradient(rgba(38, 198, 218, 0.3), rgba(38, 198, 218, 0.1)) !important;
+        border: 1px solid #26c6da !important;
+
+        & svg {
+            color: #26c6da !important;
+        }
+    }
+
+    &.blue {
+        background: linear-gradient(rgba(97, 218, 251, 0.3), rgba(97, 218, 251, 0.1)) !important;
+        border: 1px solid #61dafb !important;
+
+        & svg {
+            color: #61dafb !important;
+        }
+    }
+
+    &.orange {
+        background: linear-gradient(rgba(255, 152, 0, 0.3), rgba(255, 152, 0, 0.1)) !important;
+        border: 1px solid #ff9800 !important;
+
+        & svg {
+            color: #ff9800 !important;
+        }
+    }
+
+    &.red {
+        background: linear-gradient(rgba(244, 67, 54, 0.3), rgba(244, 67, 54, 0.1)) !important;
+        border: 1px solid #ff2828 !important;
+
+        & svg {
+            color: #ff2828 !important;
+        }
+    }
+
+    &.purple {
+        border: 1px solid #9c7fe0 !important;
+        background: linear-gradient(rgba(156, 127, 224, 0.3), rgba(156, 127, 224, 0.1)) !important;
+
+        & svg {
+            color: #9c7fe0 !important;
+        }
+    }
+}
+
+.dark-web-card-offer-cipher-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    margin-top: 12px !important;
+    padding: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+
+    & .dark-web-card-offer-cipher-title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        font-size: 14px !important;
+        text-transform: uppercase !important;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        gap: 6px;
+
+        & svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+
+    & .dark-web-card-offer-cipher-select {
+        width: 100% !important;
+        background-color: rgba(255, 255, 255, 0.06) !important;
+        border-top-left-radius: 8px !important;
+        border-top-right-radius: 8px !important;
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.04em !important;
+        transition: background-color 150ms ease;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.09) !important;
+        }
+
+        &.Mui-focused {
+            background-color: rgba(255, 255, 255, 0.09) !important;
+        }
+
+        & .MuiSelect-select {
+            padding: 14px 32px 14px 14px !important;
+            min-height: 0 !important;
+        }
+
+        &.accent::before, &.accent::after {
+            border-bottom-color: var(--accent) !important;
+        }
+
+        &.cyan::before, &.cyan::after {
+            border-bottom-color: #26c6da !important;
+        }
+
+        &.blue::before, &.blue::after {
+            border-bottom-color: #61dafb !important;
+        }
+
+        &.orange::before, &.orange::after {
+            border-bottom-color: #ff9800 !important;
+        }
+
+        &.red::before, &.red::after {
+            border-bottom-color: #ff2828 !important;
+        }
+
+        &.purple::before, &.purple::after {
+            border-bottom-color: #9c7fe0 !important;
+        }
+
+        // Bottom underline (idle)
+        &::before {
+            border-bottom-width: 1px !important;
+        }
+
+        // Bottom underline (focus / active) – uses card accent color
+        &::after {
+            border-bottom-width: 2px !important;
+        }
+
+        // &:hover:not(.Mui-disabled, .Mui-error)::before {
+        //     border-bottom: 1px solid rgba(255, 255, 255, 0.24) !important;
+        // }
+
+        & .MuiSelect-icon {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        & .dark-web-card-offer-cipher-placeholder {
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+        }
+    }
+}
+
+.dark-web-card-offer-cipher-menu-item .dark-web-card-offer-cipher-menu-item-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    & > span:nth-child(1) {
+        flex: 1 1 0;
+        text-align: left;
+    }
+
+    & > span:nth-child(2) {
+        flex: 1 1 0;
+        text-align: right;
+        font-family: var(--font-code) !important;
+        color: var(--fg-secondary) !important;
+    }
+}
+
+.dark-web-card-offer-cipher-menu-item.Mui-selected {
+    background-color: var(--accent-dim) !important;
+    color: var(--accent) !important;
+}
+
+.dark-web-card-sell-quantity-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.06);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    margin-top: 6px !important;
+
+    & .dark-web-card-sell-quantity-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg-secondary);
+        font-family: var(--font-ui);
+        letter-spacing: 0.17em;
+    }
+
+    & .dark-web-card-sell-quantity-input-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    & .dark-web-card-sell-quantity-input-button {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background-color: rgba(255, 255, 255, 0.06) !important;
+    }
+
+    & .dark-web-card-sell-quantity-input-button:disabled {
+        background-color: rgba(255, 255, 255, 0.03) !important;
+        color: var(--fg-disabled) !important;
+        border-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    & .dark-web-card-sell-quantity-input-value {
+        font-family: var(--font-code);
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--fg-primary);
+        user-select: none;
+        margin: 0 10px;
+        min-width: 36px;
+        display: inline-block;
+        text-align: center;
+    }
+}
+
+.dark-web-card-sell-payout-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    & > div {
+        display: flex;
+        flex-direction: row;
+
+        & > span:nth-child(1) {
+            flex: 1 1 0;
+            text-align: left;
+        }
+
+        & > span:nth-child(2) {
+            flex: 1 1 0;
+            text-align: right;
+        }
+    }
+}
+
+.dark-web-card-footer-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+    margin-top: 12px !important;
+
+    & > div:nth-child(1) {
+        flex: 1 1 0;
+        text-align: left;
+    }
+
+    & > div:nth-child(2) {
+        flex: 1 1 0;
+        text-align: right;
+    }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+    100% { transform: translateX(100%); }
+}

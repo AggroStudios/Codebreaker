@@ -6,7 +6,6 @@ import RouterTwoToneIcon from '@mui/icons-material/RouterTwoTone';
 import PublicTwoToneIcon from '@mui/icons-material/PublicTwoTone';
 import PublishTwoToneIcon from '@mui/icons-material/PublishTwoTone';
 import SettingsBackupRestoreTwoToneIcon from '@mui/icons-material/SettingsBackupRestoreTwoTone';
-import AssignmentIcon from '@mui/icons-material/Assignment';
 import ShareTwoToneIcon from '@mui/icons-material/ShareTwoTone';
 import PeopleTwoToneIcon from '@mui/icons-material/PeopleTwoTone';
 import PestControlTwoToneIcon from '@mui/icons-material/PestControlTwoTone';
@@ -14,6 +13,7 @@ import AccountTreeTwoToneIcon from '@mui/icons-material/AccountTreeTwoTone';
 import TerminalTwoTone from '@mui/icons-material/TerminalTwoTone';
 import type { OverridableComponent } from '@mui/material/OverridableComponent';
 import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import PollOutlinedIcon from '@mui/icons-material/PollOutlined';
 
 export interface INavigationItem {
     title: string;
@@ -97,6 +97,6 @@ export const secondaryNavigation: INavigationItem[] = [
     {
         title: 'Statistics',
         link: '/stats',
-        icon: AssignmentIcon,
+        icon: PollOutlinedIcon,
     },
 ];
