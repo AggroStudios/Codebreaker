@@ -10,6 +10,7 @@ import { ReputationTiers } from '../../includes/DarkWeb.interface';
 
 export default function DarkWeb() {
 
+    const onlineFactions = (darkWebFactions.filter((faction) => faction.online) ?? []).length;
     const sortedFactions = darkWebFactions.sort((a, b) => 
         Object.keys(ReputationTiers).indexOf(b.reputationTier) - Object.keys(ReputationTiers).indexOf(a.reputationTier) ||
         b.reputation - a.reputation
@@ -25,7 +26,7 @@ export default function DarkWeb() {
                 actions={
                     <div className="chips">
                         <Chip label="ONION ROUTED" size="small" variant="outlined" className="accent" style={{ marginRight: 6 }} icon={<span className="live-dot" />} />
-                        <Chip label="5 GROUPS ONLINE" variant="outlined" className="cyan" icon={<HubOutlined fontSize="small" />} />
+                        <Chip label={onlineFactions + ' GROUP' + (onlineFactions > 1 ? 'S' : '') + ' ONLINE'} variant="outlined" className="cyan" icon={<HubOutlined fontSize="small" />} />
                     </div>
                 }
                 icon={PublicTwoTone}

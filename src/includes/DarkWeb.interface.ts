@@ -20,8 +20,8 @@ export interface FactionRelationship {
 }
 
 export enum ReputationTiers {
-    unknown = 'Unknown',
-    contact = 'Contact',
+    Unknown = 'Unknown',
+    Contact = 'Contact',
     Associate = 'Associate',
     Trusted = 'Trusted',
     Insider = 'Insider',
