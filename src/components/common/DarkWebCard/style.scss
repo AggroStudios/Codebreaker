@@ -455,15 +455,19 @@
     }
 
     & .dark-web-card-sell-quantity-input-button {
-        padding: 8px 12px;
+        padding: 4px 8px;
         border-radius: 8px;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         background-color: rgba(255, 255, 255, 0.06) !important;
+        color: #61dafb;
+        text-shadow: 0 0 10px rgba(97, 218, 251, 0.5) !important;
+        min-width: 0 !important;
+        font-family: var(--font-code);
     }
 
     & .dark-web-card-sell-quantity-input-button:disabled {
         background-color: rgba(255, 255, 255, 0.03) !important;
-        color: var(--fg-disabled) !important;
+        color: var(--fg-secondary) !important;
         border-color: rgba(255, 255, 255, 0.05) !important;
     }
 
