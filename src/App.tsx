@@ -22,6 +22,7 @@ import { NotifierProvider } from './components/Notifier';
 import { AnchorsProvider } from './components/AnchorsContext';
 
 import './index.css';
+import Statistics from './lib/statistics';
 
 const TerminalRoute = lazy(() => import('./pages/Terminal'));
 const StationRoute = lazy(() => import('./pages/Station'));
@@ -46,6 +47,9 @@ export default function App() {
         const operatingSystem = new OperatingSystem(playerStoreProxy);
         operatingSystem.station = stationProxy;
         stationProxy.os = operatingSystem;
+
+        const statisticsProcess = new Statistics(playerStoreProxy);
+        operatingSystem.addProcess(statisticsProcess);
 
         if (stationProxy.exponent) {
             operatingSystem.setExponent(stationProxy.exponent);

@@ -1,6 +1,14 @@
 import React from 'react';
 
-export function CpuSparkline({ cpuActivity, height = 220 }: { cpuActivity: { x: number; y: number }[], height?: number }) {
+interface SparklineProps {
+    values: { x: number; y: number }[];
+    height?: number;
+    staticYAxis?: number | null;
+    yAxisSuffix?: string;
+    zeroMinYAxis?: boolean;
+}
+
+export function Sparkline({ values, height = 220, staticYAxis = null, yAxisSuffix = '', zeroMinYAxis = false }: SparklineProps) {
     const ref = React.useRef<HTMLCanvasElement | null>(null);
     React.useEffect(() => {
         const canvas = ref.current;
@@ -18,6 +26,8 @@ export function CpuSparkline({ cpuActivity, height = 220 }: { cpuActivity: { x: 
         const padL = 44, padR = 44, padT = 14, padB = 28;
         const innerW = W - padL - padR;
         const innerH = H - padT - padB;
+
+        const yAxisMax = staticYAxis ?? Math.max(...values.map(({ y }) => y));
         
         // grid
         ctx.strokeStyle = 'rgba(255,255,255,0.06)';
@@ -34,9 +44,9 @@ export function CpuSparkline({ cpuActivity, height = 220 }: { cpuActivity: { x: 
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';
         for (let i = 0; i <= 4; i++) {
-            const v = 100 - i * 25;
+            const v = yAxisMax - (zeroMinYAxis ? Math.max(0, Math.min(yAxisMax, i * 25)) : i * 25);
             const y = padT + (innerH * i) / 4;
-            ctx.fillText(v + '%', padL - 8, y);
+            ctx.fillText(v + yAxisSuffix, padL - 8, y);
         }
         
         // x axis baseline
@@ -46,11 +56,11 @@ export function CpuSparkline({ cpuActivity, height = 220 }: { cpuActivity: { x: 
         ctx.lineTo(W - padR, padT + innerH);
         ctx.stroke();
         
-        if (cpuActivity.length < 2) return;
+        if (values.length < 2) return;
         
-        const pts = cpuActivity.map(({ y }, i: number) => ({
-            x: padL + (innerW * i) / (cpuActivity.length - 1),
-            y: padT + innerH * (1 - y / 100),
+        const pts = values.map(({ y }, i: number) => ({
+            x: padL + (innerW * i) / (values.length - 1),
+            y: padT + innerH * (1 - y / yAxisMax),
         }));
         
         // area fill
@@ -89,14 +99,14 @@ export function CpuSparkline({ cpuActivity, height = 220 }: { cpuActivity: { x: 
         ctx.fillStyle = 'rgba(10,245,176,0.95)';
         ctx.font = '600 12px Inter, sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(cpuActivity[cpuActivity.length - 1].y.toFixed(0) + '%', last.x + 8, last.y - 4);
+        ctx.fillText(values[values.length - 1].y.toFixed(0) + yAxisSuffix, last.x + 8, last.y - 4);
         
         // x label
         ctx.fillStyle = 'rgba(255,255,255,0.42)';
         ctx.font = '11px Inter, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('TIME →', W / 2, H - 8);
-    }, [cpuActivity, height]);
+    }, [values, height]);
     
     return <canvas ref={ref} style={{ width: '100%', height, display: 'block' }} />;
 }

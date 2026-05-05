@@ -20,6 +20,40 @@ export const formatMoney = (money: number, decimalPlaces: number = 2) => {
     });
 }
 
+const DURATION_UNITS: ReadonlyArray<readonly [string, number]> = [
+    ['d', 60 * 60 * 24],
+    ['h', 60 * 60],
+    ['m', 60],
+    ['s', 1],
+];
+
+/**
+ * Convert a duration in seconds into a human readable string like
+ * `375d 2h`, `2h 5m`, or `45s`. Shows the `precision` largest non-zero
+ * units; defaults to 2. Days are the largest unit (no years/weeks).
+ *
+ * - Negative inputs are clamped to 0.
+ * - Sub-second inputs (including 0) render as `0s`.
+ * - Fractional seconds are floored.
+ */
+export const formatDuration = (seconds: number, raw: boolean = false, precision: number = 4): string | string[] => {
+    if (!Number.isFinite(seconds) || seconds <= 0) return '0s';
+
+    let remaining = Math.floor(seconds);
+    const parts: string[] = [];
+
+    for (const [label, size] of DURATION_UNITS) {
+        if (parts.length >= precision) break;
+        const value = Math.floor(remaining / size);
+        if (value > 0 || (parts.length === 0 && label === 's')) {
+            parts.push(`${value}${label}`);
+            remaining -= value * size;
+        }
+    }
+
+    return raw ? parts : parts.join(' ') || '0s';
+};
+
 export const dataSizeFromSuffix = ({ size, unit }) => {
     const index = dataSizeSuffixes.indexOf(unit);
     if (index === -1) {

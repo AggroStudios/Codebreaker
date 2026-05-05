@@ -4,8 +4,9 @@ import { SsidChartOutlined } from '@mui/icons-material';
 
 import './style.scss';
 import StationCard, { StationCardAccentType } from '../common/StationCard';
-import { CpuSparkline } from './components';
 import { Stat } from '../common/Stat';
+import { Sparkline } from '../common/Sparkline';
+
 
 export default function SparkLineWidget() {
     const cpuActivity = useStationState((s) => s.cpuActivity);
@@ -32,7 +33,7 @@ export default function SparkLineWidget() {
                         <Stat label="PEAK" value={peak.toFixed(0) + '%'} />
                         <Stat label="AVG" value={avg.toFixed(0) + '%'} />
                     </div>
-                    <CpuSparkline cpuActivity={cpuActivity} height={220} />
+                    <Sparkline values={cpuActivity} height={220} staticYAxis={100} yAxisSuffix="%" zeroMinYAxis={true} />
                 </>
             }
         />

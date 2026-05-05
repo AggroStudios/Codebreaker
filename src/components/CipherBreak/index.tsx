@@ -149,6 +149,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
     const completeCipher = (cipher: Cipher, state: CipherState) => {
         const entry = useCipherBreakStore.getState().entries[id ?? ''];
         if (state === CipherState.SUCCESS) {
+            station.os?.player.successCipher(entry?.type);
             station.os?.player.earnExperience(entry?.type?.xp);
             station.os?.player.addMoney(entry?.type?.payout);
             station.os?.sendNotification(
@@ -156,11 +157,13 @@ export default function CipherBreak(props: CipherBreakOptions) {
                 NotificationLevel.INFO,
             );
         } else if (state === CipherState.CANCELLED) {
+            station.os?.player.failedCipher(entry?.type);
             station.os?.sendNotification(
                 `You have cancelled the cipher.`,
                 NotificationLevel.WARNING,
             );
         } else if (state === CipherState.FAILURE) {
+            station.os?.player.failedCipher(entry?.type);
             station.os?.sendNotification(
                 `You have failed the cipher.`,
                 NotificationLevel.ERROR,

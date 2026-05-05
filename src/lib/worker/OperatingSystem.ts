@@ -50,7 +50,7 @@ onmessage = (event: MessageEvent<OperatingSystemWorkerMessage>) => {
 
     const update = () => {
         currentFrame += 0.001;
-        if (currentFrame > 1) {
+        if (currentFrame > 0.6) {
             currentFrame = 0;
             currentCount++;
         }

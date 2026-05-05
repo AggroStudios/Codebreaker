@@ -17,6 +17,13 @@ function createMockPlayerState(): PlayerState {
             nextLevel: 2,
             notifications: [],
             messages: [],
+            statistics: {
+                startTime: 0,
+                totalPlayedTime: 0,
+                totalCiphers: {},
+                totalMoneyEarned: 0,
+                totalMoneySpent: 0,
+            },
         },
         moneyLabel: null,
         xpLabel: null,
@@ -42,6 +49,9 @@ function createMockPlayerState(): PlayerState {
         deleteAllNotifications: vi.fn(),
         purchasedUpgrades: [],
         purchaseUpgrade: vi.fn(),
+        successCipher: vi.fn(),
+        failedCipher: vi.fn(),
+        updateTotalPlayedTime: vi.fn(),
     };
 }
 

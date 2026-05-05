@@ -249,6 +249,12 @@ export default class OperatingSystem {
         );
     }
 
+    attachProcess(processId: string): Process | undefined {
+        return this.processes.find(
+            (p) => p?.['id'] === processId,
+        );
+    }
+
     resetProcesses() {
         this.processes = Array<Process>();
     }

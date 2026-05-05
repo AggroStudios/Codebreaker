@@ -1,4 +1,6 @@
+import { ICipherType } from './Cipher.interface';
 import { Notification, Message } from './OperatingSystem.interface';
+import { IStatistics } from './Statistics.interface';
 
 export const experienceForLevel = (level: number) =>
     Math.floor(100 * Math.pow(1.12, level - 1));
@@ -11,6 +13,7 @@ export type Player = {
     nextLevel: number;
     notifications: Notification[];
     messages: Message[];
+    statistics: IStatistics;
 };
 
 export type MoneyLabelSpawn = { amount: number; id: number };
@@ -45,4 +48,7 @@ export interface PlayerState {
     deleteAllNotifications: () => void;
     purchasedUpgrades: string[];
     purchaseUpgrade: (upgrade: string, cost: number) => void;
+    successCipher: (cipher: ICipherType) => void;
+    failedCipher: (cipher: ICipherType) => void;
+    updateTotalPlayedTime: (time: number) => void;
 }

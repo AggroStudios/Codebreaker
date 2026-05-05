@@ -49,6 +49,13 @@ describe('Terminal', () => {
                 nextLevel: 2,
                 notifications: [],
                 messages: [],
+                statistics: {
+                    startTime: 0,
+                    totalPlayedTime: 0,
+                    totalCiphers: {},
+                    totalMoneyEarned: 0,
+                    totalMoneySpent: 0,
+                },
             },
             earnExperience: vi.fn(),
             addMoney: vi.fn(),
@@ -57,6 +64,9 @@ describe('Terminal', () => {
             deleteAllNotifications: vi.fn(),
             purchasedUpgrades: [],
             purchaseUpgrade: vi.fn(),
+            successCipher: vi.fn(),
+            failedCipher: vi.fn(),
+            updateTotalPlayedTime: vi.fn(),
         });
         term.attachOperatingSystem(os);
         expect(term.operatingSystem).toBe(os);
