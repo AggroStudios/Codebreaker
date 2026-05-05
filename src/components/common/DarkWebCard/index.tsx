@@ -84,18 +84,18 @@ export default function DarkWebCard(props: IDarkWebFaction) {
                         <SellQuantity available={available} onChange={handleChangeQuantity} />
                         <Box className="dark-web-card-sell-payout-container">
                             <Box>
-                                <span>Payout</span>
-                                <span>${formatMoney((selectedCipher ? selectedCipher.payout * (bonusRate ?? 1) * (quantityToSell ?? 1) : 0))}</span>
+                                <span className="dark-web-card-sell-payout-label">Payout</span>
+                                <span className={clsx('dark-web-card-sell-payout-value', selectedCipher && quantityToSell > 0 ? 'income' : undefined)}>${formatMoney((selectedCipher ? selectedCipher.payout * (bonusRate ?? 1) * (quantityToSell ?? 1) : 0))}</span>
                             </Box>
-                            <Box>
+                            <Box className="dark-web-card-sell-payout-xp-container">
                                 <span>+36 XP</span>
-                                <span>${formatMoney(selectedCipher ? selectedCipher.payout * (bonusRate ?? 1) : 0)} each</span>
+                                <span>{selectedCipher && `$${(selectedCipher ? selectedCipher.payout * (bonusRate ?? 1) : 0)} each`}</span>
                             </Box>
                         </Box>
                     </Box>
                     <Box className="dark-web-card-footer-container">
-                        <Box><Button variant="text" color="primary" className="dark-web-card-footer-button"><ForumOutlined />Message</Button></Box>
-                        <Box><Button variant="contained" color="primary" className="dark-web-card-footer-button"><SendOutlined />Sell</Button></Box>
+                        <Box><Button variant="text" disabled={!props.online} color="primary" className="dark-web-card-footer-button"><ForumOutlined />Message</Button></Box>
+                        <Box><Button variant="contained" disabled={!selectedCipher || quantityToSell <= 0} color="primary" className="dark-web-card-footer-button"><SendOutlined />Sell</Button></Box>
                     </Box>
                 </CardContent>
             </Card>

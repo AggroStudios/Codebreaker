@@ -1,3 +1,6 @@
+.dark-web-card .MuiCardContent-root {
+    padding: 12px 24px 24px 24px;
+}
 .dark-web-card .glyph-card-header {
     border-bottom: 1px solid rgba(255,255,255,0.06);
     overflow: hidden;
@@ -303,7 +306,7 @@
     background-color: rgba(0, 0, 0, 0.5);
     border-radius: 8px;
     margin-top: 12px !important;
-    padding: 12px !important;
+    padding: 14px 14px 14px 12px;
     border: 1px solid rgba(255, 255, 255, 0.06) !important;
 
     & .dark-web-card-offer-cipher-title {
@@ -481,6 +484,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    margin-top: 12px;
 
     & > div {
         display: flex;
@@ -495,6 +499,41 @@
             flex: 1 1 0;
             text-align: right;
         }
+    }
+
+    & .dark-web-card-sell-payout-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg-secondary);
+        font-family: var(--font-ui);
+        letter-spacing: 0.17em;
+        text-transform: uppercase;
+    }
+
+    & .dark-web-card-sell-payout-value {
+        font-family: var(--font-code);
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--fg-secondary);
+        user-select: none;
+        min-width: 36px;
+        display: inline-block;
+        text-align: center;
+        &.income {
+            animation: none;
+            color: var(--color-income);
+        }
+    }
+
+    & .dark-web-card-sell-payout-xp-container > span {
+        font-family: var(--font-code);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg-secondary);
+        user-select: none;
+        min-width: 36px;
+        display: inline-block;
+        text-align: center;
     }
 }
 
