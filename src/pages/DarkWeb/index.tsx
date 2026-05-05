@@ -6,8 +6,15 @@ import { darkWebFactions } from '../../lib/darkWebFactions';
 
 import './style.scss';
 import DarkWebCard from '../../components/common/DarkWebCard';
+import { ReputationTiers } from '../../includes/DarkWeb.interface';
 
 export default function DarkWeb() {
+
+    const sortedFactions = darkWebFactions.sort((a, b) => 
+        Object.keys(ReputationTiers).indexOf(b.reputationTier) - Object.keys(ReputationTiers).indexOf(a.reputationTier) ||
+        b.reputation - a.reputation
+    );
+
     return (
         <>
             <PageHeader
@@ -24,7 +31,7 @@ export default function DarkWeb() {
                 icon={PublicTwoTone}
             />
             <Grid container spacing={2} className="dark-web-container">
-                {darkWebFactions.map((faction) => (
+                {sortedFactions.map((faction) => (
                     <DarkWebCard key={faction.id} {...faction} />
                 ))}
             </Grid>

@@ -15,6 +15,8 @@ interface ReputationProgressProps {
     color: string;
 }
 
+const SHIMMER_DURATION_MS = 5000;
+
 interface OfferCipherProps {
     ciphers: ICipherType[];
     accent?: string;
@@ -51,7 +53,10 @@ export function ReputationProgress({
                 className={clsx('reputation-progress-bar', color)}
                 variant="determinate"
                 value={percent}
-                style={{ '--progress': `${percent}%` } as Record<string, string>}
+                style={{
+                    '--progress': `${percent}%`,
+                    '--shimmer-delay': `-${Date.now() % SHIMMER_DURATION_MS}ms`,
+                } as Record<string, string>}
             />
             <Box className="dark-web-card-reputation-footer">
                 <span className="dark-web-card-reputation-next-bracket">
