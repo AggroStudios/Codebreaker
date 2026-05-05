@@ -21,12 +21,7 @@ interface OfferCipherProps {
     ciphers: ICipherType[];
     accent?: string;
     bonuses?: FactionBonus[];
-    onSelect: (cipher: ICipherType, available: number) => void;
-}
-
-interface SellQuantityProps {
-    available: number;
-    onChange: (quantity: number) => void;
+    onSelect: (cipher: ICipherType, quantityToSell: number, payout: number) => void;
 }
 
 export function ReputationProgress({
@@ -70,6 +65,10 @@ export function ReputationProgress({
 export function OfferCipher(props: OfferCipherProps) {
     const [selectedCipher, setSelectedCipher] = useState<ICipherType | null>(null);
     const [foundCiphers, setFoundCiphers] = useState<Record<string, number> | null>(null);
+    const [available, setAvailable] = useState<number | null>(null);
+    const [quantityToSell, setQuantityToSell] = useState<number | null>(null);
+    const [quantity, setQuantity] = useState(0);
+    const [bonusRate, setBonusRate] = useState<number | null>(null);
     const operatingSystem = useStationState((s) => s.os);
 
     useEffect(() => {
@@ -84,70 +83,90 @@ export function OfferCipher(props: OfferCipherProps) {
     
     useEffect(() => {
         if (selectedCipher) {
-            props.onSelect(selectedCipher, foundCiphers?.[selectedCipher.name.replaceAll(' ', '-').toLowerCase()] ?? 0);
+            const availableCiphers = foundCiphers?.[selectedCipher.name.replaceAll(' ', '-').toLowerCase()] ?? 0;
+            setAvailable(availableCiphers);
+            if (availableCiphers > 0) {
+                setQuantity(1);
+            } else {
+                setQuantity(0);
+            }
+            const foundBonus = props.bonuses?.find((b) => b.cipher.name === selectedCipher.name);
+            setBonusRate(foundBonus ? foundBonus.multiplier : null);
         }
     }, [selectedCipher])
 
-    return (
-        <Select
-            variant="filled"
-            disableUnderline={false}
-            displayEmpty
-            className={clsx('dark-web-card-offer-cipher-select', props.accent)}
-            value={selectedCipher?.name ?? ''}
-            renderValue={(value) =>
-                value
-                    ? `${(value as string)} · ${foundCiphers?.[(value as string).replaceAll(' ', '-').toLowerCase()] ?? 0} in stock`
-                    : <span className="dark-web-card-offer-cipher-placeholder">Select cipher type...</span>
-            }
-            onChange={(event: SelectChangeEvent<string>) => setSelectedCipher(props.ciphers.find((c) => c.name === event.target.value) ?? null)}
-        >
-            {props.ciphers.map((cipher) => {
-                return (
-                    <MenuItem
-                        key={cipher.name}
-                        value={cipher.name}
-                        className={clsx('dark-web-card-offer-cipher-menu-item', props.accent)}
-                    >
-                        <Box className="dark-web-card-offer-cipher-menu-item-content">  
-                            <span className="dark-web-card-offer-cipher-menu-item-name">{cipher.name} · {foundCiphers?.[cipher.name.replaceAll(' ', '-').toLowerCase()] ?? 0} in stock</span>
-                            <span className="dark-web-card-offer-cipher-menu-item-price">{props.bonuses?.find((b) => b.cipher.name === cipher.name) ? '(DEAL)' : ''} ${formatMoney(cipher.payout)}</span>
-                        </Box>
-                    </MenuItem>
-                );
-            })}
-        </Select>
-    );
-}
-
-export function SellQuantity(props: SellQuantityProps) {
-    const [quantity, setQuantity] = useState(0);
-
     useEffect(() => {
-        props.onChange(quantity);
+        setQuantityToSell(quantity);
     }, [quantity])
 
+    useEffect(() => {
+        if (selectedCipher) {
+            const payout = selectedCipher.payout * (bonusRate ?? 1) * (quantityToSell ?? 1);
+            props.onSelect(selectedCipher, quantityToSell, payout);
+        }
+    }, [selectedCipher, quantityToSell])
+
     return (
-        <Box className="dark-web-card-sell-quantity-container">
-            <span className="dark-web-card-sell-quantity-label">QTY</span>
-            <Box className="dark-web-card-sell-quantity-input-container">
-                <IconButton 
-                    className="dark-web-card-sell-quantity-icon-button"
-                    disabled={quantity <= 0}
-                    onClick={() => setQuantity(Math.max(0, quantity - 1))}
-                >
-                    <Remove />
-                </IconButton>
-                <span className="dark-web-card-sell-quantity-input-value">{quantity}</span>
-                <IconButton 
-                    className="dark-web-card-sell-quantity-icon-button"
-                    disabled={quantity >= props.available}
-                    onClick={() => setQuantity(Math.min(props.available, quantity + 1))}
-                >
-                    <Add />
-                </IconButton>
-                <Button variant="outlined" className="dark-web-card-sell-quantity-input-button" disabled={props.available <= 0 || quantity >= props.available} onClick={() => setQuantity(props.available)}>MAX</Button>
+        <>
+            <Select
+                variant="filled"
+                disableUnderline={false}
+                displayEmpty
+                className={clsx('dark-web-card-offer-cipher-select', props.accent)}
+                value={selectedCipher?.name ?? ''}
+                renderValue={(value) =>
+                    value
+                        ? `${(value as string)} · ${foundCiphers?.[(value as string).replaceAll(' ', '-').toLowerCase()] ?? 0} in stock`
+                        : <span className="dark-web-card-offer-cipher-placeholder">Select cipher type...</span>
+                }
+                onChange={(event: SelectChangeEvent<string>) => setSelectedCipher(props.ciphers.find((c) => c.name === event.target.value) ?? null)}
+            >
+                {props.ciphers.map((cipher) => {
+                    return (
+                        <MenuItem
+                            key={cipher.name}
+                            value={cipher.name}
+                            className={clsx('dark-web-card-offer-cipher-menu-item', props.accent)}
+                        >
+                            <Box className="dark-web-card-offer-cipher-menu-item-content">  
+                                <span className="dark-web-card-offer-cipher-menu-item-name">{cipher.name} · {foundCiphers?.[cipher.name.replaceAll(' ', '-').toLowerCase()] ?? 0} in stock</span>
+                                <span className="dark-web-card-offer-cipher-menu-item-price">{props.bonuses?.find((b) => b.cipher.name === cipher.name) ? '(DEAL)' : ''} ${formatMoney(cipher.payout)}</span>
+                            </Box>
+                        </MenuItem>
+                    );
+                })}
+            </Select>
+            <Box className="dark-web-card-sell-quantity-container">
+                <span className="dark-web-card-sell-quantity-label">QTY</span>
+                <Box className="dark-web-card-sell-quantity-input-container">
+                    <IconButton 
+                        className="dark-web-card-sell-quantity-icon-button"
+                        disabled={quantity <= 1}
+                        onClick={() => setQuantity(Math.max(0, quantity - 1))}
+                    >
+                        <Remove />
+                    </IconButton>
+                    <span className="dark-web-card-sell-quantity-input-value">{quantity}</span>
+                    <IconButton 
+                        className="dark-web-card-sell-quantity-icon-button"
+                        disabled={quantity >= available}
+                        onClick={() => setQuantity(Math.min(available, quantity + 1))}
+                    >
+                        <Add />
+                    </IconButton>
+                    <Button variant="outlined" className="dark-web-card-sell-quantity-input-button" disabled={available <= 0 || quantity >= available} onClick={() => setQuantity(available)}>MAX</Button>
+                </Box>
             </Box>
-        </Box>
+            <Box className="dark-web-card-sell-payout-container">
+                <Box>
+                    <span className="dark-web-card-sell-payout-label">Payout</span>
+                    <span className={clsx('dark-web-card-sell-payout-value', selectedCipher && quantityToSell > 0 ? 'income' : undefined)}>${formatMoney((selectedCipher ? selectedCipher.payout * (bonusRate ?? 1) * (quantityToSell ?? 1) : 0))}</span>
+                </Box>
+                <Box className="dark-web-card-sell-payout-xp-container">
+                    <span>+36 XP</span>
+                    <span>{selectedCipher && `$${(selectedCipher ? selectedCipher.payout * (bonusRate ?? 1) : 0)} each`}</span>
+                </Box>
+            </Box>
+        </>
     );
 }

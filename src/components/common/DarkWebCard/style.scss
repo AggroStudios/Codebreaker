@@ -560,6 +560,29 @@
         flex: 1 1 0;
         text-align: right;
     }
+
+    & .dark-web-card-footer-button {
+
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.10em;
+        color: var(--fg-primary);
+
+        &.MuiButton-contained:not(:disabled) {
+            color: var(--color-fg-on-accent);
+            background-color: var(--accent);
+        }
+
+        &:disabled {
+            color: var(--fg-muted);
+        }
+
+        & svg {
+            margin-right: 8px;
+            width: 20px;
+            height: 20px;
+        }
+    }
 }
 
 @keyframes shimmer {

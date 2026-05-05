@@ -7,14 +7,26 @@ import { darkWebFactions } from '../../lib/darkWebFactions';
 import './style.scss';
 import DarkWebCard from '../../components/common/DarkWebCard';
 import { ReputationTiers } from '../../includes/DarkWeb.interface';
+import { ICipherType } from '../../includes/Cipher.interface';
 
 export default function DarkWeb() {
 
     const onlineFactions = (darkWebFactions.filter((faction) => faction.online) ?? []).length;
     const sortedFactions = darkWebFactions.sort((a, b) => 
-        Object.keys(ReputationTiers).indexOf(b.reputationTier) - Object.keys(ReputationTiers).indexOf(a.reputationTier) ||
-        b.reputation - a.reputation
+        Object.keys(ReputationTiers).indexOf(b.reputation?.reputationTier ?? ReputationTiers.Unknown) - Object.keys(ReputationTiers).indexOf(a.reputation?.reputationTier ?? ReputationTiers.Unknown) ||
+        (b.reputation?.reputation ?? 0) - (a.reputation?.reputation ?? 0)
     );
+
+    const handleSellCipher = (factionId: string, cipher: ICipherType, quantityToSell: number, payout: number) => {
+        const faction = darkWebFactions.find((faction) => faction.id === factionId);
+        console.log('Sell cipher to faction', faction.name);
+        console.log(cipher, quantityToSell, payout);
+    }
+
+    const handleMessage = (factionId: string) => {
+        const faction = darkWebFactions.find((faction) => faction.id === factionId);
+        console.log('Message faction', faction.name);
+    }
 
     return (
         <>
@@ -33,7 +45,7 @@ export default function DarkWeb() {
             />
             <Grid container spacing={2} className="dark-web-container">
                 {sortedFactions.map((faction) => (
-                    <DarkWebCard key={faction.id} {...faction} />
+                    <DarkWebCard key={faction.id} faction={faction} onSellCipher={handleSellCipher} onMessage={handleMessage} />
                 ))}
             </Grid>
         </>

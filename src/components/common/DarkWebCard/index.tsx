@@ -5,11 +5,10 @@ import GlyphCardHeader from '../GlyphCardHeader';
 import { ForumOutlined, GppGoodOutlined, LocalOfferOutlined, SendOutlined, ShieldOutlined, WarningAmberOutlined } from '@mui/icons-material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import clsx from 'clsx';
-import { OfferCipher, ReputationProgress, SellQuantity } from './components';
+import { OfferCipher, ReputationProgress } from './components';
 import { Stat } from '../Stat';
 import { useEffect, useState } from 'react';
 import { ICipherType } from '../../../includes/Cipher.interface';
-import { formatMoney } from '../../../lib/utils';
 
 const DarkWebChipIcon: Record<RiskTier, OverridableComponent<SvgIconTypeMap<object, 'svg'>>> = {
     [RiskTier.low]: GppGoodOutlined,
@@ -23,79 +22,79 @@ const DarkWebChipLabel: Record<RiskTier, string> = {
     [RiskTier.high]: 'high risk',
 };
 
-export default function DarkWebCard(props: IDarkWebFaction) {
-    const ChipIcon = DarkWebChipIcon[props.riskTier];
-    const ChipLabel = DarkWebChipLabel[props.riskTier];
+export interface IDarkWebCardProps {
+    faction: Partial<IDarkWebFaction>;
+    onSellCipher: (factionId: string, cipher: ICipherType, quantityToSell: number, payout: number) => void;
+    onMessage: (factionId: string) => void;
+}
+
+export default function DarkWebCard(props: IDarkWebCardProps) {
+    const ChipIcon = DarkWebChipIcon[props.faction.riskTier];
+    const ChipLabel = DarkWebChipLabel[props.faction.riskTier];
 
     const [selectedCipher, setSelectedCipher] = useState<ICipherType | null>(null);
-    const [available, setAvailable] = useState<number | null>(null);
-    const [quantityToSell, setQuantityToSell] = useState<number | null>(null);
     const [bonusRate, setBonusRate] = useState<number | null>(null);
+    const [quantityToSell, setQuantityToSell] = useState<number | null>(null);
+    const [payout, setPayout] = useState<number | null>(null);
 
     useEffect(() => {
         if (selectedCipher) {
-            const foundBonus = props.bonus?.find((b) => b.cipher.name === selectedCipher.name);
+            const foundBonus = props.faction.bonus?.find((b) => b.cipher.name === selectedCipher.name);
             setBonusRate(foundBonus ? foundBonus.multiplier : null);
         }
     }, [selectedCipher])
 
-    const nextReputationTier = ReputationTiers[Object.keys(ReputationTiers)[Object.keys(ReputationTiers).indexOf(props.reputationTier) + 1]];
+    const nextReputationTier = ReputationTiers[Object.keys(ReputationTiers)[Object.keys(ReputationTiers).indexOf(props.faction.reputation?.reputationTier ?? ReputationTiers.Unknown) + 1]];
 
-    const handleSelectCipher = (cipher: ICipherType, available: number) => {
+    const handleSelectCipher = (cipher: ICipherType, quantityToSell: number, payout: number) => {
         setSelectedCipher(cipher);
-        setAvailable(available);
+        setQuantityToSell(quantityToSell);
+        setPayout(payout);
     }
 
-    const handleChangeQuantity = (quantity: number) => {
-        setQuantityToSell(quantity);
+    const handleSellCipher = () => {
+        props.onSellCipher(props.faction.id, selectedCipher, quantityToSell, payout);
+    }
+
+    const handleMessage = () => {
+        props.onMessage(props.faction.id);
     }
 
     return (
-        <Grid size={{sm: 12, lg: 6, xl: 4}} key={props.id}>
+        <Grid size={{sm: 12, lg: 6, xl: 4}} key={props.faction.id}>
             <Card className="dark-web-card">
                 <GlyphCardHeader
-                    className={props.color.className}
-                    title={props.name}
-                    subheader={props.handle}
-                    glyphColor={props.color.color}
-                    online={props.online}
+                    className={props.faction.color.className}
+                    title={props.faction.name}
+                    subheader={props.faction.handle}
+                    glyphColor={props.faction.color.color}
+                    online={props.faction.online}
                     avatar={
-                        <Avatar variant="rounded" className={props.color.className}>
-                            <props.glyph />
+                        <Avatar variant="rounded" className={props.faction.color.className}>
+                            <props.faction.glyph />
                         </Avatar>
                     }
                     action={
-                        <Chip className={clsx('dark-web-chip', props.riskTier.toLowerCase())} label={ChipLabel} size="small" variant="outlined" avatar={
-                            <ChipIcon className={clsx('dark-web-chip-icon', props.riskTier.toLowerCase())} />
+                        <Chip className={clsx('dark-web-chip', props.faction.riskTier.toLowerCase())} label={ChipLabel} size="small" variant="outlined" avatar={
+                            <ChipIcon className={clsx('dark-web-chip-icon', props.faction.riskTier.toLowerCase())} />
                         } />
                     }
                 />
                 <CardContent>
-                    <Typography variant="body1" className="dark-web-card-blurb">{props.blurb}</Typography>
-                    <ReputationProgress currentBracket={props.reputationTier} nextBracket={nextReputationTier} currentValue={props.reputation} totalValue={10000} color={props.color.className} />
+                    <Typography variant="body1" className="dark-web-card-blurb">{props.faction.blurb}</Typography>
+                    <ReputationProgress currentBracket={props.faction.reputation?.reputationTier ?? ReputationTiers.Unknown} nextBracket={nextReputationTier} currentValue={props.faction.reputation?.reputation ?? 0} totalValue={10000} color={props.faction.color.className} />
                     <Box className="dark-web-card-stats">
-                        <Stat label="Rate" value={'×' + (bonusRate ? bonusRate.toFixed(2) : '1.00')} accent={props.color.className} />
-                        <Stat label="Deals" value={props.bonus?.length?.toString() ?? '0'} />
+                        <Stat label="Rate" value={'×' + (bonusRate ? bonusRate.toFixed(2) : '1.00')} accent={props.faction.color.className} />
+                        <Stat label="Deals" value={props.faction.bonus?.length?.toString() ?? '0'} />
                         <Stat label="Bonus" value={bonusRate ? 'Active' : 'None'} accent={bonusRate ? 'income' : undefined} />
                     </Box>
                     <Box className="dark-web-card-offer-cipher-container">
-                        <Typography variant="body2" className="dark-web-card-offer-cipher-title"><LocalOfferOutlined className={clsx('dark-web-card-offer-cipher-icon', props.color.className)} />Offer Cipher</Typography>
-                        <OfferCipher accent={props.color.className} ciphers={props.acceptedCiphers} bonuses={props.bonus} onSelect={handleSelectCipher} />
-                        <SellQuantity available={available} onChange={handleChangeQuantity} />
-                        <Box className="dark-web-card-sell-payout-container">
-                            <Box>
-                                <span className="dark-web-card-sell-payout-label">Payout</span>
-                                <span className={clsx('dark-web-card-sell-payout-value', selectedCipher && quantityToSell > 0 ? 'income' : undefined)}>${formatMoney((selectedCipher ? selectedCipher.payout * (bonusRate ?? 1) * (quantityToSell ?? 1) : 0))}</span>
-                            </Box>
-                            <Box className="dark-web-card-sell-payout-xp-container">
-                                <span>+36 XP</span>
-                                <span>{selectedCipher && `$${(selectedCipher ? selectedCipher.payout * (bonusRate ?? 1) : 0)} each`}</span>
-                            </Box>
-                        </Box>
+                        <Typography variant="body2" className="dark-web-card-offer-cipher-title"><LocalOfferOutlined className={clsx('dark-web-card-offer-cipher-icon', props.faction.color.className)} />Offer Cipher</Typography>
+                        <OfferCipher accent={props.faction.color.className} ciphers={props.faction.acceptedCiphers} bonuses={props.faction.bonus} onSelect={handleSelectCipher} />
                     </Box>
                     <Box className="dark-web-card-footer-container">
-                        <Box><Button variant="text" disabled={!props.online} color="primary" className="dark-web-card-footer-button"><ForumOutlined />Message</Button></Box>
-                        <Box><Button variant="contained" disabled={!selectedCipher || quantityToSell <= 0} color="primary" className="dark-web-card-footer-button"><SendOutlined />Sell</Button></Box>
+                        <Button variant="text" disabled={!props.faction.online} color="primary" className="dark-web-card-footer-button" onClick={handleMessage}><ForumOutlined />Message</Button>
+                        <Button variant="contained" disabled={!selectedCipher || quantityToSell <= 0} color="primary" className="dark-web-card-footer-button" onClick={handleSellCipher}><SendOutlined />Sell</Button>
                     </Box>
                 </CardContent>
             </Card>

@@ -33,6 +33,11 @@ export interface FactionColor {
     className: string;
 }
 
+export interface FactionReputation {
+    reputation: number;
+    reputationTier: ReputationTiers;
+}
+
 export interface IDarkWebFaction {
     id: string;
     name: string;
@@ -41,8 +46,7 @@ export interface IDarkWebFaction {
     color: FactionColor;
     region: string;
     blurb: string;
-    reputation: number;
-    reputationTier: ReputationTiers;
+    reputation?: FactionReputation | null;
     riskTier: RiskTier;
     online: boolean;
     bonus?: FactionBonus[] | null;
