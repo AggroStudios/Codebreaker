@@ -5,10 +5,22 @@ interface SparklineProps {
     height?: number;
     staticYAxis?: number | null;
     yAxisSuffix?: string;
+    yAxisPrefix?: string;
     zeroMinYAxis?: boolean;
+    xAxisLabel?: string;
+    decimalPrecision?: number;
 }
 
-export function Sparkline({ values, height = 220, staticYAxis = null, yAxisSuffix = '', zeroMinYAxis = false }: SparklineProps) {
+export function Sparkline({
+    values,
+    height = 220,
+    staticYAxis = null,
+    yAxisSuffix = '',
+    yAxisPrefix = '',
+    zeroMinYAxis = false,
+    xAxisLabel = 'TIME →',
+    decimalPrecision = 0
+}: SparklineProps) {
     const ref = React.useRef<HTMLCanvasElement | null>(null);
     React.useEffect(() => {
         const canvas = ref.current;
@@ -46,7 +58,7 @@ export function Sparkline({ values, height = 220, staticYAxis = null, yAxisSuffi
         for (let i = 0; i <= 4; i++) {
             const v = yAxisMax - (zeroMinYAxis ? Math.max(0, Math.min(yAxisMax, i * 25)) : i * 25);
             const y = padT + (innerH * i) / 4;
-            ctx.fillText(v + yAxisSuffix, padL - 8, y);
+            ctx.fillText(yAxisPrefix + v.toFixed(decimalPrecision) + yAxisSuffix, padL - 8, y);
         }
         
         // x axis baseline
@@ -99,13 +111,13 @@ export function Sparkline({ values, height = 220, staticYAxis = null, yAxisSuffi
         ctx.fillStyle = 'rgba(10,245,176,0.95)';
         ctx.font = '600 12px Inter, sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(values[values.length - 1].y.toFixed(0) + yAxisSuffix, last.x + 8, last.y - 4);
+        ctx.fillText(yAxisPrefix + values[values.length - 1].y.toFixed(decimalPrecision) + yAxisSuffix, last.x + 8, last.y - 4);
         
         // x label
         ctx.fillStyle = 'rgba(255,255,255,0.42)';
         ctx.font = '11px Inter, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('TIME →', W / 2, H - 8);
+        ctx.fillText(xAxisLabel, W / 2, H - 8);
     }, [values, height]);
     
     return <canvas ref={ref} style={{ width: '100%', height, display: 'block' }} />;

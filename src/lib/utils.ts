@@ -20,6 +20,8 @@ export const formatMoney = (money: number, decimalPlaces: number = 2) => {
     });
 }
 
+export const DURATION_UNITS_LONG: ReadonlyArray<string> = ['days', 'hours', 'minutes', 'seconds'];
+
 const DURATION_UNITS: ReadonlyArray<readonly [string, number]> = [
     ['d', 60 * 60 * 24],
     ['h', 60 * 60],
@@ -36,7 +38,7 @@ const DURATION_UNITS: ReadonlyArray<readonly [string, number]> = [
  * - Sub-second inputs (including 0) render as `0s`.
  * - Fractional seconds are floored.
  */
-export const formatDuration = (seconds: number, raw: boolean = false, precision: number = 4): string | string[] => {
+export const formatDuration = (seconds: number, raw: boolean = false, showUnits: boolean = true, precision: number = 4): string | string[] => {
     if (!Number.isFinite(seconds) || seconds <= 0) return '0s';
 
     let remaining = Math.floor(seconds);
@@ -45,10 +47,8 @@ export const formatDuration = (seconds: number, raw: boolean = false, precision:
     for (const [label, size] of DURATION_UNITS) {
         if (parts.length >= precision) break;
         const value = Math.floor(remaining / size);
-        if (value > 0 || (parts.length === 0 && label === 's')) {
-            parts.push(`${value}${label}`);
-            remaining -= value * size;
-        }
+        parts.push(`${value}${showUnits ? label : ''}`);
+        remaining -= value * size;
     }
 
     return raw ? parts : parts.join(' ') || '0s';

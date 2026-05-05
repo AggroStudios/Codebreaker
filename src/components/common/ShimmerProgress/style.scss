@@ -1,0 +1,86 @@
+.shimmer-progress-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5px;
+    width: 100%;
+
+    font-size: 14px !important;
+    font-family: var(--font-code) !important;
+    color: var(--fg-secondary) !important;
+    text-transform: uppercase;
+    font-weight: 600 !important;
+    letter-spacing: 0.06em !important;
+    line-height: 1 !important;
+
+    & span {
+        margin: 0;
+        font-weight: inherit;
+        line-height: 1.66 !important;
+        letter-spacing: inherit;
+    }
+
+    & .shimmer-progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 6px !important;
+    }
+
+    & .shimmer-progress-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-top: 6px !important;
+        font-size: 11px !important;
+    }
+
+    & .shimmer-progress-bar {
+        height: 8px !important;
+        border-radius: 4px !important;
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        overflow: hidden !important;
+        position: relative !important;
+    
+        &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent 40%, rgba(255, 255, 255, 0.25) 50%, transparent 60%);
+            animation: shimmer 5s linear infinite;
+            animation-delay: var(--shimmer-delay, 0ms);
+            pointer-events: none;
+        }
+    
+        & .MuiLinearProgress-bar1 {
+            transform: none !important;
+            width: var(--progress, 0%) !important;
+            transition: width 0.4s linear;
+            background-color: transparent !important;
+            border-radius: 4px !important;
+        }
+    
+        &.accent .MuiLinearProgress-bar1 {
+            background-image: linear-gradient(90deg, rgba(10, 245, 176, 0.333), rgb(10, 245, 176)) !important;
+        }
+    
+        &.blue .MuiLinearProgress-bar1 {
+            background-image: linear-gradient(90deg, rgba(97, 218, 251, 0.333), rgb(97, 218, 251)) !important;
+        }
+    
+        &.cyan .MuiLinearProgress-bar1 {
+            background-image: linear-gradient(90deg, rgba(38, 198, 218, 0.33), rgb(38, 198, 218)) !important;
+        }
+    
+        &.orange .MuiLinearProgress-bar1 {
+            background-image: linear-gradient(90deg,rgba(255, 183, 77, 0.333), rgb(255, 183, 77)) !important;
+        }
+    
+        &.red .MuiLinearProgress-bar1 {
+            background-image: linear-gradient(90deg, rgba(255, 95, 109, 0.333), rgb(255, 95, 109)) !important;
+        }
+    
+        &.purple .MuiLinearProgress-bar1 {
+            background-image: linear-gradient(90deg, rgba(155, 140, 255, 0.333), rgb(155, 140, 255)) !important;
+        }
+    }
+}
