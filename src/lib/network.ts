@@ -5,28 +5,28 @@ import Process, {
 
 export class NetworkDSL implements INetworkType {
     connectionType: NetworkConnectionType = NetworkConnectionType.dsl;
-    speedInBps = 10000000;
+    speedInBps = 10000;
 
     toString() {
-        return `${this.connectionType} - ${this.speedInBps / 1000 / 1000} Mbps`;
+        return `${this.connectionType} - ${this.speedInBps / 1000} Mbps`;
     }
 }
 
 export class NetworkCable implements INetworkType {
     connectionType: NetworkConnectionType = NetworkConnectionType.cable;
-    speedInBps = 100000000;
+    speedInBps = 100000;
 
     toString() {
-        return `${this.connectionType} - ${this.speedInBps / 1000 / 1000} Mbps`;
+        return `${this.connectionType} - ${this.speedInBps / 1000} Mbps`;
     }
 }
 
 export class NetworkFiber implements INetworkType {
     connectionType: NetworkConnectionType = NetworkConnectionType.fiber;
-    speedInBps = 1000000000;
+    speedInBps = 1000000;
 
     toString() {
-        return `${this.connectionType} - ${this.speedInBps / 1000 / 1000 / 1000} Gbps`;
+        return `${this.connectionType} - ${this.speedInBps / 1000 / 1000} Gbps`;
     }
 }
 

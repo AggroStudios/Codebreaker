@@ -69,6 +69,7 @@ export default function CipherBreak(props: CipherBreakOptions) {
     const autoCipher = useCipherBreakStore((s) => s.entries[id ?? '']?.autoCipher ?? false);
     const removeEntry = useCipherBreakStore((s) => s.removeEntry);
     const enableAutoCipher = usePlayerStore((s) => s.purchasedUpgrades.includes('auto-cipher'));
+    const [processedCipher, setProcessedCipher] = useState(false);
 
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [infoDialogOpen, setInfoDialogOpen] = useState(false);
@@ -152,10 +153,6 @@ export default function CipherBreak(props: CipherBreakOptions) {
             station.os?.player.successCipher(entry?.type);
             station.os?.player.earnExperience(entry?.type?.xp);
             station.os?.player.addMoney(entry?.type?.payout);
-            station.os?.sendNotification(
-                `You have earned ${entry?.type?.xp} XP and $${entry?.type?.payout}.`,
-                NotificationLevel.INFO,
-            );
         } else if (state === CipherState.CANCELLED) {
             station.os?.player.failedCipher(entry?.type);
             station.os?.sendNotification(
@@ -210,11 +207,17 @@ export default function CipherBreak(props: CipherBreakOptions) {
                 permissions: 644,
                 size: dataSizeFromSuffix(cipherType.block),
             });
+            setProcessedCipher(true);
         } catch(error) {
             const message = error.message;
             notify({ level: 'error', message });
-            removeEntry(id);
-            removeProcess?.(id);
+            if (!processedCipher) {
+                removeEntry(id);
+                removeProcess?.(id);
+            }
+            // else {
+            //     useCipherBreakStore.getState().update(id, { state: CipherState.IDLE });
+            // }
             station.os?.sendNotification(message, NotificationLevel.ERROR);
         }
     };

@@ -6,7 +6,6 @@ import { usePlayerStore } from '../../stores/player';
 import { DURATION_UNITS_LONG, formatDuration, formatMoney } from '../../lib/utils';
 import { Box, Chip, Grid, Table, TableBody, TableCell, TableFooter, TableHead, TableRow } from '@mui/material';
 import { Stat } from '../../components/common/Stat';
-import { useEffect, useState } from 'react';
 import { Sparkline } from '../../components/common/Sparkline';
 import StationCard, { StationCardAccentType } from '../../components/common/StationCard';
 import { padStart } from 'lodash';
@@ -14,40 +13,21 @@ import clsx from 'clsx';
 import { ShimmerProgress } from '../../components/common/ShimmerProgress';
 import { LinearProgress } from '../../components/common/LinearProgress';
 
-const INCOME_RATE_REFRESH_MS = 2000;
-
 const LinearProgressColorArray = ['accent', 'cyan', 'orange', 'blue', 'red', 'purple'];
 
 export default function Statistics() {
     const bankBalance = usePlayerStore((state) => state.player.money);
     const statistics = usePlayerStore((state) => state.player.statistics);
     const incomeHistory = usePlayerStore((state) => state.player.statistics.incomeHistory);
-    const pushIncomeRate = usePlayerStore((state) => state.pushIncomeRate);
 
-    const [incomeRate, setIncomeRate] = useState(() => {
-        const seconds = statistics.totalPlayedTime / 1000;
-        return seconds > 0 ? statistics.totalMoneyEarned / seconds : 0;
-    });
-
+    // The Statistics OS process samples income rates and pushes them into
+    // `incomeHistory`. Reading the latest entry keeps the page driven entirely
+    // by the persisted store — no local state or effects needed.
+    const incomeRate = incomeHistory.length > 0 ? incomeHistory[incomeHistory.length - 1] : 0;
     const incomeRatePeak = incomeHistory.length > 0 ? Math.max(...incomeHistory) : 0;
     const incomeRateAvg = incomeHistory.length > 0
         ? incomeHistory.reduce((sum, v) => sum + v, 0) / incomeHistory.length
         : 0;
-
-    // Re-render only when totalPlayedTime crosses each 2s bucket, even though
-    // the store updates ~60 times per second. Zustand's strict-equality compare
-    // skips renders while the bucket value is unchanged.
-    const incomeRateBucket = usePlayerStore(
-        (s) => Math.floor(s.player.statistics.totalPlayedTime / INCOME_RATE_REFRESH_MS),
-    );
-
-    useEffect(() => {
-        const stats = usePlayerStore.getState().player.statistics;
-        const seconds = stats.totalPlayedTime / 1000;
-        const nextRate = seconds > 0 ? stats.totalMoneyEarned / seconds : 0;
-        setIncomeRate(nextRate);
-        pushIncomeRate(nextRate);
-    }, [incomeRateBucket, pushIncomeRate]);
     
     const cipherEntries = Object.values(statistics.totalCiphers).sort((a, b) => b.success + b.failed - (a.success + a.failed));
     const totalCipherAttempts = cipherEntries.reduce(

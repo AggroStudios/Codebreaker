@@ -11,7 +11,7 @@ export const CipherTypes: ICipherType[] = [
         memoryRequired: 1024,
         block: {
             size: 1024,
-            unit: BlockUnit.megabytes,
+            unit: BlockUnit.kilobytes,
         },
         payout: 100,
         xp: 10,
@@ -25,7 +25,7 @@ export const CipherTypes: ICipherType[] = [
         memoryRequired: 1024,
         block: {
             size: 1024,
-            unit: BlockUnit.megabytes,
+            unit: BlockUnit.kilobytes,
         },
         payout: 100,
         xp: 10,
@@ -39,7 +39,7 @@ export const CipherTypes: ICipherType[] = [
         memoryRequired: 1024,
         block: {
             size: 1024,
-            unit: BlockUnit.megabytes,
+            unit: BlockUnit.kilobytes,
         },
         payout: 100,
         xp: 10,
@@ -53,7 +53,7 @@ export const CipherTypes: ICipherType[] = [
         memoryRequired: 1024,
         block: {
             size: 1024,
-            unit: BlockUnit.megabytes,
+            unit: BlockUnit.kilobytes,
         },
         payout: 100,
         xp: 10,
@@ -66,7 +66,7 @@ export const CipherTypes: ICipherType[] = [
         memoryRequired: 2048,
         block: {
             size: 2048,
-            unit: BlockUnit.megabytes,
+            unit: BlockUnit.kilobytes,
         },
         payout: 200,
         xp: 12,
@@ -79,7 +79,7 @@ export const CipherTypes: ICipherType[] = [
         memoryRequired: 3072,
         block: {
             size: 3072,
-            unit: BlockUnit.megabytes,
+            unit: BlockUnit.kilobytes,
         },
         payout: 300,
         xp: 17,
@@ -92,7 +92,7 @@ export const CipherTypes: ICipherType[] = [
         memoryRequired: 4096,
         block: {
             size: 4096,
-            unit: BlockUnit.megabytes,
+            unit: BlockUnit.kilobytes,
         },
         payout: 400,
         xp: 20,
