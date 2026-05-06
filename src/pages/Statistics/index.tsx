@@ -12,22 +12,27 @@ import StationCard, { StationCardAccentType } from '../../components/common/Stat
 import { padStart } from 'lodash';
 import clsx from 'clsx';
 import { ShimmerProgress } from '../../components/common/ShimmerProgress';
+import { LinearProgress } from '../../components/common/LinearProgress';
 
 const INCOME_RATE_REFRESH_MS = 2000;
+
+const LinearProgressColorArray = ['accent', 'cyan', 'orange', 'blue', 'red', 'purple'];
 
 export default function Statistics() {
     const bankBalance = usePlayerStore((state) => state.player.money);
     const statistics = usePlayerStore((state) => state.player.statistics);
-
-    const [incomeHistory, setIncomeHistory] = useState<number[]>(Array(60 * 5).fill(0));
+    const incomeHistory = usePlayerStore((state) => state.player.statistics.incomeHistory);
+    const pushIncomeRate = usePlayerStore((state) => state.pushIncomeRate);
 
     const [incomeRate, setIncomeRate] = useState(() => {
         const seconds = statistics.totalPlayedTime / 1000;
         return seconds > 0 ? statistics.totalMoneyEarned / seconds : 0;
     });
 
-    const [incomeRatePeak, setIncomeRatePeak] = useState(0);
-    const [incomeRateAvg, setIncomeRateAvg] = useState(0);
+    const incomeRatePeak = incomeHistory.length > 0 ? Math.max(...incomeHistory) : 0;
+    const incomeRateAvg = incomeHistory.length > 0
+        ? incomeHistory.reduce((sum, v) => sum + v, 0) / incomeHistory.length
+        : 0;
 
     // Re-render only when totalPlayedTime crosses each 2s bucket, even though
     // the store updates ~60 times per second. Zustand's strict-equality compare
@@ -39,16 +44,10 @@ export default function Statistics() {
     useEffect(() => {
         const stats = usePlayerStore.getState().player.statistics;
         const seconds = stats.totalPlayedTime / 1000;
-        setIncomeRate(seconds > 0 ? stats.totalMoneyEarned / seconds : 0);
-        setIncomeRatePeak(Math.max(incomeRatePeak, incomeRate));
-        setIncomeRateAvg((incomeRateAvg + incomeRate) / 2);
-        setIncomeHistory((prev) => {
-            const newHistory = prev;
-            newHistory.shift();
-            newHistory.push(incomeRate);
-            return newHistory;
-        });
-    }, [incomeRateBucket]);
+        const nextRate = seconds > 0 ? stats.totalMoneyEarned / seconds : 0;
+        setIncomeRate(nextRate);
+        pushIncomeRate(nextRate);
+    }, [incomeRateBucket, pushIncomeRate]);
     
     const cipherEntries = Object.values(statistics.totalCiphers).sort((a, b) => b.success + b.failed - (a.success + a.failed));
     const totalCipherAttempts = cipherEntries.reduce(
@@ -59,6 +58,7 @@ export default function Statistics() {
     const totalCipherSuccesses = cipherEntries.reduce((acc, c) => acc + c.success, 0);
     const totalCipherFailures = cipherEntries.reduce((acc, c) => acc + c.failed, 0);
     const totalCipherSuccessRate = totalCipherSuccesses / totalCipherAttempts * 100;
+    const totalCipherEarned = cipherEntries.reduce((acc, c) => acc + c.success * c.cipher.payout, 0);
 
     const totalPlayedTime = formatDuration(statistics.totalPlayedTime / 1000, true);
     const totalPlayedTimeSubtitle = (totalPlayedTime as string[]).splice(-2);
@@ -100,7 +100,7 @@ export default function Statistics() {
                         titleIconAccent='orange'
                         label="Ciphers Failed"
                         value={totalCipherFailures.toString()}
-                        subheader={`${100 - totalCipherSuccessRate}% fail rate`}
+                        subheader={`${(100 - totalCipherSuccessRate).toFixed(2)}% fail rate`}
                         accent='orange'
                     />
                 </Grid>
@@ -110,7 +110,7 @@ export default function Statistics() {
                         titleIcon={<CheckCircleOutlined />}
                         titleIconAccent='accent'
                         label="Success Rate"
-                        value={totalCipherSuccessRate.toString() + '%'}
+                        value={totalCipherSuccessRate.toFixed(2) + '%'}
                         subheader="lifetime average"
                         accent='income'
                     />
@@ -236,13 +236,15 @@ export default function Statistics() {
                 </Grid>
                 <Grid size={12}>
                     <StationCard
+                        id="ciphersBroken"
                         avatar={CodeTwoTone}
                         accent={StationCardAccentType.CYAN}
                         title="Ciphers Broken"
                         subheader="LIFETIME · BY TYPE"
+                        headerAction={<Chip className="accent" label={`${totalCipherSuccessRate.toFixed(2) + '%'} success`} size="small" />}
                         content={
                             <Table sx={{ width: '100%' }}>
-                                <TableHead>
+                                <TableHead className="statistics-cipher-broken-table-head">
                                     <TableRow>
                                         <TableCell sx={{ whiteSpace: 'nowrap' }}>Type</TableCell>
                                         <TableCell sx={{ width: '100%' }}>Success Distribution</TableCell>
@@ -251,24 +253,32 @@ export default function Statistics() {
                                         <TableCell sx={{ whiteSpace: 'nowrap' }}>Earned</TableCell>
                                     </TableRow>
                                 </TableHead>
-                                <TableBody>
-                                    {cipherEntries.map((entry) => (
+                                <TableBody className="statistics-cipher-broken-table-body">
+                                    {cipherEntries.map((entry, index) => (
                                         <TableRow key={entry.cipher.name}>
                                             <TableCell sx={{ whiteSpace: 'nowrap' }}>{entry.cipher.name}</TableCell>
-                                            <TableCell sx={{ width: '100%' }}>Proportion: {((entry.success + entry.failed) / totalCipherAttempts * 100).toFixed(0)}% · Success Rate: {entry.success / (entry.success + entry.failed) * 100}%</TableCell>
-                                            <TableCell sx={{ whiteSpace: 'nowrap' }}>{entry.success}</TableCell>
-                                            <TableCell sx={{ whiteSpace: 'nowrap' }}>{entry.failed}</TableCell>
-                                            <TableCell sx={{ whiteSpace: 'nowrap' }}>${formatMoney(entry.success * entry.cipher.payout)}</TableCell>
+                                            <TableCell sx={{ width: '100%' }}>
+                                                <LinearProgress
+                                                    total={totalCipherAttempts}
+                                                    current={entry.success + (entry.failed)}
+                                                    success={entry.success}
+                                                    failure={entry.failed}
+                                                    color={LinearProgressColorArray[index % LinearProgressColorArray.length] as 'accent' | 'blue' | 'cyan' | 'orange' | 'red' | 'purple'}
+                                                />
+                                            </TableCell>
+                                            <TableCell sx={{ whiteSpace: 'nowrap' }} className="accent">{entry.success}</TableCell>
+                                            <TableCell sx={{ whiteSpace: 'nowrap' }} className="red">{entry.failed}</TableCell>
+                                            <TableCell sx={{ whiteSpace: 'nowrap' }} className="income">${formatMoney(entry.success * entry.cipher.payout)}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
-                                <TableFooter>
+                                <TableFooter className="statistics-cipher-broken-table-footer">
                                     <TableRow>
                                         <TableCell sx={{ whiteSpace: 'nowrap' }}>Total</TableCell>
                                         <TableCell sx={{ width: '100%' }}>{totalCipherAttempts} attempts</TableCell>
                                         <TableCell sx={{ whiteSpace: 'nowrap' }}>{totalCipherSuccesses}</TableCell>
                                         <TableCell sx={{ whiteSpace: 'nowrap' }}>{totalCipherFailures}</TableCell>
-                                        <TableCell sx={{ whiteSpace: 'nowrap' }}>${formatMoney(statistics.totalMoneyEarned)}</TableCell>
+                                        <TableCell sx={{ whiteSpace: 'nowrap' }}>${formatMoney(totalCipherEarned)}</TableCell>
                                     </TableRow>
                                 </TableFooter>
                             </Table>

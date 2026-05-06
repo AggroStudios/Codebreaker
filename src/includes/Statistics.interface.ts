@@ -14,4 +14,7 @@ export interface IStatistics {
     totalCiphers: Record<string, IStatisticsCipher>;
     totalMoneyEarned: number;
     totalMoneySpent: number;
+    /** Rolling window of recent income-rate samples (oldest -> newest). */
+    incomeHistory: number[];
+    totalBytesDownloaded: number;
 }

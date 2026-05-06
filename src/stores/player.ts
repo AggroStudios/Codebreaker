@@ -33,12 +33,20 @@ export interface Upgrade {
     tags: string[];
 }
 
+/** Number of income-rate samples to keep in the rolling history. */
+export const INCOME_HISTORY_LENGTH = 300;
+
+const makeIncomeHistoryDefault = (): number[] =>
+    Array(INCOME_HISTORY_LENGTH).fill(0);
+
 const makeDefaults = (): IStatistics => ({
     startTime: 0,
     totalPlayedTime: 0,
     totalCiphers: {},
     totalMoneyEarned: 0,
     totalMoneySpent: 0,
+    incomeHistory: makeIncomeHistoryDefault(),
+    totalBytesDownloaded: 0,
 });
 
 const normalizeStartTime = (raw: unknown): number => {
@@ -86,6 +94,20 @@ const normalizeTotalCiphers = (raw: unknown): Record<string, IStatisticsCipher> 
     return result;
 };
 
+const normalizeIncomeHistory = (raw: unknown): number[] => {
+    if (!Array.isArray(raw)) return makeIncomeHistoryDefault();
+    const cleaned = raw.map((v) =>
+        typeof v === 'number' && Number.isFinite(v) ? v : 0,
+    );
+    if (cleaned.length >= INCOME_HISTORY_LENGTH) {
+        return cleaned.slice(cleaned.length - INCOME_HISTORY_LENGTH);
+    }
+    return [
+        ...Array(INCOME_HISTORY_LENGTH - cleaned.length).fill(0),
+        ...cleaned,
+    ];
+};
+
 const reviveStatistics = (raw: unknown): IStatistics => {
     const defaults = makeDefaults();
     if (!raw || typeof raw !== 'object') return defaults;
@@ -98,10 +120,12 @@ const reviveStatistics = (raw: unknown): IStatistics => {
         totalCiphers: normalizeTotalCiphers(r.totalCiphers),
         totalMoneyEarned: typeof r.totalMoneyEarned === 'number' ? r.totalMoneyEarned : defaults.totalMoneyEarned,
         totalMoneySpent: typeof r.totalMoneySpent === 'number' ? r.totalMoneySpent : defaults.totalMoneySpent,
+        incomeHistory: normalizeIncomeHistory(r.incomeHistory),
+        totalBytesDownloaded: typeof r.totalBytesDownloaded === 'number' ? r.totalBytesDownloaded : defaults.totalBytesDownloaded,
     };
 };
 
-export const usePlayerStore = create<PlayerState>()(
+const createPlayerStore = () => create<PlayerState>()(
     persist(
         (set) => ({
             player: {
@@ -302,6 +326,23 @@ export const usePlayerStore = create<PlayerState>()(
                         statistics: { ...state.player.statistics, totalPlayedTime: time - state.player.statistics.startTime },
                     },
                 })),
+            pushIncomeRate: (rate: number) =>
+                set((state) => {
+                    const safeRate = Number.isFinite(rate) ? rate : 0;
+                    const prev = state.player.statistics.incomeHistory;
+                    // Drop the oldest sample and append the new one, keeping
+                    // the window pinned at INCOME_HISTORY_LENGTH entries.
+                    const next = [...prev, safeRate].slice(-INCOME_HISTORY_LENGTH);
+                    return {
+                        player: {
+                            ...state.player,
+                            statistics: {
+                                ...state.player.statistics,
+                                incomeHistory: next,
+                            },
+                        },
+                    };
+                }),
         }),
         {
             name: 'player-store',
@@ -342,6 +383,23 @@ export const usePlayerStore = create<PlayerState>()(
         },
     ),
 );
+
+// Preserve a single store instance across Vite HMR. When this module is
+// re-evaluated, components re-import `usePlayerStore` and resubscribe to
+// the new export, but long-lived non-React holders (e.g. the OperatingSystem
+// captured in App's `useState` initializer) still reference the previous
+// instance via `playerStoreProxy`. Reusing the existing store keeps both
+// sides talking to the same state container so background processes keep
+// updating the UI after a hot reload.
+const HMR_STORE_KEY = 'usePlayerStore';
+const hotData = (import.meta.hot?.data ?? {}) as Record<string, unknown>;
+export const usePlayerStore = (hotData[HMR_STORE_KEY] as ReturnType<typeof createPlayerStore> | undefined)
+    ?? createPlayerStore();
+
+if (import.meta.hot) {
+    import.meta.hot.data[HMR_STORE_KEY] = usePlayerStore;
+    import.meta.hot.accept();
+}
 
 /**
 * Live proxy for non-React callers (game engine classes). Reads always

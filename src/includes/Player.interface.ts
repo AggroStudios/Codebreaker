@@ -51,4 +51,5 @@ export interface PlayerState {
     successCipher: (cipher: ICipherType) => void;
     failedCipher: (cipher: ICipherType) => void;
     updateTotalPlayedTime: (time: number) => void;
+    pushIncomeRate: (rate: number) => void;
 }

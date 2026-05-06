@@ -55,6 +55,8 @@ describe('Terminal', () => {
                     totalCiphers: {},
                     totalMoneyEarned: 0,
                     totalMoneySpent: 0,
+                    totalBytesDownloaded: 0,
+                    incomeHistory: [],
                 },
             },
             earnExperience: vi.fn(),
@@ -67,6 +69,7 @@ describe('Terminal', () => {
             successCipher: vi.fn(),
             failedCipher: vi.fn(),
             updateTotalPlayedTime: vi.fn(),
+            pushIncomeRate: vi.fn(),
         });
         term.attachOperatingSystem(os);
         expect(term.operatingSystem).toBe(os);

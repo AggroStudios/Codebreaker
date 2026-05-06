@@ -34,6 +34,7 @@ export default class Cipher implements Process {
     private _previousState: CipherState | undefined = undefined;
     private _paused: boolean = false;
     private _percentUse: number = 0;
+    private _failureRate: number = 0.00001;
 
     constructor(
         width: number,
@@ -159,6 +160,12 @@ export default class Cipher implements Process {
 
         // Manual-mode ciphers are solved by the player via a minigame
         if (this._cipherType.manualMode?.length) return;
+
+        // Fail the cipher with a chance of this._failureRate
+        if (Math.random() < this._failureRate) {
+            this.fail();
+            return;
+        }
 
         const complexity = Math.round(10 * this._cipherType.complexity);
         if (this.frame > 0 && this.frame % parseFloat((complexity / this._stationProcessor.gigaflops).toFixed(3)) === 0) {

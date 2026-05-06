@@ -23,6 +23,8 @@ function createMockPlayerState(): PlayerState {
                 totalCiphers: {},
                 totalMoneyEarned: 0,
                 totalMoneySpent: 0,
+                totalBytesDownloaded: 0,
+                incomeHistory: [],
             },
         },
         moneyLabel: null,
@@ -52,6 +54,7 @@ function createMockPlayerState(): PlayerState {
         successCipher: vi.fn(),
         failedCipher: vi.fn(),
         updateTotalPlayedTime: vi.fn(),
+        pushIncomeRate: vi.fn(),
     };
 }
 
