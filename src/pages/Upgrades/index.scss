@@ -3,7 +3,7 @@
     height: 100% !important;
     overflow: hidden !important;
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: column;
     min-height: 0 !important;
     margin: 2em;
 }
@@ -99,12 +99,12 @@
 }
 
 .upgrades-content {
-    padding: 0 24px 24px !important;
+    padding: 0 14px 24px !important;
     flex: 1 1 0 !important;
     min-height: 0 !important;
     background-color: var(--color-bg-card) !important;
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
 }
 
 .upgrades-content-label {
@@ -130,6 +130,7 @@
     flex: 1 1 0 !important;
     min-height: 0 !important;
     overflow-y: auto !important;
+    padding: 10px !important;
     align-content: flex-start !important;
     align-items: stretch !important;
 }

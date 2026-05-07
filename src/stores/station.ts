@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { IProcessorType, IStorageType, StationStoreType } from '../includes/Process.interface';
+import { IMemoryType, IProcessorType, IStorageType, StationStoreType } from '../includes/Process.interface';
 import { storeProxy } from '../utils/storeProxy';
 import { NetworkDSL, Networking } from '../lib/network';
 import { CodiumMemory } from '../lib/memory';
@@ -37,6 +37,7 @@ export const createStationStore = () =>
                     set(() => ({ cpuActivity })),
                 setNetwork: (network: Networking) => set(() => ({ network })),
                 setProcessor: (cpu: IProcessorType) => set(() => ({ cpu })),
+                setMemory: (memory: IMemoryType) => set(() => ({ memory })),
                 reset: () => set(() => ({ ...makeDefaults(), isRunning: false, exponent: 0 })),
                 glowActive: false,
                 setGlowActive: (active: boolean) => set(() => ({ glowActive: active })),

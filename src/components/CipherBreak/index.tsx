@@ -68,7 +68,9 @@ export default function CipherBreak(props: CipherBreakOptions) {
     const cipherState = useCipherBreakStore((s) => (id ? s.entries[id]?.state : undefined));
     const autoCipher = useCipherBreakStore((s) => s.entries[id ?? '']?.autoCipher ?? false);
     const removeEntry = useCipherBreakStore((s) => s.removeEntry);
-    const enableAutoCipher = usePlayerStore((s) => s.purchasedUpgrades.includes('auto-cipher'));
+    const purchasedUpgrades = usePlayerStore((s) => s.purchasedUpgrades);
+
+    const enableAutoCipher = purchasedUpgrades.find((u) => u.upgradeId === 'auto-cipher')?.tierId === cipherType?.autoCipherTier;
     const [processedCipher, setProcessedCipher] = useState(false);
 
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);

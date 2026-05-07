@@ -65,7 +65,7 @@ describe('Terminal', () => {
             deleteNotification: vi.fn(),
             deleteAllNotifications: vi.fn(),
             purchasedUpgrades: [],
-            purchaseUpgrade: vi.fn(),
+            purchaseUpgradeTier: vi.fn(),
             successCipher: vi.fn(),
             failedCipher: vi.fn(),
             updateTotalPlayedTime: vi.fn(),

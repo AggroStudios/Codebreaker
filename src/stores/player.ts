@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import {
     experienceForLevel,
+    IPurchasedUpgrade,
     Player,
     PlayerState,
 } from '../includes/Player.interface';
@@ -38,6 +39,21 @@ export const INCOME_HISTORY_LENGTH = 300;
 
 const makeIncomeHistoryDefault = (): number[] =>
     Array(INCOME_HISTORY_LENGTH).fill(0);
+
+const makePurchasedUpgradeDefault = (): IPurchasedUpgrade[] => ([
+    {
+        upgradeId: 'codium-processor',
+        tierId: 'mk1',
+    },
+    {
+        upgradeId: 'codium-memory',
+        tierId: 'mk1',
+    },
+    {
+        upgradeId: 'internet-connection',
+        tierId: 'mk1',
+    },
+]);
 
 const makeDefaults = (): IStatistics => ({
     startTime: 0,
@@ -148,11 +164,11 @@ const createPlayerStore = () => create<PlayerState>()(
             markTutorialAsSeen: (stage: string) => set((state) => ({ hasSeenTutorial: [...state.hasSeenTutorial, stage] })),
             resetTutorial: () => set({ hasSeenTutorial: [], tutorialDisabled: false, tutorialStage: '' }),
             setTutorialDisabled: (disabled: boolean) => set({ tutorialDisabled: disabled }),
-            purchasedUpgrades: [] as string[],
-            purchaseUpgrade: (upgrade: string, cost: number) =>
+            purchasedUpgrades: makePurchasedUpgradeDefault(),
+            purchaseUpgradeTier: (upgradeId: string, tierId: string, cost: number) =>
                 set((state) => {
                 state.removeMoney(cost);
-                return { purchasedUpgrades: [...state.purchasedUpgrades, upgrade] };
+                return { purchasedUpgrades: [...state.purchasedUpgrades, { upgradeId, tierId }] };
             }),
             setXpLabel: (amount: number | null, levelUp?: boolean) =>
                 set(() => ({ xpLabel: { data: { amount, levelUp }, id: Date.now() } })),

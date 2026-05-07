@@ -9,7 +9,7 @@ describe('CodiumProcessor', () => {
         expect(proc.cores).toBe(4);
         expect(proc.manufacturer).toBe('Codium');
         expect(proc.model).toBe('Brkr 1');
-        expect(proc.speed).toBe('3.2 GHz');
+        expect(proc.speed).toBe('2.6 GHz');
         expect(proc.architecture).toBe(ProcessorArchitecture.risc32);
     });
 
@@ -29,7 +29,7 @@ describe('CodiumProcessor64', () => {
         expect(proc.architecture).toBe(ProcessorArchitecture.risc64);
         expect(proc.cores).toBe(6); // inherited
         expect(proc.manufacturer).toBe('Codium'); // inherited
-        expect(proc.speed).toBe('3.2 GHz'); // inherited
+        expect(proc.speed).toBe('3.4 GHz');
     });
 
     it('should return correct string from toString()', () => {

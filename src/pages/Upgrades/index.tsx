@@ -24,9 +24,14 @@ import { useEffect } from 'react';
 import { capitalize } from '@mui/material/utils';
 import PageHeader from '../../components/common/PageHeader';
 import { Stat } from '../../components/common/Stat';
+import UpgradeDetails from '../../components/UpgradeDetails';
+import { useStationContext } from '../../stores/stationContext';
+import type { IUpgradeTier } from '../../lib/upgrades';
 
 export default function UpgradesComponent() {
     const playerStore = usePlayerStore();
+    const purchaseUpgradeTier = usePlayerStore((s) => s.purchaseUpgradeTier);
+    const { stationProxy } = useStationContext();
 
     const purchasedUpgrades = usePlayerStore((s) => s.purchasedUpgrades);
 
@@ -35,6 +40,7 @@ export default function UpgradesComponent() {
     const [filter, setFilter] = useState<string>('all');
     const [showOwned, setShowOwned] = useState(true);
     const [filterLabels, setFilterLabels] = useState<string[]>(['all']);
+    const [selectedUpgrade, setSelectedUpgrade] = useState<IUpgradeItem | null>(null);
 
     useEffect(() => {
         const labels = new Set<string>();
@@ -49,10 +55,10 @@ export default function UpgradesComponent() {
 
     useEffect(() => {
         if (filter !== 'all') {
-            setDisplayedUpgrades(UpgradeList.filter((upg) => upg.tags.includes(filter) && (showOwned || !purchasedUpgrades.includes(upg.key))));
+            setDisplayedUpgrades(UpgradeList.filter((upg) => upg.tags.includes(filter) && (showOwned || !purchasedUpgrades.find((pu) => pu.upgradeId === upg.key))));
         }
         else {
-            setDisplayedUpgrades(UpgradeList.filter((upg) => showOwned || !purchasedUpgrades.includes(upg.key)));
+            setDisplayedUpgrades(UpgradeList.filter((upg) => showOwned || !purchasedUpgrades.find((pu) => pu.upgradeId === upg.key)));
         }
     }, [showOwned, filter]);
 
@@ -68,11 +74,30 @@ export default function UpgradesComponent() {
         setCantAffordDialogOpen(false);
     };
 
+
+    const handleUpgradeClick = (upgrade: IUpgradeItem) => {
+        if (selectedUpgrade?.key === upgrade.key) {
+            setSelectedUpgrade(null);
+        }
+        else {
+            setSelectedUpgrade(upgrade);
+        }
+    };
+
+    const handleDetailsClose = () => {
+        setSelectedUpgrade(null);
+    };
+
+    const handleDetailsPurchase = (upgrade: IUpgradeItem, tier: IUpgradeTier) => {
+        tier.onPurchase?.(stationProxy);
+        purchaseUpgradeTier(upgrade.key, tier.tierId, tier.cost);
+    };
+
     return (
         <>
             <PageHeader
                 title="Upgrades"
-                subtitle={`Upgrade your station to gain new features and improve performance.<br> ${purchasedUpgrades.length} of ${UpgradeList.length} upgrades unlocked`}
+                subtitle={`Station modifications. Each upgrade has multiple tiers — purchase the next tier to make it more powerful. Some upgrades require prerequisites.`}
                 breadcrumbs={['home', 'upgrades']}
                 actions={
                     <Stat
@@ -97,12 +122,26 @@ export default function UpgradesComponent() {
                         color="primary"
                     />} label="Show Owned" />
                 </Box>
-                <Box className="upgrades-content">
-                    <div className="upgrades-content-label">{filter} Upgrades - {(displayedUpgrades.filter((upg) => !purchasedUpgrades.includes(upg.key))).length} available</div>
-                    <Box className="upgrades-content-grid" sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 2 }}>
-                        {displayedUpgrades.map((upg) => (
-                            <UpgradeComponent key={upg.key} upgrade={upg} />
-                        ))}
+                <Box className="upgrades-content" sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 360px', gap: 2 }}>
+                    <Box className="upgrades-content-grid" sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 2 }}>
+                            {displayedUpgrades.map((upg) => (
+                                <UpgradeComponent onClick={handleUpgradeClick} key={upg.key} upgrade={upg} selected={selectedUpgrade?.key === upg.key} />
+                            ))}
+                    </Box>
+                    <Box className="upgrades-content-details" sx={{
+                            position: 'sticky',
+                            height: '100%',
+                            width: '360px',
+                            overflow: 'hidden',
+                            display: 'flex', flexDirection: 'column',
+                            paddingTop: '10px',
+                            paddingRight: '14px',
+                    }}>
+                        <UpgradeDetails
+                            upgrade={selectedUpgrade}
+                            onPurchase={handleDetailsPurchase}
+                            onClose={handleDetailsClose}
+                        />
                     </Box>
                 </Box>
             </Box>

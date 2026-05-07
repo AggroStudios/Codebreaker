@@ -5,6 +5,11 @@ import { IStatistics } from './Statistics.interface';
 export const experienceForLevel = (level: number) =>
     Math.floor(100 * Math.pow(1.12, level - 1));
 
+export interface IPurchasedUpgrade {
+    upgradeId: string;
+    tierId: string;
+}
+
 export type Player = {
     name: string;
     money: number;
@@ -46,8 +51,8 @@ export interface PlayerState {
     markAllNotificationsAsRead: () => void;
     deleteNotification: (index: number) => void;
     deleteAllNotifications: () => void;
-    purchasedUpgrades: string[];
-    purchaseUpgrade: (upgrade: string, cost: number) => void;
+    purchasedUpgrades: IPurchasedUpgrade[];
+    purchaseUpgradeTier: (upgradeId: string, tierId: string, cost: number) => void;
     successCipher: (cipher: ICipherType) => void;
     failedCipher: (cipher: ICipherType) => void;
     updateTotalPlayedTime: (time: number) => void;

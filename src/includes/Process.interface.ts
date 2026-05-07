@@ -43,6 +43,7 @@ export type StationStoreType = {
     setCpuActivity: (cpuActivity: { x: number; y: number }[]) => void;
     setNetwork: (network: Networking) => void;
     setProcessor: (cpu: IProcessorType) => void;
+    setMemory: (memory: IMemoryType) => void;
     reset: () => void;
     glowActive: boolean;
     setGlowActive: (active: boolean) => void;
@@ -58,10 +59,8 @@ export type MenuStateType = {
 export enum ProcessorArchitecture {
     risc32 = 'risc32',
     risc64 = 'risc64',
-    sca32 = 'sca32',
-    sca64 = 'sca64',
-    mca32 = 'mca32',
-    mca64 = 'mca64',
+    quantum = 'quantum',
+    singularity = 'singularity',
 }
 
 export enum MemoryType {
@@ -71,6 +70,7 @@ export enum MemoryType {
     ddr3 = 'DDR-3',
     ddr4 = 'DDR-4',
     ddr5 = 'DDR-5',
+    nonVolatile = 'Non-Volatile',
 }
 
 export enum StorageType {

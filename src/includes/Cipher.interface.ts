@@ -38,6 +38,7 @@ export interface ICipherType {
     };
     payout: number;
     xp: number;
+    autoCipherTier?: string | null; // The tier ID of the auto-cipher upgrade that can break this cipher type.
     requiredArchitecture: ProcessorArchitecture[];
     manualMode?: React.ComponentType<MiniGameProps>[];
 }
