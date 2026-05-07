@@ -2,6 +2,12 @@ import { lazy, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 import Layout from './Layout';
 import LoadingScreen from './components/LoadingScreen';
@@ -23,6 +29,10 @@ import { AnchorsProvider } from './components/AnchorsContext';
 
 import './index.css';
 import Statistics from './lib/statistics';
+import {
+    GAME_PERSISTENCE_VERSION,
+    PERSISTENCE_VERSION_KEY,
+} from './lib/persistenceVersion';
 
 const TerminalRoute = lazy(() => import('./pages/Terminal'));
 const StationRoute = lazy(() => import('./pages/Station'));
@@ -39,6 +49,7 @@ const StatisticsRoute = lazy(() => import('./pages/Statistics'));
 
 export default function App() {
     const [loadingProgress, setLoadingProgress] = useState(0);
+    const [persistMismatchOpen, setPersistMismatchOpen] = useState(false);
 
     const [bootstrap] = useState(() => {
         const useStationStore = createStationStore();
@@ -70,6 +81,16 @@ export default function App() {
     });
 
     useEffect(() => {
+        const persistedVersion = localStorage.getItem(PERSISTENCE_VERSION_KEY);
+        const mismatch =
+            persistedVersion !== null &&
+            persistedVersion !== GAME_PERSISTENCE_VERSION;
+        if (mismatch) {
+            setPersistMismatchOpen(true);
+            return;
+        }
+        localStorage.setItem(PERSISTENCE_VERSION_KEY, GAME_PERSISTENCE_VERSION);
+
         preloadImages(setLoadingProgress);
         // Preload all route chunks in the background so navigation is instant
         import('./pages/Terminal');
@@ -85,6 +106,12 @@ export default function App() {
         import('./pages/Prestige');
         import('./pages/Statistics');
     }, []);
+
+    const handlePersistMismatchDismiss = () => {
+        setPersistMismatchOpen(false);
+        sessionStorage.setItem('reset-pending', 'true');
+        window.location.reload();
+    };
 
     const { operatingSystem, useStationStore, stationProxy, terminalController } =
         bootstrap;
@@ -138,6 +165,29 @@ export default function App() {
                 loading={loadingProgress}
                 onHidden={handleLoadingHidden}
             />
+            <Dialog
+                open={persistMismatchOpen}
+                onClose={handlePersistMismatchDismiss}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle>Save Version Mismatch</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" color="text.secondary">
+                        Your saved game was created with an older incompatible
+                        version. The game needs to reset your save data to
+                        migrate to the current version.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={handlePersistMismatchDismiss}
+                        variant="contained"
+                    >
+                        Reset Game
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </ThemeProvider>
     );
 }
