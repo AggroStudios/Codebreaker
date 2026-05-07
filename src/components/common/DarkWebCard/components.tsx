@@ -130,7 +130,7 @@ export function OfferCipher(props: OfferCipherProps) {
                         >
                             <Box className="dark-web-card-offer-cipher-menu-item-content">  
                                 <span className="dark-web-card-offer-cipher-menu-item-name">{cipher.name} · {foundCiphers?.[cipher.name.replaceAll(' ', '-').toLowerCase()] ?? 0} in stock</span>
-                                <span className="dark-web-card-offer-cipher-menu-item-price">{props.bonuses?.find((b) => b.cipher.name === cipher.name) ? '(DEAL)' : ''} ${formatMoney(cipher.payout)}</span>
+                                <span className="dark-web-card-offer-cipher-menu-item-price">{props.bonuses?.find((b) => b.cipher.name === cipher.name) ? '(DEAL)' : ''} ${formatMoney(cipher.payout * (props.bonuses?.find((b) => b.cipher.name === cipher.name)?.multiplier ?? 1))}</span>
                             </Box>
                         </MenuItem>
                     );

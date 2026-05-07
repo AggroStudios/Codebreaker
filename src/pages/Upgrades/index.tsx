@@ -19,6 +19,9 @@ import { formatMoney } from '../../lib/utils';
 import clsx from 'clsx';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import SearchIcon from '@mui/icons-material/Search';
 import UpgradeComponent from '../../components/Upgrade';
 import { useEffect } from 'react';
 import { capitalize } from '@mui/material/utils';
@@ -39,6 +42,9 @@ export default function UpgradesComponent() {
     const [displayedUpgrades, setDisplayedUpgrades] = useState<IUpgradeItem[]>(UpgradeList);
     const [filter, setFilter] = useState<string>('all');
     const [showOwned, setShowOwned] = useState(true);
+    const [hideFullyUpgraded, setHideFullyUpgraded] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [filterLabels, setFilterLabels] = useState<string[]>(['all']);
     const [selectedUpgrade, setSelectedUpgrade] = useState<IUpgradeItem | null>(null);
 
@@ -54,16 +60,54 @@ export default function UpgradesComponent() {
     }, []);
 
     useEffect(() => {
-        if (filter !== 'all') {
-            setDisplayedUpgrades(UpgradeList.filter((upg) => upg.tags.includes(filter) && (showOwned || !purchasedUpgrades.find((pu) => pu.upgradeId === upg.key))));
-        }
-        else {
-            setDisplayedUpgrades(UpgradeList.filter((upg) => showOwned || !purchasedUpgrades.find((pu) => pu.upgradeId === upg.key)));
-        }
-    }, [showOwned, filter]);
+        const debounceTimer = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 500);
+
+        return () => {
+            clearTimeout(debounceTimer);
+        };
+    }, [searchTerm]);
+
+    useEffect(() => {
+        const purchasedTierCountByKey = purchasedUpgrades.reduce<Record<string, number>>(
+            (acc, item) => {
+                acc[item.upgradeId] = (acc[item.upgradeId] ?? 0) + 1;
+                return acc;
+            },
+            {},
+        );
+
+        const normalizedSearch = debouncedSearchTerm.trim().toLowerCase();
+
+        setDisplayedUpgrades(
+            UpgradeList.filter((upg) => {
+                const purchasedTierCount = purchasedTierCountByKey[upg.key] ?? 0;
+                const isOwned = purchasedTierCount > 0;
+                const isFullyUpgraded = purchasedTierCount >= upg.tiers.length;
+
+                const tagMatches = filter === 'all' || upg.tags.includes(filter);
+                const searchMatches = normalizedSearch.length === 0
+                    || upg.name.toLowerCase().includes(normalizedSearch)
+                    || upg.description.toLowerCase().includes(normalizedSearch);
+                const ownedMatches = showOwned || !isOwned;
+                const fullyUpgradedMatches = !hideFullyUpgraded || !isFullyUpgraded;
+
+                return tagMatches && searchMatches && ownedMatches && fullyUpgradedMatches;
+            }),
+        );
+    }, [debouncedSearchTerm, filter, hideFullyUpgraded, purchasedUpgrades, showOwned]);
 
     const handleShowOwnedChange = () => {
         setShowOwned((prev) => !prev);
+    };
+
+    const handleHideFullyUpgradedChange = () => {
+        setHideFullyUpgraded((prev) => !prev);
+    };
+
+    const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
     };
 
     const handleFilterClick = (filter: string) => {
@@ -115,12 +159,34 @@ export default function UpgradesComponent() {
                     {filterLabels.map((label, idx: number) => (
                         <Chip key={'filter-label-' + idx.toString()} label={capitalize(label)} className={clsx(filter === label && 'active')} onClick={() => handleFilterClick(label)} variant="outlined" />
                     ))}
+                    <TextField
+                        className="upgrades-search"
+                        size="small"
+                        placeholder="Search upgrades"
+                        value={searchTerm}
+                        onChange={handleSearchTermChange}
+                        slotProps={{
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon fontSize="small" />
+                                    </InputAdornment>
+                                ),
+                            },
+                        }}
+                    />
                     <FormControlLabel className="show-owned" control={
                         <Switch
                         checked={showOwned}
                         onChange={handleShowOwnedChange}
                         color="primary"
                     />} label="Show Owned" />
+                    <FormControlLabel className="hide-fully-upgraded" control={
+                        <Switch
+                        checked={hideFullyUpgraded}
+                        onChange={handleHideFullyUpgradedChange}
+                        color="primary"
+                    />} label="Hide Fully Upgraded" />
                 </Box>
                 <Box className="upgrades-content" sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 360px', gap: 2 }}>
                     <Box className="upgrades-content-grid" sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 2 }}>

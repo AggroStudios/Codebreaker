@@ -22,8 +22,12 @@ export const darkWebFactions: IDarkWebFaction[] = [
         online: true,
         bonus: [
             {
-                cipher: CipherTypes.find((c) => c.name === 'Cipher 1'),
+                cipher: CipherTypes.find((c) => c.name === 'CRC-32'),
                 multiplier: 1.05,
+            },
+            {
+                cipher: CipherTypes.find((c) => c.name === 'MD5'),
+                multiplier: 1.15,
             }
         ],
         acceptedCiphers: CipherTypes.filter((c) => c.complexity < 1.8),
@@ -108,8 +112,12 @@ export const darkWebFactions: IDarkWebFaction[] = [
         online: true,
         bonus: [
             {
-                cipher: CipherTypes.find((c) => c.name === 'Cipher 4'),
+                cipher: CipherTypes.find((c) => c.name === 'RSA-1024'),
                 multiplier: 1.15,
+            },
+            {
+                cipher: CipherTypes.find((c) => c.name === 'RSA-2048'),
+                multiplier: 1.35,
             }
         ],
         acceptedCiphers: CipherTypes.filter((c) => c.complexity >= 3.2),

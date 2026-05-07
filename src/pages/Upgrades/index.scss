@@ -73,8 +73,57 @@
     user-select: none !important;
 }
 
-.show-owned {
+.hide-fully-upgraded .MuiFormControlLabel-label {
+    font-size: 12px !important;
+    color: var(--color-fg-secondary) !important;
+    user-select: none !important;
+}
+
+.upgrades-search {
+    min-width: 240px !important;
     margin-left: auto !important;
+}
+
+.upgrades-search .MuiOutlinedInput-root {
+    height: 30px !important;
+    font-size: 12px !important;
+    color: var(--color-fg) !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+.upgrades-search .MuiOutlinedInput-input {
+    padding: 6px 10px !important;
+}
+
+.upgrades-search .MuiInputAdornment-root {
+    color: var(--color-fg-secondary) !important;
+}
+
+.upgrades-search .MuiOutlinedInput-notchedOutline {
+    border-color: var(--color-border) !important;
+}
+
+.upgrades-search .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: var(--color-border-hover) !important;
+}
+
+.upgrades-search .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: var(--accent) !important;
+}
+
+.upgrades-search .MuiInputBase-input::placeholder {
+    color: var(--color-fg-secondary) !important;
+    opacity: 0.8 !important;
+}
+
+.show-owned {
+    display: flex !important;
+    gap: 6px !important;
+    align-items: center !important;
+    margin-right: 0 !important;
+}
+
+.hide-fully-upgraded {
     display: flex !important;
     gap: 6px !important;
     align-items: center !important;
@@ -85,7 +134,16 @@
     padding: 8px !important;
 }
 
+.hide-fully-upgraded .MuiSwitch-root {
+    padding: 8px !important;
+}
+
 .show-owned .MuiSwitch-track {
+    background-color: var(--color-border-hi) !important;
+    border-radius: 14px !important;
+}
+
+.hide-fully-upgraded .MuiSwitch-track {
     background-color: var(--color-border-hi) !important;
     border-radius: 14px !important;
 }
@@ -94,7 +152,15 @@
     background-color: var(--accent) !important;
 }
 
+.hide-fully-upgraded .Mui-checked+.MuiSwitch-track {
+    background-color: var(--accent) !important;
+}
+
 .show-owned .MuiSwitch-switchBase {
+    color: var(--color-fg) !important;
+}
+
+.hide-fully-upgraded .MuiSwitch-switchBase {
     color: var(--color-fg) !important;
 }
 
