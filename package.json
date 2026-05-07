@@ -1,7 +1,7 @@
 {
   "name": "codebreaker",
   "private": true,
-  "version": "0.6.91",
+  "version": "0.6.92",
   "type": "module",
   "scripts": {
     "dev": "NODE_ENV=LOCAL_DEV vite --open",
