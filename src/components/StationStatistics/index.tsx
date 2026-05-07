@@ -13,7 +13,7 @@ import DeveloperBoardIcon from '@mui/icons-material/DeveloperBoard';
 
 import { StationStoreType } from '../../includes/Process.interface';
 
-import StationCard, { StationCardAccentType } from '../common/StationCard';
+import StationCard, { StationCardAccentType } from '../StationCard';
 
 export default function StationStatistics({ station }: { station: StationStoreType }) {
     return (

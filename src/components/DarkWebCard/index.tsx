@@ -1,14 +1,14 @@
 import { Card, Typography, CardContent, Grid, Avatar, SvgIconTypeMap, Chip, Box, Button } from '@mui/material';
-import { IDarkWebFaction, ReputationTiers, RiskTier } from '../../../includes/DarkWeb.interface';
+import { IDarkWebFaction, ReputationTiers, RiskTier } from '../../includes/DarkWeb.interface';
 import './style.scss';
-import GlyphCardHeader from '../GlyphCardHeader';
+import GlyphCardHeader from '../common/GlyphCardHeader';
 import { ForumOutlined, GppGoodOutlined, LocalOfferOutlined, SendOutlined, ShieldOutlined, WarningAmberOutlined } from '@mui/icons-material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import clsx from 'clsx';
 import { OfferCipher, ReputationProgress } from './components';
-import { Stat } from '../Stat';
+import { Stat } from '../common/Stat';
 import { useEffect, useState } from 'react';
-import { ICipherType } from '../../../includes/Cipher.interface';
+import { ICipherType } from '../../includes/Cipher.interface';
 
 const DarkWebChipIcon: Record<RiskTier, OverridableComponent<SvgIconTypeMap<object, 'svg'>>> = {
     [RiskTier.low]: GppGoodOutlined,

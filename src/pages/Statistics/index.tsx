@@ -7,7 +7,7 @@ import { DURATION_UNITS_LONG, formatDuration, formatMoney } from '../../lib/util
 import { Box, Chip, Grid, Table, TableBody, TableCell, TableFooter, TableHead, TableRow } from '@mui/material';
 import { Stat } from '../../components/common/Stat';
 import { Sparkline } from '../../components/common/Sparkline';
-import StationCard, { StationCardAccentType } from '../../components/common/StationCard';
+import StationCard, { StationCardAccentType } from '../../components/StationCard';
 import { padStart } from 'lodash';
 import clsx from 'clsx';
 import { ShimmerProgress } from '../../components/common/ShimmerProgress';

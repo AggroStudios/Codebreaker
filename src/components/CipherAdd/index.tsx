@@ -9,7 +9,7 @@ import './styles.scss';
 import { useStationContext } from '../../stores/stationContext';
 import { ProcessorArchitecture } from '../../includes/Process.interface';
 import { CipherTypes } from '../../lib/cipherList';
-import StationCard, { StationCardAccentType } from '../common/StationCard';
+import StationCard, { StationCardAccentType } from '../StationCard';
 
 export default function CipherAdd({ onAdd }: { onAdd: (id: string, cipherType: ICipherType) => void }) {
     const [picked, setPicked] = useState('');

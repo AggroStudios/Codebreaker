@@ -1,11 +1,11 @@
 import { Box, Button, IconButton, LinearProgress, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import clsx from 'clsx';
-import { ICipherType } from '../../../includes/Cipher.interface';
+import { ICipherType } from '../../includes/Cipher.interface';
 import { useEffect, useState } from 'react';
-import { useStationState } from '../../../stores/stationContext';
-import { formatMoney } from '../../../lib/utils';
+import { useStationState } from '../../stores/stationContext';
+import { formatMoney } from '../../lib/utils';
 import { Add, Remove } from '@mui/icons-material';
-import { FactionBonus } from '../../../includes/DarkWeb.interface';
+import { FactionBonus } from '../../includes/DarkWeb.interface';
 
 interface ReputationProgressProps {
     currentBracket: string;

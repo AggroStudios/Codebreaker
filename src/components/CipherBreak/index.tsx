@@ -42,7 +42,7 @@ import CipherGrid from '../CipherGrid';
 import successSound from '../../assets/sounds/success.mp3';
 import failureSound from '../../assets/sounds/failure.mp3';
 import { CipherInfo, CipherProgressBar } from './components';
-import StationCard, { StationCardAccentType } from '../common/StationCard';
+import StationCard, { StationCardAccentType } from '../StationCard';
 
 export interface CipherBreakFunctions {
     addProcess?: (id: string, type: ICipherType) => void;

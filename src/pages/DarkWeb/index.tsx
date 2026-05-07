@@ -5,7 +5,7 @@ import { HubOutlined, PublicTwoTone } from '@mui/icons-material';
 import { darkWebFactions } from '../../lib/darkWebFactions';
 
 import './style.scss';
-import DarkWebCard from '../../components/common/DarkWebCard';
+import DarkWebCard from '../../components/DarkWebCard';
 import { ReputationTiers } from '../../includes/DarkWeb.interface';
 import { ICipherType } from '../../includes/Cipher.interface';
 

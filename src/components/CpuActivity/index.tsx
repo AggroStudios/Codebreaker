@@ -3,7 +3,7 @@ import { Chip } from '@mui/material';
 import { SsidChartOutlined } from '@mui/icons-material';
 
 import './style.scss';
-import StationCard, { StationCardAccentType } from '../common/StationCard';
+import StationCard, { StationCardAccentType } from '../StationCard';
 import { Stat } from '../common/Stat';
 import { Sparkline } from '../common/Sparkline';
 
