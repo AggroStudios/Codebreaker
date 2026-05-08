@@ -20,6 +20,12 @@ export const formatMoney = (money: number, decimalPlaces: number = 2) => {
     });
 }
 
+export const formatMoneyDay = (money: number) => formatMoney(money) + '/d';
+export const formatKw = (power: number) => `${power.toFixed(0)} kW`;
+export const formatGbps = (uplink: number) => uplink >= 1000 ? `${(uplink/1000).toFixed(1)} Tbps` : `${uplink} Gbps`;
+export const formatMs = (latency: number) => `${latency} ms`;
+
+
 export const DURATION_UNITS_LONG: ReadonlyArray<string> = ['days', 'hours', 'minutes', 'seconds'];
 
 const DURATION_UNITS: ReadonlyArray<readonly [string, number]> = [
@@ -155,3 +161,22 @@ export const path = class Path {
         );
     }
 };
+
+// viewBox: 0 0 3882.44 2100. The map geometry in this asset aligns best with
+// a calibrated linear lon/lat mapping:
+// x = X_AT_LNG_MINUS_180 + (lng + 180) * PX_PER_DEG
+// y = Y_AT_EQUATOR - lat * PY_PER_DEG
+// Constants are fit to the visible world bbox so city pins sit on land.
+
+// Tuned to place NA/EMEA/APAC pins on the visual landmass in this specific SVG.
+const X_AT_LNG_MINUS_180 = 135.0;
+const PX_PER_DEG = 3402.4 / 360; // 9.479...
+const PY_PER_DEG = 9.479;
+export const Y_AT_EQUATOR = 1275;
+
+export function projectLngLat(lng: number, lat: number) {
+    return [
+      X_AT_LNG_MINUS_180 + (lng + 180) * PX_PER_DEG,
+      Y_AT_EQUATOR - lat * PY_PER_DEG,
+    ];
+}
