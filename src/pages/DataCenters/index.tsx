@@ -88,7 +88,6 @@ export default function DataCenters() {
                             <DataCenterCard
                                 dataCenter={selectedDataCenter}
                                 contract={INITIAL_CONTRACTS[selectedDataCenter?.id] || null}
-                                wallet={1000}
                                 onSign={() => {}}
                                 onUpgradePower={() => {}}
                                 onUpgradeUplink={() => {}}

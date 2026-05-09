@@ -12,10 +12,11 @@ export const DATA_CENTERS = [
     { id: 'me-central',     code: 'MEC-1',  name: 'Middle East',      city: 'Bahrain',            lat:  26.2, lng:   48.6, provider: 'DesertGrid',  tier: 'III', baseLeaseDay: 1390, ratePerKw: 0.052, latency: 64 },
     { id: 'af-south',       code: 'AFS-1',  name: 'Africa South',     city: 'Cape Town, ZA',      lat: -36.9, lng:   18.4, provider: 'AfriArc',     tier: 'II',  baseLeaseDay:  980, ratePerKw: 0.118, latency: 102 },
     { id: 'ap-south',       code: 'APS-1',  name: 'Asia South',       city: 'Mumbai, IN',         lat:  17.1, lng:   73.4, provider: 'MonsoonDC',   tier: 'III', baseLeaseDay: 1240, ratePerKw: 0.088, latency: 78 },
-    { id: 'ap-southeast-1', code: 'APSE-1', name: 'Asia Southeast',   city: 'Singapore, SG',      lat:   -0.3, lng:  103.8, provider: 'EquatorIX',   tier: 'IV',  baseLeaseDay: 2640, ratePerKw: 0.146, latency: 56 },
+    { id: 'ap-southeast-1', code: 'APSE-1', name: 'Asia Southeast',   city: 'Singapore, SG',      lat:  -0.3, lng:  103.8, provider: 'EquatorIX',   tier: 'IV',  baseLeaseDay: 2640, ratePerKw: 0.146, latency: 56 },
     { id: 'ap-east',        code: 'APE-1',  name: 'Asia East',        city: 'Hong Kong',          lat:  21.3, lng:  115.7, provider: 'NeoPearl',    tier: 'III', baseLeaseDay: 2180, ratePerKw: 0.132, latency: 48 },
     { id: 'ap-northeast',   code: 'APN-1',  name: 'Asia Northeast',   city: 'Tokyo, JP',          lat:  35.7, lng:  139.7, provider: 'KoyoNet',     tier: 'IV',  baseLeaseDay: 2560, ratePerKw: 0.158, latency: 42 },
     { id: 'ap-southeast-2', code: 'APSE-2', name: 'Oceania',          city: 'Sydney, AU',         lat: -38.9, lng:  150.2, provider: 'CoralStack',  tier: 'III', baseLeaseDay: 1620, ratePerKw: 0.124, latency: 96 },
+    { id: 'eu-iceland',     code: 'ICE-1',  name: 'Iceland',          city: 'Reykjavik, IS',      lat:  73.1, lng:  -22.5, provider: 'IceLine',     tier: 'IV',  baseLeaseDay: 1840, ratePerKw: 0.034, latency: 29 },
 ];
 
 // ── Initial contracts ────────────────────────────────────────────────────────

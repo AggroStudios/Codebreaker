@@ -23,6 +23,8 @@ import {
 import { POWER_TIERS, UPLINK_TIERS } from '../../lib/dataCenter';
 import { Stat } from '../common/Stat';
 import { ShimmerProgress } from '../common/ShimmerProgress';
+import clsx from 'clsx';
+import { usePlayerStore } from '../../stores/player';
     
 // ── DataCenter pin ──────────────────────────────────────────────────────────────
 export function DataCenterPin({ dataCenter, signed, selected, onClick, scale = 1 }: IDataCenterContractProps) {
@@ -147,14 +149,14 @@ function UpgradeRow({ icon, label, current, currentUnit, nextValue, nextUnit, co
         </div>
         {!maxed ? (
             <Button
-            variant="contained"
-            // color={canAfford ? 'primary' : 'neutral'}
-            size="small"
-            disabled={!canAfford}
-            onClick={onUpgrade}
-            startIcon={<UpgradeOutlined fontSize="small" />}
+                className={clsx('data-center-card-button', canAfford ? 'accent' : 'neutral')}
+                variant="contained"
+                size="small"
+                disabled={!canAfford}
+                onClick={onUpgrade}
+                startIcon={<UpgradeOutlined fontSize="small" />}
             >
-            {formatMoney(cost)}
+                {formatMoney(cost)}
             </Button>
         ) : (
             <Chip label="MAXED" color="warning" size="small" variant="outlined" />
@@ -166,7 +168,6 @@ function UpgradeRow({ icon, label, current, currentUnit, nextValue, nextUnit, co
 interface IDataCenterCardProps {
     dataCenter?: IDataCenter;
     contract?: IDataCenterContract;
-    wallet: number;
     onSign: (id: string) => void;
     onUpgradePower: (id: string, power: number) => void;
     onUpgradeUplink: (id: string, uplink: number) => void;
@@ -175,7 +176,10 @@ interface IDataCenterCardProps {
     floating: boolean;
 }
 
-export function DataCenterCard({ dataCenter, contract, wallet, onSign, onUpgradePower, onUpgradeUplink, onAddRack, onClose, floating = false }: IDataCenterCardProps) {
+export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, onUpgradeUplink, onAddRack, onClose, floating = false }: IDataCenterCardProps) {
+    
+    const money = usePlayerStore((state) => state.player.money);
+    
     if (!dataCenter) {
         return (
             <Card style={{ height: '100%' }}>
@@ -224,12 +228,12 @@ export function DataCenterCard({ dataCenter, contract, wallet, onSign, onUpgrade
         }}>
             <CardHeader
                 avatar={
-                    <Avatar color={signed ? 'accent' : 'cyan'}>
+                    <Avatar className={clsx('data-center-card-avatar', signed ? 'accent' : 'cyan')}>
                         {signed ? <VerifiedOutlined fontSize="small" /> : <PlaceOutlined fontSize="small" />}
                     </Avatar>
                 }
                 title={
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18 }}>
                         {dataCenter.name}
                         <span style={{
                             fontFamily: "'Fira Code', monospace", fontSize: 11,
@@ -240,10 +244,10 @@ export function DataCenterCard({ dataCenter, contract, wallet, onSign, onUpgrade
                         </span>
                     </span>
                 }
-                subheader={`${dataCenter.city.toUpperCase()} · ${dataCenter.provider.toUpperCase()}`}
+                subheader={<span style={{ fontSize: 12 }}>{dataCenter.city.toUpperCase()} · {dataCenter.provider.toUpperCase()}</span>}
                 action={
                     <>
-                        <Chip label={`TIER ${dataCenter?.tier}`} size="small" variant="outlined" />
+                        <Chip className={clsx('data-center-card-chip', `data-center-card-chip-tier-${dataCenter?.tier}`)} label={`TIER ${dataCenter?.tier}`} size="small" variant="outlined" />
                         <IconButton title="Close" onClick={onClose}>
                             <CloseOutlined fontSize="small" />
                         </IconButton>
@@ -256,18 +260,18 @@ export function DataCenterCard({ dataCenter, contract, wallet, onSign, onUpgrade
                 <div style={{
                     display: 'flex', alignItems: 'center', gap: 8,
                     padding: '8px 12px',
-                    background: signed ? 'rgba(10,245,176,0.08)' : 'rgba(38,198,218,0.08)',
-                    border: `1px solid ${signed ? 'rgba(10,245,176,0.32)' : 'rgba(38,198,218,0.32)'}`,
+                    background: signed ? (contract.status === 'ACTIVE' ? 'rgba(10,245,176,0.08)' : 'rgba(255,152,0,0.08)') : 'rgba(38,198,218,0.08)',
+                    border: `1px solid ${signed ? (contract.status === 'ACTIVE' ? 'rgba(10,245,176,0.32)' : 'rgba(255,152,0,0.32)') : 'rgba(38,198,218,0.32)'}`,
                     borderRadius: 8,
                 }}>
                     <span className="live-dot" style={{
-                        background: signed ? '#0af5b0' : '#26c6da',
-                        boxShadow: `0 0 6px ${signed ? '#0af5b0' : '#26c6da'}`,
+                        background: signed ? (contract.status === 'ACTIVE' ? '#0af5b0' : '#ff9800') : '#26c6da',
+                        boxShadow: `0 0 6px ${signed ? (contract.status === 'ACTIVE' ? '#0af5b0' : '#ff9800') : '#26c6da'}`,
                     }} />
                     <span style={{
                         fontSize: 12, fontWeight: 600, letterSpacing: '0.10em',
                         fontFamily: "'Fira Code', monospace",
-                        color: signed ? '#0af5b0' : '#26c6da',
+                        color: signed ? (contract.status === 'ACTIVE' ? '#0af5b0' : '#ff9800') : '#26c6da',
                     }}>
                         {signed ? `${contract.status} · LEASED ${contract.signedDays}d AGO` : 'NO CONTRACT · OPEN FOR LEASE'}
                     </span>
@@ -334,7 +338,7 @@ export function DataCenterCard({ dataCenter, contract, wallet, onSign, onUpgrade
                                 current={contract.powerKw} currentUnit=" kW"
                                 nextValue={nextPower?.kw} nextUnit=" kW"
                                 cost={nextPower?.cost || 0}
-                                canAfford={!!nextPower && wallet >= nextPower.cost}
+                                canAfford={!!nextPower && money >= nextPower.cost}
                                 maxed={!nextPower}
                                 onUpgrade={() => onUpgradePower(dataCenter.id, nextPower?.kw || 0)}
                             />
@@ -345,14 +349,14 @@ export function DataCenterCard({ dataCenter, contract, wallet, onSign, onUpgrade
                                 current={formatGbps(contract.uplinkGbps)} currentUnit=""
                                 nextValue={nextUplink ? formatGbps(nextUplink.gbps) : ''} nextUnit=""
                                 cost={nextUplink?.cost || 0}
-                                canAfford={!!nextUplink && wallet >= nextUplink.cost}
+                                canAfford={!!nextUplink && money >= nextUplink.cost}
                                 maxed={!nextUplink}
                                 onUpgrade={() => onUpgradeUplink(dataCenter.id, nextUplink?.gbps || 0)}
                             />
                         </div>
                     </>
                 ) : (
-                    <Table>
+                    <Table className="data-center-card-contract-table">
                         <TableBody>
                             <TableRow>
                                 <TableCell>
@@ -393,7 +397,7 @@ export function DataCenterCard({ dataCenter, contract, wallet, onSign, onUpgrade
                                         <span>Base Lease</span>
                                     </div>
                                     </TableCell>
-                                <TableCell>{formatMoneyDay(dataCenter.baseLeaseDay)}</TableCell>
+                                <TableCell className="accent">{formatMoneyDay(dataCenter.baseLeaseDay)}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell colSpan={2}>
@@ -425,10 +429,11 @@ export function DataCenterCard({ dataCenter, contract, wallet, onSign, onUpgrade
             <CardActions style={{ justifyContent: 'space-between', padding: '12px 16px' }}>
                 {signed ? (
                     <>
-                        <Button variant="text" color="primary" startIcon={<OpenInNewOutlined fontSize="small" />}>
+                        <Button className="data-center-card-floor-plan-button" variant="text" color="primary" startIcon={<OpenInNewOutlined fontSize="small" />}>
                             View Floor Plan
                         </Button>
                         <Button
+                            className="data-center-card-install-rack-button"
                             variant="contained" color="primary" size="medium"
                             onClick={() => onAddRack(dataCenter.id)}
                             disabled={contract.racks >= contract.rackCap}
@@ -439,13 +444,14 @@ export function DataCenterCard({ dataCenter, contract, wallet, onSign, onUpgrade
                     </>
                 ) : (
                     <>
-                        <Button variant="text" color="error" onClick={onClose}>
+                        <Button className="data-center-card-floor-plan-button" variant="text" color="primary" onClick={onClose}>
                             Cancel
                         </Button>
                         <Button
+                            className="data-center-card-install-rack-button"
                             variant="contained" color="primary" size="medium"
                             onClick={() => onSign(dataCenter.id)}
-                            disabled={wallet < dataCenter.baseLeaseDay * 7}
+                            disabled={money < dataCenter.baseLeaseDay * 7}
                             startIcon={<DrawOutlined fontSize="small" />}
                         >
                             Sign Contract · {formatMoney(dataCenter.baseLeaseDay * 7)}
