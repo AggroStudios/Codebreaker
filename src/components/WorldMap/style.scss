@@ -27,6 +27,16 @@
     }
 }
 
+.data-center-card {
+    & .MuiCardHeader-root {
+        border-bottom: 1px solid rgba(81, 81, 81, 0.35);
+    }
+
+    & .MuiCardActions-root {
+        border-top: 1px solid rgba(81, 81, 81, 0.35);
+    }
+}
+
 .data-center-card-chip {
     display: inline-flex;
     align-items: center;
@@ -109,6 +119,18 @@
 }
 
 .data-center-card-contract-table {
+
+    & .MuiTableRow-root {
+        & .MuiTableCell-root {
+            border-bottom: 1px solid rgba(81, 81, 81, 0.35);
+        }
+
+        &:last-child .MuiTableCell-root {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+    }
 
     & .MuiTableRow-root:first-child {
         font-family: var(--font-ui);

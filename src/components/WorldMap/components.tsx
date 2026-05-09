@@ -179,6 +179,13 @@ interface IDataCenterCardProps {
 export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, onUpgradeUplink, onAddRack, onClose, floating = false }: IDataCenterCardProps) {
     
     const money = usePlayerStore((state) => state.player.money);
+    const signed = !!contract;
+    
+    const powerIdx = signed ? Math.max(0, POWER_TIERS.findIndex((t) => t.kw === contract.powerKw)) : -1;
+    const nextPower = signed && powerIdx < POWER_TIERS.length - 1 ? POWER_TIERS[powerIdx + 1] : null;
+    
+    const uplinkIdx = signed ? Math.max(0, UPLINK_TIERS.findIndex((t) => t.gbps === contract.uplinkGbps)) : -1;
+    const nextUplink = signed && uplinkIdx < UPLINK_TIERS.length - 1 ? UPLINK_TIERS[uplinkIdx + 1] : null;
     
     if (!dataCenter) {
         return (
@@ -207,18 +214,8 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
         );
     }
     
-    const signed = !!contract;
-    // const tierColor = { II: 'default', III: 'cyan', IV: 'accent' }[dataCenter.tier] || 'default';
-    
-    // upgrade lookups
-    const powerIdx = signed ? Math.max(0, POWER_TIERS.findIndex((t) => t.kw === contract.powerKw)) : -1;
-    const nextPower = signed && powerIdx < POWER_TIERS.length - 1 ? POWER_TIERS[powerIdx + 1] : null;
-    
-    const uplinkIdx = signed ? Math.max(0, UPLINK_TIERS.findIndex((t) => t.gbps === contract.uplinkGbps)) : -1;
-    const nextUplink = signed && uplinkIdx < UPLINK_TIERS.length - 1 ? UPLINK_TIERS[uplinkIdx + 1] : null;
-    
     return (
-        <Card style={{
+        <Card className="data-center-card" style={{
             height: floating ? 'auto' : '100%',
             display: 'flex',
             flexDirection: 'column',
@@ -256,7 +253,6 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
             />
             
             <CardContent style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
-                {/* Status banner */}
                 <div style={{
                     display: 'flex', alignItems: 'center', gap: 8,
                     padding: '8px 12px',
@@ -279,7 +275,6 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
                     
                 {signed ? (
                     <>
-                        {/* Live stats */}
                         <div style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(3, 1fr)',
@@ -306,7 +301,6 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
                             />
                         </div>
                         
-                        {/* Rack utilization */}
                         <div>
                             <div style={{
                                 display: 'flex', justifyContent: 'space-between',
@@ -322,7 +316,6 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
                             <ShimmerProgress value={(contract.racks / contract.rackCap) * 100} color="accent" />
                         </div>
                         
-                        {/* Upgrade list */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                             <div style={{
                                 fontSize: 10, fontWeight: 700, letterSpacing: '0.18em',
