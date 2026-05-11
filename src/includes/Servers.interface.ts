@@ -1,4 +1,4 @@
-import { Networking } from '../lib/network';
+import { Networking } from '../data/network';
 import { ICipherType } from './Cipher.interface';
 import { IDataCenter } from './DataCenter.interface';
 import { IMemoryType, IProcessorType, IStorageType } from './Process.interface';

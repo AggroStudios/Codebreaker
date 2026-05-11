@@ -2,10 +2,10 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { IMemoryType, IProcessorType, IStorageType, StationStoreType } from '../includes/Process.interface';
 import { storeProxy } from '../utils/storeProxy';
-import { NetworkDSL, Networking } from '../lib/network';
-import { CodiumMemory } from '../lib/memory';
-import { CodiumStorageHdd } from '../lib/storage';
-import { CodiumProcessor } from '../lib/processors';
+import { NetworkDSL, Networking } from '../data/network';
+import { CodiumMemory } from '../data/memory';
+import { CodiumStorageHdd } from '../data/storage';
+import { CodiumProcessor } from '../data/processors';
 import { ScreenGlowType } from '../components/ScreenGlow';
 
 const makeDefaults = () => ({

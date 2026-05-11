@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { CodiumProcessor, CodiumProcessor64 } from './processors';
+import { CodiumProcessor, CodiumProcessor64 } from '../data/processors';
 import { ProcessorArchitecture } from '../includes/Process.interface';
 
 describe('CodiumProcessor', () => {

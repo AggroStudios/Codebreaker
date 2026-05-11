@@ -11,7 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import TouchAppOutlinedIcon from '@mui/icons-material/TouchAppOutlined';
 import clsx from 'clsx';
 
-import { IUpgradeItem, IUpgradeRequirement, IUpgradeTier, UpgradeList } from '../../lib/upgrades';
+import { IUpgradeItem, IUpgradeRequirement, IUpgradeTier, UpgradeList } from '../../data/upgrades';
 import { formatMoney } from '../../lib/utils';
 import { usePlayerStore } from '../../stores/player';
 

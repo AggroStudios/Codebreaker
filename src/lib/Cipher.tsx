@@ -1,7 +1,7 @@
 import { CipherState, ICipherType } from '../includes/Cipher.interface';
 import Process, { IProcessorType, StationStoreType } from '../includes/Process.interface';
 import OperatingSystem from '../lib/OperatingSystem';
-import { Networking } from './network';
+import { Networking } from '../data/network';
 import { dataSizeFromSuffix } from './utils';
 
 export interface CipherDelegate {

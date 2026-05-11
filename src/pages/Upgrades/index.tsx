@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 
-import { UpgradeList, type IUpgradeItem } from '../../lib/upgrades';
+import { UpgradeList, type IUpgradeItem } from '../../data/upgrades';
 
 import { usePlayerStore } from '../../stores/player';
 import { useState } from 'react';
@@ -29,7 +29,7 @@ import PageHeader from '../../components/common/PageHeader';
 import { Stat } from '../../components/common/Stat';
 import UpgradeDetails from '../../components/UpgradeDetails';
 import { useStationContext } from '../../stores/stationContext';
-import type { IUpgradeTier } from '../../lib/upgrades';
+import type { IUpgradeTier } from '../../data/upgrades';
 
 export default function UpgradesComponent() {
     const playerStore = usePlayerStore();

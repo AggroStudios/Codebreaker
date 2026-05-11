@@ -2,7 +2,7 @@ import PageHeader from '../../components/common/PageHeader';
 import { AccountBalanceWalletOutlined, ApartmentTwoTone, BoltOutlined, DescriptionOutlined, DnsOutlined, RequestQuoteOutlined, RouterOutlined } from '@mui/icons-material';
 
 import './style.scss';
-import { DATA_CENTERS, INITIAL_CONTRACTS } from '../../lib/dataCenter';
+import { DATA_CENTERS, INITIAL_CONTRACTS } from '../../data/dataCenter';
 import { WorldMap } from '../../components/WorldMap';
 import { DataCenterCard } from '../../components/WorldMap/components';
 import { useState } from 'react';

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
-import { getTrack, musicTracks } from '../../lib/musicTracks';
+import { getTrack, musicTracks } from '../../data/musicTracks';
 
 export default function MusicPlayer() {
     const audioRef = useRef<HTMLAudioElement | null>(null);

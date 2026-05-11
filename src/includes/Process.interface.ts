@@ -1,5 +1,5 @@
 import { ScreenGlowType } from '../components/ScreenGlow';
-import { Networking } from '../lib/network';
+import { Networking } from '../data/network';
 import OperatingSystem from '../lib/OperatingSystem';
 
 export enum NetworkConnectionType {

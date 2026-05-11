@@ -1,4 +1,4 @@
-import { IUpgradeItem, IUpgradeRequirement, IUpgradeTier, UpgradeList } from '../../lib/upgrades';
+import { IUpgradeItem, IUpgradeRequirement, IUpgradeTier, UpgradeList } from '../../data/upgrades';
 import { useMemo, useState } from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';

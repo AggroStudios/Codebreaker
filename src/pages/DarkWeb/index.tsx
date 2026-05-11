@@ -2,7 +2,7 @@ import PageHeader from '../../components/common/PageHeader';
 import { Chip, Grid } from '@mui/material';
 import { HubOutlined, PublicTwoTone } from '@mui/icons-material';
 
-import { darkWebFactions } from '../../lib/darkWebFactions';
+import { darkWebFactions } from '../../data/darkWebFactions';
 
 import './style.scss';
 import DarkWebCard from '../../components/DarkWebCard';

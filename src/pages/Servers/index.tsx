@@ -2,7 +2,7 @@ import { Box, Chip, Grid, Tab, Tabs } from '@mui/material';
 import PageHeader from '../../components/common/PageHeader';
 import { DnsOutlined, Lan, StorageTwoTone, StorefrontOutlined } from '@mui/icons-material';
 
-import SERVERS from '../../lib/servers';
+import SERVERS from '../../data/servers';
 import ServerCard from '../../components/ServerCard';
 import ServerFilters, { ServerFilters as ServerFiltersType, ServerPriceMinMax } from '../../components/ServerFilters';
 import { usePlayerStore } from '../../stores/player';

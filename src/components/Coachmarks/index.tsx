@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Box, Button, Checkbox, FormControlLabel, IconButton, Typography } from '@mui/material';
 import { Close, ArrowBack, ArrowForward, CheckCircleOutlined } from '@mui/icons-material';
 import { usePlayerStore } from '../../stores/player';
-import { STEPS } from '../../lib/tutorialSteps';
+import { STEPS } from '../../data/tutorialSteps';
 
 import './styles.scss';
 

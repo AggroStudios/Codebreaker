@@ -8,7 +8,7 @@ import { AddCircleOutlineOutlined, PlayArrowTwoTone, TerminalTwoTone } from '@mu
 import './styles.scss';
 import { useStationContext } from '../../stores/stationContext';
 import { ProcessorArchitecture } from '../../includes/Process.interface';
-import { CipherTypes } from '../../lib/cipherList';
+import { CipherTypes } from '../../data/cipherList';
 import StationCard, { StationCardAccentType } from '../StationCard';
 
 export default function CipherAdd({ onAdd }: { onAdd: (id: string, cipherType: ICipherType) => void }) {

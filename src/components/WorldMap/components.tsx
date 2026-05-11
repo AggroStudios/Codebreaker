@@ -20,7 +20,7 @@ import {
     AddOutlined,
     DrawOutlined
 } from '@mui/icons-material';
-import { POWER_TIERS, UPLINK_TIERS } from '../../lib/dataCenter';
+import { POWER_TIERS, UPLINK_TIERS } from '../../data/dataCenter';
 import { Stat } from '../common/Stat';
 import { ShimmerProgress } from '../common/ShimmerProgress';
 import clsx from 'clsx';

@@ -23,7 +23,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
 import { usePlayerStore } from '../../stores/player';
-import { getTrack } from '../../lib/musicTracks';
+import { getTrack } from '../../data/musicTracks';
 
 export interface SettingsProps {
     open: boolean;

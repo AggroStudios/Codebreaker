@@ -3,7 +3,7 @@ import {
     IProcessorType,
     IStorageType,
 } from '../includes/Process.interface';
-import { Networking } from './network';
+import { Networking } from '../data/network';
 import OperatingSystem from './OperatingSystem';
 
 export class Station {
