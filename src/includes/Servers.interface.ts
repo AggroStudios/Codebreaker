@@ -1,5 +1,6 @@
 import { Networking } from '../lib/network';
 import { ICipherType } from './Cipher.interface';
+import { IDataCenter } from './DataCenter.interface';
 import { IMemoryType, IProcessorType, IStorageType } from './Process.interface';
 
 export enum ServerStatus {
@@ -24,6 +25,14 @@ export enum ServerTier {
     QUANTUM = 'Quantum',
 }
 
+export const ServerTierColor: Record<ServerTier, string> = {
+    [ServerTier.ENTRY]: '#ffffff',
+    [ServerTier.STANDARD]: '#26c6da',
+    [ServerTier.PRO]: '#0af5b0',
+    [ServerTier.ENTERPRISE]: '#ff9800',
+    [ServerTier.QUANTUM]: '#9c7fe0',
+}
+
 export const ServerTiers: Record<ServerTier, string> = {
     [ServerTier.ENTRY]: 'T1',
     [ServerTier.STANDARD]: 'T2',
@@ -31,6 +40,20 @@ export const ServerTiers: Record<ServerTier, string> = {
     [ServerTier.ENTERPRISE]: 'T4',
     [ServerTier.QUANTUM]: 'T5',
 }
+
+export interface ServerTierRecord {
+    id: ServerTier;
+    label: string;
+    count: number;
+    swatch: string;
+}
+
+export const ServerTiersArray: ServerTierRecord[] = Object.values(ServerTier).map((tier) => ({
+    id: tier as ServerTier,
+    label: tier,
+    count: 0,
+    swatch: ServerTierColor[tier],
+}));
 
 export enum ServerFormFactor {
     ONE_U = '1U',
@@ -40,19 +63,46 @@ export enum ServerFormFactor {
     FIVE_U = '5U',
 }
 
-export interface Server {
+export interface ServerFormFactorRecord {
+    id: ServerFormFactor;
+    label: string;
+}
+
+export const ServerFormFactorsArray: ServerFormFactorRecord[] = Object.values(ServerFormFactor).map((formFactor) => ({
+    id: formFactor as ServerFormFactor,
+    label: formFactor,
+}));
+
+export interface IRack {
     id: string;
+    dataCenter: IDataCenter;
+    size: number;
+}
+
+export interface IRackedServer {
+    rack: IRack;
+    server: Server;
+    position: number;
+}
+
+export interface Server {
+    id?: string;
     manufacturer: string;
+    manufacturerLogoSrc?: string;
     model: string;
     tier: ServerTier;
+    imageSrc?: string;
     formFactor: ServerFormFactor;
     cpu: IProcessorType;
+    threadingFactor: number;
+    cpuAmount: number;
     memory: IMemoryType;
     storage: IStorageType[];
     network: Networking;
+    networkPorts: number;
     powerConsumption: number;
-    status: ServerStatus;
+    status?: ServerStatus;
     price: number;
-    load: number;
-    processes: ICipherType[];
+    load?: number;
+    processes?: ICipherType[];
 }

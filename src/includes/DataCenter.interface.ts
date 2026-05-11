@@ -22,7 +22,6 @@ export interface IDataCenterContractProps {
 
 export type IDataCenterContractStatus = 'ACTIVE' | 'PROVISIONING';
 
-/** Contract terms keyed by data center id (see DATA_CENTERS). */
 export interface IDataCenterContract {
     racks: number;
     rackCap: number;

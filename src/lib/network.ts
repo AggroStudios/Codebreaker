@@ -30,6 +30,15 @@ export class NetworkFiber implements INetworkType {
     }
 }
 
+export class NetworkFiber10Gbps implements INetworkType {
+    connectionType: NetworkConnectionType = NetworkConnectionType.fiber;
+    speedInBps = 10000000;
+
+    toString() {
+        return `${this.connectionType} - ${this.speedInBps / 1000 / 1000} Tbps`;
+    }
+}
+
 export class Networking {
     private _network: INetworkType;
     private _stack: Array<Process> = [];

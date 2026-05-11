@@ -1,0 +1,409 @@
+/*
+ * ServerCard
+ * --------------------------------------------------------------------------
+ * Tier-themed merchant card for purchasing/owning servers. The tier color is
+ * applied via `tier-1` … `tier-5` modifier classes which drive the chip,
+ * pricing, hashrate badge, top glow, and CTA accents.
+ */
+
+.server-card {
+    --server-card-tier-color: var(--accent);
+    --server-card-tier-rgb: 10, 245, 176;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--color-border) !important;
+    box-shadow: var(--shadow-card) !important;
+    transition: transform var(--transition-fast), border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+
+    &.tier-1 {
+        --server-card-tier-color: var(--fg-primary);
+        --server-card-tier-rgb: 255, 255, 255;
+    }
+
+    &.tier-2 {
+        --server-card-tier-color: #26c6da;
+        --server-card-tier-rgb: 38, 198, 218;
+    }
+
+    &.tier-3 {
+        --server-card-tier-color: #0af5b0;
+        --server-card-tier-rgb: 10, 245, 176;
+    }
+
+    &.tier-4 {
+        --server-card-tier-color: #ff9800;
+        --server-card-tier-rgb: 255, 152, 0;
+    }
+
+    &.tier-5 {
+        --server-card-tier-color: #9c7fe0;
+        --server-card-tier-rgb: 156, 127, 224;
+    }
+
+    &:hover:not(.is-locked) {
+        transform: translateY(-2px);
+        border-color: rgba(var(--server-card-tier-rgb), 0.5) !important;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6),
+            0 0 24px rgba(var(--server-card-tier-rgb), 0.18) !important;
+    }
+
+    &.is-locked {
+        opacity: 0.85;
+
+        .server-card-image,
+        .server-card-eyebrow,
+        .server-card-model,
+        .server-card-specs,
+        .server-card-glow {
+            filter: saturate(0.4) brightness(0.85);
+        }
+    }
+}
+
+/* ─── Top accent glow ────────────────────────────────────────────────────── */
+.server-card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    pointer-events: none;
+    z-index: 1;
+    background: linear-gradient(
+        180deg,
+        rgba(var(--server-card-tier-rgb), 0.22) 0%,
+        rgba(var(--server-card-tier-rgb), 0) 100%
+    );
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 12%;
+        right: 12%;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(var(--server-card-tier-rgb), 0.9) 50%,
+            transparent 100%
+        );
+        box-shadow: 0 0 12px rgba(var(--server-card-tier-rgb), 0.7);
+    }
+}
+
+.server-card.is-locked .server-card-glow,
+.server-card.is-on-sale .server-card-glow {
+    opacity: 0.15;
+}
+
+/* ─── Image section (top half) ───────────────────────────────────────────── */
+.server-card-image-section {
+    position: relative;
+    z-index: 2;
+    padding: 14px 16px 0 16px;
+    aspect-ratio: 16 / 10;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--color-bg-scene) !important;
+    margin-top: 2px;
+}
+
+.server-card-manufacturer-logo {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 75px;
+    height: 75px;
+}
+
+.server-card-top-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    z-index: 3;
+}
+
+.server-card-tags {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.server-card-actions-top {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    flex: 0 0 auto;
+}
+
+.server-card-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -42%);
+    width: 78%;
+    height: auto;
+    max-height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+    filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.5));
+}
+
+/* ─── Tier + sale + owned chips ─────────────────────────────────────────── */
+.server-card-tier-chip {
+    background: linear-gradient(
+        180deg,
+        rgba(var(--server-card-tier-rgb), 0.22),
+        rgba(var(--server-card-tier-rgb), 0.08)
+    ) !important;
+    border: 1px solid rgba(var(--server-card-tier-rgb), 0.55) !important;
+    color: var(--server-card-tier-color) !important;
+    height: 20px !important;
+    border-radius: var(--radius-pill) !important;
+
+    .MuiChip-label {
+        font-family: var(--font-ui) !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.14em !important;
+        text-transform: uppercase;
+        padding: 0 12px !important;
+    }
+}
+
+.server-card-tag-chip {
+    height: 24px !important;
+    border-radius: var(--radius-pill) !important;
+    background-color: transparent !important;
+    border: 1px solid transparent !important;
+
+    .MuiChip-label {
+        font-family: var(--font-ui) !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.14em !important;
+        text-transform: uppercase;
+        padding: 0 10px !important;
+    }
+
+    &.sale {
+        background-color: rgba(255, 40, 40, 0.18) !important;
+        border-color: rgba(255, 40, 40, 0.55) !important;
+        color: #ff5f6d !important;
+    }
+
+    &.owned {
+        background-color: rgba(10, 245, 176, 0.14) !important;
+        border-color: rgba(10, 245, 176, 0.5) !important;
+        color: var(--accent) !important;
+    }
+}
+
+/* ─── Top-right icon buttons ─────────────────────────────────────────────── */
+.server-card-icon-button {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+    background-color: rgba(0, 0, 0, 0.45) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: var(--fg-secondary) !important;
+    transition: color var(--transition-fast), border-color var(--transition-fast),
+        background-color var(--transition-fast);
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.65) !important;
+        border-color: rgba(var(--server-card-tier-rgb), 0.5) !important;
+        color: var(--server-card-tier-color) !important;
+    }
+
+    &.active {
+        color: #ff5f6d !important;
+        border-color: rgba(255, 95, 109, 0.55) !important;
+    }
+
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* ─── Hashrate badge (bottom-right of image) ─────────────────────────────── */
+.server-card-hashrate {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    z-index: 3;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(var(--server-card-tier-rgb), 0.35);
+    color: var(--server-card-tier-color);
+    font-family: var(--font-code);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 8px rgba(var(--server-card-tier-rgb), 0.5);
+    line-height: 1;
+}
+
+/* ─── Body ──────────────────────────────────────────────────────────────── */
+.server-card-body {
+    position: relative;
+    z-index: 2;
+    padding: 18px 20px 8px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 auto;
+}
+
+.server-card-eyebrow {
+    font-family: var(--font-code) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.18em !important;
+    text-transform: uppercase;
+    color: var(--color-fg-disabled) !important;
+    line-height: 1 !important;
+}
+
+.server-card-model {
+    font-family: var(--font-code) !important;
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+    color: var(--fg-primary) !important;
+    line-height: 1.1 !important;
+    margin-bottom: 6px !important;
+}
+
+.server-card-specs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 18px;
+    row-gap: 8px;
+    margin-top: 6px;
+}
+
+.server-card-spec {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-code);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fg-primary);
+    line-height: 1.2;
+    min-width: 0;
+
+    span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.server-card-spec-icon {
+    width: 18px !important;
+    height: 18px !important;
+    color: var(--accent);
+    flex: 0 0 auto;
+}
+
+/* ─── Footer (price + CTA) ───────────────────────────────────────────────── */
+.server-card-footer {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px 18px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    margin-top: 8px;
+}
+
+.server-card-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1;
+}
+
+.server-card-price-original {
+    font-family: var(--font-ui) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: var(--fg-muted) !important;
+    text-decoration: line-through;
+    line-height: 1 !important;
+    margin-bottom: 4px !important;
+}
+
+.server-card-price-current {
+    font-family: var(--font-code) !important;
+    font-size: 30px !important;
+    font-weight: 700 !important;
+    color: var(--fg-primary) !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em !important;
+
+    &.sale {
+        color: var(--color-income) !important;
+        text-shadow: 0 0 12px rgba(40, 255, 40, 0.35);
+    }
+}
+
+.server-card-cta {
+    min-width: 124px !important;
+    height: 44px !important;
+    border-radius: 8px !important;
+    font-family: var(--font-ui) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.18em !important;
+    text-transform: uppercase !important;
+    background-color: var(--accent) !important;
+    color: var(--color-fg-on-accent) !important;
+    box-shadow: 0 0 0 transparent !important;
+    transition: filter var(--transition-fast), box-shadow var(--transition-fast);
+
+    .MuiButton-startIcon {
+        margin-right: 8px;
+
+        svg {
+            width: 18px;
+            height: 18px;
+        }
+    }
+
+    &:hover {
+        filter: brightness(1.08);
+        box-shadow: var(--glow-accent) !important;
+    }
+
+    &.locked,
+    &.Mui-disabled {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: var(--fg-muted) !important;
+        box-shadow: none !important;
+    }
+}

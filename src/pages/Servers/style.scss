@@ -1,3 +1,17 @@
+.servers-page {
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.servers-page .page-header {
+    flex-shrink: 0;
+}
+
 .servers-header .MuiChip-root {
     display: inline-flex;
     align-items: center;
@@ -40,5 +54,55 @@
         animation: statusPulse 1.6s ease-in-out infinite;
         flex-shrink: 0;
         display: inline-block;
+    }
+}
+
+.servers-container {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 2em;
+    box-sizing: border-box;
+}
+
+.servers-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.servers-marketplace-container {
+    align-items: flex-start;
+}
+
+.servers-filters-column {
+    position: sticky;
+    top: 0;
+}
+
+.servers-tabs-container {
+    padding: 0 2em;
+}
+
+.servers-tabs {
+
+    & .MuiTab-root.Mui-selected {
+        color: var(--accent) !important;
+
+        &::after {
+            border-bottom: 2px solid var(--accent) !important;
+        }
+    }
+
+    & .MuiTab-root:focus {
+        outline: none;
+    }
+
+    & .MuiTabs-indicator {
+        background-color: var(--accent) !important;
     }
 }
