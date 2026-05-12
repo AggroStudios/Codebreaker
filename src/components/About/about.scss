@@ -1,0 +1,400 @@
+/*
+ * About Codebreaker — terminal / build-info aesthetic
+ */
+
+.about-modal-paper {
+    background: rgba(12, 12, 16, 0.97) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(10, 245, 176, 0.06) !important;
+    overflow: hidden;
+    max-width: 520px !important;
+    width: 100%;
+}
+
+.about-modal {
+    --about-accent: var(--accent, #0af5b0);
+    --about-cyan: #26c6da;
+    --about-muted: rgba(255, 255, 255, 0.5);
+    --about-border: rgba(255, 255, 255, 0.12);
+    --about-card: rgba(0, 0, 0, 0.45);
+
+    color: rgba(255, 255, 255, 0.9);
+    font-family: var(--font-ui, 'Inter', system-ui, sans-serif);
+}
+
+.about-modal__title-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid var(--about-border);
+}
+
+.about-modal__traffic {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.about-modal__traffic-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+
+    &--red {
+        background: #ff5f57;
+    }
+    &--yellow {
+        background: #febc2e;
+    }
+    &--green {
+        background: #28c840;
+    }
+}
+
+.about-modal__prompt {
+    font-family: var(--font-code, monospace);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--about-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+
+    .about-modal__prompt-cmd {
+        color: var(--about-cyan);
+    }
+}
+
+.about-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--about-border);
+}
+
+.about-modal__heading {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.02em;
+}
+
+.about-modal__close {
+    color: var(--about-muted) !important;
+    margin-right: -4px;
+
+    &:hover {
+        color: #fff !important;
+        background: rgba(255, 255, 255, 0.06) !important;
+    }
+}
+
+.about-modal__body {
+    padding: 16px 18px 18px;
+    max-height: min(70vh, 640px);
+    overflow-y: auto;
+}
+
+.about-modal__frame {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px;
+}
+
+/* Border + L-corners only wrap the hero block, not credits / system */
+.about-modal__frame-content {
+    position: relative;
+    padding: 20px 18px 5px;
+    margin-bottom: 15px;
+
+    .about-modal__frame-border {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        // border: 1px solid rgba(10, 245, 176, 0.22);
+        border-radius: 4px;
+    }
+
+    .about-modal__frame-corner {
+        position: absolute;
+        z-index: 0;
+        width: 14px;
+        height: 14px;
+        border-color: var(--about-accent);
+        pointer-events: none;
+
+        &--tl {
+            top: 0;
+            left: 0;
+            border-top: 2px solid rgba(10, 245, 176, 0.32);
+            border-left: 2px solid rgba(10, 245, 176, 0.32);
+            border-radius: 2px 0 0 0;
+        }
+        &--tr {
+            top: 0;
+            right: 0;
+            border-top: 2px solid rgba(10, 245, 176, 0.32);
+            border-right: 2px solid rgba(10, 245, 176, 0.32);
+            border-radius: 0 2px 0 0;
+        }
+        &--bl {
+            bottom: 0;
+            left: 0;
+            border-bottom: 2px solid rgba(10, 245, 176, 0.32);
+            border-left: 2px solid rgba(10, 245, 176, 0.32);
+            border-radius: 0 0 0 2px;
+        }
+        &--br {
+            bottom: 0;
+            right: 0;
+            border-bottom: 2px solid rgba(10, 245, 176, 0.32);
+            border-right: 2px solid rgba(10, 245, 176, 0.32);
+            border-radius: 0 0 2px 0;
+        }
+    }
+}
+
+.about-modal__hero-brand {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.about-modal__hero-logo {
+    width: 200px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(10, 245, 176, 0.25));
+    margin-bottom: 8px;
+}
+
+.about-modal__hero-studio {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.2em !important;
+    color: var(--about-accent) !important;
+    margin-bottom: 10px !important;
+}
+
+.about-modal__hero-title {
+    margin: 0;
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    line-height: 1.05;
+    color: #fff;
+    text-shadow:
+        0 0 20px rgba(10, 245, 176, 0.45),
+        0 0 40px rgba(10, 245, 176, 0.2);
+}
+
+.about-modal__hero-title-accent {
+    color: var(--about-accent);
+    text-shadow:
+        0 0 24px rgba(10, 245, 176, 0.7),
+        0 0 48px rgba(10, 245, 176, 0.35);
+}
+
+/* Stylized “B” reads as a digital block / “3”-like mark */
+.about-modal__hero-b {
+    display: inline-block;
+    font-weight: 900;
+    transform: skewX(-8deg);
+    margin: 0 0.02em;
+    padding: 0 0.02em;
+    border-left: 3px solid currentColor;
+    border-right: 3px solid currentColor;
+    border-radius: 2px;
+}
+
+.about-modal__pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.about-modal__pill {
+    font-family: var(--font-code, monospace);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.65);
+    border: 1px solid var(--about-border);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.about-modal__pill-val {
+    color: var(--about-accent);
+    font-weight: 700;
+}
+
+.about-modal__intro {
+    margin: 20px 0 0;
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.72);
+    text-align: center;
+}
+
+.about-modal__intro strong {
+    color: var(--about-accent);
+    font-weight: 600;
+}
+
+.about-modal__section {
+    margin-top: 22px;
+}
+
+.about-modal__section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.about-modal__section-label {
+    font-family: var(--font-code, monospace);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--about-accent);
+}
+
+.about-modal__section-meta {
+    font-size: 10px;
+    font-family: var(--font-code) !important;
+    color: var(--about-muted);
+    letter-spacing: 0.04em;
+}
+
+.about-modal__credits {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.about-modal__credit {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--about-card);
+    border: 1px solid var(--about-border);
+    border-radius: 10px;
+}
+
+.about-modal__credit-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(10, 245, 176, 0.1);
+    border: 1px solid rgba(10, 245, 176, 0.28);
+    color: var(--about-accent) !important;
+    box-shadow: 0 0 14px rgba(10, 245, 176, 0.12);
+}
+
+.about-modal__credit-body {
+    min-width: 0;
+    flex: 1;
+}
+
+.about-modal__credit-label-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.about-modal__credit-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--about-muted);
+}
+
+.about-modal__credit-tag {
+    font-family: var(--font-code, monospace);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--about-accent);
+    border: 1px solid rgba(10, 245, 176, 0.45);
+    background: rgba(10, 245, 176, 0.08);
+}
+
+.about-modal__credit-names {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.35;
+}
+
+.about-modal__terminal {
+    font-family: var(--font-code, monospace);
+    font-size: 11px;
+    line-height: 1.65;
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid var(--about-border);
+    border-radius: 8px;
+    color: var(--about-muted);
+}
+
+.about-modal__terminal-prompt {
+    color: var(--about-accent);
+    margin-right: 6px;
+}
+
+.about-modal__terminal-dim {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.about-modal__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px 16px;
+    border-top: 1px solid var(--about-border);
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.about-modal__footer-note {
+    font-size: 11px;
+    color: var(--about-muted);
+}
+
+.about-modal__btn-done {
+    font-family: var(--font-code, monospace) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.14em !important;
+    color: var(--about-accent) !important;
+
+    &:hover {
+        background: rgba(10, 245, 176, 0.1) !important;
+    }
+}
