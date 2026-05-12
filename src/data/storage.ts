@@ -12,14 +12,25 @@ export class CodiumStorage implements IStorageType {
     }
 }
 
-export class CodiumStorage2 extends CodiumStorage {
+export class CodiumStorage1TB extends CodiumStorage {
     capacity: number = 1024;
-    model: string = 'Codium 2';
+    speed: string = '10 Gbps';
+    type: StorageType = StorageType.nvme;
+    model: string = 'Codium 1TB';
 }
 
-export class CodiumStorage3 extends CodiumStorage {
+export class CodiumStorage2TB extends CodiumStorage1TB {
     capacity: number = 2048;
-    model: string = 'Codium 3';
+}
+
+export class CodiumStorage4TB extends CodiumStorage1TB {
+    capacity: number = 4096;
+    model: string = 'Codium 4TB';
+}
+
+export class CodiumStorage8TB extends CodiumStorage1TB {
+    capacity: number = 8192;
+    model: string = 'Codium 8TB';
 }
 
 export class CodiumStorageHdd extends CodiumStorage {

@@ -34,7 +34,7 @@ import { ServerFormFactor, ServerTier } from '../includes/Servers.interface';
 import { CodiumMemory, CodiumMemory128, CodiumMemory256, CodiumMemory64 } from './memory';
 import { NetworkFiber, NetworkFiber10Gbps, Networking } from './network';
 import { CodiumProcessor, CodiumProcessor64, CodiumProcessorQuantum1, CodiumProcessorQuantumX, CodiumProcessorX8 } from './processors';
-import { CodiumStorage } from './storage';
+import { CodiumStorage, CodiumStorage8TB } from './storage';
 
 export default [
     {
@@ -507,7 +507,16 @@ export default [
         threadingFactor: 2,
         cpuAmount: 8,
         memory: new CodiumMemory256(),
-        storage: [new CodiumStorage()],
+        storage: [
+            new CodiumStorage8TB(),
+            new CodiumStorage8TB(),
+            new CodiumStorage8TB(),
+            new CodiumStorage8TB(),
+            new CodiumStorage8TB(),
+            new CodiumStorage8TB(),
+            new CodiumStorage8TB(),
+            new CodiumStorage8TB()
+        ],
         network: new Networking(new NetworkFiber10Gbps()),
         networkPorts: 12,
         powerConsumption: 14000,

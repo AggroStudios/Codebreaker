@@ -8,6 +8,9 @@ export interface MusicPlayerState {
     muted: boolean;
     mutedSfx: boolean;
     currentTrackIndex: number;
+    /** Seconds, for UI (e.g. settings now-playing bar). */
+    currentTime: number;
+    duration: number;
     shuffle: boolean;
     loop: boolean;
     play: () => void;
@@ -25,6 +28,7 @@ export interface MusicPlayerState {
     setShuffle: (shuffle: boolean) => void;
     toggleShuffle: () => void;
     setLoop: (loop: boolean) => void;
+    setPlaybackTimes: (currentTime: number, duration: number) => void;
 }
 
 const clampVolume = (value: number): number => {
@@ -40,6 +44,8 @@ export const useMusicPlayerStore = create<MusicPlayerState>()(
         muted: false,
         mutedSfx: false,
         currentTrackIndex: 0,
+        currentTime: 0,
+        duration: 0,
         shuffle: true,
         setShuffle: (shuffle: boolean) => set(() => ({ shuffle })),
         toggleShuffle: () => set((state) => ({ shuffle: !state.shuffle })),
@@ -52,7 +58,11 @@ export const useMusicPlayerStore = create<MusicPlayerState>()(
         setMuted: (muted: boolean) => set(() => ({ muted })),
         toggleMuted: () => set((state) => ({ muted: !state.muted })),
         setTrackIndex: (index: number) =>
-            set(() => ({ currentTrackIndex: Math.max(0, index) })),
+            set(() => ({
+                currentTrackIndex: Math.max(0, index),
+                currentTime: 0,
+                duration: 0,
+            })),
         nextTrack: (trackCount: number) =>
             set((state) => ({
                 currentTrackIndex:
@@ -61,6 +71,8 @@ export const useMusicPlayerStore = create<MusicPlayerState>()(
                             ? selectRandomTrack(trackCount, state.currentTrackIndex)
                             : (state.currentTrackIndex + 1) % trackCount
                         : 0,
+                currentTime: 0,
+                duration: 0,
             })),
         prevTrack: (trackCount: number) =>
             set((state) => ({
@@ -70,11 +82,18 @@ export const useMusicPlayerStore = create<MusicPlayerState>()(
                             ? selectRandomTrack(trackCount, state.currentTrackIndex)
                             : (state.currentTrackIndex - 1 + trackCount) % trackCount
                         : 0,
+                currentTime: 0,
+                duration: 0,
             })),
         setLoop: (loop: boolean) => set(() => ({ loop })),
         setSfxVolume: (volume: number) => set(() => ({ sfxVolume: clampVolume(volume) })),
         setSfxMuted: (muted: boolean) => set(() => ({ mutedSfx: muted })),
         toggleSfxMuted: () => set((state) => ({ mutedSfx: !state.mutedSfx })),
+        setPlaybackTimes: (currentTime: number, duration: number) =>
+            set(() => ({
+                currentTime: Number.isFinite(currentTime) ? currentTime : 0,
+                duration: Number.isFinite(duration) ? duration : 0,
+            })),
     }),
     {
         name: 'music-player-store',

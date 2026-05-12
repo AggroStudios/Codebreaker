@@ -1,6 +1,8 @@
 export interface MusicTrack {
     title: string;
     src: string;
+    /** Shown in System Preferences now-playing (e.g. `Artist — Album`). */
+    artist?: string;
 }
 
 const trackModules = import.meta.glob<string>(
