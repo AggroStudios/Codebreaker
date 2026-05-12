@@ -247,7 +247,7 @@
 
 .about-modal__intro {
     margin: 20px 0 0;
-    font-size: 13px;
+    font-size: 13px !important;
     line-height: 1.55;
     color: rgba(255, 255, 255, 0.72);
     text-align: center;
@@ -275,6 +275,10 @@
     font-weight: 600;
     letter-spacing: 0.1em;
     color: var(--about-accent);
+
+    & .about-modal__section-label-accent {
+        color: var(--color-fg);
+    }
 }
 
 .about-modal__section-meta {
@@ -347,10 +351,10 @@
 }
 
 .about-modal__credit-names {
-    font-size: 14px;
-    font-weight: 600;
-    color: #fff;
-    line-height: 1.35;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    line-height: 1.35 !important;
 }
 
 .about-modal__terminal {

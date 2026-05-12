@@ -173,6 +173,10 @@
 
 /* ─── SEMANTIC TYPE RULES ─────────────────────────────────────────────────── */
 
+html {
+    scrollbar-color: rgba(10, 245, 176, 0.45) rgba(10, 245, 176, 0.25);
+}
+
 body {
     font-family: var(--font-ui);
     font-size: var(--text-base);

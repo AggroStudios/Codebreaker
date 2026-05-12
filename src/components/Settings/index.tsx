@@ -207,7 +207,7 @@ export default function Settings({ open, onClose }: SettingsProps) {
                 <Box className="settings-modal__body">
                     <Box component="section" className="settings-modal__section" aria-label="Audio">
                         <Box className="settings-modal__section-head">
-                            <span className="settings-modal__section-label">01 // AUDIO</span>
+                            <span className="settings-modal__section-label">01 // <span className="settings-modal__section-label-accent">AUDIO</span></span>
                             <span className="settings-modal__section-meta">3 controls</span>
                         </Box>
 
@@ -405,7 +405,7 @@ export default function Settings({ open, onClose }: SettingsProps) {
 
                     <Box component="section" className="settings-modal__section" aria-label="Game">
                         <Box className="settings-modal__section-head">
-                            <span className="settings-modal__section-label">02 // GAME</span>
+                            <span className="settings-modal__section-label">02 // <span className="settings-modal__section-label-accent">GAME</span></span>
                             <span className="settings-modal__section-meta">profile · save · run-state</span>
                         </Box>
 
@@ -472,7 +472,7 @@ export default function Settings({ open, onClose }: SettingsProps) {
 
                     <Box component="section" className="settings-modal__section" aria-label="Danger zone">
                         <Box className="settings-modal__section-head">
-                            <span className="settings-modal__section-label">03 // DANGER ZONE</span>
+                            <span className="settings-modal__section-label">03 // <span className="settings-modal__section-label-accent">DANGER ZONE</span></span>
                             <span className="settings-modal__section-meta settings-modal__section-meta--danger">
                                 irreversible
                             </span>

@@ -103,6 +103,10 @@
     font-weight: 600;
     letter-spacing: 0.12em;
     color: var(--settings-accent);
+
+    & .settings-modal__section-label-accent {
+        color: var(--color-fg);
+    }
 }
 
 .settings-modal__section-meta {
@@ -633,8 +637,9 @@
 }
 
 .settings-modal__footer-hint {
-    font-size: 11px;
-    color: var(--settings-muted);
+    font-size: 11px !important;
+    color: var(--settings-muted) !important;
+    font-family: var(--font-code) !important;
 }
 
 .settings-modal__btn-done {

@@ -17,6 +17,8 @@ import CodebreakerLogo from '../../assets/logos/codebreaker-logo.png';
 import pkg from '../../../package.json';
 
 import './about.scss';
+import { usePlayerStore } from '../../stores/player';
+import { formatDuration } from '../../lib/utils';
 
 export interface AboutProps {
     open: boolean;
@@ -67,6 +69,12 @@ const CREDITS: CreditRow[] = [
         icon: PaletteOutlinedIcon,
         label: 'VISUAL DESIGN',
         names: 'Carmen Galante',
+        tag: 'LEAD',
+    },
+    {
+        icon: TerminalOutlinedIcon,
+        label: 'FRONT-END',
+        names: 'Melanie Germain',
     },
     {
         icon: AlbumOutlinedIcon,
@@ -77,11 +85,14 @@ const CREDITS: CreditRow[] = [
     {
         icon: FavoriteBorderOutlinedIcon,
         label: 'SPECIAL THANKS',
-        names: 'Everyone who plays, breaks ciphers, and shares feedback.',
+        names: 'Everyone who helped test, play, breaks ciphers, and shares feedback.',
     },
 ];
 
 export default function About({ open, onClose }: AboutProps) {
+
+    const totalPlayTime = usePlayerStore((state) => state.player.statistics.totalPlayedTime);
+    
     return (
         <Dialog
             open={open}
@@ -170,7 +181,7 @@ export default function About({ open, onClose }: AboutProps) {
 
                         <Box component="section" className="about-modal__section" aria-label="Credits">
                             <Box className="about-modal__section-head">
-                                <span className="about-modal__section-label">01 // CREDITS</span>
+                                <span className="about-modal__section-label">01 // <span className="about-modal__section-label-accent">CREDITS</span></span>
                                 <span className="about-modal__section-meta">contributors · roles</span>
                             </Box>
                             <Box className="about-modal__credits">
@@ -207,7 +218,7 @@ export default function About({ open, onClose }: AboutProps) {
 
                         <Box component="section" className="about-modal__section" aria-label="System">
                             <Box className="about-modal__section-head">
-                                <span className="about-modal__section-label">02 // SYSTEM</span>
+                                <span className="about-modal__section-label">02 // <span className="about-modal__section-label-accent">SYSTEM</span></span>
                                 <span className="about-modal__section-meta">runtime</span>
                             </Box>
                             <Box className="about-modal__terminal" role="region" aria-label="Build info">
@@ -217,6 +228,9 @@ export default function About({ open, onClose }: AboutProps) {
                                 </div>
                                 <div className="about-modal__terminal-dim">
                                     → commit {BUILD_HASH} · {BUILD_DATE}
+                                </div>
+                                <div className="about-modal__terminal-dim">
+                                    → uptime {formatDuration(totalPlayTime / 1000)}
                                 </div>
                             </Box>
                         </Box>
@@ -228,7 +242,7 @@ export default function About({ open, onClose }: AboutProps) {
                         Codebreaker © {new Date().getFullYear()} AGGRO Studios
                     </Typography>
                     <Button className="about-modal__btn-done" onClick={onClose} variant="text">
-                        DONE
+                        CLOSE
                     </Button>
                 </Box>
             </Box>
