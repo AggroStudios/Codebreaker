@@ -25,6 +25,7 @@ import { Stat } from '../common/Stat';
 import { ShimmerProgress } from '../common/ShimmerProgress';
 import clsx from 'clsx';
 import { usePlayerStore } from '../../stores/player';
+import { useEffect } from 'react';
     
 // ── DataCenter pin ──────────────────────────────────────────────────────────────
 export function DataCenterPin({ dataCenter, signed, selected, onClick, scale = 1 }: IDataCenterContractProps) {
@@ -32,70 +33,64 @@ export function DataCenterPin({ dataCenter, signed, selected, onClick, scale = 1
     const color = signed ? '#0af5b0' : '#26c6da';
     return (
         <g
-        transform={`translate(${x}, ${y}) scale(${scale})`}
-        onClick={(e) => { e.stopPropagation(); onClick(dataCenter.id); }}
-        style={{ cursor: 'pointer' }}
+            transform={`translate(${x}, ${y}) scale(${scale})`}
+            onClick={(e) => { e.stopPropagation(); onClick(dataCenter.id); }}
+            style={{ cursor: 'pointer' }}
         >
-        {/* hit area */}
-        <circle r={62} fill="transparent" />
-        
-        {/* pulsing ring (only for signed contracts) */}
-        {signed && (
-            <circle r={36} fill="none" stroke={color} strokeWidth={4.6} opacity={0.6}>
-            <animate attributeName="r" values="20;55;20" dur="2.4s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.7;0;0.7" dur="2.4s" repeatCount="indefinite" />
-            </circle>
-        )}
-        
-        {/* selection ring */}
-        {selected && (
-            <circle
-            r={40}
-            fill="none"
-            stroke={color}
-            strokeWidth={5}
-            strokeDasharray="10 10"
-            opacity={0.9}
-            >
-            <animateTransform
-            attributeName="transform"
-            type="rotate"
-            from="0"
-            to="360"
-            dur="6s"
-            repeatCount="indefinite"
-            />
-            </circle>
-        )}
-        
-        {/* core */}
-        <circle r={17} fill={color} opacity={signed ? 1 : 0.85} />
-        <circle r={6.5} fill="#0a0f0d" />
-        
-        {/* code label */}
-        <g transform="translate(28, -28)">
-        <rect
-        x={-4}
-        y={-30}
-        width={dataCenter.code.length * 18 + 26}
-        height={42}
-        rx={5}
-        fill="rgba(10, 12, 14, 0.82)"
-        stroke="rgba(255,255,255,0.16)"
-        strokeWidth={1.4}
-        />
-        <text
-        x={9}
-        y={3}
-        fill={signed ? '#0af5b0' : 'rgba(255,255,255,0.82)'}
-        fontFamily="'Fira Code', monospace"
-        fontSize={26}
-        fontWeight={600}
-        letterSpacing="0.04em"
-        >
-        {dataCenter.code}
-        </text>
-        </g>
+            <circle r={62} fill="transparent" />
+            {signed && (
+                <circle r={36} fill="none" stroke={color} strokeWidth={4.6} opacity={0.6}>
+                    <animate attributeName="r" values="20;55;20" dur="2.4s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.7;0;0.7" dur="2.4s" repeatCount="indefinite" />
+                </circle>
+            )}
+            
+            {selected && (
+                <circle
+                    r={40}
+                    fill="none"
+                    stroke={color}
+                    strokeWidth={5}
+                    strokeDasharray="10 10"
+                    opacity={0.9}
+                >
+                    <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        from="0"
+                        to="360"
+                        dur="6s"
+                        repeatCount="indefinite"
+                    />
+                </circle>
+            )}
+            
+            <circle r={17} fill={color} opacity={signed ? 1 : 0.85} />
+            <circle r={6.5} fill="#0a0f0d" />
+            
+            <g transform="translate(28, -28)">
+                <rect
+                    x={-4}
+                    y={-30}
+                    width={dataCenter.code.length * 18 + 26}
+                    height={42}
+                    rx={5}
+                    fill="rgba(10, 12, 14, 0.82)"
+                    stroke="rgba(255,255,255,0.16)"
+                    strokeWidth={1.4}
+                />
+                <text
+                    x={9}
+                    y={3}
+                    fill={signed ? '#0af5b0' : 'rgba(255,255,255,0.82)'}
+                    fontFamily="'Fira Code', monospace"
+                    fontSize={26}
+                    fontWeight={600}
+                    letterSpacing="0.04em"
+                >
+                    {dataCenter.code}
+                </text>
+            </g>
         </g>
     );
 }
@@ -169,9 +164,9 @@ interface IDataCenterCardProps {
     dataCenter?: IDataCenter;
     contract?: IDataCenterContract;
     onSign: (id: string) => void;
-    onUpgradePower: (id: string, power: number) => void;
-    onUpgradeUplink: (id: string, uplink: number) => void;
-    onAddRack: (id: string) => void;
+    onUpgradePower: (id: string, power: number, cost: number) => void;
+    onUpgradeUplink: (id: string, uplink: number, cost: number) => void;
+    onAddRack: (id: string, cost: number) => void;
     onClose: () => void;
     floating: boolean;
 }
@@ -187,6 +182,10 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
     const uplinkIdx = signed ? Math.max(0, UPLINK_TIERS.findIndex((t) => t.gbps === contract.uplinkGbps)) : -1;
     const nextUplink = signed && uplinkIdx < UPLINK_TIERS.length - 1 ? UPLINK_TIERS[uplinkIdx + 1] : null;
     
+    useEffect(() => {
+        console.log('contract', contract);
+    }, [contract]);
+
     if (!dataCenter) {
         return (
             <Card style={{ height: '100%' }}>
@@ -333,7 +332,7 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
                                 cost={nextPower?.cost || 0}
                                 canAfford={!!nextPower && money >= nextPower.cost}
                                 maxed={!nextPower}
-                                onUpgrade={() => onUpgradePower(dataCenter.id, nextPower?.kw || 0)}
+                                onUpgrade={() => onUpgradePower(dataCenter.id, nextPower?.kw || 0, nextPower?.cost || 0)}
                             />
                         
                             <UpgradeRow
@@ -344,7 +343,7 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
                                 cost={nextUplink?.cost || 0}
                                 canAfford={!!nextUplink && money >= nextUplink.cost}
                                 maxed={!nextUplink}
-                                onUpgrade={() => onUpgradeUplink(dataCenter.id, nextUplink?.gbps || 0)}
+                                onUpgrade={() => onUpgradeUplink(dataCenter.id, nextUplink?.gbps || 0, nextUplink?.cost || 0)}
                             />
                         </div>
                     </>
@@ -428,7 +427,7 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
                         <Button
                             className="data-center-card-install-rack-button"
                             variant="contained" color="primary" size="medium"
-                            onClick={() => onAddRack(dataCenter.id)}
+                            onClick={() => onAddRack(dataCenter.id, dataCenter.rackCost)}
                             disabled={contract.racks >= contract.rackCap}
                             startIcon={<AddOutlined fontSize="small" />}
                         >

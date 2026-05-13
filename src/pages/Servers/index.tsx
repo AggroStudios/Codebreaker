@@ -9,7 +9,7 @@ import { usePlayerStore } from '../../stores/player';
 import { serverMatchesFilters } from './filterServers';
 
 import './style.scss';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const ServersMarketplace = () => {
 
@@ -76,6 +76,13 @@ const ServersMarketplace = () => {
 
 export default function Servers() {
     const [value, setValue] = useState(0);
+    const [inventoryMounted, setInventoryMounted] = useState(false);
+
+    useEffect(() => {
+        if (value === 1) {
+            setInventoryMounted(true);
+        }
+    }, [value]);
 
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -98,12 +105,56 @@ export default function Servers() {
             />
             <Box className="servers-tabs-container">
                 <Tabs value={value} onChange={handleChange} className="servers-tabs" scrollButtons={false}>
-                    <Tab icon={<StorefrontOutlined />} iconPosition="start" label="Marketplace" value={0} />
-                    <Tab icon={<DnsOutlined />} iconPosition="start" label="My Servers" value={1} />
+                    <Tab
+                        id="servers-tab-marketplace"
+                        aria-controls="servers-tabpanel-marketplace"
+                        icon={<StorefrontOutlined />}
+                        iconPosition="start"
+                        label="Marketplace"
+                        value={0}
+                    />
+                    <Tab
+                        id="servers-tab-inventory"
+                        aria-controls="servers-tabpanel-inventory"
+                        icon={<DnsOutlined />}
+                        iconPosition="start"
+                        label="My Servers"
+                        value={1}
+                    />
                 </Tabs>
             </Box>
-            {value === 0 && <ServersMarketplace />}
-            {value === 1 && <div>Server Inventory goes here.</div>}
+            <Box className="servers-tab-panels">
+                <Box
+                    className="servers-tab-panel"
+                    role="tabpanel"
+                    id="servers-tabpanel-marketplace"
+                    aria-labelledby="servers-tab-marketplace"
+                    hidden={value !== 0}
+                    sx={{
+                        display: value === 0 ? 'flex' : 'none',
+                        flexDirection: 'column',
+                    }}
+                >
+                    <ServersMarketplace />
+                </Box>
+                {inventoryMounted ? (
+                    <Box
+                        className="servers-tab-panel"
+                        role="tabpanel"
+                        id="servers-tabpanel-inventory"
+                        aria-labelledby="servers-tab-inventory"
+                        hidden={value !== 1}
+                        sx={{
+                            display: value === 1 ? 'flex' : 'none',
+                            flexDirection: 'column',
+                        }}
+                    >
+                        <div className="servers-container">
+                            <div className="servers-scroll">Server Inventory goes here.</div>
+                        </div>
+                    </Box>
+                ) : null}
+            </Box>
         </div>
     );
 }

@@ -10,6 +10,7 @@ export interface IDataCenter {
     baseLeaseDay: number;
     ratePerKw: number;
     latency: number;
+    rackCost: number;
 }
   
 export interface IDataCenterContractProps {

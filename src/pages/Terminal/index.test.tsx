@@ -27,6 +27,8 @@ function createMockPlayerState(): PlayerState {
                 incomeHistory: [],
             },
         },
+        ownedServers: [],
+        setOwnedServers: vi.fn(),
         moneyLabel: null,
         xpLabel: null,
         hasSeenTutorial: [],

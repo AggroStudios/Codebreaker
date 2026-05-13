@@ -1,5 +1,6 @@
 import { ICipherType } from './Cipher.interface';
 import { Notification, Message } from './OperatingSystem.interface';
+import { Server } from './Servers.interface';
 import { IStatistics } from './Statistics.interface';
 
 export const experienceForLevel = (level: number) =>
@@ -29,6 +30,8 @@ export type XpLabelSpawn = {
 
 export interface PlayerState {
     player: Player;
+    ownedServers: Server[];
+    setOwnedServers: (servers: Server[]) => void;
     moneyLabel: MoneyLabelSpawn | null;
     xpLabel: XpLabelSpawn | null;
     hasSeenTutorial: string[];

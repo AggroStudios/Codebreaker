@@ -353,8 +353,8 @@
     }
 
     &--play-lg {
-        width: 48px !important;
-        height: 48px !important;
+        width: 36px !important;
+        height: 36px !important;
         padding: 0 !important;
         margin: 0 4px !important;
         border-radius: 50% !important;
@@ -661,4 +661,13 @@
     flex-wrap: wrap;
     gap: 8px;
     margin-top: 10px;
+}
+
+@keyframes eqBar {
+    0% {
+        transform: scaleY(0.3);
+    }
+    100% {
+        transform: scaleY(1);
+    }
 }

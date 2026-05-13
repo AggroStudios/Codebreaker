@@ -87,6 +87,7 @@ export interface IRackedServer {
 
 export interface Server {
     id?: string;
+    name?: string;
     manufacturer: string;
     manufacturerLogoSrc?: string;
     model: string;
@@ -105,4 +106,5 @@ export interface Server {
     price: number;
     load?: number;
     processes?: ICipherType[];
+    discount?: number;
 }

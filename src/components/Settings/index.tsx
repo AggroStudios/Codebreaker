@@ -76,6 +76,34 @@ function formatSaveSize(bytes: number): string {
     return kb < 100 ? `${kb.toFixed(1)} kb` : `${Math.round(kb)} kb`;
 }
 
+function Equalizer({ playing, size = 28, color = '#0af5b0' }) {
+    const bars = [0.55, 0.95, 0.40, 0.75, 0.35];
+    return (
+        <div
+            style={{
+                width: size, height: size, display: 'flex', alignItems: 'flex-end',
+                gap: 2, padding: 4, justifyContent: 'center',
+            }}
+        >
+            {bars.map((h, i) => (
+                <span
+                    key={i}
+                    style={{
+                    width: 2, flex: '0 0 2px',
+                    background: playing ? color : 'rgba(255,255,255,0.3)',
+                    boxShadow: playing ? `0 0 4px ${color}` : 'none',
+                    height: `${h * 100}%`,
+                    animation: playing
+                        ? `eqBar 0.${5 + i}s ease-in-out ${i * 0.07}s infinite alternate`
+                        : 'none',
+                    transformOrigin: 'bottom',
+                    }}
+                />
+            ))}
+        </div>
+    );
+}
+
 export default function Settings({ open, onClose }: SettingsProps) {
     const [confirmReset, setConfirmReset] = useState(false);
 
@@ -213,17 +241,19 @@ export default function Settings({ open, onClose }: SettingsProps) {
 
                         <Box className="settings-modal__card settings-modal__card--now-playing">
                             <Box className="settings-modal__now-playing-shell">
-                                <Box className="settings-modal__viz-wrap">
-                                    <Box className="settings-modal__viz" aria-hidden>
-                                        <Box className="settings-modal__viz-inner">
-                                            <span className="settings-modal__viz-bar" />
-                                            <span className="settings-modal__viz-bar" />
-                                            <span className="settings-modal__viz-bar" />
-                                            <span className="settings-modal__viz-bar" />
-                                            <span className="settings-modal__viz-bar" />
-                                        </Box>
-                                    </Box>
-                                </Box>
+                            <div
+                                style={{
+                                width: 56, height: 56, borderRadius: 8,
+                                background:
+                                    'linear-gradient(135deg, rgba(10,245,176,0.18) 0%, rgba(38,198,218,0.12) 100%)',
+                                border: '1px solid rgba(10,245,176,0.30)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                flexShrink: 0,
+                                boxShadow: '0 0 16px rgba(10,245,176,0.18)',
+                                }}
+                            >
+                                <Equalizer playing={playing} size={36} />
+                            </div>
 
                                 <Box className="settings-modal__now-center">
                                     <Box className="settings-modal__now-eyebrow-row">

@@ -33,6 +33,10 @@ import {
     GAME_PERSISTENCE_VERSION,
     PERSISTENCE_VERSION_KEY,
 } from './lib/persistenceVersion';
+import ServersData from './data/servers';
+import { useServersStore } from './stores/servers';
+import ServersDailyOffers from './lib/servers-dailyOffers';
+import DataCenter from './lib/dataCenter';
 
 const TerminalRoute = lazy(() => import('./pages/Terminal'));
 const StationRoute = lazy(() => import('./pages/Station'));
@@ -55,12 +59,21 @@ export default function App() {
         const useStationStore = createStationStore();
         const stationProxy = makeStationProxy(useStationStore);
 
+        const serversStore = useServersStore.getState();
+        serversStore.setServers(ServersData);
+
         const operatingSystem = new OperatingSystem(playerStoreProxy);
         operatingSystem.station = stationProxy;
         stationProxy.os = operatingSystem;
 
         const statisticsProcess = new Statistics(playerStoreProxy);
         operatingSystem.addProcess(statisticsProcess);
+
+        const serversDailyOffers = new ServersDailyOffers();
+        operatingSystem.addProcess(serversDailyOffers);
+
+        const dataCenterProcess = new DataCenter();
+        operatingSystem.addProcess(dataCenterProcess);
 
         if (stationProxy.exponent) {
             operatingSystem.setExponent(stationProxy.exponent);

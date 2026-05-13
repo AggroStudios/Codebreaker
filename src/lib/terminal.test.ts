@@ -26,6 +26,8 @@ describe('Terminal', () => {
         const os = new OperatingSystem({
             moneyLabel: null,
             xpLabel: null,
+            ownedServers: [],
+            setOwnedServers: vi.fn(),
             hasSeenTutorial: [],
             tutorialDisabled: false,
             tutorialStage: '',

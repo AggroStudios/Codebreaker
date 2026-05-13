@@ -2,25 +2,69 @@ import PageHeader from '../../components/common/PageHeader';
 import { AccountBalanceWalletOutlined, ApartmentTwoTone, BoltOutlined, DescriptionOutlined, DnsOutlined, RequestQuoteOutlined, RouterOutlined } from '@mui/icons-material';
 
 import './style.scss';
-import { DATA_CENTERS, INITIAL_CONTRACTS } from '../../data/dataCenter';
+import { DATA_CENTERS } from '../../data/dataCenter';
 import { WorldMap } from '../../components/WorldMap';
 import { DataCenterCard } from '../../components/WorldMap/components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IDataCenter } from '../../includes/DataCenter.interface';
 import { Box, Grid } from '@mui/material';
 import { Stat } from '../../components/common/Stat';
 import { formatKw, formatMoney, formatGbps, formatMoneyDay } from '../../lib/utils';
 import { usePlayerStore } from '../../stores/player';
+import { useDataCentersStore } from '../../stores/dataCenters';
+import { useStationContext } from '../../stores/stationContext';
 
 export default function DataCenters() {
     const [selectedDataCenter, setSelectedDataCenter] = useState<IDataCenter | null>(null);
-
-    const totalContracts = Object.keys(INITIAL_CONTRACTS).length;
+    const { contracts, setContracts, upgradeContract } = useDataCentersStore();
+    const operatingSystem = useStationContext().stationProxy.os;
+    const totalContracts = Object.keys(contracts).length;
     const availableContracts = Object.keys(DATA_CENTERS).length - totalContracts;
-    const totalRacks = Object.values(INITIAL_CONTRACTS).reduce((acc, contract) => acc + contract.racks, 0);
-    const totalPower = formatKw(Object.values(INITIAL_CONTRACTS).reduce((acc, contract) => acc + contract.powerKw, 0));
-    const totalUplink = formatGbps(Object.values(INITIAL_CONTRACTS).reduce((acc, contract) => acc + contract.uplinkGbps, 0));
-    const dailyLeaseCost = formatMoneyDay(Object.keys(INITIAL_CONTRACTS).reduce((acc, region) => acc + DATA_CENTERS.find((dc) => dc.id === region)?.baseLeaseDay || 0, 0));
+    const totalRacks = Object.values(contracts).reduce((acc, contract) => acc + contract.racks || 0, 0);
+    const totalPower = formatKw(Object.values(contracts).reduce((acc, contract) => acc + contract.powerKw || 0, 0));
+    const totalUplink = formatGbps(Object.values(contracts).reduce((acc, contract) => acc + contract.uplinkGbps || 0, 0));
+    const dailyLeaseCost = formatMoneyDay(Object.keys(contracts).reduce((acc, region) => acc + DATA_CENTERS.find((dc) => dc.id === region)?.baseLeaseDay || 0, 0));
+
+    useEffect(() => {
+        console.log('contracts', contracts);
+    }, [contracts]);
+
+    const handleSignContract = (dataCenterId: string) => {
+        console.log('handleSignContract', dataCenterId);
+        const dataCenter = DATA_CENTERS.find((dc) => dc.id === dataCenterId);
+        setContracts({
+            ...contracts,
+            [dataCenterId]: {
+                racks: 1,
+                rackCap: dataCenter?.baseRacks || 0,
+                powerKw: 4,
+                uplinkGbps: 1,
+                signedDays: operatingSystem.frame,
+                status: 'PROVISIONING',
+            },
+        });
+    };
+
+    const handleAddRack = (dataCenterId: string, cost: number) => {
+        console.log('handleAddRack', dataCenterId, cost);
+        upgradeContract(dataCenterId, {
+            racks: (contracts[dataCenterId]?.racks || 0) + 1,
+        });
+    };
+
+    const handleUpgradePower = (dataCenterId: string, power: number, cost: number) => {
+        console.log('handleUpgradePower', dataCenterId, power, cost);
+        upgradeContract(dataCenterId, {
+            powerKw: power,
+        });
+    };
+
+    const handleUpgradeUplink = (dataCenterId: string, uplink: number, cost: number) => {
+        console.log('handleUpgradeUplink', dataCenterId, uplink, cost);
+        upgradeContract(dataCenterId, {
+            uplinkGbps: uplink,
+        });
+    };
 
     return (
         <Box className="data-centers-page">
@@ -78,7 +122,7 @@ export default function DataCenters() {
                 >
                     <WorldMap
                         dataCenters={DATA_CENTERS}
-                        contracts={INITIAL_CONTRACTS}
+                        contracts={contracts}
                         selectedId={selectedDataCenter?.id}
                         onSelect={(id: string) => {
                             setSelectedDataCenter(DATA_CENTERS.find((dc) => dc.id === id) || null);
@@ -87,11 +131,11 @@ export default function DataCenters() {
                         floatingCard={
                             <DataCenterCard
                                 dataCenter={selectedDataCenter}
-                                contract={INITIAL_CONTRACTS[selectedDataCenter?.id] || null}
-                                onSign={() => {}}
-                                onUpgradePower={() => {}}
-                                onUpgradeUplink={() => {}}
-                                onAddRack={() => {}}
+                                contract={contracts[selectedDataCenter?.id] || null}
+                                onSign={handleSignContract}
+                                onUpgradePower={handleUpgradePower}
+                                onUpgradeUplink={handleUpgradeUplink}
+                                onAddRack={handleAddRack}
                                 onClose={() => {
                                     setSelectedDataCenter(null);
                                 }}

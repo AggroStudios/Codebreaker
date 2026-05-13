@@ -1,22 +1,22 @@
 // ── Data center regions ──────────────────────────────────────────────────────
 // lat/lng for pin placement; provider for theming; tier indicates the facility class
 export const DATA_CENTERS = [
-    { id: 'us-west',        code: 'USW-1',  name: 'US West',          city: 'San Francisco, CA',  lat:  37.7, lng: -122.4, provider: 'OmniNet',     tier: 'III', baseLeaseDay: 1850, ratePerKw: 0.084, latency: 18 },
-    { id: 'us-central',     code: 'USC-2',  name: 'US Central',       city: 'Dallas, TX',         lat:  32.8, lng:  -96.8, provider: 'CoreLink',    tier: 'III', baseLeaseDay: 1620, ratePerKw: 0.072, latency: 24 },
-    { id: 'us-east',        code: 'USE-1',  name: 'US East',          city: 'Ashburn, VA',        lat:  39.0, lng:  -77.5, provider: 'OmniNet',     tier: 'IV',  baseLeaseDay: 2240, ratePerKw: 0.076, latency: 12 },
-    { id: 'ca-central',     code: 'CAC-1',  name: 'Canada Central',   city: 'Toronto, ON',        lat:  43.6, lng:  -82.4, provider: 'NorthBit',    tier: 'III', baseLeaseDay: 1490, ratePerKw: 0.068, latency: 22 },
-    { id: 'sa-east',        code: 'SAE-1',  name: 'South America',    city: 'São Paulo, BR',      lat: -23.5, lng:  -46.6, provider: 'TropoNet',    tier: 'II',  baseLeaseDay: 1180, ratePerKw: 0.094, latency: 88 },
-    { id: 'eu-west',        code: 'EUW-1',  name: 'EU West',          city: 'Dublin, IE',         lat:  57.3, lng:   -7.0, provider: 'EuroFiber',   tier: 'IV',  baseLeaseDay: 2080, ratePerKw: 0.112, latency: 32 },
-    { id: 'eu-central',     code: 'EUC-1',  name: 'EU Central',       city: 'Frankfurt, DE',      lat:  53.1, lng:    8.7, provider: 'EuroFiber',   tier: 'IV',  baseLeaseDay: 2310, ratePerKw: 0.142, latency: 28 },
-    { id: 'eu-north',       code: 'EUN-1',  name: 'EU North',         city: 'Stockholm, SE',      lat:  65.6, lng:   17.5, provider: 'NordCool',    tier: 'III', baseLeaseDay: 1740, ratePerKw: 0.058, latency: 38 },
-    { id: 'me-central',     code: 'MEC-1',  name: 'Middle East',      city: 'Bahrain',            lat:  26.2, lng:   48.6, provider: 'DesertGrid',  tier: 'III', baseLeaseDay: 1390, ratePerKw: 0.052, latency: 64 },
-    { id: 'af-south',       code: 'AFS-1',  name: 'Africa South',     city: 'Cape Town, ZA',      lat: -36.9, lng:   18.4, provider: 'AfriArc',     tier: 'II',  baseLeaseDay:  980, ratePerKw: 0.118, latency: 102 },
-    { id: 'ap-south',       code: 'APS-1',  name: 'Asia South',       city: 'Mumbai, IN',         lat:  17.1, lng:   73.4, provider: 'MonsoonDC',   tier: 'III', baseLeaseDay: 1240, ratePerKw: 0.088, latency: 78 },
-    { id: 'ap-southeast-1', code: 'APSE-1', name: 'Asia Southeast',   city: 'Singapore, SG',      lat:  -0.3, lng:  103.8, provider: 'EquatorIX',   tier: 'IV',  baseLeaseDay: 2640, ratePerKw: 0.146, latency: 56 },
-    { id: 'ap-east',        code: 'APE-1',  name: 'Asia East',        city: 'Hong Kong',          lat:  21.3, lng:  115.7, provider: 'NeoPearl',    tier: 'III', baseLeaseDay: 2180, ratePerKw: 0.132, latency: 48 },
-    { id: 'ap-northeast',   code: 'APN-1',  name: 'Asia Northeast',   city: 'Tokyo, JP',          lat:  35.7, lng:  139.7, provider: 'KoyoNet',     tier: 'IV',  baseLeaseDay: 2560, ratePerKw: 0.158, latency: 42 },
-    { id: 'ap-southeast-2', code: 'APSE-2', name: 'Oceania',          city: 'Sydney, AU',         lat: -38.9, lng:  150.2, provider: 'CoralStack',  tier: 'III', baseLeaseDay: 1620, ratePerKw: 0.124, latency: 96 },
-    { id: 'eu-iceland',     code: 'ICE-1',  name: 'Iceland',          city: 'Reykjavik, IS',      lat:  73.1, lng:  -22.5, provider: 'IceLine',     tier: 'IV',  baseLeaseDay: 1840, ratePerKw: 0.034, latency: 29 },
+    { id: 'us-west',        code: 'USW-1',  name: 'US West',          city: 'San Francisco, CA',  lat:  37.7, lng: -122.4, provider: 'OmniNet',     tier: 'III', baseLeaseDay: 1850, ratePerKw: 0.084, latency: 18, rackCost: 1000, baseRacks: 8 },
+    { id: 'us-central',     code: 'USC-2',  name: 'US Central',       city: 'Dallas, TX',         lat:  32.8, lng:  -96.8, provider: 'CoreLink',    tier: 'III', baseLeaseDay: 1620, ratePerKw: 0.072, latency: 24, rackCost: 1000, baseRacks: 4 },
+    { id: 'us-east',        code: 'USE-1',  name: 'US East',          city: 'Ashburn, VA',        lat:  39.0, lng:  -77.5, provider: 'OmniNet',     tier: 'IV',  baseLeaseDay: 2240, ratePerKw: 0.076, latency: 12, rackCost: 1000, baseRacks: 14 },
+    { id: 'ca-central',     code: 'CAC-1',  name: 'Canada Central',   city: 'Toronto, ON',        lat:  43.6, lng:  -82.4, provider: 'NorthBit',    tier: 'III', baseLeaseDay: 1490, ratePerKw: 0.068, latency: 22, rackCost: 1000, baseRacks: 6 },
+    { id: 'sa-east',        code: 'SAE-1',  name: 'South America',    city: 'São Paulo, BR',      lat: -23.5, lng:  -46.6, provider: 'TropoNet',    tier: 'II',  baseLeaseDay: 1180, ratePerKw: 0.094, latency: 88, rackCost: 1000, baseRacks: 2 },
+    { id: 'eu-west',        code: 'EUW-1',  name: 'EU West',          city: 'Dublin, IE',         lat:  57.3, lng:   -7.0, provider: 'EuroFiber',   tier: 'IV',  baseLeaseDay: 2080, ratePerKw: 0.112, latency: 32, rackCost: 1000, baseRacks: 10 },
+    { id: 'eu-central',     code: 'EUC-1',  name: 'EU Central',       city: 'Frankfurt, DE',      lat:  53.1, lng:    8.7, provider: 'EuroFiber',   tier: 'IV',  baseLeaseDay: 2310, ratePerKw: 0.142, latency: 28, rackCost: 1000, baseRacks: 6 },
+    { id: 'eu-north',       code: 'EUN-1',  name: 'EU North',         city: 'Stockholm, SE',      lat:  65.6, lng:   17.5, provider: 'NordCool',    tier: 'III', baseLeaseDay: 1740, ratePerKw: 0.058, latency: 38, rackCost: 1000, baseRacks: 2 },
+    { id: 'me-central',     code: 'MEC-1',  name: 'Middle East',      city: 'Bahrain',            lat:  26.2, lng:   48.6, provider: 'DesertGrid',  tier: 'III', baseLeaseDay: 1390, ratePerKw: 0.052, latency: 64, rackCost: 1000, baseRacks: 4 },
+    { id: 'af-south',       code: 'AFS-1',  name: 'Africa South',     city: 'Cape Town, ZA',      lat: -36.9, lng:   18.4, provider: 'AfriArc',     tier: 'II',  baseLeaseDay:  980, ratePerKw: 0.118, latency: 102, rackCost: 1000, baseRacks: 2 },
+    { id: 'ap-south',       code: 'APS-1',  name: 'Asia South',       city: 'Mumbai, IN',         lat:  17.1, lng:   73.4, provider: 'MonsoonDC',   tier: 'III', baseLeaseDay: 1240, ratePerKw: 0.088, latency: 78, rackCost: 1000, baseRacks: 4 },
+    { id: 'ap-southeast-1', code: 'APSE-1', name: 'Asia Southeast',   city: 'Singapore, SG',      lat:  -0.3, lng:  103.8, provider: 'EquatorIX',   tier: 'IV',  baseLeaseDay: 2640, ratePerKw: 0.146, latency: 56, rackCost: 1000, baseRacks: 9 }, 
+    { id: 'ap-east',        code: 'APE-1',  name: 'Asia East',        city: 'Hong Kong',          lat:  21.3, lng:  115.7, provider: 'NeoPearl',    tier: 'III', baseLeaseDay: 2180, ratePerKw: 0.132, latency: 48, rackCost: 1000, baseRacks: 4 },
+    { id: 'ap-northeast',   code: 'APN-1',  name: 'Asia Northeast',   city: 'Tokyo, JP',          lat:  35.7, lng:  139.7, provider: 'KoyoNet',     tier: 'IV',  baseLeaseDay: 2560, ratePerKw: 0.158, latency: 42, rackCost: 1000, baseRacks: 7 },
+    { id: 'ap-southeast-2', code: 'APSE-2', name: 'Oceania',          city: 'Sydney, AU',         lat: -38.9, lng:  150.2, provider: 'CoralStack',  tier: 'III', baseLeaseDay: 1620, ratePerKw: 0.124, latency: 96, rackCost: 1000, baseRacks: 6 },
+    { id: 'eu-iceland',     code: 'ICE-1',  name: 'Iceland',          city: 'Reykjavik, IS',      lat:  73.1, lng:  -22.5, provider: 'IceLine',     tier: 'IV',  baseLeaseDay: 1840, ratePerKw: 0.034, latency: 29, rackCost: 1000, baseRacks: 2 },
 ];
 
 // ── Initial contracts ────────────────────────────────────────────────────────
@@ -62,6 +62,10 @@ export const UPLINK_TIERS = [
     { gbps: 100, cost: 62400 },
     { gbps: 400, cost: 188000 },
 ];
+
+export const RACK_CAPACITY = [
+    { }
+]
 
 // ── World-map continent polygons (lng/lat outlines) ─────────────────────────
 // Hand-traced outlines — denser vertex sets so smoothed contours read clearly

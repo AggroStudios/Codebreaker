@@ -11,6 +11,7 @@ import TerminalOutlinedIcon from '@mui/icons-material/TerminalOutlined';
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
 import AlbumOutlinedIcon from '@mui/icons-material/AlbumOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import WallpaperOutlinedIcon from '@mui/icons-material/WallpaperOutlined';
 
 import AggroStudiosLogo from '../../assets/logos/AggroStudios.png';
 import CodebreakerLogo from '../../assets/logos/codebreaker-logo.png';
@@ -72,7 +73,7 @@ const CREDITS: CreditRow[] = [
         tag: 'LEAD',
     },
     {
-        icon: TerminalOutlinedIcon,
+        icon: WallpaperOutlinedIcon,
         label: 'FRONT-END',
         names: 'Melanie Germain',
     },

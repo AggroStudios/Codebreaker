@@ -9,6 +9,7 @@ import {
 import { IStatistics, IStatisticsCipher } from '../includes/Statistics.interface';
 import { storeProxy } from '../utils/storeProxy';
 import { ICipherType } from '../includes/Cipher.interface';
+import { Server } from '../includes/Servers.interface';
 
 let hideMoneyLabelTimer: ReturnType<typeof setTimeout> | null = null;
 let hideXpLabelTimer: ReturnType<typeof setTimeout> | null = null;
@@ -154,6 +155,8 @@ const createPlayerStore = () => create<PlayerState>()(
                 messages: [],
                 statistics: makeDefaults(),
             } as Player,
+            ownedServers: [],
+            setOwnedServers: (servers: Server[]) => set({ ownedServers: servers }),
             moneyLabel: null,
             xpLabel: null,
             hasSeenTutorial: [] as string[],

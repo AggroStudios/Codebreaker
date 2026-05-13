@@ -11,6 +11,7 @@ import { IApplication } from '../../includes/Terminal.interface';
 import BootSequence from './bootSequence';
 import Tutorial from './tutorial';
 import Glow from './glow';
+import ContractEdit from './contractEdit';
 
 export default Array<IApplication>(
     {
@@ -25,6 +26,12 @@ export default Array<IApplication>(
         contentType: 'text/plain',
         permissions: 444,
         content: `--------- readme.txt ----------\r\n\r\n        LEAVE ME HERE\r\n\r\n-------------------------------`,
+    },
+    {
+        cmd: 'contract',
+        path: '/',
+        app: ContractEdit,
+        permissions: 555,
     },
     {
         cmd: 'player',
