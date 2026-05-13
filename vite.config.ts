@@ -12,6 +12,8 @@ export default defineConfig(({ command }) => {
         },
         plugins: [
             command === 'serve' ? eslint({
+                include: ['src/**/*.ts', 'src/**/*.tsx'],
+                exclude: ['node_modules', 'dist'],
                 fix: true,
                 lintOnStart: true,
             }) : [],
