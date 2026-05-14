@@ -29,6 +29,16 @@ export default defineConfig(({ command }) => {
                     electron({
                         main: {
                             entry: 'electron/main.ts',
+                            vite: {
+                                build: {
+                                    // Mark native node modules as external so Rolldown does not try
+                                    // to read their .node binaries as UTF-8 source files. They will
+                                    // be resolved at runtime by Node's require() from node_modules.
+                                    rollupOptions: {
+                                        external: ['steamworks.js'],
+                                    },
+                                },
+                            },
                         },
                         preload: {
                             input: 'electron/preload.ts',
@@ -42,7 +52,9 @@ export default defineConfig(({ command }) => {
             minify: 'oxc',
             assetsInlineLimit: 0,
             // Relative paths required for Electron's file:// protocol
-            ...(process.env.ELECTRON === 'true' ? { outDir: 'dist' } : {}),
+            ...(process.env.ELECTRON === 'true' ? {
+                outDir: 'dist',
+            } : {}),
         },
         base: process.env.ELECTRON === 'true' ? './' : '/',
     }

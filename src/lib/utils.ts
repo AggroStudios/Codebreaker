@@ -1,3 +1,4 @@
+import axios from 'axios';
 import isEmpty from 'lodash/isEmpty';
 
 export const dataSizeSuffixes = [
@@ -179,4 +180,10 @@ export function projectLngLat(lng: number, lat: number) {
       X_AT_LNG_MINUS_180 + (lng + 180) * PX_PER_DEG,
       Y_AT_EQUATOR - lat * PY_PER_DEG,
     ];
+}
+
+export const getSmallFriendAvatar = async (steamId: string) => {
+    const apiKey = 'BA9DBBE63AD6F57CEBFDEB350F3F3912'; // For testing
+    const response = await axios.get(`https://partner.steam-api.com/ISteamUser/GetPlayerSummaries/v2/?key=${apiKey}&steamids=${steamId}`);
+    return response.data.response.players[0].avatar;
 }

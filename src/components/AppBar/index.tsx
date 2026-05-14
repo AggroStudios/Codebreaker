@@ -1,4 +1,4 @@
-import { useEffect, useState, type MouseEvent as ReactMouseEvent } from 'react';
+import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 
 import {
     Box,
@@ -19,6 +19,7 @@ import {
     DialogContent,
     DialogActions,
     Button,
+    Avatar,
 } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 
@@ -48,7 +49,8 @@ import { usePlayerStore } from '../../stores/player';
 import { useStationContext } from '../../stores/stationContext';
 import { useAnchors } from '../AnchorsContext';
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
-import { formatMoney } from '../../lib/utils';
+import { formatMoney, getSmallFriendAvatar } from '../../lib/utils';
+// import { formatMoney } from '../../lib/utils';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -182,6 +184,8 @@ export default function AppBarComponent() {
     const [deleteConfirm, setDeleteConfirm] = useState<
         { mode: 'one'; index: number } | { mode: 'all' } | null
     >(null);
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+    const profileButtonRef = useRef<HTMLButtonElement | null>(null);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileAnchorEl);
@@ -234,6 +238,30 @@ export default function AppBarComponent() {
     const unreadNotifications = notifications.filter(
         (n) => n.unread,
     ).length;
+
+    useEffect(() => {
+        // Guard against setting state after unmount (the fetch can outlive
+        // the component during fast HMR / route changes).
+        let cancelled = false;
+
+        window.steam?.isReady().then((ready) => {
+            if (!ready) return;
+            window.steam?.localplayer.getSteamId().then((id) => {
+                getSmallFriendAvatar(id.steamId64)
+                    .then((avatar) => {
+                        if (cancelled) return;
+                        setAvatarUrl(avatar);
+                    })
+                    .catch((err) => {
+                        console.warn('Failed to load Steam avatar:', err);
+                    });
+            });
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -313,6 +341,7 @@ export default function AppBarComponent() {
                             </Badge>
                         </IconButton>
                         <IconButton
+                            ref={profileButtonRef}
                             size="large"
                             aria-label="Account of current user"
                             aria-controls={menuId}
@@ -321,7 +350,17 @@ export default function AppBarComponent() {
                             color="inherit"
                             style={{ outline: 0 }}
                         >
-                            <AccountCircle />
+                            {avatarUrl ? (
+                                <Avatar
+                                    src={avatarUrl}
+                                    alt="User avatar"
+                                    sx={{ width: 32, height: 32 }}
+                                >
+                                    <AccountCircle />
+                                </Avatar>
+                            ) : (
+                                <AccountCircle />
+                            )}
                         </IconButton>
                     </Box>
                     <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
