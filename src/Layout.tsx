@@ -1,10 +1,14 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router';
 import { styled } from '@mui/material/styles';
 
 import AppBar from './components/AppBar';
 import NavMenu from './components/NavMenu';
 import MusicPlayer from './components/MusicPlayer';
+import ScreenGlow from './components/ScreenGlow';
+import { usePlayerStore } from './stores/player';
+import { useAppReadyStore } from './stores/appReady';
+import Coachmarks from './components/Coachmarks';
 
 const backgroundModules = import.meta.glob<string>(
     './assets/backgrounds/*_bg.png',
@@ -43,6 +47,7 @@ const MainContainer = styled('div', {
 
 const GameContainer = styled('div')({
     flexGrow: 1,
+    minHeight: 0,
     display: 'flex',
     height: '100%',
     flexDirection: 'column',
@@ -53,8 +58,37 @@ const GameContainer = styled('div')({
 
 export default function Layout() {
     const location = useLocation();
+
+    const isAppReady = useAppReadyStore((s) => s.isAppReady);
+    const hasSeenTutorial = usePlayerStore((s) => s.hasSeenTutorial);
+    const resetTutorial = usePlayerStore((s) => s.resetTutorial);
+    const tutorialDisabled = usePlayerStore((s) => s.tutorialDisabled);
+    const tutorialStage = usePlayerStore((s) => s.tutorialStage);
+
+    const [showTutorial, setShowTutorial] = useState(false);
+
+    useEffect(() => {
+        const isStringArray =
+            Array.isArray(hasSeenTutorial) &&
+            hasSeenTutorial.every((s) => typeof s === 'string');
+
+        if (!isStringArray) {
+            resetTutorial();
+            setShowTutorial(false);
+            return;
+        }
+
+        setShowTutorial(
+            isAppReady &&
+                !hasSeenTutorial.includes(tutorialStage) &&
+                !tutorialDisabled,
+        );
+    }, [hasSeenTutorial, tutorialStage, isAppReady, tutorialDisabled, resetTutorial]);
+
     return (
         <>
+            <Coachmarks open={showTutorial} />
+            <ScreenGlow />
             <MusicPlayer />
             <AppBar />
             <MainContainer background={getBackground(location.pathname)}>

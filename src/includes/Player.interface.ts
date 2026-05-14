@@ -1,7 +1,15 @@
+import { ICipherType } from './Cipher.interface';
 import { Notification, Message } from './OperatingSystem.interface';
+import { Server } from './Servers.interface';
+import { IStatistics } from './Statistics.interface';
 
 export const experienceForLevel = (level: number) =>
-    Math.floor(100 * Math.pow(2.5, level - 1));
+    Math.floor(100 * Math.pow(1.12, level - 1));
+
+export interface IPurchasedUpgrade {
+    upgradeId: string;
+    tierId: string;
+}
 
 export type Player = {
     name: string;
@@ -11,6 +19,7 @@ export type Player = {
     nextLevel: number;
     notifications: Notification[];
     messages: Message[];
+    statistics: IStatistics;
 };
 
 export type MoneyLabelSpawn = { amount: number; id: number };
@@ -21,8 +30,18 @@ export type XpLabelSpawn = {
 
 export interface PlayerState {
     player: Player;
+    ownedServers: Server[];
+    setOwnedServers: (servers: Server[]) => void;
     moneyLabel: MoneyLabelSpawn | null;
     xpLabel: XpLabelSpawn | null;
+    hasSeenTutorial: string[];
+    tutorialDisabled: boolean;
+    tutorialStage: string;
+    showTutorial: (stage: string) => void;
+    setHasSeenTutorial: (stage: string) => void;
+    markTutorialAsSeen: (stage: string) => void;
+    resetTutorial: () => void;
+    setTutorialDisabled: (disabled: boolean) => void;
     setMoneyLabel: (amount: number | null) => void;
     setXpLabel: (amount: number | null, levelUp?: boolean) => void;
     earnExperience: (amount: number) => void;
@@ -35,6 +54,10 @@ export interface PlayerState {
     markAllNotificationsAsRead: () => void;
     deleteNotification: (index: number) => void;
     deleteAllNotifications: () => void;
-    purchasedUpgrades: string[];
-    purchaseUpgrade: (upgrade: string, cost: number) => void;
+    purchasedUpgrades: IPurchasedUpgrade[];
+    purchaseUpgradeTier: (upgradeId: string, tierId: string, cost: number) => void;
+    successCipher: (cipher: ICipherType) => void;
+    failedCipher: (cipher: ICipherType) => void;
+    updateTotalPlayedTime: (time: number) => void;
+    pushIncomeRate: (rate: number) => void;
 }

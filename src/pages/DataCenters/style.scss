@@ -1,0 +1,82 @@
+.data-centers-header .MuiChip-root {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 6px;
+    border-radius: 9999px;
+    border: 1px solid #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    white-space: nowrap;
+    height: 18px !important;
+
+    & svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    &.accent {
+        border-color: #0af5b0;
+        color: #0af5b0;
+
+        & svg {
+            color: #0af5b0;
+        }
+    }
+
+    &.cyan {
+        border-color: #26c6da;
+        color: #26c6da;
+
+        & svg {
+            color: #26c6da;
+        }
+    }
+
+    &.warning {
+        border-color: #ff2828;
+        color: #ff2828;
+
+        & svg {
+            color: #ff2828;
+        }
+    }
+
+    & .live-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #0af5b0;
+        box-shadow: 0 0 6px #0af5b0;
+        animation: statusPulse 1.6s ease-in-out infinite;
+        flex-shrink: 0;
+        display: inline-block;
+    }
+}
+
+// Fill viewport below the app bar (Layout GameContainer is a column flex).
+// Use padding for inset — margin + width:100% on the grid would overflow horizontally.
+.data-centers-page {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    // Side/top clamp; fixed 2em bottom gutter while map clamps above it.
+    padding: clamp(12px, 3vw, 2em) clamp(12px, 3vw, 2em) 2em;
+}
+
+// Outer column grid: nested row for stats, then size-12 map row (flex:1 in sx) fills remaining height.
+.data-centers-container {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}

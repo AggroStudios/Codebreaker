@@ -6,9 +6,10 @@ import { filter, isEmpty, uniq, uniqBy } from 'lodash';
 
 import { colorizeString, decolorizeString } from './display';
 
-import { path } from '../utils';
+import { path, stripLastSlash, stripTrailingSlashes } from '../utils';
 
 import { IApplication, TerminalApp } from '../../includes/Terminal.interface';
+import OperatingSystem from '../OperatingSystem';
 
 export interface IDirectory {
     path: string;
@@ -18,6 +19,11 @@ export interface IDirectory {
     group: string;
     permissions: Permissions;
     directory: boolean;
+}
+
+export interface IMount {
+    path: string;
+    os: OperatingSystem;
 }
 
 class Permissions {
@@ -75,16 +81,8 @@ interface IPermission {
     execute: boolean;
 }
 
-const stripLastSlash = (path: string) => path.replace(/\/$/, '');
-function stripTrailingSlashes(path: string) {
-    while (path.endsWith('/')) {
-        path = stripLastSlash(path);
-    }
-    return path;
-}
-
 const directoryRegex = (path: string) =>
-    new RegExp(`^${stripLastSlash(path)}/([a-zA-Z-_]+)$`);
+    new RegExp(`^${stripLastSlash(path)}/([^/]+)$`);
 
 const getSubDirectories = (path: string, apps: IApplication[]) =>
     uniqBy(apps, 'path')
@@ -102,14 +100,24 @@ const getSubDirectories = (path: string, apps: IApplication[]) =>
 
 export default class FileSystem {
     private _cwd: string = '/';
-    private apps: IApplication[];
+    private _apps: IApplication[];
+    private _mounts: IMount[] = [];
 
     constructor(apps: IApplication[]) {
-        this.apps = apps;
+        this._apps = apps;
+    }
+
+    private get apps(): IApplication[] {
+        const mountedFiles = this._mounts.flatMap((mount) => (mount.os.storedFiles || []).map((file) => ({ ...file, path: stripTrailingSlashes(`${mount.path}/${file.path}`) })));
+        return [...this._apps, ...mountedFiles];
     }
 
     get cwd() {
         return this._cwd;
+    }
+
+    mount(mountPath: string, os: OperatingSystem) {
+        this._mounts.push({ path: mountPath, os });
     }
 
     cat([passedPath]: string[]) {
@@ -128,6 +136,58 @@ export default class FileSystem {
             outputArray.push(line.replaceAll(' ', '\u00a0'));
         }
         return outputArray;
+    }
+
+    rm([passedPath]: string[]) {
+        if (isEmpty(passedPath)) {
+            throw new Error('Path is empty.');
+        }
+
+        let resolvedPath = passedPath;
+
+        // This means we're resolving from a relative path
+        if (!passedPath.startsWith('/')) {
+            resolvedPath = `${stripLastSlash(this._cwd)}/${passedPath}`;
+        }
+
+        const parsed = path.parse(resolvedPath);
+
+        const filesToDelete = [];
+
+        if (parsed.base !== '*') {
+            const foundApp = this.apps.find(
+                (o) => o.path === parsed.dir && o.cmd === parsed.base,
+            );
+
+            if (isEmpty(foundApp)) {
+                throw new Error(`File '${passedPath}' not found.`);
+            }
+            const permissions = new Permissions(foundApp.permissions);
+
+            if (isEmpty(foundApp) || !permissions.isWritable) {
+                throw new Error(`Command '${passedPath}' not found.`);
+            }
+
+            filesToDelete.push(foundApp);
+        }
+        else {
+            const filesInDirectory = this.apps.filter((f) => f.path === parsed.dir);
+            filesToDelete.push(...filesInDirectory);
+        }
+
+        const mount = this._mounts.find((mount) => parsed.dir.startsWith(mount.path))
+        const foundFiles = mount?.os.storedFiles
+            .map((f) => ({ ...f, path: stripTrailingSlashes(`${mount.path}/${f.path}`) }))
+            .filter((f) => filesToDelete.some((file) => file.path === f.path && file.cmd === f.cmd));
+
+        if (foundFiles.length > 0) {
+            foundFiles.forEach((f) => {
+                mount?.os.unlinkFile(f.path.replace(`${mount.path}/`, ''), f.cmd);
+            });
+        }
+        else {
+            throw new Error(`File '${passedPath}' not found.`);
+        }
     }
 
     changeDirectory([passedPath]: string[]) {
@@ -198,6 +258,38 @@ export default class FileSystem {
         }
 
         return foundApp.app;
+    }
+
+    resolveAbsoluteDir(rel: string): string {
+        const resolved = rel.startsWith('/')
+            ? rel
+            : `${stripLastSlash(this._cwd)}/${rel}`;
+        const normalized = path.normalize(resolved);
+        if (!normalized) return '/';
+        return stripTrailingSlashes(normalized) || '/';
+    }
+
+    listEntriesAt(absDir: string): { name: string; isDirectory: boolean }[] {
+        const dir = stripTrailingSlashes(absDir) || '/';
+        const childPrefix = dir === '/' ? '/' : `${dir}/`;
+        const subdirNames = uniq(
+            this.apps
+                .map((a) => a.path)
+                .filter((p) => p !== dir && p.startsWith(childPrefix))
+                .map((p) => p.substring(childPrefix.length).split('/')[0])
+                .filter((name) => name !== ''),
+        );
+        const subdirEntries = subdirNames.map((name) => ({ name, isDirectory: true }));
+        const fileEntries = this.apps
+            .filter((a) => a.path === dir && a.contentType !== 'inode/directory')
+            .map((a) => ({ name: a.cmd, isDirectory: false }));
+        return [...subdirEntries, ...fileEntries];
+    }
+
+    getExecutableCommandsAtCwd(): string[] {
+        return this.apps
+            .filter((a) => a.path === this._cwd && new Permissions(a.permissions).isExecutable)
+            .map((a) => a.cmd);
     }
 
     listDirectory(args: string[]) {
@@ -326,7 +418,7 @@ export default class FileSystem {
 
         const dir = this.apps
             .reduce((acc: IDirectory[], cur: IApplication) => {
-                if (cur.path === dirToList) {
+                if (cur.path === dirToList && cur.contentType !== 'inode/directory') {
                     acc.push({
                         path: cur.cmd,
                         owner: 'root',
@@ -343,6 +435,10 @@ export default class FileSystem {
                 }
                 return true;
             });
+
+        if (isEmpty(dir)) {
+            throw new Error(`Directory '${resolvedPath}' not found.`);
+        }
 
         if (!parsedArgs.all) {
             return listingOutput(filter(dir, (d) => !d.hidden));

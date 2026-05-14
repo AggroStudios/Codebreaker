@@ -1,4 +1,5 @@
-import { Networking } from '../lib/network';
+import { ScreenGlowType } from '../components/ScreenGlow';
+import { Networking } from '../data/network';
 import OperatingSystem from '../lib/OperatingSystem';
 
 export enum NetworkConnectionType {
@@ -20,8 +21,10 @@ export default interface Process {
     callback: (...args: unknown[]) => unknown;
     pid?: number;
     cores?: number;
+    memoryRequired?: number;
     paused?: boolean;
     percentUse?: number;
+    size?: number;
 }
 
 export type StationStoreType = {
@@ -38,6 +41,14 @@ export type StationStoreType = {
     callback: (frame: number, count: number, exponent: number) => void;
     cpuActivity: { x: number; y: number }[];
     setCpuActivity: (cpuActivity: { x: number; y: number }[]) => void;
+    setNetwork: (network: Networking) => void;
+    setProcessor: (cpu: IProcessorType) => void;
+    setMemory: (memory: IMemoryType) => void;
+    reset: () => void;
+    glowActive: boolean;
+    setGlowActive: (active: boolean) => void;
+    glowType: ScreenGlowType;
+    setGlowType: (type: ScreenGlowType) => void;
 };
 
 export type MenuStateType = {
@@ -48,10 +59,8 @@ export type MenuStateType = {
 export enum ProcessorArchitecture {
     risc32 = 'risc32',
     risc64 = 'risc64',
-    sca32 = 'sca32',
-    sca64 = 'sca64',
-    mca32 = 'mca32',
-    mca64 = 'mca64',
+    quantum = 'quantum',
+    singularity = 'singularity',
 }
 
 export enum MemoryType {
@@ -61,6 +70,7 @@ export enum MemoryType {
     ddr3 = 'DDR-3',
     ddr4 = 'DDR-4',
     ddr5 = 'DDR-5',
+    nonVolatile = 'Non-Volatile',
 }
 
 export enum StorageType {
@@ -74,7 +84,7 @@ export enum StorageType {
 }
 
 export interface IProcessorType {
-    flops: number;
+    gigaflops: number;
     cores: number;
     manufacturer: string;
     model: string;

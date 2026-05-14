@@ -1,0 +1,32 @@
+.mainLogo {
+    height: 45px;
+    margin-top: 0.5em;
+    margin-left: 25px;
+    will-change: filter;
+    transition: filter 300ms;
+}
+
+.mainLogo:hover {
+    filter: drop-shadow(0 0 0.5em #61dafbaa);
+}
+
+.centerContent {
+    text-align: center;
+}
+
+.moneyLabel {
+    font-family: var(--font-code) !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: var(--accent) !important;
+    letter-spacing: 0.05em !important;
+    text-shadow: 0 0 0.5em rgba(10, 245, 176, 0.5) !important;
+    margin-left: 12px !important;
+}
+
+.gameFrameCounter {
+    font-family: var(--font-code) !important;
+    font-size: 12px !important;
+    color: var(--fg-3) !important;
+    letter-spacing: 0.03em !important;
+}

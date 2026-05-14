@@ -1,0 +1,81 @@
+.linear-progress {
+    position: relative;
+    width: 100%;
+    height: 22px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+
+    & .linear-progress-fill {
+        position: relative;
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.4s linear;
+        overflow: hidden;
+        min-width: 0;
+    }
+
+    & .linear-progress-label {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        z-index: 2;
+        font-family: var(--font-code);
+        font-size: 12px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.96);
+        letter-spacing: 0.04em;
+        text-shadow: 0 0 6px rgba(0, 0, 0, 0.55);
+        white-space: nowrap;
+        pointer-events: none;
+    }
+
+    & .linear-progress-failure {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        z-index: 1;
+        background-image: repeating-linear-gradient(
+            50deg,
+            rgba(255, 40, 40, 0.6),
+            rgba(255, 40, 40, 0.6) 6px,
+            rgba(0, 0, 0, 0.15) 12px,
+            rgba(0, 0, 0, 0.15) 18px
+        );
+        pointer-events: none;
+    }
+
+    &.accent .linear-progress-fill {
+        background-image: linear-gradient(90deg, rgba(10, 245, 176, 0.5), rgb(10, 245, 176));
+        box-shadow: 0 0 10px rgba(10, 245, 176, 0.18);
+    }
+
+    &.blue .linear-progress-fill {
+        background-image: linear-gradient(90deg, rgba(97, 218, 251, 0.5), rgb(97, 218, 251));
+        box-shadow: 0 0 10px rgba(97, 218, 251, 0.18);
+    }
+
+    &.cyan .linear-progress-fill {
+        background-image: linear-gradient(90deg, rgba(38, 198, 218, 0.5), rgb(38, 198, 218));
+        box-shadow: 0 0 10px rgba(38, 198, 218, 0.18);
+    }
+
+    &.orange .linear-progress-fill {
+        background-image: linear-gradient(90deg, rgba(255, 183, 77, 0.5), rgb(255, 183, 77));
+        box-shadow: 0 0 10px rgba(255, 183, 77, 0.18);
+    }
+
+    &.red .linear-progress-fill {
+        background-image: linear-gradient(90deg, rgba(255, 95, 109, 0.5), rgb(255, 95, 109));
+        box-shadow: 0 0 10px rgba(255, 95, 109, 0.18);
+    }
+
+    &.purple .linear-progress-fill {
+        background-image: linear-gradient(90deg, rgba(155, 140, 255, 0.5), rgb(155, 140, 255));
+        box-shadow: 0 0 10px rgba(155, 140, 255, 0.18);
+    }
+}

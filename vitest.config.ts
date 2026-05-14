@@ -13,6 +13,10 @@ export default defineConfig({
             '@src': './src',
             '@test': './test',
         },
+        typecheck: {
+            enable: true,
+            tsconfig: './tsconfig.json',
+        },
     },
     resolve: {
         alias: {

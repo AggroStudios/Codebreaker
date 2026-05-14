@@ -1,24 +1,34 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface MusicPlayerState {
     playing: boolean;
     volume: number;
+    sfxVolume: number;
     muted: boolean;
+    mutedSfx: boolean;
     currentTrackIndex: number;
+    /** Seconds, for UI (e.g. settings now-playing bar). */
+    currentTime: number;
+    duration: number;
     shuffle: boolean;
     loop: boolean;
     play: () => void;
     pause: () => void;
     toggle: () => void;
     setVolume: (volume: number) => void;
+    setSfxVolume: (volume: number) => void;
     setMuted: (muted: boolean) => void;
+    setSfxMuted: (muted: boolean) => void;
     toggleMuted: () => void;
+    toggleSfxMuted: () => void;
     setTrackIndex: (index: number) => void;
     nextTrack: (trackCount: number) => void;
     prevTrack: (trackCount: number) => void;
     setShuffle: (shuffle: boolean) => void;
     toggleShuffle: () => void;
     setLoop: (loop: boolean) => void;
+    setPlaybackTimes: (currentTime: number, duration: number) => void;
 }
 
 const clampVolume = (value: number): number => {
@@ -26,44 +36,78 @@ const clampVolume = (value: number): number => {
     return Math.min(1, Math.max(0, value));
 };
 
-export const useMusicPlayerStore = create<MusicPlayerState>((set) => ({
-    playing: false,
-    volume: 0.1,
-    muted: false,
-    currentTrackIndex: 0,
-    shuffle: true,
-    setShuffle: (shuffle: boolean) => set(() => ({ shuffle })),
-    toggleShuffle: () => set((state) => ({ shuffle: !state.shuffle })),
-    loop: true,
-    play: () => set(() => ({ playing: true })),
-    pause: () => set(() => ({ playing: false })),
-    toggle: () => set((state) => ({ playing: !state.playing })),
-    setVolume: (volume: number) =>
-        set(() => ({ volume: clampVolume(volume) })),
-    setMuted: (muted: boolean) => set(() => ({ muted })),
-    toggleMuted: () => set((state) => ({ muted: !state.muted })),
-    setTrackIndex: (index: number) =>
-        set(() => ({ currentTrackIndex: Math.max(0, index) })),
-    nextTrack: (trackCount: number) =>
-        set((state) => ({
-            currentTrackIndex:
-                trackCount > 0
-                    ? state.shuffle
-                        ? selectRandomTrack(trackCount, state.currentTrackIndex)
-                        : (state.currentTrackIndex + 1) % trackCount
-                    : 0,
-        })),
-    prevTrack: (trackCount: number) =>
-        set((state) => ({
-            currentTrackIndex:
-                trackCount > 0
-                    ? state.shuffle
-                        ? selectRandomTrack(trackCount, state.currentTrackIndex)
-                        : (state.currentTrackIndex - 1 + trackCount) % trackCount
-                    : 0,
-        })),
-    setLoop: (loop: boolean) => set(() => ({ loop })),
-}));
+export const useMusicPlayerStore = create<MusicPlayerState>()(
+    persist((set) => ({
+        playing: false,
+        volume: 0.1,
+        sfxVolume: 0.5,
+        muted: false,
+        mutedSfx: false,
+        currentTrackIndex: 0,
+        currentTime: 0,
+        duration: 0,
+        shuffle: true,
+        setShuffle: (shuffle: boolean) => set(() => ({ shuffle })),
+        toggleShuffle: () => set((state) => ({ shuffle: !state.shuffle })),
+        loop: true,
+        play: () => set(() => ({ playing: true })),
+        pause: () => set(() => ({ playing: false })),
+        toggle: () => set((state) => ({ playing: !state.playing })),
+        setVolume: (volume: number) =>
+            set(() => ({ volume: clampVolume(volume) })),
+        setMuted: (muted: boolean) => set(() => ({ muted })),
+        toggleMuted: () => set((state) => ({ muted: !state.muted })),
+        setTrackIndex: (index: number) =>
+            set(() => ({
+                currentTrackIndex: Math.max(0, index),
+                currentTime: 0,
+                duration: 0,
+            })),
+        nextTrack: (trackCount: number) =>
+            set((state) => ({
+                currentTrackIndex:
+                    trackCount > 0
+                        ? state.shuffle
+                            ? selectRandomTrack(trackCount, state.currentTrackIndex)
+                            : (state.currentTrackIndex + 1) % trackCount
+                        : 0,
+                currentTime: 0,
+                duration: 0,
+            })),
+        prevTrack: (trackCount: number) =>
+            set((state) => ({
+                currentTrackIndex:
+                    trackCount > 0
+                        ? state.shuffle
+                            ? selectRandomTrack(trackCount, state.currentTrackIndex)
+                            : (state.currentTrackIndex - 1 + trackCount) % trackCount
+                        : 0,
+                currentTime: 0,
+                duration: 0,
+            })),
+        setLoop: (loop: boolean) => set(() => ({ loop })),
+        setSfxVolume: (volume: number) => set(() => ({ sfxVolume: clampVolume(volume) })),
+        setSfxMuted: (muted: boolean) => set(() => ({ mutedSfx: muted })),
+        toggleSfxMuted: () => set((state) => ({ mutedSfx: !state.mutedSfx })),
+        setPlaybackTimes: (currentTime: number, duration: number) =>
+            set(() => ({
+                currentTime: Number.isFinite(currentTime) ? currentTime : 0,
+                duration: Number.isFinite(duration) ? duration : 0,
+            })),
+    }),
+    {
+        name: 'music-player-store',
+        storage: createJSONStorage(() => localStorage),
+        partialize: (state) => ({
+            volume: state.volume,
+            sfxVolume: state.sfxVolume,
+            muted: state.muted,
+            mutedSfx: state.mutedSfx,
+            shuffle: state.shuffle,
+            loop: state.loop,
+        }),
+    },
+));
 
 const selectRandomTrack = (trackCount: number, currentTrackIndex: number) => {
     const randomIndex = Math.floor(Math.random() * trackCount);

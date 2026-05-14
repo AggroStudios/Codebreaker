@@ -3,8 +3,13 @@ const imageModules = import.meta.glob<string>('../assets/**/*.{png,jpg,jpeg,mp3}
     import: 'default',
 });
 
+const soundModules = import.meta.glob<string>('../components/**/*.mp3', {
+    eager: true,
+    import: 'default',
+});
+
 export function preloadImages(onProgress: (percent: number) => void): Promise<void> {
-    const urls = Object.values(imageModules);
+    const urls = [...Object.values(imageModules), ...Object.values(soundModules)];
     if (urls.length === 0) {
         onProgress(100);
         return Promise.resolve();

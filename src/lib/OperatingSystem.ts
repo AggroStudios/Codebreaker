@@ -7,6 +7,9 @@ import { StationStoreType } from '../includes/Process.interface';
 
 import WorkerOperatingSystem from './worker/OperatingSystem?worker';
 import { OperatingSystemWorkerMessage, OperatingSystemWorkerMessageType, type OSUpdateGameLoopData } from './worker/OperatingSystem';
+import { IApplication } from '../includes/Terminal.interface';
+import { dataSizeFromSuffix } from './utils';
+import { useStorageStore } from '../stores/storage';
 
 function validateProcess(process: any): process is Process {
     return 'id' in process && 'callback' in process;
@@ -26,10 +29,24 @@ export default class OperatingSystem {
     private _station: StationStoreType | null = null;
     private _worker: Worker | null = null;
     private _isRunning: boolean = false;
+    private _storagePath: string = '/storage';
 
     constructor(player: PlayerState) {
         this._player = player;
         this._cpuActivity = new CpuActivity(100, 50);
+
+        // Default file in storage root (only if not already persisted)
+        const { storedFiles, pushFile } = useStorageStore.getState();
+        if (!storedFiles.some((f) => f.cmd === 'lost+found')) {
+            pushFile({
+                cmd: 'lost+found',
+                path: '/',
+                contentType: 'text/plain',
+                permissions: 644,
+                content: '',
+            } as IApplication);
+        }
+
         if (window.Worker) {
             this._worker = new WorkerOperatingSystem();
 
@@ -64,9 +81,21 @@ export default class OperatingSystem {
         });
     }
 
+    public get station(): StationStoreType | null {
+        return this._station;
+    }
+
     public set station(station: StationStoreType) {
         this._station = station;
         this._cpuActivity.state = station;
+    }
+
+    get storagePath() {
+        return this._storagePath;
+    }
+
+    get storedFiles() {
+        return useStorageStore.getState().storedFiles;
     }
 
     get player() {
@@ -145,8 +174,52 @@ export default class OperatingSystem {
         }
     }
 
+    addFile(file: IApplication) {
+        const { storedFiles, pushFile } = useStorageStore.getState();
+        const storageAvailable = this._station?.storage.reduce((acc, storage) => acc + dataSizeFromSuffix({ size: storage.capacity, unit: 'GB' }), 0);
+        const storageUsed = storedFiles.reduce((acc, f) => acc + (f.size || 0), 0);
+        if ((storageUsed + (file.size || 0)) > storageAvailable) {
+            throw new OperatingSystemError(`Not enough storage available to add file '${file.path}'.`);
+        }
+
+        // Ensure an entry exists for every intermediate directory segment so
+        // that getSubDirectories can discover them one level at a time.
+        const parts = file.path.split('/').filter(Boolean);
+        for (let i = 0; i < parts.length - 1; i++) {
+            const dirPath = `${this._storagePath}/${parts.slice(0, i + 1).join('/')}`;
+            if (!useStorageStore.getState().storedFiles.some((f) => f.path === dirPath)) {
+                pushFile({
+                    cmd: '',
+                    path: dirPath,
+                    permissions: 755,
+                    contentType: 'inode/directory',
+                } as IApplication);
+            }
+        }
+
+        file.path = parts.join('/');
+        pushFile(file);
+    }
+
+    unlinkFile(directory: string, filename: string) {
+        const { storedFiles, removeFile } = useStorageStore.getState();
+        if (!storedFiles.find((f) => f.path === directory && f.cmd === filename)) {
+            throw new OperatingSystemError(`File '${directory}/${filename}' not found.`);
+        }
+        removeFile(directory, filename);
+    }
+
     addProcess(process: Process) {
-        // console.log('Adding process!', process);
+        const memoryAvailable = this._station?.memory?.capacity || 0;
+        const memoryUsed = this.processes.reduce(
+            (acc, process) => acc + (process.memoryRequired || 0),
+            0,
+        );
+        
+        if ((memoryUsed + (process.memoryRequired || 0)) > memoryAvailable) {
+            throw new OperatingSystemError(`Not enough memory available to add process '${process.id}'.`);
+        }
+
         // Make sure the process object is valid and you can't duplicate processes
         const coreUsage = this.processes.reduce(
             (acc, process) => acc + (process.cores || 0),
@@ -173,6 +246,12 @@ export default class OperatingSystem {
     removeProcess(process: Process) {
         this.processes = this.processes.filter(
             (p) => p?.['id'] !== process?.['id'],
+        );
+    }
+
+    attachProcess(processId: string): Process | undefined {
+        return this.processes.find(
+            (p) => p?.['id'] === processId,
         );
     }
 

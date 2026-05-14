@@ -15,6 +15,7 @@ import {
     isPlainObject,
     isString,
     isUndefined,
+    uniq,
 } from 'lodash';
 
 import FileSystem from './terminal-utils/filesystem';
@@ -50,6 +51,16 @@ interface TerminalAttachment {
     ) => void;
     stdout: (message: string, options?: TerminalAttachmentOptions) => void;
     stderr: (message: string, options?: TerminalAttachmentOptions) => void;
+}
+
+const BUILTIN_COMMANDS = [
+    'ls', 'rm', 'cat', 'cd', 'history', 'clear', 'reboot', 'help',
+    'test', 'anyKey', 'yesno', 'password', 'input', 'loader', 'fancyLoader', 'progress',
+];
+
+export interface CompletionResult {
+    completions: string[];
+    replaceFrom: number;
 }
 
 export default class Terminal {
@@ -154,6 +165,32 @@ export default class Terminal {
         // await new BootSequence(this).run(null, null);
     }
 
+    complete(line: string): CompletionResult {
+        let wordStart = line.length;
+        while (wordStart > 0 && line[wordStart - 1] !== ' ') wordStart--;
+        const word = line.substring(wordStart);
+        const isFirstWord = line.substring(0, wordStart).trim() === '';
+
+        if (isFirstWord && !word.includes('/')) {
+            const apps = this.fs.getExecutableCommandsAtCwd();
+            const completions = uniq([...BUILTIN_COMMANDS, ...apps])
+                .filter((c) => c.startsWith(word))
+                .sort();
+            return { completions, replaceFrom: wordStart };
+        }
+
+        const lastSlash = word.lastIndexOf('/');
+        const dirPart = lastSlash >= 0 ? word.substring(0, lastSlash + 1) : '';
+        const prefix = lastSlash >= 0 ? word.substring(lastSlash + 1) : word;
+        const absDir = this.fs.resolveAbsoluteDir(dirPart || '.');
+        const entries = this.fs.listEntriesAt(absDir);
+        const completions = entries
+            .filter((e) => e.name.startsWith(prefix))
+            .map((e) => `${dirPart}${e.name}${e.isDirectory ? '/' : ''}`)
+            .sort();
+        return { completions, replaceFrom: wordStart };
+    }
+
     addHistory(commandLine: string, commandId: number) {
         if (!this.history[0] || this.history[0].command !== commandLine) {
             this._history = [
@@ -175,6 +212,7 @@ export default class Terminal {
 
     attachOperatingSystem(os: OperatingSystem) {
         this._osController = os;
+        this.fs.mount(os.storagePath, os);
     }
 
     async readSecure(prompt: string) {
@@ -456,6 +494,13 @@ export default class Terminal {
                     this.fs.listDirectory(args).forEach((entry) => {
                         this.stdout(entry);
                     });
+                } catch (err) {
+                    this.stderr(err.message);
+                }
+                break;
+            case 'rm':
+                try {
+                    this.fs.rm(args);
                 } catch (err) {
                     this.stderr(err.message);
                 }

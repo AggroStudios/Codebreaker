@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
-import { getTrack, musicTracks } from '../../lib/musicTracks';
+import { getTrack, musicTracks } from '../../data/musicTracks';
 
 export default function MusicPlayer() {
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -12,12 +12,10 @@ export default function MusicPlayer() {
     const loop = useMusicPlayerStore((s) => s.loop);
     const nextTrack = useMusicPlayerStore((s) => s.nextTrack);
     const pause = useMusicPlayerStore((s) => s.pause);
+    const setPlaybackTimes = useMusicPlayerStore((s) => s.setPlaybackTimes);
 
     const trackCount = musicTracks.length;
-    const currentSrc = useMemo(
-        () => getTrack(currentTrackIndex)?.src,
-        [currentTrackIndex],
-    );
+    const currentSrc = getTrack(currentTrackIndex)?.src;
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -53,12 +51,19 @@ export default function MusicPlayer() {
 
     if (!currentSrc) return null;
 
+    const syncTimes = (el: HTMLAudioElement) => {
+        setPlaybackTimes(el.currentTime, Number.isFinite(el.duration) ? el.duration : 0);
+    };
+
     return (
         <audio
             ref={audioRef}
             src={currentSrc}
             preload="auto"
             onEnded={handleEnded}
+            onTimeUpdate={(e) => syncTimes(e.currentTarget)}
+            onLoadedMetadata={(e) => syncTimes(e.currentTarget)}
+            onDurationChange={(e) => syncTimes(e.currentTarget)}
             style={{ display: 'none' }}
             aria-hidden="true"
         />

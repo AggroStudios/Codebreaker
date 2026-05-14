@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import LinearProgress from '@mui/material/LinearProgress';
 import { styled, keyframes } from '@mui/material/styles';
-import LoadingImage from '../../assets/CodeBreaker-Logo.jpeg';
+import LoadingImage from '../../assets/codebreaker-loading.jpg';
 
 import './LoadingScreen.scss';
 

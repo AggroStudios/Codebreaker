@@ -1,20 +1,22 @@
-import { CipherState, ICipherType, IGridItem } from '../includes/Cipher.interface';
-import Process, { StationStoreType } from '../includes/Process.interface';
+import { CipherState, ICipherType } from '../includes/Cipher.interface';
+import Process, { IProcessorType, StationStoreType } from '../includes/Process.interface';
 import OperatingSystem from '../lib/OperatingSystem';
-import { Networking } from './network';
+import { Networking } from '../data/network';
 import { dataSizeFromSuffix } from './utils';
 
 export interface CipherDelegate {
-    setGrid: (grid: IGridItem[]) => void;
+    setGrid: (chars: Uint8Array, classes: Uint8Array) => void;
     setProgress: (progress: number) => void;
     setState: (state: CipherState) => void;
-    completeCipher: (cipher: Cipher, cancelled: boolean) => void;
+    completeCipher: (cipher: Cipher, state: CipherState) => void;
+    downloadTick: (frame: number) => void;
 }
 
 export default class Cipher implements Process {
     private readonly characters =
         'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()/\\-=+,.<>;:';
-    private _characterGrid: IGridItem[] = [];
+    private _chars: Uint8Array;
+    private _classes: Uint8Array;
     private _delegate: CipherDelegate;
     private unsolvedIndexes: Set<number> = new Set();
     private width: number;
@@ -25,12 +27,14 @@ export default class Cipher implements Process {
     private frame: number = 0;
     private _stationOs: OperatingSystem;
     private _stationNet: Networking;
+    private _stationProcessor: IProcessorType;
     private _cipherType: ICipherType;
     private cipherSize: number;
     private _state: CipherState = CipherState.DOWNLOADING;
     private _previousState: CipherState | undefined = undefined;
     private _paused: boolean = false;
     private _percentUse: number = 0;
+    private _failureRate: number = 0.00001;
 
     constructor(
         width: number,
@@ -38,7 +42,7 @@ export default class Cipher implements Process {
         cssClasses: string[],
         cipherType: ICipherType,
         station: StationStoreType,
-        delegate: CipherDelegate
+        delegate: CipherDelegate,
     ) {
         this.width = width;
         this.height = height;
@@ -46,12 +50,15 @@ export default class Cipher implements Process {
         this._id = crypto.randomUUID();
         this._stationOs = station.os;
         this._stationNet = station.network;
+        this._stationProcessor = station.cpu;
         this._cipherType = cipherType;
         this.cipherSize = dataSizeFromSuffix({
             size: cipherType.block.size,
             unit: cipherType.block.unit,
         });
         this._delegate = delegate;
+        this._chars = new Uint8Array(width * height);
+        this._classes = new Uint8Array(width * height);
 
         for (let i = 0; i < this.width * this.height; i++) {
             this.unsolvedIndexes.add(i);
@@ -60,10 +67,6 @@ export default class Cipher implements Process {
         this._stationOs.addProcess(this);
         this._stationNet.addProcess(this);
         this.state = this._state;
-    }
-
-    public get characterGrid() {
-        return this._characterGrid;
     }
 
     public get id() {
@@ -95,7 +98,7 @@ export default class Cipher implements Process {
     }
 
     public reset() {
-        this._delegate.setGrid([]);
+        this._delegate.setGrid(new Uint8Array(0), new Uint8Array(0));
         this._delegate.setProgress(0);
         this.state = CipherState.IDLE;
     }
@@ -125,54 +128,62 @@ export default class Cipher implements Process {
         this.state = CipherState.CANCELLED;
     }
 
+    public fail() {
+        this._paused = false;
+        this.state = CipherState.FAILURE;
+    }
+
     private set state(value: CipherState) {
         this._state = value;
         this._delegate.setState(value);
     }
 
-    private set progress(value: number) {
+    public set progress(value: number) {
         this._delegate.setProgress(value);
     }
 
-    private generateGrid(): IGridItem[] {
-        const rndGrid = [];
-        for (let i = 0; i < this.width * this.height; i++) {
+    private randomizeGrid() {
+        const total = this.width * this.height;
+        const charCount = this.characters.length;
+        const classCount = this.cssClasses.length;
+        for (let i = 0; i < total; i++) {
             if (this.unsolvedIndexes.has(i)) {
-                const cssClassIndex = Math.floor(
-                    Math.random() * this.cssClasses.length,
-                );
-                const charIndex = Math.floor(
-                    Math.random() * this.characters.length,
-                );
-                rndGrid.push({
-                    character: this.characters[charIndex],
-                    cssClass: this.cssClasses[cssClassIndex],
-                });
-            } else {
-                rndGrid.push(this._characterGrid[i]);
+                this._chars[i] = Math.floor(Math.random() * charCount);
+                this._classes[i] = Math.floor(Math.random() * classCount);
             }
         }
-        return rndGrid;
-    }
-
-    private randomizeGrid() {
-        this._delegate.setGrid(this.generateGrid());
+        this._delegate.setGrid(this._chars, this._classes);
     }
 
     private breaking() {
         this._percentUse = 100;
+
+        // Manual-mode ciphers are solved by the player via a minigame
+        if (this._cipherType.manualMode?.length) return;
+
+        // Fail the cipher with a chance of this._failureRate
+        if (Math.random() < this._failureRate) {
+            this.fail();
+            return;
+        }
+
         const complexity = Math.round(10 * this._cipherType.complexity);
-        if (this.frame > 0 && this.frame % complexity === 0) {
-            const unsolvedArr = [...this.unsolvedIndexes];
-            const solvedIndex =
-                unsolvedArr[Math.floor(Math.random() * unsolvedArr.length)];
-            const solvedValue = Math.round(Math.random());
-
-            this._characterGrid[solvedIndex] = {
-                character: solvedValue.toString(),
-                cssClass: 'broken',
-            };
-
+        if (this.frame > 0 && this.frame % parseFloat((complexity / this._stationProcessor.gigaflops).toFixed(3)) === 0) {
+            const targetPos = Math.floor(
+                Math.random() * this.unsolvedIndexes.size,
+            );
+            let solvedIndex = 0;
+            let pos = 0;
+            for (const idx of this.unsolvedIndexes) {
+                if (pos === targetPos) {
+                    solvedIndex = idx;
+                    break;
+                }
+                pos++;
+            }
+            // '0' = index 73, '1' = index 74 in CHAR_SET; class 4 = 'broken'
+            this._chars[solvedIndex] = 73 + Math.round(Math.random());
+            this._classes[solvedIndex] = 4;
             this.unsolvedIndexes.delete(solvedIndex);
             this.progress = Math.floor(
                 ((this.width * this.height - this.unsolvedIndexes.size) /
@@ -191,10 +202,15 @@ export default class Cipher implements Process {
         }
     }
 
+    public manualComplete() {
+        this.progress = 100;
+        this.state = CipherState.SUCCESS;
+    }
+
     private downloading() {
         this._percentUse = 50;
+        this._delegate.downloadTick(this.frame);
         if (this.frame > 0 && this.frame % 10 === 0) {
-            // calculate the amount of blocks downloaded, divided by the number of processes currently downloading.
             this.downloadedBlocks +=
                 this._stationNet.network.speedInBps /
                 this._stationNet.stack.length;
@@ -223,15 +239,17 @@ export default class Cipher implements Process {
                 break;
             case CipherState.SUCCESS:
                 this._stationOs.removeProcess(this);
-                this._delegate.completeCipher(this, false);
+                this._delegate.completeCipher(this, CipherState.SUCCESS);
                 break;
             case CipherState.CANCELLED:
                 this._stationOs.removeProcess(this);
                 this._stationNet.removeProcess(this);
-                this._delegate.completeCipher(this, true);
+                this._delegate.completeCipher(this, CipherState.CANCELLED);
                 break;
             case CipherState.FAILURE:
-                throw new Error('Cipher failed!');
+                this._stationOs.removeProcess(this);
+                this._delegate.completeCipher(this, CipherState.FAILURE);
+                break;
         }
     }
 }

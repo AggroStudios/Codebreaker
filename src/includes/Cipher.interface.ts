@@ -1,12 +1,15 @@
 import Cipher from '../lib/Cipher';
+import { ProcessorArchitecture } from './Process.interface';
+import { MiniGameProps } from './minigame.interfaces';
+import React from 'react';
 
 export enum CipherState {
     IDLE = 'Idle',
-    DOWNLOADING = 'Download',
+    DOWNLOADING = 'Downloading',
     BREAKING = 'Breaking',
     SUCCESS = 'Success',
     CANCELLED = 'Cancelled',
-    FAILURE = 'Failure',
+    FAILURE = 'Failed',
     PAUSED = 'Paused',
 }
 
@@ -28,65 +31,28 @@ export interface ICipherType {
     name: string;
     complexity: number;
     parallelism: number;
+    memoryRequired: number;
     block: {
         size: number;
         unit: BlockUnit;
     };
     payout: number;
     xp: number;
+    cipherTier?: string | null; // The tier ID of the auto-cipher upgrade that can break this cipher type.
+    requiredArchitecture: ProcessorArchitecture[];
+    manualMode?: React.ComponentType<MiniGameProps>[];
 }
 
-export interface IGridItem {
-    character: string;
-    cssClass: string;
+export interface CipherEntry {
+    cipher?: Cipher;
+    progress: number;
+    type?: ICipherType;
+    state?: CipherState;
+    autoCipher: boolean;
 }
 
 export interface CipherBreakState {
-    ciphers: Record<string, Cipher | undefined>;
-    grids: Record<string, IGridItem[] | undefined>;
-    progress: Record<string, number | undefined>;
-    types: Record<string, ICipherType | undefined>;
-    states: Record<string, CipherState | undefined>;
-    setCipher: (id: string, cipher: Cipher | undefined) => void;
-    setGrid: (id: string, grid: IGridItem[]) => void;
-    setProgress: (id: string, progress: number) => void;
-    setType: (id: string, type: ICipherType) => void;
-    setState: (id: string, state: CipherState) => void;
+    entries: Record<string, CipherEntry>;
+    update: (id: string, partial: Partial<CipherEntry>) => void;
     removeEntry: (id: string) => void;
 }
-
-export const CipherTypes: ICipherType[] = [
-    {
-        name: 'Cipher 1',
-        complexity: 1,
-        parallelism: 1,
-        block: {
-            size: 1024,
-            unit: BlockUnit.megabytes,
-        },
-        payout: 100,
-        xp: 10,
-    },
-    {
-        name: 'Cipher 2',
-        complexity: 1.8,
-        parallelism: 2,
-        block: {
-            size: 2048,
-            unit: BlockUnit.megabytes,
-        },
-        payout: 200,
-        xp: 12,
-    },
-    {
-        name: 'Cipher 3',
-        complexity: 2.5,
-        parallelism: 3,
-        block: {
-            size: 3072,
-            unit: BlockUnit.megabytes,
-        },
-        payout: 300,
-        xp: 17,
-    },
-];

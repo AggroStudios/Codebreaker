@@ -1,158 +1,252 @@
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
+    Box,
     Button,
+    Dialog,
     IconButton,
     Typography,
-    Box,
-    Divider,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
+import TerminalOutlinedIcon from '@mui/icons-material/TerminalOutlined';
+import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
+import AlbumOutlinedIcon from '@mui/icons-material/AlbumOutlined';
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import WallpaperOutlinedIcon from '@mui/icons-material/WallpaperOutlined';
 
 import AggroStudiosLogo from '../../assets/logos/AggroStudios.png';
+import CodebreakerLogo from '../../assets/logos/codebreaker-logo.png';
+import pkg from '../../../package.json';
+
+import './about.scss';
+import { usePlayerStore } from '../../stores/player';
+import { formatDuration } from '../../lib/utils';
 
 export interface AboutProps {
     open: boolean;
     onClose: () => void;
 }
 
+const BUILD_HASH =
+    (import.meta.env.VITE_GIT_SHA as string | undefined)?.slice(0, 7) ??
+    (import.meta.env.VITE_BUILD_HASH as string | undefined) ??
+    'localdev';
+
+const BUILD_DATE =
+    (import.meta.env.VITE_BUILD_DATE as string | undefined) ??
+    new Date().toISOString().slice(0, 10);
+
+const APP_VERSION = (import.meta.env.VITE_APP_VERSION as string | undefined) ?? pkg.version;
+
+const REACT_MAJOR = (() => {
+    const m = /^(\d+)/.exec(pkg.dependencies?.react ?? '');
+    return m ? m[1] : '19';
+})();
+
+const VITE_MAJOR = (() => {
+    const m = /^(\d+)/.exec(pkg.devDependencies?.vite ?? '');
+    return m ? m[1] : '8';
+})();
+
+interface CreditRow {
+    icon: typeof LightbulbOutlinedIcon;
+    label: string;
+    names: string;
+    tag?: string;
+}
+
+const CREDITS: CreditRow[] = [
+    {
+        icon: LightbulbOutlinedIcon,
+        label: 'ORIGINAL CONCEPT',
+        names: 'Simon Germain · Carmen Galante',
+    },
+    {
+        icon: TerminalOutlinedIcon,
+        label: 'ENGINEERING',
+        names: 'Simon Germain',
+        tag: 'LEAD',
+    },
+    {
+        icon: PaletteOutlinedIcon,
+        label: 'VISUAL DESIGN',
+        names: 'Carmen Galante',
+        tag: 'LEAD',
+    },
+    {
+        icon: WallpaperOutlinedIcon,
+        label: 'FRONT-END',
+        names: 'Melanie Germain',
+    },
+    {
+        icon: AlbumOutlinedIcon,
+        label: 'MUSIC',
+        names: 'Mathieu Lalonde — Funebrae',
+        tag: 'FUNEBRAE',
+    },
+    {
+        icon: FavoriteBorderOutlinedIcon,
+        label: 'SPECIAL THANKS',
+        names: 'Everyone who helped test, play, breaks ciphers, and shares feedback.',
+    },
+];
+
 export default function About({ open, onClose }: AboutProps) {
+
+    const totalPlayTime = usePlayerStore((state) => state.player.statistics.totalPlayedTime);
+    
     return (
         <Dialog
             open={open}
             onClose={onClose}
             fullWidth
             maxWidth="sm"
-            aria-labelledby="about-dialog-title"
+            aria-labelledby="about-dialog-heading"
+            slotProps={{
+                paper: {
+                    className: 'about-modal-paper',
+                    elevation: 0,
+                },
+            }}
         >
-            <DialogTitle
-                id="about-dialog-title"
-                component="div"
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                }}
-            >
-                About Code Breaker
-                <IconButton
-                    aria-label="Close about"
-                    onClick={onClose}
-                    size="small"
-                    sx={{ outline: 0 }}
-                >
-                    <CloseIcon />
-                </IconButton>
-            </DialogTitle>
-
-            <DialogContent dividers>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        mb: 3,
-                    }}
-                >
-                    <img
-                        src={AggroStudiosLogo}
-                        alt="Aggro Studios Logo"
-                        style={{ maxWidth: '100%', maxHeight: 240, objectFit: 'contain' }}
-                    />
+            <Box className="about-modal">
+                <Box className="about-modal__header" component="header">
+                    <h2 id="about-dialog-heading" className="about-modal__heading">
+                        About Codebreaker
+                    </h2>
+                    <IconButton
+                        className="about-modal__close"
+                        aria-label="Close about"
+                        onClick={onClose}
+                        size="small"
+                    >
+                        <CloseIcon />
+                    </IconButton>
                 </Box>
 
-                <Divider sx={{ mb: 2 }} />
+                <Box className="about-modal__body">
+                    <Box className="about-modal__frame">
+                        <Box className="about-modal__frame-content">
+                        <span className="about-modal__frame-border" aria-hidden />
+                        <span
+                            className="about-modal__frame-corner about-modal__frame-corner--tl"
+                            aria-hidden
+                        />
+                        <span
+                            className="about-modal__frame-corner about-modal__frame-corner--tr"
+                            aria-hidden
+                        />
+                        <span
+                            className="about-modal__frame-corner about-modal__frame-corner--bl"
+                            aria-hidden
+                        />
+                        <span
+                            className="about-modal__frame-corner about-modal__frame-corner--br"
+                            aria-hidden
+                        />
 
-                <Typography
-                    component="div"
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                    sx={{ display: 'block', textAlign: 'center' }}
-                >
-                    <h2>Thank you for playing Code Breaker!</h2>
-                </Typography>
+                        <Box className="about-modal__hero-brand">
+                            <img
+                                className="about-modal__hero-logo"
+                                src={AggroStudiosLogo}
+                                alt=""
+                            />
+                            <Typography className="about-modal__hero-studio" component="div">
+                                A GAME BY AGGRO STUDIOS
+                            </Typography>
+                            <img
+                                className="about-modal__hero-logo"
+                                src={CodebreakerLogo}
+                                alt=""
+                            />
+                            <Box className="about-modal__pills">
+                                <span className="about-modal__pill">
+                                    VERSION <span className="about-modal__pill-val">{APP_VERSION}</span>
+                                </span>
+                                <span className="about-modal__pill">
+                                    BUILD <span className="about-modal__pill-val">{BUILD_HASH}</span>
+                                </span>
+                                <span className="about-modal__pill">
+                                    ENGINE{' '}
+                                    <span className="about-modal__pill-val">
+                                        React {REACT_MAJOR} · Vite {VITE_MAJOR}
+                                    </span>
+                                </span>
+                            </Box>
+                            </Box>
+                        </Box>
 
-                <Typography
-                    component="div"
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                    sx={{ display: 'block' }}
-                >
-                    Code Breaker - Version {import.meta.env.VITE_APP_VERSION}<br />
-                </Typography>
+                        <Typography className="about-modal__intro" component="p">
+                            Thanks for playing. <strong>Codebreaker</strong> is the product of late nights,
+                            strong coffee, and the people below.
+                        </Typography>
 
-                <Typography
-                    component="div"
-                    variant="overline"
-                    color="text.secondary"
-                    gutterBottom
-                    sx={{ display: 'block' }}
-                >
-                    <h2 style={{ marginBottom: 0 }}>Credits</h2>
-                </Typography>
+                        <Box component="section" className="about-modal__section" aria-label="Credits">
+                            <Box className="about-modal__section-head">
+                                <span className="about-modal__section-label">01 // <span className="about-modal__section-label-accent">CREDITS</span></span>
+                                <span className="about-modal__section-meta">contributors · roles</span>
+                            </Box>
+                            <Box className="about-modal__credits">
+                                {CREDITS.map((row) => {
+                                    const Icon = row.icon;
+                                    return (
+                                        <Box key={row.label} className="about-modal__credit">
+                                            <Box className="about-modal__credit-icon" aria-hidden>
+                                                <Icon fontSize="small" />
+                                            </Box>
+                                            <Box className="about-modal__credit-body">
+                                                <Box className="about-modal__credit-label-row">
+                                                    <span className="about-modal__credit-label">
+                                                        {row.label}
+                                                    </span>
+                                                    {row.tag ? (
+                                                        <span className="about-modal__credit-tag">
+                                                            {row.tag}
+                                                        </span>
+                                                    ) : null}
+                                                </Box>
+                                                <Typography
+                                                    className="about-modal__credit-names"
+                                                    component="div"
+                                                >
+                                                    {row.names}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                    );
+                                })}
+                            </Box>
+                        </Box>
 
-                <Typography
-                    component="div"
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                    sx={{ display: 'block' }}
-                >
-                    <b>Code Breaker</b> is the culmination of a lot of hard work, dedication, and big dreams. This project would not have been possible without the support of the following people:
-                </Typography>
+                        <Box component="section" className="about-modal__section" aria-label="System">
+                            <Box className="about-modal__section-head">
+                                <span className="about-modal__section-label">02 // <span className="about-modal__section-label-accent">SYSTEM</span></span>
+                                <span className="about-modal__section-meta">runtime</span>
+                            </Box>
+                            <Box className="about-modal__terminal" role="region" aria-label="Build info">
+                                <div>
+                                    <span className="about-modal__terminal-prompt">$</span>
+                                    <span>codebreaker --info</span>
+                                </div>
+                                <div className="about-modal__terminal-dim">
+                                    → commit {BUILD_HASH} · {BUILD_DATE}
+                                </div>
+                                <div className="about-modal__terminal-dim">
+                                    → uptime {formatDuration(totalPlayTime / 1000)}
+                                </div>
+                            </Box>
+                        </Box>
+                    </Box>
+                </Box>
 
-                <Typography
-                    component="div"
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                    sx={{ display: 'block' }}
-                >
-                    <h3 style={{ marginBottom: 0 }}><b>Original Concept</b> by:</h3>
-                    <ul style={{ marginTop: 0 }}>
-                        <li>Simon Germain</li>
-                        <li>Carmen Galante</li>
-                    </ul>
-                </Typography>
-
-                <Typography
-                    component="div"
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom
-                    sx={{ display: 'block' }}
-                >
-                    <h3 style={{ marginBottom: 0 }}><b>Music</b> by:</h3>
-                    <ul style={{ marginTop: 0 }}>
-                        <li>Mathieu Lalonde - Funebrae</li>
-                    </ul>
-                </Typography>
-
-            </DialogContent>
-
-            <DialogActions sx={{ position: 'relative' }}>
-                <Typography
-                    component="div"
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                        position: 'absolute',
-                        left: '50%',
-                        top: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        textAlign: 'center',
-                        pointerEvents: 'none',
-                    }}
-                >
-                    Copyright © {new Date().getFullYear()} AGGRO Studios.
-                </Typography>
-                <Button onClick={onClose} sx={{ outline: 0 }}>
-                    Close
-                </Button>
-            </DialogActions>
+                <Box className="about-modal__footer">
+                    <Typography className="about-modal__footer-note" component="span">
+                        Codebreaker © {new Date().getFullYear()} AGGRO Studios
+                    </Typography>
+                    <Button className="about-modal__btn-done" onClick={onClose} variant="text">
+                        CLOSE
+                    </Button>
+                </Box>
+            </Box>
         </Dialog>
     );
 }

@@ -1,0 +1,84 @@
+.stat {
+    padding: 10px 12px;
+    background-color: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+
+    & .label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.5);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 6px;
+
+        & .title-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            & svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            &.accent {
+                color: #0af5b0;
+                text-shadow: 0 0 12px rgba(10,245,176,0.4);
+            }
+            
+            &.orange {
+                color: #ff9800;
+                text-shadow: 0 0 12px rgba(255,152,0,0.4);
+            }
+
+            &.income {
+                color: var(--color-income);
+                text-shadow: var(--glow-income);
+            }
+        }
+    }
+
+    & .value {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-top: 4px;
+        font-family: var(--font-code);
+        color: rgba(255,255,255,0.92);
+        text-shadow: none;
+        animation: none !important;
+
+        &.accent {
+            color: #0af5b0;
+            text-shadow: 0 0 12px rgba(10,245,176,0.4);
+        }
+
+        &.cyan {
+            color: #26c6da;
+            text-shadow: 0 0 12px rgba(38,198,218,0.4);
+        }
+
+        &.orange {
+            color: #ff9800;
+            text-shadow: 0 0 12px rgba(255,152,0,0.4);
+        }
+
+        &.income {
+            color: var(--color-income);
+            text-shadow: var(--glow-income);
+        }
+    }
+
+    & .subheader {
+        font-size: 12px;
+        font-weight: 500;
+        margin-top: 4px;
+        color: rgba(255,255,255,0.55);
+        letter-spacing: 0.04em;
+        font-family: var(--font-code);
+    }
+}

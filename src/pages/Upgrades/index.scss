@@ -1,0 +1,202 @@
+.upgrade-container {
+    border-radius: 12px !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column;
+    min-height: 0 !important;
+    margin: 2em;
+}
+
+.balance-display {
+    text-align: right !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    border-color: rgba(0, 0, 0, 0.2) !important
+}
+
+.balance-display-label {
+    font-size: 10px !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--color-fg-secondary) !important;
+}
+
+.balance-display-amount {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    font-family: var(--font-code) !important;
+    color: var(--accent) !important;
+    text-shadow: 0 0 10px rgba(10, 245, 176, 0.5) !important;
+}
+
+.upgrades-filter-bar {
+    padding: 16px 24px 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+    flex-wrap: wrap !important;
+    background-color: var(--color-bg-card) !important;
+}
+
+.filter-label {
+    font-size: 11px !important;
+    color: var(--color-fg-secondary) !important;
+    letter-spacing: 0.08em !important;
+    margin-right: 4px !important;
+    text-transform: uppercase !important;
+}
+
+.upgrades-filter-bar .MuiChip-root {
+    padding: 4px 4px !important;
+    font-size: 12px !important;
+    border:  1px solid var(--color-border);
+    cursor: pointer !important;
+    color: var(--color-fg-secondary) !important;
+    height: 24px !important;
+}
+
+.upgrades-filter-bar .MuiChip-root:hover {
+    color: var(--color-fg) !important;
+}
+
+.upgrades-filter-bar .MuiChip-root.active {
+    background-color: var(--accent-dim) !important;
+    border-color: var(--color-border-hi) !important;
+    color: var(--accent) !important;
+    box-shadow: 0 0 10px rgba(10, 245, 176, 0.5) !important;
+}
+
+.show-owned .MuiFormControlLabel-label {
+    font-size: 12px !important;
+    color: var(--color-fg-secondary) !important;
+    user-select: none !important;
+}
+
+.hide-fully-upgraded .MuiFormControlLabel-label {
+    font-size: 12px !important;
+    color: var(--color-fg-secondary) !important;
+    user-select: none !important;
+}
+
+.upgrades-search {
+    min-width: 240px !important;
+    margin-left: auto !important;
+}
+
+.upgrades-search .MuiOutlinedInput-root {
+    height: 30px !important;
+    font-size: 12px !important;
+    color: var(--color-fg) !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+.upgrades-search .MuiOutlinedInput-input {
+    padding: 6px 10px !important;
+}
+
+.upgrades-search .MuiInputAdornment-root {
+    color: var(--color-fg-secondary) !important;
+}
+
+.upgrades-search .MuiOutlinedInput-notchedOutline {
+    border-color: var(--color-border) !important;
+}
+
+.upgrades-search .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: var(--color-border-hover) !important;
+}
+
+.upgrades-search .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: var(--accent) !important;
+}
+
+.upgrades-search .MuiInputBase-input::placeholder {
+    color: var(--color-fg-secondary) !important;
+    opacity: 0.8 !important;
+}
+
+.show-owned {
+    display: flex !important;
+    gap: 6px !important;
+    align-items: center !important;
+    margin-right: 0 !important;
+}
+
+.hide-fully-upgraded {
+    display: flex !important;
+    gap: 6px !important;
+    align-items: center !important;
+    margin-right: 0 !important;
+}
+
+.show-owned .MuiSwitch-root {
+    padding: 8px !important;
+}
+
+.hide-fully-upgraded .MuiSwitch-root {
+    padding: 8px !important;
+}
+
+.show-owned .MuiSwitch-track {
+    background-color: var(--color-border-hi) !important;
+    border-radius: 14px !important;
+}
+
+.hide-fully-upgraded .MuiSwitch-track {
+    background-color: var(--color-border-hi) !important;
+    border-radius: 14px !important;
+}
+
+.show-owned .Mui-checked+.MuiSwitch-track {
+    background-color: var(--accent) !important;
+}
+
+.hide-fully-upgraded .Mui-checked+.MuiSwitch-track {
+    background-color: var(--accent) !important;
+}
+
+.show-owned .MuiSwitch-switchBase {
+    color: var(--color-fg) !important;
+}
+
+.hide-fully-upgraded .MuiSwitch-switchBase {
+    color: var(--color-fg) !important;
+}
+
+.upgrades-content {
+    padding: 0 14px 24px !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    background-color: var(--color-bg-card) !important;
+    display: flex !important;
+    flex-direction: row !important;
+}
+
+.upgrades-content-label {
+    font-size: 10px !important;
+    letter-spacing: 0.14em !important;
+    text-transform: uppercase !important;
+    color: var(--color-fg-secondary) !important;
+    font-family: var(--font-code) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 10px !important;
+}
+
+.upgrades-content-label::after {
+    content: '';
+    flex: 1 !important;
+    height: 1px !important;
+    background: var(--color-border) !important;
+}
+
+.upgrades-content-grid {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    padding: 10px !important;
+    align-content: flex-start !important;
+    align-items: stretch !important;
+}

@@ -1,0 +1,221 @@
+.breaking-1 {
+    color: #666;
+}
+
+.breaking-2 {
+    color: #888;
+}
+
+.breaking-3 {
+    color: #aaa;
+}
+
+.breaking-4 {
+    color: #ccc;
+}
+
+.broken {
+    color: #37ff37;
+}
+
+.progress {
+    margin-bottom: 10px;
+}
+
+.cipher-success {
+    animation: successPulse 1s !important;
+}
+
+.cipher-error {
+    animation: errorPulse 1s !important;
+}
+
+.centerAlign {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.cipher-select {
+    padding-top: 0;
+    margin: 0 8px;
+}
+
+.cipher-progress-complexity {
+    font-size: 12px;
+    margin-left: 12px;
+    color: rgba(255, 255, 255, 0.55);
+    letter-spacing: 0.1em;
+    font-family: var(--font-code) !important;
+    white-space: nowrap;
+}
+
+#cipher-break-card .MuiCardHeader-root {
+    padding-bottom: 10px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.cipher-progress-bar .MuiLinearProgress-root, .cipher-progress-container .MuiLinearProgress-root {
+    background-color: var(--accent-dim);
+    height: 8px;
+    border-radius: 4px !important;
+    & .MuiLinearProgress-bar {
+        background-color: var(--accent);
+        border-radius: 4px !important;
+    }
+}
+
+.cipher-progress-container .MuiLinearProgress-root {
+    height: 6px !important;
+    border-radius: 3px !important;
+    & .MuiLinearProgress-bar {
+        border-radius: 3px !important;
+    }
+}
+
+.cipher-progress-bar.paused {
+    background-color: rgba(255,152,0,0.15) !important;
+    & .MuiLinearProgress-bar {
+        background-color: #ff9800 !important;
+    }
+}
+
+.cipher-progress-bar.downloading {
+    background-color: rgba(38,198,218,0.15) !important;
+    & .MuiLinearProgress-bar {
+        background-color: #26c6da !important;
+    }
+}
+
+.cipher-card-header .MuiCardHeader-title {
+    font-family: var(--font-ui) !important;
+    font-size: 18px !important;
+}
+
+.cipher-card-header .MuiCardHeader-subheader {
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 2px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.cipher-progress-percentage {
+    color: var(--accent);
+    font-family: var(--font-code) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    padding: 0 6px !important;
+    margin: 0 !important;
+}
+
+.auto-cipher-checkbox.Mui-checked {
+    color: var(--accent) !important;
+    & .MuiCheckbox-root {
+        color: var(--accent) !important;
+    }
+}
+
+.cipher-progress-chip {
+    &.idle {
+        background-color: rgba(255,255,255,0.15);
+        color: rgba(255,255,255,0.6);
+    }
+    &.breaking {
+        background-color: var(--accent-dim);
+        color: var(--accent);
+    }
+    &.downloading {
+        background-color: rgba(38,198,218,0.15);
+        color: #26c6da;
+    }
+    &.success {
+        background-color: rgba(0,128,0,0.15);
+        color: #008000;
+    }
+    &.cancelled {
+        background-color: rgba(255, 0, 0, 0.15);
+        color: #d00000;
+    }
+    &.paused {
+        background-color: rgba(255,152,0,0.15);
+        color: #ff9800;
+    }
+
+    & .MuiChip-label {
+        padding: 2px 6px;
+    }
+
+    height: 18px !important;
+    font-family: var(--font-code) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    padding: 0 6px !important;
+    margin: 0 !important;
+}
+
+.cipher-info-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+    & > div {
+        flex: 1 1 0;
+        text-align: left;
+    }
+}
+
+.cipher-progress-container {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.cipher-break-canvas {
+    width: 100% !important;
+    display: block !important;
+    margin-bottom: 12px !important;
+    background-color: rgba(0,0,0,0.45) !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(255,255,255,0.06) !important;
+    box-shadow: inset 0 0 24px rgba(0,0,0,0.6) !important;
+}
+
+@keyframes scanX {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(200%);
+    }
+}
+
+@keyframes successPulse {
+    0% {
+        background-color: rgba(25, 25, 25, 0.8);
+    }
+    25% {
+        background-color: rgba(0, 128, 0, 0.8);
+    }
+    100% {
+        background-color: rgba(25, 25, 25, 0.8);
+    }
+}
+
+@keyframes errorPulse {
+    0% {
+        background-color: rgba(25, 25, 25, 0.8);
+    }
+    25% {
+        background-color: rgba(128, 0, 0, 0.8);
+    }
+    100% {
+        background-color: rgba(25, 25, 25, 0.8);
+    }
+}

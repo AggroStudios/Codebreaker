@@ -1,0 +1,131 @@
+.servers-page {
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.servers-page .page-header {
+    flex-shrink: 0;
+}
+
+.servers-header .MuiChip-root {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 6px;
+    border-radius: 9999px;
+    border: 1px solid #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    white-space: nowrap;
+    height: 18px !important;
+
+    & svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    &.accent {
+        border-color: #0af5b0;
+        color: #0af5b0;
+    }
+
+    &.warning {
+        border-color: #ff2828;
+        color: #ff2828;
+
+        & svg {
+            color: #ff2828;
+        }
+    }
+
+    & .live-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #0af5b0;
+        box-shadow: 0 0 6px #0af5b0;
+        animation: statusPulse 1.6s ease-in-out infinite;
+        flex-shrink: 0;
+        display: inline-block;
+    }
+}
+
+.servers-container {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 2em;
+    box-sizing: border-box;
+}
+
+.servers-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.servers-marketplace-container {
+    align-items: flex-start;
+}
+
+.servers-filters-column {
+    position: sticky;
+    top: 0;
+}
+
+.servers-sort-row {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.servers-tabs-container {
+    padding: 0 2em;
+    flex-shrink: 0;
+}
+
+.servers-tab-panels {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.servers-tab-panel {
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.servers-tabs {
+
+    & .MuiTab-root.Mui-selected {
+        color: var(--accent) !important;
+
+        &::after {
+            border-bottom: 2px solid var(--accent) !important;
+        }
+    }
+
+    & .MuiTab-root:focus {
+        outline: none;
+    }
+
+    & .MuiTabs-indicator {
+        background-color: var(--accent) !important;
+    }
+}
