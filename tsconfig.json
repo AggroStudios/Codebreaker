@@ -23,5 +23,6 @@
     "noUnusedParameters": true
   },
   "include": ["src", "test"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [{ "path": "./tsconfig.node.json" }],
+  "exclude": ["node_modules", "dist", "src/assets"]
 }

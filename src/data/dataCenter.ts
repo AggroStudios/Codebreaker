@@ -20,27 +20,7 @@ export const DATA_CENTERS = [
 ];
 
 // ── Initial contracts ────────────────────────────────────────────────────────
-export type IDataCenterContractStatus = 'ACTIVE' | 'PROVISIONING';
-
-/** Contract terms keyed by data center id (see DATA_CENTERS). */
-export interface IInitialContract {
-    racks: number;
-    rackCap: number;
-    powerKw: number;
-    uplinkGbps: number;
-    signedDays: number;
-    status: IDataCenterContractStatus;
-}
-
-export type IInitialContractsByRegion = Record<string, IInitialContract>;
-
-export const INITIAL_CONTRACTS: IInitialContractsByRegion = {
-    'us-west':       { racks: 8,  rackCap: 12, powerKw: 24,  uplinkGbps: 40,   signedDays: 142, status: 'ACTIVE'   },
-    'us-east':       { racks: 14, rackCap: 24, powerKw: 56,  uplinkGbps: 100,  signedDays: 318, status: 'ACTIVE'   },
-    'eu-central':    { racks: 6,  rackCap: 16, powerKw: 22,  uplinkGbps: 25,   signedDays: 86,  status: 'ACTIVE'   },
-    'ap-northeast':  { racks: 4,  rackCap: 12, powerKw: 18,  uplinkGbps: 10,   signedDays: 47,  status: 'ACTIVE'   },
-    'eu-north':      { racks: 2,  rackCap: 8,  powerKw: 6,   uplinkGbps: 10,   signedDays: 12,  status: 'PROVISIONING' },
-};
+export type IDataCenterContractStatus = 'ACTIVE' | 'PROVISIONING' | 'SUSPENDED';
 
 // ── Upgrade tiers ────────────────────────────────────────────────────────────
 // Power upgrades step the contract's allowed kW ceiling.
