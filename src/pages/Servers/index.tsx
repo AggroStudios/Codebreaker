@@ -10,8 +10,10 @@ import { serverMatchesFilters } from './filterServers';
 
 import './style.scss';
 import { useEffect, useMemo, useState } from 'react';
+import ServerDailyDealCard from '../../components/ServerDailyDealCard';
 import ServerSortBar from '../../components/ServerSortBar';
 import { ServerTier } from '../../includes/Servers.interface';
+import { useServersStore } from '../../stores/servers';
 
 const TIER_ORDER: Record<ServerTier, number> = Object.values(ServerTier).reduce(
     (acc, tier, index) => ({ ...acc, [tier]: index }),
@@ -19,6 +21,9 @@ const TIER_ORDER: Record<ServerTier, number> = Object.values(ServerTier).reduce(
 );
 
 const ServersMarketplace = () => {
+    const dailyDeal = useServersStore((s) => s.dailyDeal);
+    const dealServer = SERVERS.find((s) => s.tier === ServerTier.ENTRY) ?? SERVERS[0];
+    const dealDiscount = dailyDeal?.discountPercent ?? 13;
 
     const [filters, setFilters] = useState<ServerFiltersType>({});
     const [sortBy, setSortBy] = useState<string>('tierAsc');
@@ -77,7 +82,12 @@ const ServersMarketplace = () => {
             <div className="servers-scroll">
                 <Grid container spacing={2}>
                     <Grid size={12}>
-                        <span>Deal of the day shows here.</span>
+                        <ServerDailyDealCard
+                            server={dealServer}
+                            discount={dealDiscount}
+                            onPurchase={() => {}}
+                            onViewSpecs={() => {}}
+                        />
                     </Grid>
                     <Grid
                         container
@@ -89,7 +99,7 @@ const ServersMarketplace = () => {
                             <ServerFilters servers={serversForTierCounts} onChange={handleFiltersChange} priceRange={serverPriceMinMax} />
                         </Grid>
                         <Grid container spacing={2} size={{ xs: 12, md: 9, lg: 10 }}>
-                            <Grid size={12}>
+                            <Grid size={12} className="servers-sort-row">
                                 <ServerSortBar servers={filteredServers} totalServers={SERVERS.length} onSort={handleSort} />
                             </Grid>
                             {filteredServers.map((server) => (

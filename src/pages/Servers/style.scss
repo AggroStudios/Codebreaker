@@ -84,6 +84,12 @@
     top: 0;
 }
 
+.servers-sort-row {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
 .servers-tabs-container {
     padding: 0 2em;
     flex-shrink: 0;
