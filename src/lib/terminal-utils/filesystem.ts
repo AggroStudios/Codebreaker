@@ -437,7 +437,6 @@ export default class FileSystem {
             });
 
         if (isEmpty(dir)) {
-            console.log(parsed);
             throw new Error(`Directory '${resolvedPath}' not found.`);
         }
 

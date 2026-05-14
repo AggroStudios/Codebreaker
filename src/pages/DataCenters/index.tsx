@@ -30,7 +30,6 @@ export default function DataCenters() {
     }, [contracts]);
 
     const handleSignContract = (dataCenterId: string) => {
-        console.log('handleSignContract', dataCenterId);
         const dataCenter = DATA_CENTERS.find((dc) => dc.id === dataCenterId);
         setContracts({
             ...contracts,
@@ -45,22 +44,19 @@ export default function DataCenters() {
         });
     };
 
-    const handleAddRack = (dataCenterId: string, cost: number) => {
-        console.log('handleAddRack', dataCenterId, cost);
+    const handleAddRack = (dataCenterId: string, _cost: number) => {
         upgradeContract(dataCenterId, {
             racks: (contracts[dataCenterId]?.racks || 0) + 1,
         });
     };
 
-    const handleUpgradePower = (dataCenterId: string, power: number, cost: number) => {
-        console.log('handleUpgradePower', dataCenterId, power, cost);
+    const handleUpgradePower = (dataCenterId: string, power: number, _cost: number) => {
         upgradeContract(dataCenterId, {
             powerKw: power,
         });
     };
 
-    const handleUpgradeUplink = (dataCenterId: string, uplink: number, cost: number) => {
-        console.log('handleUpgradeUplink', dataCenterId, uplink, cost);
+    const handleUpgradeUplink = (dataCenterId: string, uplink: number, _cost: number) => {
         upgradeContract(dataCenterId, {
             uplinkGbps: uplink,
         });
