@@ -10,15 +10,39 @@ import { serverMatchesFilters } from './filterServers';
 
 import './style.scss';
 import { useEffect, useMemo, useState } from 'react';
+import ServerSortBar from '../../components/ServerSortBar';
+import { ServerTier } from '../../includes/Servers.interface';
+
+const TIER_ORDER: Record<ServerTier, number> = Object.values(ServerTier).reduce(
+    (acc, tier, index) => ({ ...acc, [tier]: index }),
+    {} as Record<ServerTier, number>,
+);
 
 const ServersMarketplace = () => {
 
     const [filters, setFilters] = useState<ServerFiltersType>({});
+    const [sortBy, setSortBy] = useState<string>('tierAsc');
     const playerMoney = usePlayerStore((s) => s.player.money);
 
     const filteredServers = useMemo(
-        () => SERVERS.filter((server) => serverMatchesFilters(server, filters, playerMoney)),
-        [filters, playerMoney],
+        () => {
+            const filtered = SERVERS.filter((server) => serverMatchesFilters(server, filters, playerMoney));
+            return [...filtered].sort((a, b) => {
+                switch (sortBy) {
+                    case 'tierAsc':
+                        return TIER_ORDER[a.tier] - TIER_ORDER[b.tier];
+                    case 'tierDesc':
+                        return TIER_ORDER[b.tier] - TIER_ORDER[a.tier];
+                    case 'priceAsc':
+                        return a.price - b.price;
+                    case 'priceDesc':
+                        return b.price - a.price;
+                    default:
+                        return 0;
+                }
+            });
+        },
+        [filters, playerMoney, sortBy],
     );
 
     const serverPriceMinMax = useMemo((): ServerPriceMinMax => {
@@ -44,6 +68,10 @@ const ServersMarketplace = () => {
         setFilters(next);
     };
 
+    const handleSort = (sortBy: string) => {
+        setSortBy(sortBy);
+    };
+
     return (
         <div className="servers-container">
             <div className="servers-scroll">
@@ -61,6 +89,9 @@ const ServersMarketplace = () => {
                             <ServerFilters servers={serversForTierCounts} onChange={handleFiltersChange} priceRange={serverPriceMinMax} />
                         </Grid>
                         <Grid container spacing={2} size={{ xs: 12, md: 9, lg: 10 }}>
+                            <Grid size={12}>
+                                <ServerSortBar servers={filteredServers} totalServers={SERVERS.length} onSort={handleSort} />
+                            </Grid>
                             {filteredServers.map((server) => (
                                 <Grid size={{ xs: 12, md: 6, lg: 6, xl: 4 }} key={server.model}>
                                     <ServerCard server={server} />

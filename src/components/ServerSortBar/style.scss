@@ -1,0 +1,70 @@
+.server-sort {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.server-sort .MuiCardContent-root {
+    padding-bottom: 16px !important;
+    border: 1px solid var(--color-border) !important;
+}
+
+.server-sort-bar__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    & .server-sort-bar__show-items-label {
+        color: var(--fg-secondary);
+        font-size: 0.8125rem;
+        font-family: var(--font-code);
+        text-transform: uppercase;
+
+        & .accent {
+            color: var(--accent);
+        }
+    }
+
+    & .server-sort-bar__item {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    & .server-sort-bar__item-label {
+        gap: 0.35rem;
+        margin-right: 1rem;
+        color: var(--fg-secondary);
+        text-transform: uppercase;
+    }
+}
+
+.server-sort-bar__item-button {
+    display: flex;
+    gap: 0.35rem;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 0.65rem;
+    color: var(--fg-secondary);
+    font-family: var(--font-code);
+
+    &:focus {
+        outline: none !important;
+    }
+
+    &:hover {
+        border-color: rgba(10, 245, 176, 0.55) !important;
+    }
+
+    &.Mui-selected {
+        background-color: var(--accent-dim) !important;
+        color: var(--accent) !important;
+        border-color: rgba(10, 245, 176, 0.55) !important;
+        box-shadow: inset 0 0 0 1px rgba(10, 245, 176, 0.12);
+    }
+
+    & svg {
+        width: 14px;
+        height: 14px;
+    }
+}
