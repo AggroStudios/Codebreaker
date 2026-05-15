@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { Server } from '../includes/Servers.interface';
+import { steamCloudStorage } from '../lib/steamCloudStorage';
 
 export interface DailyDeal {
     server: Server;
@@ -31,8 +32,8 @@ export const useServersStore = create<ServersStoreState>()(
              }),
         }),
         {
-            name: 'servers-store',
-            storage: createJSONStorage(() => localStorage),
+            name: 'servers-store.json',
+            storage: createJSONStorage(() => steamCloudStorage),
             partialize: (state) => ({
                 servers: state.servers,
                 dailyDeal: state.dailyDeal,

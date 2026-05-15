@@ -91,9 +91,7 @@ function registerSteamIpc() {
 
     ipcMain.handle('steam:getAppId', () => requireSteam().utils.getAppId());
 
-    ipcMain.handle('steam:localplayer:getName', () =>
-        requireSteam().localplayer.getName(),
-    );
+    ipcMain.handle('steam:localplayer:getName', () => requireSteam().localplayer.getName());
 
     ipcMain.handle('steam:localplayer:getSteamId', () => {
         const id = requireSteam().localplayer.getSteamId();
@@ -109,10 +107,8 @@ function registerSteamIpc() {
         requireSteam().localplayer.getLevel(),
     );
 
-    ipcMain.handle(
-        'steam:localplayer:setRichPresence',
-        (_e, key: string, value?: string | null) =>
-            requireSteam().localplayer.setRichPresence(key, value ?? null),
+    ipcMain.handle('steam:localplayer:setRichPresence', (_e, key: string, value?: string | null) =>
+        requireSteam().localplayer.setRichPresence(key, value ?? null),
     );
 
     ipcMain.handle('steam:achievement:activate', (_e, name: string) =>
@@ -131,10 +127,8 @@ function registerSteamIpc() {
     ipcMain.handle('steam:overlay:activateToWebPage', (_e, url: string) =>
         requireSteam().overlay.activateToWebPage(url),
     );
-    ipcMain.handle(
-        'steam:overlay:activateToStore',
-        (_e, appId: number, flag: number) =>
-            requireSteam().overlay.activateToStore(appId, flag),
+    ipcMain.handle('steam:overlay:activateToStore', (_e, appId: number, flag: number) =>
+        requireSteam().overlay.activateToStore(appId, flag),
     );
 
     ipcMain.handle('steam:cloud:isEnabledForApp', () =>
@@ -143,10 +137,8 @@ function registerSteamIpc() {
     ipcMain.handle('steam:cloud:readFile', (_e, name: string) =>
         requireSteam().cloud.readFile(name),
     );
-    ipcMain.handle(
-        'steam:cloud:writeFile',
-        (_e, name: string, content: string) =>
-            requireSteam().cloud.writeFile(name, content),
+    ipcMain.handle('steam:cloud:writeFile', (_e, name: string, content: string) =>
+        requireSteam().cloud.writeFile(name, content),
     );
     ipcMain.handle('steam:cloud:deleteFile', (_e, name: string) =>
         requireSteam().cloud.deleteFile(name),

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { IApplication } from '../includes/Terminal.interface';
+import { steamCloudStorage } from '../lib/steamCloudStorage';
 
 type StorageStoreState = {
     storedFiles: IApplication[];
@@ -23,8 +24,8 @@ export const useStorageStore = create<StorageStoreState>()(
             clearFiles: () => set({ storedFiles: [] }),
         }),
         {
-            name: 'storage-store',
-            storage: createJSONStorage(() => localStorage),
+            name: 'storage-store.json',
+            storage: createJSONStorage(() => steamCloudStorage),
             partialize: (state) => ({ storedFiles: state.storedFiles }),
         },
     ),

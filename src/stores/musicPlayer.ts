@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { steamCloudStorage } from '../lib/steamCloudStorage';
 
 export interface MusicPlayerState {
     playing: boolean;
@@ -96,8 +97,8 @@ export const useMusicPlayerStore = create<MusicPlayerState>()(
             })),
     }),
     {
-        name: 'music-player-store',
-        storage: createJSONStorage(() => localStorage),
+        name: 'music-player-store.json',
+        storage: createJSONStorage(() => steamCloudStorage),
         partialize: (state) => ({
             volume: state.volume,
             sfxVolume: state.sfxVolume,

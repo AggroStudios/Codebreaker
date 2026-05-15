@@ -10,6 +10,7 @@ import { IStatistics, IStatisticsCipher } from '../includes/Statistics.interface
 import { storeProxy } from '../utils/storeProxy';
 import { ICipherType } from '../includes/Cipher.interface';
 import { Server } from '../includes/Servers.interface';
+import { steamCloudStorage } from '../lib/steamCloudStorage';
 
 let hideMoneyLabelTimer: ReturnType<typeof setTimeout> | null = null;
 let hideXpLabelTimer: ReturnType<typeof setTimeout> | null = null;
@@ -364,8 +365,8 @@ const createPlayerStore = () => create<PlayerState>()(
                 }),
         }),
         {
-            name: 'player-store',
-            storage: createJSONStorage(() => localStorage),
+            name: 'player-store.json',
+            storage: createJSONStorage(() => steamCloudStorage),
             partialize: (state) => ({
                 player: state.player,
                 purchasedUpgrades: state.purchasedUpgrades,

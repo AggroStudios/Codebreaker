@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { IDataCenterContractsByRegion } from '../includes/DataCenter.interface';
 import { omit } from 'lodash';
+import { steamCloudStorage } from '../lib/steamCloudStorage';
 
 export interface IDataCenterContractUpgrade {
     racks?: number;
@@ -69,8 +70,8 @@ export const useDataCentersStore = create<DataCentersStore>()(
             })),
         }),
         {
-            name: 'dataCenters-store',
-            storage: createJSONStorage(() => localStorage),
+            name: 'dataCenters-store.json',
+            storage: createJSONStorage(() => steamCloudStorage),
             partialize: (state) => ({ contracts: state.contracts }),
         },
     ),

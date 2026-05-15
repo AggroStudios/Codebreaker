@@ -7,6 +7,7 @@ import { CodiumMemory } from '../data/memory';
 import { CodiumStorageHdd } from '../data/storage';
 import { CodiumProcessor } from '../data/processors';
 import { ScreenGlowType } from '../components/ScreenGlow';
+import { steamCloudStorage } from '../lib/steamCloudStorage';
 
 const makeDefaults = () => ({
     cpu: new CodiumProcessor(),
@@ -45,8 +46,8 @@ export const createStationStore = () =>
                 setGlowType: (type: ScreenGlowType) => set(() => ({ glowType: type })),
             }),
             {
-                name: 'station-store',
-                storage: createJSONStorage(() => localStorage),
+                name: 'station-store.json',
+                storage: createJSONStorage(() => steamCloudStorage),
                 partialize: (state) => ({
                     isRunning: state.isRunning,
                     exponent: state.exponent,
