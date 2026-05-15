@@ -12,6 +12,7 @@ import BootSequence from './bootSequence';
 import Tutorial from './tutorial';
 import Glow from './glow';
 import ContractEdit from './contractEdit';
+import DailyDeal from './dailyDeal';
 
 export default Array<IApplication>(
     {
@@ -31,6 +32,12 @@ export default Array<IApplication>(
         cmd: 'contract',
         path: '/',
         app: ContractEdit,
+        permissions: 555,
+    },
+    {
+        cmd: 'dailyDeal',
+        path: '/',
+        app: DailyDeal,
         permissions: 555,
     },
     {

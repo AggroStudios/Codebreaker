@@ -1,5 +1,5 @@
-import { Button, Typography } from '@mui/material';
-import { Bolt, InfoOutlined, ShoppingCartOutlined, StarBorderOutlined } from '@mui/icons-material';
+import { Button, Chip, Typography } from '@mui/material';
+import { Bolt, ShoppingCartOutlined, StarBorderOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -10,12 +10,12 @@ import './style.scss';
 
 export interface ServerDailyDealCardProps {
     server: Server;
+    owned?: number;
     /** Percent off list price (e.g. `13` for 13% off). */
     discount: number;
     /** When the offer ends (ms or Date). Defaults to end of local calendar day. */
     dealEndsAt?: number | Date;
     onPurchase?: (server: Server) => void;
-    onViewSpecs?: (server: Server) => void;
     className?: string;
 }
 
@@ -43,10 +43,10 @@ const formatNetworkUplink = (kbps: number) => {
 
 export default function ServerDailyDealCard({
     server,
+    owned,
     discount,
     dealEndsAt,
     onPurchase,
-    onViewSpecs,
     className,
 }: ServerDailyDealCardProps) {
     const ends = useMemo(() => {
@@ -87,18 +87,28 @@ export default function ServerDailyDealCard({
 
     const tierClass = `tier-${server.tier.toLowerCase()}`;
 
+    const isOwned = !!owned && owned > 0;
+
     return (
         <div className={clsx('server-daily-deal-card', tierClass, className)}>
             <div className="server-daily-deal-card__backdrop" aria-hidden />
-            <div className="server-daily-deal-card__inner">
-                <div className={clsx('server-daily-deal-card__badge', tierClass)}>
-                    <Bolt fontSize="small" />
-                    <span>Deal of the day</span>
-                    <span className="server-daily-deal-card__badge-sep">·</span>
-                    <span className="server-daily-deal-card__badge-time">{formatCountdown(secondsLeft)} left</span>
-                </div>
-
-                <div className="server-daily-deal-card__row">
+            <div className="server-daily-deal-card__row">
+                <div className="server-daily-deal-card__inner">
+                    <div className="server-daily-deal-card__row">
+                        <div className={clsx('server-daily-deal-card__badge', tierClass)}>
+                            <Bolt fontSize="small" />
+                            <span>Deal of the day</span>
+                            <span className="server-daily-deal-card__badge-sep">·</span>
+                            <span className="server-daily-deal-card__badge-time">{formatCountdown(secondsLeft)} left</span>
+                        </div>
+                        {isOwned &&
+                            <Chip
+                                className={clsx('server-daily-deal-card__badge', 'tier-pro')}
+                                label={`OWNED ×${owned}`}
+                                size="small"
+                            />
+                        }
+                    </div>
                     <div className="server-daily-deal-card__copy">
                         <Typography className={clsx('server-daily-deal-card__eyebrow', tierClass)} component="div">
                             {eyebrow}
@@ -130,33 +140,26 @@ export default function ServerDailyDealCard({
                             >
                                 Purchase now
                             </Button>
-                            <Button
-                                variant="outlined"
-                                className="server-daily-deal-card__btn-specs"
-                                startIcon={<InfoOutlined />}
-                                onClick={() => onViewSpecs?.(server)}
-                            >
-                                View specs
-                            </Button>
                         </div>
                     </div>
 
-                    <div className="server-daily-deal-card__visual">
-                        <div className="server-daily-deal-card__featured">
-                            <StarBorderOutlined fontSize="inherit" />
-                            Featured
-                        </div>
-                        {server.imageSrc ? (
-                            <div className="server-daily-deal-card__image-wrap">
-                                <img
-                                    className="server-daily-deal-card__image"
-                                    src={server.imageSrc}
-                                    alt={`${server.manufacturer} ${server.model}`}
-                                    draggable={false}
-                                />
-                            </div>
-                        ) : null}
+                </div>
+
+                <div className="server-daily-deal-card__visual">
+                    <div className="server-daily-deal-card__featured">
+                        <StarBorderOutlined fontSize="inherit" />
+                        Featured
                     </div>
+                    {server.imageSrc ? (
+                        <div className="server-daily-deal-card__image-wrap">
+                            <img
+                                className="server-daily-deal-card__image"
+                                src={server.imageSrc}
+                                alt={`${server.manufacturer} ${server.model}`}
+                                draggable={false}
+                            />
+                        </div>
+                    ) : null}
                 </div>
             </div>
         </div>

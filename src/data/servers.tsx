@@ -36,6 +36,49 @@ import { NetworkFiber, NetworkFiber10Gbps, Networking } from './network';
 import { CodiumProcessor, CodiumProcessor64, CodiumProcessorQuantum1, CodiumProcessorQuantumX, CodiumProcessorX8 } from './processors';
 import { CodiumStorage, CodiumStorage8TB } from './storage';
 
+export const ServerNamePrefixes: Record<ServerTier, string[]> = {
+    [ServerTier.ENTRY]: [
+        'Hydrogen',
+        'Carbon',
+        'Nitrogen',
+        'Oxygen',
+        'Sulfur',
+        'Selenium',
+    ],
+    [ServerTier.STANDARD]: [
+        'Helium',
+        'Neon',
+        'Argon',
+        'Krypton',
+        'Xenon',
+        'Radon',
+    ],
+    [ServerTier.PRO]: [
+        'Lithium',
+        'Sodium',
+        'Calcium',
+        'Radium',
+        'Caesium',
+        'Beryllium',
+    ],
+    [ServerTier.ENTERPRISE]: [
+        'Titanium',
+        'Vanadium',
+        'Chromium',
+        'Cadmium',
+        'Palladium',
+        'Platinum',
+    ],
+    [ServerTier.QUANTUM]: [
+        'Thorium',
+        'Uranium',
+        'Neptunium',
+        'Plutonium',
+        'Curium',
+        'Fermium',
+    ],    
+};
+
 export default [
     {
         manufacturer: 'Procyon',

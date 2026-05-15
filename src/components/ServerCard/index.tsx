@@ -41,7 +41,7 @@ export interface ServerCardProps {
     /** Pre-formatted storage label override (e.g. `0.5 TB SSD`). When omitted, derived from `server.storage`. */
     storageLabel?: string;
     /** Apply a percent discount to `server.price`. The original price is shown struck-through. */
-    salePercent?: number;
+    discount?: number;
     /** Quantity of this server already owned by the player. Hidden when `0`/undefined. */
     owned?: number;
     /** Render the card in a locked state (greyed out, "Locked" CTA, no glow). */
@@ -96,8 +96,8 @@ export default function ServerCard(props: ServerCardProps) {
     const networkLabel = props.networkLabel ?? formatNetwork(networkSpeed);
 
     const originalPrice = server.price ?? 0;
-    const onSale = !!props.salePercent && props.salePercent > 0;
-    const salePrice = onSale ? originalPrice * (1 - (props.salePercent as number) / 100) : originalPrice;
+    const onSale = !!server.discount && server.discount > 0;
+    const salePrice = onSale ? originalPrice * (1 - (server.discount / 100)) : originalPrice;
 
     const isFavorite = !!props.favorite;
     const isOwned = !!props.owned && props.owned > 0;
@@ -126,7 +126,7 @@ export default function ServerCard(props: ServerCardProps) {
                         {onSale && (
                             <Chip
                                 className="server-card-tag-chip sale"
-                                label={`SALE −${props.salePercent}%`}
+                                label={`SALE −${server.discount}%`}
                                 size="small"
                             />
                         )}

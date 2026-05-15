@@ -2,7 +2,6 @@ import { Box, Chip, Grid, Tab, Tabs } from '@mui/material';
 import PageHeader from '../../components/common/PageHeader';
 import { DnsOutlined, Lan, StorageTwoTone, StorefrontOutlined } from '@mui/icons-material';
 
-import SERVERS from '../../data/servers';
 import ServerCard from '../../components/ServerCard';
 import ServerFilters, { ServerFilters as ServerFiltersType, ServerPriceMinMax } from '../../components/ServerFilters';
 import { usePlayerStore } from '../../stores/player';
@@ -12,7 +11,7 @@ import './style.scss';
 import { useEffect, useMemo, useState } from 'react';
 import ServerDailyDealCard from '../../components/ServerDailyDealCard';
 import ServerSortBar from '../../components/ServerSortBar';
-import { ServerTier } from '../../includes/Servers.interface';
+import { Server, ServerTier } from '../../includes/Servers.interface';
 import { useServersStore } from '../../stores/servers';
 
 const TIER_ORDER: Record<ServerTier, number> = Object.values(ServerTier).reduce(
@@ -21,17 +20,22 @@ const TIER_ORDER: Record<ServerTier, number> = Object.values(ServerTier).reduce(
 );
 
 const ServersMarketplace = () => {
+    const servers = useServersStore((s) => s.servers);
     const dailyDeal = useServersStore((s) => s.dailyDeal);
-    const dealServer = SERVERS.find((s) => s.tier === ServerTier.ENTRY) ?? SERVERS[0];
+    const dealServer = dailyDeal?.server ?? servers[0];
     const dealDiscount = dailyDeal?.discountPercent ?? 13;
 
     const [filters, setFilters] = useState<ServerFiltersType>({});
     const [sortBy, setSortBy] = useState<string>('tierAsc');
     const playerMoney = usePlayerStore((s) => s.player.money);
 
+    const purchasedServers = useServersStore((s) => s.purchasedServers);
+    const purchaseServer = useServersStore((s) => s.purchaseServer);
+    // const sellServer = useServersStore((s) => s.sellServer);
+
     const filteredServers = useMemo(
         () => {
-            const filtered = SERVERS.filter((server) => serverMatchesFilters(server, filters, playerMoney));
+            const filtered = servers.filter((server) => serverMatchesFilters(server, filters, playerMoney));
             return [...filtered].sort((a, b) => {
                 switch (sortBy) {
                     case 'tierAsc':
@@ -52,14 +56,14 @@ const ServersMarketplace = () => {
 
     const serverPriceMinMax = useMemo((): ServerPriceMinMax => {
         return {
-            min: Math.min(...SERVERS.map((server) => server.price)),
-            max: Math.max(...SERVERS.map((server) => server.price)),
+            min: Math.min(...servers.map((server) => server.price)),
+            max: Math.max(...servers.map((server) => server.price)),
         };
     }, []);
 
     const serversForTierCounts = useMemo(
         () =>
-            SERVERS.filter((server) =>
+            servers.filter((server) =>
                 serverMatchesFilters(
                     server,
                     { ...filters, tierId: undefined },
@@ -77,6 +81,11 @@ const ServersMarketplace = () => {
         setSortBy(sortBy);
     };
 
+    const handleBuy = (server: Server) => {
+        console.log('handleBuy', server);
+        purchaseServer(server);
+    };
+
     return (
         <div className="servers-container">
             <div className="servers-scroll">
@@ -85,8 +94,8 @@ const ServersMarketplace = () => {
                         <ServerDailyDealCard
                             server={dealServer}
                             discount={dealDiscount}
-                            onPurchase={() => {}}
-                            onViewSpecs={() => {}}
+                            owned={purchasedServers.filter((server) => server.manufacturer === dealServer.manufacturer && server.model === dealServer.model).length}
+                            onPurchase={handleBuy}
                         />
                     </Grid>
                     <Grid
@@ -100,11 +109,11 @@ const ServersMarketplace = () => {
                         </Grid>
                         <Grid container spacing={2} size={{ xs: 12, md: 9, lg: 10 }}>
                             <Grid size={12} className="servers-sort-row">
-                                <ServerSortBar servers={filteredServers} totalServers={SERVERS.length} onSort={handleSort} />
+                                <ServerSortBar servers={filteredServers} totalServers={servers.length} onSort={handleSort} />
                             </Grid>
                             {filteredServers.map((server) => (
                                 <Grid size={{ xs: 12, md: 6, lg: 6, xl: 4 }} key={server.model}>
-                                    <ServerCard server={server} />
+                                    <ServerCard server={server} owned={purchasedServers.filter((s) => s.manufacturer === server.manufacturer && s.model === server.model).length} onBuy={handleBuy} />
                                 </Grid>
                             ))}
                         </Grid>
@@ -118,6 +127,8 @@ const ServersMarketplace = () => {
 export default function Servers() {
     const [value, setValue] = useState(0);
     const [inventoryMounted, setInventoryMounted] = useState(false);
+
+    const purchasedServers = useServersStore((s) => s.purchasedServers);
 
     useEffect(() => {
         if (value === 1) {
@@ -191,7 +202,11 @@ export default function Servers() {
                         }}
                     >
                         <div className="servers-container">
-                            <div className="servers-scroll">Server Inventory goes here.</div>
+                            <div className="servers-scroll">
+                                {purchasedServers.map((server, key) => 
+                                    <div key={key}>{server.name} - {server.tier} - {server.manufacturer} - {server.model}</div>
+                                )}
+                            </div>
                         </div>
                     </Box>
                 ) : null}
