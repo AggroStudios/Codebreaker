@@ -211,6 +211,14 @@ const getComponents = () => {
     //     },
     //   ],
     // },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backdropFilter: `blur(6px)`,
+          WebkitBackdropFilter: `blur(6px)`,
+        },
+      },
+    },
     // MuiCardActions: {
     //   styleOverrides: {
     //     root: {
