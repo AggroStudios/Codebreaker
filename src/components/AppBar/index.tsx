@@ -49,6 +49,7 @@ import { useStationContext } from '../../stores/stationContext';
 import { useAnchors } from '../AnchorsContext';
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
 import { formatMoney } from '../../lib/utils';
+import { ExitToAppOutlined } from '@mui/icons-material';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -225,6 +226,10 @@ export default function AppBarComponent() {
     };
     const handleAboutClose = () => setAboutOpen(false);
 
+    const handleLogout = () => {
+        console.log('Handle Logout');
+    };
+
     const menuId = 'primary-search-account-menu';
     const notificationId = 'primary-search-notification-menu';
     const messageId = 'primary-search-message-menu';
@@ -361,6 +366,12 @@ export default function AppBarComponent() {
                         <InfoTwoTone fontSize="small" />
                     </ListItemIcon>
                     <ListItemText primary="About" />
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>
+                    <ListItemIcon>
+                        <ExitToAppOutlined fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="Logout" />
                 </MenuItem>
             </Menu>
 

@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -38,6 +38,7 @@ import { useServersStore } from './stores/servers';
 import ServersDailyOffers from './lib/servers-dailyOffers';
 import DataCenter from './lib/dataCenter';
 
+const TitleScreenRoute = lazy(() => import('./pages/TitleScreen'));
 const TerminalRoute = lazy(() => import('./pages/Terminal'));
 const StationRoute = lazy(() => import('./pages/Station'));
 const LoginRoute = lazy(() => import('./components/Login'));
@@ -106,6 +107,7 @@ export default function App() {
 
         preloadImages(setLoadingProgress);
         // Preload all route chunks in the background so navigation is instant
+        import('./pages/TitleScreen');
         import('./pages/Terminal');
         import('./pages/Station');
         import('./components/Login');
@@ -145,8 +147,13 @@ export default function App() {
                     >
                         <BrowserRouter>
                             <Routes>
+                                <Route index element={
+                                    <Suspense fallback={null}>
+                                        <TitleScreenRoute />
+                                    </Suspense>
+                                } />
                                 <Route element={<Layout />}>
-                                    <Route index element={
+                                    <Route path="terminal" element={
                                         <TerminalRoute
                                             terminalController={
                                                 terminalController
