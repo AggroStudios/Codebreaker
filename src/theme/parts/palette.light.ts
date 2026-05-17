@@ -1,4 +1,8 @@
-import { blue, blueGrey, green, grey, red } from '@mui/material/colors';
+import {
+  blue,
+  blueGrey,
+  grey,
+} from '@mui/material/colors';
 
 //Base palette for light mode
 const getPaletteLight = ({ augmentColor }) => {
@@ -9,35 +13,66 @@ const getPaletteLight = ({ augmentColor }) => {
       default: grey[100],
       paper: '#fff',
     },
+    accent: augmentColor({
+      color: {
+        main: '#0af5b0'
+      }
+    }),
+    blue: augmentColor({
+      color: {
+        main: '#61dafb',
+      },
+      name: 'blue',
+    }),
+    cyan: augmentColor({
+      color: {
+        main: '#26c6da',
+      },
+      name: 'cyan',
+    }),
     grey: augmentColor({
       color: {
-        lighter: grey[200],
-        main: grey[600],
+        lighter: grey[100],
+        main: grey[500],
       },
       name: 'grey',
     }),
     green: augmentColor({
       color: {
-        main: green[500],
+        main: '#0af5b0',
       },
       name: 'green',
+    }),
+    orange: augmentColor({
+      color: {
+        main: '#ffb74d',
+      },
+      name: 'orange',
+    }),
+    purple: augmentColor({
+      color: {
+        main: '#9c7fe0',
+      },
+      name: 'purple',
+    }),
+    red: augmentColor({
+      color: {
+        main: '#ff2828',
+      },
+      name: 'red',
     }),
     logo: {
       text: '#000',
     },
-    primary: {
-      main: red[500],
-    },
+    primary: augmentColor({
+      color: {
+        main: '#0af5b0',
+      },
+      name: 'primary',
+    }),
     secondary: {
       main: blueGrey[500],
     },
-    //theme additions...
-    branding: augmentColor({
-      color: {
-        main: '#cc1b00',
-      },
-      name: 'branding',
-    }),
     link: {
       color: '#000',
       hover: blue[800],

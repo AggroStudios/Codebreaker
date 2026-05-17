@@ -37,7 +37,6 @@ export default function GlyphCardHeader({
     title,
     ...rest
 }: GlyphCardHeaderProps) {
-    console.log('==> REST: ', rest)
     return (
         <GlyphCardHeaderWrapper color={color}>
             <GlyphWall color={color} count={glyphCount} />

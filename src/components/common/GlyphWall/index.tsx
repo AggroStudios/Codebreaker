@@ -16,8 +16,8 @@ export const Glyph = styled('div', {
     overridesResolver: (props: any, styles: any) => ({
         ...styles.root,
         ...(props?.color && {
-            backgroundColor: props.theme.palette[props.color].main,
-            boxShadow: `0 0 6px ${props.theme.palette[props.color].main}`,
+            color: props.theme.palette[props.color].light,
+            textShadow: `0 0 6px ${props.theme.palette[props.color].light}`,
         })
     })
 })({});
@@ -43,7 +43,7 @@ const GlyphWallComponent = styled('div')<GlyphWallComponentProps>(() => ({
         opacity: 1
         },
         '50%': {
-        opacity: .5
+        opacity: 0.5
         },
         '100%': {
         opacity: 0,
@@ -86,14 +86,13 @@ export default function GlyphWall({color, count = 24}: GlyphWallProps) {
         >
             {cells.map((c, i) => (
                 <Glyph
+                    color={color}
                     key={i}
                     style={{
                         left: `${c.left}%`,
-                        color,
                         fontSize: c.size,
                         animationDuration: `${c.dur}s`,
                         animationDelay: `${c.delay}s`,
-                        textShadow: `0 0 6px ${color}66`,
                     }}
                 >
                     {c.ch}

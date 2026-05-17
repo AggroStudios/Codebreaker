@@ -1,12 +1,6 @@
 import {
   blue,
-  blueGrey,
-  //cyan,
-  //green,
   grey,
-  //orange,
-  purple,
-  red
 } from '@mui/material/colors';
 
 //Base palette for dark mode
@@ -56,32 +50,28 @@ const getPaletteDark = ({ augmentColor }) => {
     }),
     purple: augmentColor({
       color: {
-        main: purple[500],
+        main: '#9c7fe0',
       },
       name: 'purple',
     }),
     red: augmentColor({
       color: {
-        main: red[500],
+        main: '#ff2828',
       },
       name: 'red',
     }),
     logo: {
       text: '#fff',
     },
-    primary: {
-      main: red[500],
-    },
-    secondary: {
-      main: blueGrey[500],
-    },
-    //theme additions...
-    branding: augmentColor({
+    primary: augmentColor({
       color: {
-        main: '#cc1b00',
+        main: '#0af5b0',
       },
-      name: 'branding',
+      name: 'primary',
     }),
+    secondary: {
+      main: grey[500],
+    },
     link: {
       color: '#fff',
       hover: blue[300],
