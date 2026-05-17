@@ -5,6 +5,7 @@ import MatrixRain from '../../components/title/MatrixRain';
 import TerminalLog from '../../components/title/TerminalLog';
 import SystemReadout from '../../components/title/SystemReadout';
 import TitleMenu, { TitleMenuId } from '../../components/title/TitleMenu';
+import { useUIStore } from '../../stores/ui';
 
 import codebreakerLogo from '../../assets/logos/codebreaker-logo.png';
 import aggroLogo from '../../assets/logos/AggroStudios.png';
@@ -19,6 +20,8 @@ const OPERATOR_ID = '0xA3-91F4-CB07';
 export default function TitleScreen() {
     const stageRef = useRef<HTMLDivElement | null>(null);
     const navigate = useNavigate();
+    const openSettings = useUIStore((s) => s.openSettings);
+    const openAbout = useUIStore((s) => s.openAbout);
 
     useEffect(() => {
         const stage = stageRef.current;
@@ -38,12 +41,16 @@ export default function TitleScreen() {
             case 'continue':
                 navigate('/station');
                 return;
+            case 'settings':
+                openSettings();
+                return;
+            case 'credits':
+                openAbout();
+                return;
             case 'exit':
                 window.close();
                 return;
             case 'load':
-            case 'settings':
-            case 'credits':
             default:
                 // Not yet implemented — leave as no-op so the menu still feels responsive.
                 return;

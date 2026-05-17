@@ -43,9 +43,8 @@ import CodeBreakerLogo from '../../assets/logos/codebreaker-logo.png';
 import './styles.scss';
 import { NotificationLevel } from '../../includes/OperatingSystem.interface';
 import MoneyLabel from '../MoneyLabel';
-import Settings from '../Settings';
-import About from '../About';
 import { usePlayerStore } from '../../stores/player';
+import { useUIStore } from '../../stores/ui';
 import { useStationContext } from '../../stores/stationContext';
 import { useAnchors } from '../AnchorsContext';
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
@@ -170,6 +169,8 @@ export default function AppBarComponent() {
 
     const { moneyAnchorRef } = useAnchors();
     const navigate = useNavigate();
+    const openSettings = useUIStore((s) => s.openSettings);
+    const openAbout = useUIStore((s) => s.openAbout);
 
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const [mobileAnchorEl, setMobileAnchorEl] = useState<HTMLElement | null>(
@@ -180,8 +181,6 @@ export default function AppBarComponent() {
     const [messageAnchorEl, setMessageAnchorEl] = useState<HTMLElement | null>(
         null,
     );
-    const [settingsOpen, setSettingsOpen] = useState(false);
-    const [aboutOpen, setAboutOpen] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState<
         { mode: 'one'; index: number } | { mode: 'all' } | null
     >(null);
@@ -217,16 +216,14 @@ export default function AppBarComponent() {
     const handleSettingsOpen = () => {
         setAnchorEl(null);
         setMobileAnchorEl(null);
-        setSettingsOpen(true);
+        openSettings();
     };
-    const handleSettingsClose = () => setSettingsOpen(false);
 
     const handleAboutOpen = () => {
         setAnchorEl(null);
         setMobileAnchorEl(null);
-        setAboutOpen(true);
+        openAbout();
     };
-    const handleAboutClose = () => setAboutOpen(false);
 
     const handleLogout = () => {
         setAnchorEl(null);
@@ -378,9 +375,6 @@ export default function AppBarComponent() {
                     <ListItemText primary="Logout" />
                 </MenuItem>
             </Menu>
-
-            <Settings open={settingsOpen} onClose={handleSettingsClose} />
-            <About open={aboutOpen} onClose={handleAboutClose} />
 
             <Menu
                 anchorEl={mobileAnchorEl}

@@ -11,8 +11,11 @@ import Typography from '@mui/material/Typography';
 
 import Layout from './Layout';
 import LoadingScreen from './components/LoadingScreen';
+import Settings from './components/Settings';
+import About from './components/About';
 
 import { darkTheme } from './theme';
+import { useUIStore } from './stores/ui';
 
 import { playerStoreProxy } from './stores/player';
 import { createStationStore, makeStationProxy } from './stores/station';
@@ -136,6 +139,11 @@ export default function App() {
         useAppReadyStore.getState().setAppReady();
     };
 
+    const settingsOpen = useUIStore((s) => s.settingsOpen);
+    const aboutOpen = useUIStore((s) => s.aboutOpen);
+    const closeSettings = useUIStore((s) => s.closeSettings);
+    const closeAbout = useUIStore((s) => s.closeAbout);
+
     return (
         <ThemeProvider theme={darkTheme}>
             <CssBaseline />
@@ -185,6 +193,8 @@ export default function App() {
                 loading={loadingProgress}
                 onHidden={handleLoadingHidden}
             />
+            <Settings open={settingsOpen} onClose={closeSettings} />
+            <About open={aboutOpen} onClose={closeAbout} />
             <Dialog
                 open={persistMismatchOpen}
                 onClose={handlePersistMismatchDismiss}
