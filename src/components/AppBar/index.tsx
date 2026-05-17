@@ -1,4 +1,5 @@
 import { useEffect, useState, type MouseEvent as ReactMouseEvent } from 'react';
+import { useNavigate } from 'react-router';
 
 import {
     Box,
@@ -168,6 +169,7 @@ export default function AppBarComponent() {
     );
 
     const { moneyAnchorRef } = useAnchors();
+    const navigate = useNavigate();
 
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const [mobileAnchorEl, setMobileAnchorEl] = useState<HTMLElement | null>(
@@ -227,7 +229,9 @@ export default function AppBarComponent() {
     const handleAboutClose = () => setAboutOpen(false);
 
     const handleLogout = () => {
-        console.log('Handle Logout');
+        setAnchorEl(null);
+        setMobileAnchorEl(null);
+        navigate('/');
     };
 
     const menuId = 'primary-search-account-menu';
