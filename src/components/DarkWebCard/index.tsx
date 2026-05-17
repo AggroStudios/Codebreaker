@@ -62,11 +62,11 @@ export default function DarkWebCard(props: IDarkWebCardProps) {
 
     return (
         <Grid size={{sm: 12, lg: 6, xl: 4}} key={props.faction.id}>
-            <Card className="dark-web-card">
+            <Card className="dark-web-card background">
                 <GlyphCardHeader
                     className={props.faction.color.className}
                     title={props.faction.name}
-                    subheader={props.faction.handle}
+                    subheader={`${props.faction.handle} · ${props.faction.region}`}
                     glyphColor={props.faction.color.color}
                     online={props.faction.online}
                     avatar={

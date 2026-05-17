@@ -1,0 +1,44 @@
+.server-row-image-cell {
+    width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.server-row-image {
+    width: 60px;
+    height: 44px;
+    object-fit: cover;
+}
+
+.server-row-server-info-name {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--fg-primary);
+}
+
+.server-row-server-info-model {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--fg-muted);
+    font-family: var(--font-code);
+}
+
+.server-row-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+
+    & .blue svg {
+        color: rgb(38, 198, 218);
+    }
+    & .accent svg {
+        color: var(--accent);
+    }
+    & .red svg {
+        color: #ff2828;
+    }
+}

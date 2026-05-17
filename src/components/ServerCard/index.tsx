@@ -17,6 +17,7 @@ import { Server, ServerTier, ServerTiers } from '../../includes/Servers.interfac
 import { formatMoney } from '../../lib/utils';
 
 import './style.scss';
+import { usePlayerStore } from '../../stores/player';
 
 const TIER_CLASS: Record<ServerTier, string> = {
     [ServerTier.ENTRY]: 'tier-1',
@@ -81,6 +82,9 @@ const formatHashrate = (mhs: number) => {
 };
 
 export default function ServerCard(props: ServerCardProps) {
+
+    const playerMoney = usePlayerStore((s) => s.player.money);
+
     const { server } = props;
     const tierClass = TIER_CLASS[server.tier];
     const tierBadge = `${ServerTiers[server.tier]} · ${server.tier.toUpperCase()}`;
@@ -101,7 +105,7 @@ export default function ServerCard(props: ServerCardProps) {
 
     const isFavorite = !!props.favorite;
     const isOwned = !!props.owned && props.owned > 0;
-    const isLocked = !!props.locked;
+    const isLocked = !!props.locked || salePrice > playerMoney;
 
     const handleBuy = () => {
         if (!isLocked) props.onBuy?.(server);

@@ -15,7 +15,7 @@ import { IUpgradeItem, IUpgradeRequirement, IUpgradeTier, UpgradeList } from '..
 import { formatMoney } from '../../lib/utils';
 import { usePlayerStore } from '../../stores/player';
 
-import './index.scss';
+import './style.scss';
 
 const ROMAN_NUMERALS = ['0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 const toRoman = (value: number): string => {
@@ -100,7 +100,8 @@ export default function UpgradeDetails({ upgrade, onPurchase, onClose }: Upgrade
         ? `Mk ${toRoman(currentTierCount)}`
         : 'Not Owned';
 
-    const handlePurchase = () => {
+    const handlePurchase = (event: React.MouseEvent) => {
+        event.stopPropagation();
         if (!nextTier || !canPurchase) return;
         onPurchase?.(upgrade, nextTier);
     };

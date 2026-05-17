@@ -1,0 +1,516 @@
+/* ----------------------------------------------------------------------------
+ * Upgrade Details — sidebar panel showing the full tier ladder for an upgrade
+ * ------------------------------------------------------------------------- */
+
+.upgrade-details {
+    --category-color: var(--color-fg-secondary);
+    --category-color-soft: rgba(255, 255, 255, 0.07);
+    --category-color-border: rgba(255, 255, 255, 0.18);
+    --category-glow: rgba(255, 255, 255, 0.18);
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(20, 22, 26, 0.5);
+    backdrop-filter: blur(8px);
+
+    &.software {
+        --category-color: #26c6da;
+        --category-color-soft: rgba(38, 198, 218, 0.12);
+        --category-color-border: rgba(38, 198, 218, 0.45);
+        --category-glow: rgba(38, 198, 218, 0.45);
+    }
+
+    &.network {
+        --category-color: #9c7fe0;
+        --category-color-soft: rgba(103, 58, 183, 0.18);
+        --category-color-border: rgba(156, 127, 224, 0.45);
+        --category-glow: rgba(103, 58, 183, 0.45);
+    }
+
+    &.hardware {
+        --category-color: #ff9800;
+        --category-color-soft: rgba(255, 152, 0, 0.14);
+        --category-color-border: rgba(255, 152, 0, 0.45);
+        --category-glow: rgba(255, 152, 0, 0.45);
+    }
+
+    &.security {
+        --category-color: #ff4040;
+        --category-color-soft: rgba(255, 64, 64, 0.14);
+        --category-color-border: rgba(255, 64, 64, 0.45);
+        --category-glow: rgba(255, 64, 64, 0.45);
+    }
+}
+
+/* Empty state ---------------------------------------------------------------*/
+
+.upgrade-details-empty {
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 24px;
+    text-align: center;
+
+    .MuiSvgIcon-root {
+        font-size: 32px;
+        color: rgba(255, 255, 255, 0.25);
+    }
+
+    span {
+        max-width: 220px;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--color-fg-secondary);
+        user-select: none;
+    }
+}
+
+/* Header --------------------------------------------------------------------*/
+
+.upgrade-details-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 14px 10px;
+}
+
+.upgrade-details .upgrade-category-icon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    background-color: var(--category-color-soft) !important;
+    color: var(--category-color) !important;
+    border: 1px solid var(--category-color-border) !important;
+    flex-shrink: 0;
+}
+
+.upgrade-details .upgrade-category-icon .MuiSvgIcon-root {
+    font-size: 22px !important;
+}
+
+.upgrade-details-title {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.upgrade-details-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-fg);
+    line-height: 1.2;
+    user-select: none;
+}
+
+.upgrade-details-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-code);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    user-select: none;
+}
+
+.upgrade-details-category {
+    color: var(--category-color);
+}
+
+.upgrade-details-separator {
+    color: var(--color-fg-disabled);
+}
+
+.upgrade-details-status {
+    color: var(--color-fg-secondary);
+
+    &.owned {
+        color: var(--category-color);
+    }
+
+    &.not-owned {
+        color: var(--color-fg-secondary);
+    }
+}
+
+.upgrade-details .upgrade-details-close {
+    color: var(--color-fg-secondary) !important;
+    align-self: flex-start;
+    margin-top: -4px !important;
+    margin-right: -4px !important;
+}
+
+.upgrade-details .upgrade-details-close:hover {
+    color: var(--color-fg) !important;
+    background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Description ---------------------------------------------------------------*/
+
+.upgrade-details-description {
+    padding: 0 14px 14px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--color-fg-secondary);
+    user-select: none;
+}
+
+/* Body ----------------------------------------------------------------------*/
+
+.upgrade-details-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.upgrade-details-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.upgrade-details-section-label {
+    font-family: var(--font-code);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    color: var(--color-fg-disabled);
+    user-select: none;
+}
+
+/* Prerequisites -------------------------------------------------------------*/
+
+.upgrade-prereq-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.upgrade-prereq-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--color-border);
+    font-size: 12px;
+    user-select: none;
+
+    &.met {
+        border-color: rgba(10, 245, 176, 0.30);
+        background-color: rgba(10, 245, 176, 0.05);
+
+        .MuiSvgIcon-root {
+            color: var(--accent);
+            font-size: 16px;
+        }
+    }
+
+    &.missing {
+        border-color: rgba(255, 64, 64, 0.30);
+        background-color: rgba(255, 64, 64, 0.05);
+
+        .MuiSvgIcon-root {
+            color: #ff4040;
+            font-size: 16px;
+        }
+    }
+}
+
+.upgrade-prereq-name {
+    flex: 1;
+    color: var(--color-fg);
+}
+
+.upgrade-prereq-tier {
+    font-family: var(--font-code);
+    font-size: 11px;
+    color: var(--color-fg-secondary);
+    letter-spacing: 0.06em;
+}
+
+/* Tier ladder ---------------------------------------------------------------*/
+
+.upgrade-tier-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.upgrade-tier-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background-color: rgba(255, 255, 255, 0.02);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+
+    &.owned {
+        border-color: var(--color-border);
+        background-color: rgba(255, 255, 255, 0.025);
+    }
+
+    &.next {
+        border-color: var(--category-color-border);
+        background-color: rgba(255, 255, 255, 0.04);
+        box-shadow: inset 0 0 0 1px var(--category-color-border);
+    }
+
+    &.future {
+        opacity: 0.55;
+    }
+}
+
+.upgrade-tier-badge {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-family: var(--font-code);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border: 1px solid transparent;
+    user-select: none;
+
+    &.owned {
+        background-color: var(--category-color-soft);
+        color: var(--category-color);
+        border-color: var(--category-color-border);
+        box-shadow: inset 0 0 0 1px var(--category-color-border), 0 0 8px var(--category-glow);
+    }
+
+    &.next {
+        background-color: rgba(255, 255, 255, 0.04);
+        color: var(--category-color);
+        border-color: var(--category-color-border);
+    }
+
+    &.future {
+        background-color: rgba(255, 255, 255, 0.04);
+        color: var(--color-fg-disabled);
+        border-color: var(--color-border);
+    }
+}
+
+.upgrade-tier-badge.software.owned {
+    background-color: rgba(38, 198, 218, 0.24);
+}
+
+.upgrade-tier-badge.network.owned {
+    background-color: rgba(156, 127, 224, 0.24);
+}
+
+.upgrade-tier-badge.hardware.owned {
+    background-color: rgba(255, 152, 0, 0.28);
+}
+
+.upgrade-tier-badge.security.owned {
+    background-color: rgba(255, 64, 64, 0.24);
+}
+
+.upgrade-tier-row-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.upgrade-tier-row-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.upgrade-tier-row-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-fg);
+    user-select: none;
+}
+
+.upgrade-tier-row.future .upgrade-tier-row-name {
+    color: var(--color-fg-secondary);
+}
+
+.upgrade-tier-owned-pill {
+    font-family: var(--font-code);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    user-select: none;
+}
+
+.upgrade-tier-row-description {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--color-fg-secondary);
+    user-select: none;
+}
+
+.upgrade-tier-row-requires {
+    margin-top: 4px;
+    font-family: var(--font-code);
+    font-size: 10px;
+    color: var(--color-fg-disabled);
+    letter-spacing: 0.04em;
+    user-select: none;
+}
+
+.upgrade-tier-row-requires-label {
+    color: var(--color-fg-disabled);
+}
+
+.upgrade-tier-row-requires-item.missing {
+    color: #ff7070;
+}
+
+.upgrade-tier-row-requires-item.met {
+    color: var(--accent);
+}
+
+.upgrade-tier-row-cost {
+    flex-shrink: 0;
+    font-family: var(--font-code);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    user-select: none;
+
+    &.owned {
+        color: var(--color-fg-disabled);
+        text-decoration: line-through;
+    }
+
+    &.future {
+        opacity: 0.85;
+    }
+}
+
+/* Footer --------------------------------------------------------------------*/
+
+.upgrade-details-footer {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px 14px;
+    border-top: 1px solid var(--color-border);
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.upgrade-details-footer .upgrade-cost-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    user-select: none;
+}
+
+.upgrade-details-footer .upgrade-cost-label {
+    font-family: var(--font-code);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-fg-secondary);
+}
+
+.upgrade-details-footer .upgrade-cost {
+    font-family: var(--font-code);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-fg);
+
+    &.available {
+        color: var(--accent);
+        text-shadow: 0 0 10px rgba(10, 245, 176, 0.5);
+    }
+
+    &.cant-afford {
+        color: #ff4040;
+    }
+
+    &.locked,
+    &.maxed {
+        color: var(--color-fg-secondary);
+    }
+}
+
+.upgrade-details-footer .upgrade-button.MuiButton-root {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 8px;
+    box-shadow: none;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.upgrade-details-footer .upgrade-button.MuiButton-root .MuiButton-startIcon {
+    margin-right: 6px;
+}
+
+.upgrade-details-footer .upgrade-button.MuiButton-root .MuiButton-startIcon .MuiSvgIcon-root {
+    font-size: 16px;
+}
+
+.upgrade-details-footer .upgrade-button.purchase.MuiButton-root {
+    background-color: var(--accent);
+    color: var(--color-fg-on-accent);
+}
+
+.upgrade-details-footer .upgrade-button.purchase.MuiButton-root:hover {
+    background-color: var(--accent);
+    box-shadow: 0 0 14px rgba(10, 245, 176, 0.55);
+}
+
+.upgrade-details-footer .upgrade-button.cant-afford.MuiButton-root.Mui-disabled {
+    background-color: var(--color-bg-cant-afford);
+    color: #ff4040;
+    border: 1px solid rgba(255, 64, 64, 0.25);
+}
+
+.upgrade-details-footer .upgrade-button.locked.MuiButton-root.Mui-disabled {
+    background-color: rgba(255, 255, 255, 0.04);
+    color: var(--color-fg-secondary);
+    border: 1px solid var(--color-border);
+}
+
+.upgrade-details-footer .upgrade-button.maxed.MuiButton-root.Mui-disabled {
+    background-color: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(10, 245, 176, 0.30);
+}
