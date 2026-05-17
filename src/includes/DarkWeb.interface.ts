@@ -42,7 +42,8 @@ export interface IDarkWebFaction {
     id: string;
     name: string;
     handle: string;
-    glyph: OverridableComponent<SvgIconTypeMap<object, 'svg'>>;
+    glyph: string;
+    //glyph: OverridableComponent<SvgIconTypeMap<object, 'svg'>>;
     color: FactionColor;
     region: string;
     blurb: string;

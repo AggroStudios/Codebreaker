@@ -1,28 +1,60 @@
-import { CardHeader, CardHeaderProps } from '@mui/material';
+import { ReactElement } from 'react';
+import Box from '@mui/material/Box';
+import CardHeader, { CardHeaderProps } from '@mui/material/CardHeader';
 import GlyphWall, { GlyphWallProps } from '../GlyphWall';
-
-import omit from 'lodash/omit';
-
-import './styles.scss';
-import clsx from 'clsx';
+import Typography from '@mui/material/Typography';
+import { LiveDot } from '../LiveDot';
+import { alpha, styled } from '@mui/material/styles';
 
 export interface GlyphCardHeaderProps extends CardHeaderProps {
-    glyphColor?: string;
+    avatar?: ReactElement;
+    action?: ReactElement;
+    color?: string;
     glyphCount?: GlyphWallProps['count'];
     online?: boolean;
+    title: string;
 }
 
+const GlyphCardHeaderWrapper = styled(Box, {
+    name: 'GlyphCardHeader',
+    slot: 'root',
+    shouldForwardProp: (prop) => prop !== 'color',
+    overridesResolver: (props: any, styles: any) => ({
+        ...styles.root,
+        ...(props?.color ? {
+            background: `linear-gradient(180deg, ${alpha(props.theme.palette[props.color].main, 0.12)} 0%, rgba(0, 0, 0, 0) 100%)`,
+        } : {
+            background: `linear-gradient(180deg, ${alpha(props.theme.palette.accent.main, 0.12)} 0%, rgba(0, 0, 0, 0) 100%)`,
+        })
+    })
+})({});
+
 export default function GlyphCardHeader({
+    color,
+    glyphCount = 24,
     online = false,
-    glyphColor = '#0af5b0',
-    glyphCount,
-    className,
-    ...cardHeaderProps
+    subheader,
+    title,
+    ...rest
 }: GlyphCardHeaderProps) {
+    console.log('==> REST: ', rest)
     return (
-        <div className={className ? `glyph-card-header ${className}` : 'glyph-card-header'}>
-            <GlyphWall color={glyphColor} count={glyphCount} />
-            <CardHeader title={<div className="glyph-card-header__title"><span className={clsx('dot', online && 'online live-dot')} />{cardHeaderProps.title}</div>} {...omit(cardHeaderProps, ['title'])} className="glyph-card-header__header" />
-        </div>
+        <GlyphCardHeaderWrapper color={color}>
+            <GlyphWall color={color} count={glyphCount} />
+            <CardHeader
+                disableTypography
+                subheader={
+                    <Typography noWrap variant="caption">
+                        {subheader}
+                    </Typography>
+                }
+                title={
+                    <Typography noWrap variant="h2">
+                        <LiveDot color="accent" online={online}/>{title}
+                    </Typography>
+                }
+                {...rest}
+            />
+        </GlyphCardHeaderWrapper>
     );
 }

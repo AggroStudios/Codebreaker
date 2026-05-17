@@ -1,13 +1,5 @@
 import React from 'react';
-
-import './styles.scss';
-
-export interface GlyphWallProps {
-    color: string;
-    count?: number;
-    className?: string;
-    style?: React.CSSProperties;
-}
+import { styled } from '@mui/material/styles';
 
 interface Cell {
     ch: '0' | '1';
@@ -17,7 +9,63 @@ interface Cell {
     size: number;
 }
 
-export default function GlyphWall({ color, count = 24, className, style }: GlyphWallProps) {
+export const Glyph = styled('div', {
+    name: 'Glyph',
+    slot: 'root',
+    shouldForwardProp: (prop) => prop !== 'color',
+    overridesResolver: (props: any, styles: any) => ({
+        ...styles.root,
+        ...(props?.color && {
+            backgroundColor: props.theme.palette[props.color].main,
+            boxShadow: `0 0 6px ${props.theme.palette[props.color].main}`,
+        })
+    })
+})({});
+
+export interface GlyphWallComponentProps {
+    'aria-hidden': boolean;
+    className?: string;
+    style?: React.CSSProperties;
+}
+
+const GlyphWallComponent = styled('div')<GlyphWallComponentProps>(() => ({
+    inset: 0,
+    opacity: 0.5,
+    overflow: 'hidden',
+    pointerEvents: 'none',
+    position: 'absolute',
+    '@keyframes glyphDrift': {
+        '0%': {
+        opacity: 0,
+        transform: 'translateY(0)',
+        },
+        '10%': {
+        opacity: 1
+        },
+        '50%': {
+        opacity: .5
+        },
+        '100%': {
+        opacity: 0,
+        transform: 'translateY(140%)',
+        }
+    },
+}));
+
+export interface GlyphWallProps {
+    color: string;
+    count?: number;
+}
+
+declare module '@mui/material/styles' {
+    interface Components {
+        GlyphWall?: {
+            defaultProps?: GlyphWallProps;
+        };
+    }
+}
+
+export default function GlyphWall({color, count = 24}: GlyphWallProps) {
     const cells = React.useMemo<Cell[]>(() => {
         const out: Cell[] = [];
         for (let i = 0; i < count; i++) {
@@ -33,15 +81,12 @@ export default function GlyphWall({ color, count = 24, className, style }: Glyph
     }, [count]);
 
     return (
-        <div
+        <GlyphWallComponent
             aria-hidden
-            className={className ? `glyph-wall ${className}` : 'glyph-wall'}
-            style={style}
         >
             {cells.map((c, i) => (
-                <span
+                <Glyph
                     key={i}
-                    className="glyph"
                     style={{
                         left: `${c.left}%`,
                         color,
@@ -52,8 +97,8 @@ export default function GlyphWall({ color, count = 24, className, style }: Glyph
                     }}
                 >
                     {c.ch}
-                </span>
+                </Glyph>
             ))}
-        </div>
+        </GlyphWallComponent>
     );
 }

@@ -43,17 +43,6 @@
             color: #ff2828;
         }
     }
-
-    & .live-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #0af5b0;
-        box-shadow: 0 0 6px #0af5b0;
-        animation: statusPulse 1.6s ease-in-out infinite;
-        flex-shrink: 0;
-        display: inline-block;
-    }
 }
 
 .dark-web-container {

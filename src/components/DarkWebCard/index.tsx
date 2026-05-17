@@ -1,14 +1,25 @@
-import { Card, Typography, CardContent, Grid, Avatar, SvgIconTypeMap, Chip, Box, Button } from '@mui/material';
-import { IDarkWebFaction, ReputationTiers, RiskTier } from '../../includes/DarkWeb.interface';
-import './style.scss';
-import GlyphCardHeader from '../common/GlyphCardHeader';
-import { ForumOutlined, GppGoodOutlined, LocalOfferOutlined, SendOutlined, ShieldOutlined, WarningAmberOutlined } from '@mui/icons-material';
-import { OverridableComponent } from '@mui/material/OverridableComponent';
-import clsx from 'clsx';
-import { OfferCipher, ReputationProgress } from './components';
-import { Stat } from '../common/Stat';
 import { useEffect, useState } from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import ForumOutlined from '@mui/icons-material/ForumOutlined';
+import GppGoodOutlined from '@mui/icons-material/GppGoodOutlined';
+import LocalOfferOutlined from '@mui/icons-material/LocalOfferOutlined';
+import SendOutlined from '@mui/icons-material/SendOutlined';
+import ShieldOutlined from '@mui/icons-material/ShieldOutlined';
+import WarningAmberOutlined from '@mui/icons-material/WarningAmberOutlined';
+import { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import { IDarkWebFaction, ReputationTiers, RiskTier } from '../../includes/DarkWeb.interface';
+import { FactionAvatar, GlyphCardHeader, Stat } from '../common';
+import { OverridableComponent } from '@mui/material/OverridableComponent';
+import { OfferCipher, ReputationProgress } from './components';
 import { ICipherType } from '../../includes/Cipher.interface';
+import clsx from 'clsx';
+import './style.scss';
 
 const DarkWebChipIcon: Record<RiskTier, OverridableComponent<SvgIconTypeMap<object, 'svg'>>> = {
     [RiskTier.low]: GppGoodOutlined,
@@ -64,15 +75,15 @@ export default function DarkWebCard(props: IDarkWebCardProps) {
         <Grid size={{sm: 12, lg: 6, xl: 4}} key={props.faction.id}>
             <Card className="dark-web-card">
                 <GlyphCardHeader
-                    className={props.faction.color.className}
-                    title={props.faction.name}
-                    subheader={props.faction.handle}
-                    glyphColor={props.faction.color.color}
+                    color={props.faction.color.className}
                     online={props.faction.online}
+                    subheader={props.faction.handle}
+                    title={props.faction.name}
                     avatar={
-                        <Avatar variant="rounded" className={props.faction.color.className}>
-                            <props.faction.glyph />
-                        </Avatar>
+                        <FactionAvatar 
+                            color={props.faction.color.className}
+                            glyph={props.faction.glyph}
+                        />
                     }
                     action={
                         <Chip className={clsx('dark-web-chip', props.faction.riskTier.toLowerCase())} label={ChipLabel} size="small" variant="outlined" avatar={
@@ -81,13 +92,28 @@ export default function DarkWebCard(props: IDarkWebCardProps) {
                     }
                 />
                 <CardContent>
-                    <Typography variant="body1" className="dark-web-card-blurb">{props.faction.blurb}</Typography>
-                    <ReputationProgress currentBracket={props.faction.reputation?.reputationTier ?? ReputationTiers.Unknown} nextBracket={nextReputationTier} currentValue={props.faction.reputation?.reputation ?? 0} totalValue={10000} color={props.faction.color.className} />
-                    <Box className="dark-web-card-stats">
-                        <Stat label="Rate" value={'×' + (bonusRate ? bonusRate.toFixed(2) : '1.00')} accent={props.faction.color.className} />
-                        <Stat label="Deals" value={props.faction.bonus?.length?.toString() ?? '0'} />
-                        <Stat label="Bonus" value={bonusRate ? 'Active' : 'None'} accent={bonusRate ? 'income' : undefined} />
-                    </Box>
+                    <Grid container spacing={2}>
+                        <Grid size={12} sx={{ minHeight: 50 }}>
+                            <Typography variant="body1">
+                                {props.faction.blurb}
+                            </Typography>
+                        </Grid>
+
+                        <Grid size={12}>
+                            <ReputationProgress currentBracket={props.faction.reputation?.reputationTier ?? ReputationTiers.Unknown} nextBracket={nextReputationTier} currentValue={props.faction.reputation?.reputation ?? 0} totalValue={10000} color={props.faction.color.className} />
+                        </Grid>
+
+                        <Grid size={4}>
+                            <Stat label="Rate" value={'×' + (bonusRate ? bonusRate.toFixed(2) : '1.00')} accent={props.faction.color.className} />
+                        </Grid>
+                        <Grid size={4}>
+                            <Stat label="Deals" value={props.faction.bonus?.length?.toString() ?? '0'} />
+                        </Grid>
+                        <Grid size={4}>
+                            <Stat label="Bonus" value={bonusRate ? 'Active' : 'None'} accent={bonusRate ? 'income' : undefined} />
+                        </Grid>
+                    </Grid>
+
                     <Box className="dark-web-card-offer-cipher-container">
                         <Typography variant="body2" className="dark-web-card-offer-cipher-title"><LocalOfferOutlined className={clsx('dark-web-card-offer-cipher-icon', props.faction.color.className)} />Offer Cipher</Typography>
                         <OfferCipher accent={props.faction.color.className} ciphers={props.faction.acceptedCiphers} bonuses={props.faction.bonus} onSelect={handleSelectCipher} />
