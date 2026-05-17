@@ -67,6 +67,20 @@
     box-sizing: border-box;
 }
 
+.servers-stats-container {
+    margin-top: 1em;
+}
+
+.servers-table {
+    background-color: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+
+    & .MuiTableCell-stickyHeader {
+        background-color: inherit !important;
+    }
+}
+
 .servers-scroll {
     flex: 1;
     min-height: 0;

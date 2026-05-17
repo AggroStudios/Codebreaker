@@ -1,0 +1,31 @@
+.tier-marker {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+
+    &.tier-entry {
+        background: rgb(154, 163, 168);
+        box-shadow: rgb(154, 163, 168) 0px 0px 6px;
+    }
+
+    &.tier-standard {
+        background: rgb(38, 198, 218);
+        box-shadow: rgb(38, 198, 218) 0px 0px 6px;
+    }
+
+    &.tier-pro {
+        background: rgb(10, 245, 176);
+        box-shadow: rgb(10, 245, 176) 0px 0px 6px;
+    }
+
+    &.tier-enterprise {
+        background: rgb(255, 152, 0);
+        box-shadow: rgb(255, 152, 0) 0px 0px 6px;
+    }
+
+    &.tier-quantum {
+        background: rgb(156, 127, 224);
+        box-shadow: rgb(156, 127, 224) 0px 0px 6px;
+    }
+}

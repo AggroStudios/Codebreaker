@@ -1,5 +1,5 @@
 import { IUpgradeItem, IUpgradeRequirement, IUpgradeTier, UpgradeList } from '../../data/upgrades';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -8,12 +8,6 @@ import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
 import Chip from '@mui/material/Chip';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Typography from '@mui/material/Typography';
-import CheckIcon from '@mui/icons-material/Check';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import AddIcon from '@mui/icons-material/Add';
@@ -23,9 +17,8 @@ import clsx from 'clsx';
 
 import { formatMoney } from '../../lib/utils';
 import { usePlayerStore } from '../../stores/player';
-import { useStationContext } from '../../stores/stationContext';
 
-import './index.scss';
+import './style.scss';
 
 const ROMAN_NUMERALS = ['0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 
@@ -34,84 +27,11 @@ const toRoman = (value: number): string => {
     return ROMAN_NUMERALS[value] ?? String(value);
 };
 
-interface ConfirmDialogProps {
-    open: boolean;
-    upgrade: IUpgradeItem | null;
-    tier: IUpgradeTier | null;
-    onConfirm: () => void;
-    onCancel: () => void;
-}
-
 interface UpgradeComponentProps {
     upgrade: IUpgradeItem;
     onClick?: (upgrade: IUpgradeItem) => void;
     selected?: boolean;
-}
-
-function ConfirmDialog({
-    open,
-    upgrade,
-    tier,
-    onConfirm,
-    onCancel,
-}: ConfirmDialogProps) {
-    return (
-        <Dialog
-            open={open}
-            onClose={onCancel}
-            maxWidth="sm"
-            fullWidth
-            slotProps={{ paper: { className: clsx('upgrade-confirm-dialog', upgrade?.category) } }}
-        >
-            <DialogTitle className="upgrade-confirm-dialog-title">
-                <span>Confirm Purchase</span>
-                <span className="upgrade-confirm-dialog-subtitle">Confirm Transaction</span>
-            </DialogTitle>
-            <DialogContent className="upgrade-confirm-dialog-content">
-                {upgrade && tier && (
-                    <>
-                        <div className="upgrade-confirm-preview">
-                            <Avatar
-                                className={clsx('upgrade-category-icon', upgrade.category)}
-                                variant="rounded"
-                            >
-                                <upgrade.icon />
-                            </Avatar>
-                            <div className="upgrade-confirm-preview-body">
-                                <div className="upgrade-confirm-preview-head">
-                                    <span className="upgrade-confirm-preview-name">{upgrade.name}</span>
-                                    <span className="upgrade-confirm-preview-separator">·</span>
-                                    <span className="upgrade-confirm-preview-tier">{tier.title}</span>
-                                </div>
-                                <Typography className="upgrade-confirm-preview-description">
-                                    {tier.description}
-                                </Typography>
-                            </div>
-                        </div>
-
-                        <div className="upgrade-confirm-total">
-                            <span className="upgrade-confirm-total-label">Total</span>
-                            <span className="upgrade-confirm-total-value">${formatMoney(tier.cost, 0)}</span>
-                        </div>
-                    </>
-                )}
-            </DialogContent>
-            <DialogActions className="upgrade-confirm-dialog-actions">
-                <Button onClick={onCancel} className="upgrade-confirm-cancel" sx={{ outline: 0 }}>
-                    Cancel
-                </Button>
-                <Button
-                    onClick={onConfirm}
-                    variant="contained"
-                    className="upgrade-confirm-confirm"
-                    startIcon={<CheckIcon />}
-                    sx={{ outline: 0 }}
-                >
-                    Confirm
-                </Button>
-            </DialogActions>
-        </Dialog>
-    );
+    onPurchase: (upgrade: IUpgradeItem, tier: IUpgradeTier) => void;
 }
 
 interface MissingRequirement {
@@ -142,14 +62,10 @@ const computeMissingRequirements = (
 };
 
 export default function UpgradeComponent(props: UpgradeComponentProps) {
-    const { upgrade, onClick, selected } = props;
+    const { upgrade, onClick, selected, onPurchase } = props;
 
     const purchasedUpgrades = usePlayerStore((s) => s.purchasedUpgrades);
-    const purchaseUpgradeTier = usePlayerStore((s) => s.purchaseUpgradeTier);
     const money = usePlayerStore((s) => s.player.money);
-    const { stationProxy } = useStationContext();
-
-    const [confirmPurchaseDialogOpen, setConfirmPurchaseDialogOpen] = useState(false);
 
     const purchasedTierCountByKey = useMemo(() => {
         const map = new Map<string, number>();
@@ -175,23 +91,6 @@ export default function UpgradeComponent(props: UpgradeComponentProps) {
 
     const currentTierLabel = currentTierCount > 0 ? toRoman(currentTierCount) : null;
 
-    const handleConfirmPurchaseDialogClose = () => {
-        setConfirmPurchaseDialogOpen(false);
-    };
-
-    const handlePurchase = (event: React.MouseEvent) => {
-        event.stopPropagation();
-        if (!canPurchase) return;
-        setConfirmPurchaseDialogOpen(true);
-    };
-
-    const handleConfirmPurchase = () => {
-        if (!nextTier) return;
-        nextTier.onPurchase?.(stationProxy);
-        purchaseUpgradeTier(upgrade.key, nextTier.tierId, nextTier.cost);
-        setConfirmPurchaseDialogOpen(false);
-    };
-
     const lockedReason = !nextTier
         ? 'maxed'
         : isLocked
@@ -199,6 +98,16 @@ export default function UpgradeComponent(props: UpgradeComponentProps) {
             : cantAfford
                 ? 'cant-afford'
                 : 'available';
+
+    const stopCardToggle = (event: React.SyntheticEvent) => {
+        event.stopPropagation();
+    };
+
+    const handlePurchase = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        if (!nextTier || !canPurchase) return;
+        onPurchase(upgrade, nextTier);
+    };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -325,7 +234,11 @@ export default function UpgradeComponent(props: UpgradeComponentProps) {
                         </div>
                     )}
                 </CardContent>
-                <CardActions className="upgrade-footer">
+                <CardActions
+                    className="upgrade-footer"
+                    onClick={stopCardToggle}
+                    onMouseDown={stopCardToggle}
+                >
                     <div className="upgrade-tags">
                         {upgrade.tags.map((tag, idx) => (
                             <Chip
@@ -364,10 +277,13 @@ export default function UpgradeComponent(props: UpgradeComponentProps) {
                             </Button>
                         ) : canPurchase ? (
                             <Button
+                                type="button"
                                 className="upgrade-button purchase"
                                 variant="contained"
                                 startIcon={currentTierCount === 0 ? <AddIcon /> : <ArrowUpwardIcon />}
                                 onClick={handlePurchase}
+                                onMouseDown={stopCardToggle}
+                                onPointerDown={stopCardToggle}
                             >
                                 {currentTierCount === 0
                                     ? `Buy ${nextTier?.title}`
@@ -386,13 +302,6 @@ export default function UpgradeComponent(props: UpgradeComponentProps) {
                     </div>
                 </CardActions>
             </Card>
-            <ConfirmDialog
-                open={confirmPurchaseDialogOpen}
-                upgrade={upgrade}
-                tier={nextTier}
-                onConfirm={handleConfirmPurchase}
-                onCancel={handleConfirmPurchaseDialogClose}
-            />
         </Box>
     );
 }

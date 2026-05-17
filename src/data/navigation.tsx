@@ -43,7 +43,7 @@ export const adminNavigation: INavigationItem[] = [
 export const mainNavigation: INavigationItem[] = [
     {
         title: 'Terminal',
-        link: '/',
+        link: '/terminal',
         icon: TerminalTwoTone,
     },
     {

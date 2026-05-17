@@ -3,6 +3,7 @@ import Process, { IProcessorType, StationStoreType } from '../includes/Process.i
 import OperatingSystem from '../lib/OperatingSystem';
 import { Networking } from '../data/network';
 import { dataSizeFromSuffix } from './utils';
+import { cipherSpeedMultiplier } from '../stores/neuralNet';
 
 export interface CipherDelegate {
     setGrid: (chars: Uint8Array, classes: Uint8Array) => void;
@@ -167,7 +168,8 @@ export default class Cipher implements Process {
             return;
         }
 
-        const complexity = Math.round(10 * this._cipherType.complexity);
+        const neuralBonus = cipherSpeedMultiplier(this._cipherType.name);
+        const complexity = Math.round(10 * this._cipherType.complexity / neuralBonus);
         if (this.frame > 0 && this.frame % parseFloat((complexity / this._stationProcessor.gigaflops).toFixed(3)) === 0) {
             const targetPos = Math.floor(
                 Math.random() * this.unsolvedIndexes.size,

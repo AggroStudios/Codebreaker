@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, useColorScheme } from '@mui/material/styles';
@@ -12,6 +12,10 @@ import Typography from '@mui/material/Typography';
 
 import Layout from './Layout';
 import LoadingScreen from './components/LoadingScreen';
+import Settings from './components/Settings';
+import About from './components/About';
+
+import { useUIStore } from './stores/ui';
 
 import { playerStoreProxy } from './stores/player';
 import { createStationStore, makeStationProxy } from './stores/station';
@@ -36,7 +40,9 @@ import ServersData from './data/servers';
 import { useServersStore } from './stores/servers';
 import ServersDailyOffers from './lib/servers-dailyOffers';
 import DataCenter from './lib/dataCenter';
+import NeuralNet from './lib/neuralNet';
 
+const TitleScreenRoute = lazy(() => import('./pages/TitleScreen'));
 const TerminalRoute = lazy(() => import('./pages/Terminal'));
 const StationRoute = lazy(() => import('./pages/Station'));
 const LoginRoute = lazy(() => import('./components/Login'));
@@ -75,6 +81,9 @@ const AppWithProviders = () => {
         const dataCenterProcess = new DataCenter();
         operatingSystem.addProcess(dataCenterProcess);
 
+        const neuralNetProcess = new NeuralNet();
+        operatingSystem.addProcess(neuralNetProcess);
+
         if (stationProxy.exponent) {
             operatingSystem.setExponent(stationProxy.exponent);
         }
@@ -106,6 +115,7 @@ const AppWithProviders = () => {
 
         preloadImages(setLoadingProgress);
         // Preload all route chunks in the background so navigation is instant
+        import('./pages/TitleScreen');
         import('./pages/Terminal');
         import('./pages/Station');
         import('./components/Login');
@@ -134,6 +144,11 @@ const AppWithProviders = () => {
         useAppReadyStore.getState().setAppReady();
     };
 
+    const settingsOpen = useUIStore((s) => s.settingsOpen);
+    const aboutOpen = useUIStore((s) => s.aboutOpen);
+    const closeSettings = useUIStore((s) => s.closeSettings);
+    const closeAbout = useUIStore((s) => s.closeAbout);
+
     if(!mode){
         return null;
     }
@@ -148,8 +163,13 @@ const AppWithProviders = () => {
                     >
                         <BrowserRouter>
                             <Routes>
+                                <Route index element={
+                                    <Suspense fallback={null}>
+                                        <TitleScreenRoute />
+                                    </Suspense>
+                                } />
                                 <Route element={<Layout />}>
-                                    <Route index element={
+                                    <Route path="terminal" element={
                                         <TerminalRoute
                                             terminalController={
                                                 terminalController
@@ -181,6 +201,8 @@ const AppWithProviders = () => {
                 loading={loadingProgress}
                 onHidden={handleLoadingHidden}
             />
+            <Settings open={settingsOpen} onClose={closeSettings} />
+            <About open={aboutOpen} onClose={closeAbout} />
             <Dialog
                 open={persistMismatchOpen}
                 onClose={handlePersistMismatchDismiss}

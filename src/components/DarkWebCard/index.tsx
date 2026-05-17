@@ -73,14 +73,14 @@ export default function DarkWebCard(props: IDarkWebCardProps) {
 
     return (
         <Grid size={{sm: 12, lg: 6, xl: 4}} key={props.faction.id}>
-            <Card className="dark-web-card">
+            <Card className="dark-web-card background">
                 <GlyphCardHeader
                     color={props.faction.color.className}
                     online={props.faction.online}
-                    subheader={props.faction.handle}
+                    subheader={`${props.faction.handle} · ${props.faction.region}`}
                     title={props.faction.name}
                     avatar={
-                        <FactionAvatar 
+                        <FactionAvatar
                             color={props.faction.color.className}
                             glyph={props.faction.glyph}
                         />
@@ -92,28 +92,13 @@ export default function DarkWebCard(props: IDarkWebCardProps) {
                     }
                 />
                 <CardContent>
-                    <Grid container spacing={2}>
-                        <Grid size={12} sx={{ minHeight: 50 }}>
-                            <Typography variant="body1">
-                                {props.faction.blurb}
-                            </Typography>
-                        </Grid>
-
-                        <Grid size={12}>
-                            <ReputationProgress currentBracket={props.faction.reputation?.reputationTier ?? ReputationTiers.Unknown} nextBracket={nextReputationTier} currentValue={props.faction.reputation?.reputation ?? 0} totalValue={10000} color={props.faction.color.className} />
-                        </Grid>
-
-                        <Grid size={4}>
-                            <Stat label="Rate" value={'×' + (bonusRate ? bonusRate.toFixed(2) : '1.00')} accent={props.faction.color.className} />
-                        </Grid>
-                        <Grid size={4}>
-                            <Stat label="Deals" value={props.faction.bonus?.length?.toString() ?? '0'} />
-                        </Grid>
-                        <Grid size={4}>
-                            <Stat label="Bonus" value={bonusRate ? 'Active' : 'None'} accent={bonusRate ? 'income' : undefined} />
-                        </Grid>
-                    </Grid>
-
+                    <Typography variant="body1" className="dark-web-card-blurb">{props.faction.blurb}</Typography>
+                    <ReputationProgress currentBracket={props.faction.reputation?.reputationTier ?? ReputationTiers.Unknown} nextBracket={nextReputationTier} currentValue={props.faction.reputation?.reputation ?? 0} totalValue={10000} color={props.faction.color.className} />
+                    <Box className="dark-web-card-stats">
+                        <Stat label="Rate" value={'×' + (bonusRate ? bonusRate.toFixed(2) : '1.00')} accent={props.faction.color.className} />
+                        <Stat label="Deals" value={props.faction.bonus?.length?.toString() ?? '0'} />
+                        <Stat label="Bonus" value={bonusRate ? 'Active' : 'None'} accent={bonusRate ? 'income' : undefined} />
+                    </Box>
                     <Box className="dark-web-card-offer-cipher-container">
                         <Typography variant="body2" className="dark-web-card-offer-cipher-title"><LocalOfferOutlined className={clsx('dark-web-card-offer-cipher-icon', props.faction.color.className)} />Offer Cipher</Typography>
                         <OfferCipher accent={props.faction.color.className} ciphers={props.faction.acceptedCiphers} bonuses={props.faction.bonus} onSelect={handleSelectCipher} />

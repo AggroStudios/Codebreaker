@@ -20,10 +20,28 @@ export const formatMoney = (money: number, decimalPlaces: number = 2) => {
     });
 }
 
+export const formatPower = (power: number) => {
+    const units = ['W', 'kW', 'MW', 'GW', 'TW'];
+    const index = Math.floor(Math.log10(power) / 3);
+    return `${(power / Math.pow(10, index * 3)).toFixed(0)} ${units[index]}`;
+}
+
 export const formatMoneyDay = (money: number) => formatMoney(money) + '/d';
 export const formatKw = (power: number) => `${power.toFixed(0)} kW`;
 export const formatGbps = (uplink: number) => uplink >= 1000 ? `${(uplink/1000).toFixed(1)} Tbps` : `${uplink} Gbps`;
 export const formatMs = (latency: number) => `${latency} ms`;
+
+/** Compact integer with K / M / B suffix. */
+export const fmtNum = (n: number): string => {
+    if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(2)}K`;
+    return String(n);
+};
+
+/** Format a cipher's block as `<size> <unit>` (e.g. `512 KB`). */
+export const formatBlock = (cipher: { block: { size: number; unit: string } }): string =>
+    `${cipher.block.size} ${cipher.block.unit}`;
 
 
 export const DURATION_UNITS_LONG: ReadonlyArray<string> = ['days', 'hours', 'minutes', 'seconds'];

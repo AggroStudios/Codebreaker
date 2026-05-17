@@ -159,3 +159,8 @@ export const CipherTypes: ICipherType[] = [
         requiredArchitecture: [ProcessorArchitecture.risc64],
     },
 ];
+
+/** Real ciphers — manual-mode mini-game entries excluded. */
+export const NEURAL_NET_CIPHERS: ICipherType[] = CipherTypes.filter((c) =>
+    /^(CRC|MD5|SHA|AES|RSA)/.test(c.name),
+);

@@ -13,7 +13,6 @@ import DialogActions from '@mui/material/DialogActions';
 
 import Chip from '@mui/material/Chip';
 
-import './index.scss';
 import PublishTwoToneIcon from '@mui/icons-material/PublishTwoTone';
 import { formatMoney } from '../../lib/utils';
 import clsx from 'clsx';
@@ -31,6 +30,85 @@ import UpgradeDetails from '../../components/UpgradeDetails';
 import { useStationContext } from '../../stores/stationContext';
 import type { IUpgradeTier } from '../../data/upgrades';
 
+import CheckIcon from '@mui/icons-material/Check';
+import { Avatar, Typography } from '@mui/material';
+
+import './style.scss';
+
+interface ConfirmDialogProps {
+    open: boolean;
+    upgrade: IUpgradeItem | null;
+    tier: IUpgradeTier | null;
+    onConfirm: () => void;
+    onCancel: () => void;
+}
+
+function ConfirmDialog({
+    open,
+    upgrade,
+    tier,
+    onConfirm,
+    onCancel,
+}: ConfirmDialogProps) {
+    return (
+        <Dialog
+            open={open}
+            onClose={onCancel}
+            maxWidth="sm"
+            fullWidth
+            slotProps={{ paper: { className: clsx('upgrade-confirm-dialog', upgrade?.category) } }}
+        >
+            <DialogTitle className="upgrade-confirm-dialog-title">
+                <span>Confirm Purchase</span>
+                <span className="upgrade-confirm-dialog-subtitle">Confirm Transaction</span>
+            </DialogTitle>
+            <DialogContent className="upgrade-confirm-dialog-content">
+                {upgrade && tier && (
+                    <>
+                        <div className="upgrade-confirm-preview">
+                            <Avatar
+                                className={clsx('upgrade-category-icon', upgrade.category)}
+                                variant="rounded"
+                            >
+                                <upgrade.icon />
+                            </Avatar>
+                            <div className="upgrade-confirm-preview-body">
+                                <div className="upgrade-confirm-preview-head">
+                                    <span className="upgrade-confirm-preview-name">{upgrade.name}</span>
+                                    <span className="upgrade-confirm-preview-separator">·</span>
+                                    <span className="upgrade-confirm-preview-tier">{tier.title}</span>
+                                </div>
+                                <Typography className="upgrade-confirm-preview-description">
+                                    {tier.description}
+                                </Typography>
+                            </div>
+                        </div>
+
+                        <div className="upgrade-confirm-total">
+                            <span className="upgrade-confirm-total-label">Total</span>
+                            <span className="upgrade-confirm-total-value">${formatMoney(tier.cost, 0)}</span>
+                        </div>
+                    </>
+                )}
+            </DialogContent>
+            <DialogActions className="upgrade-confirm-dialog-actions">
+                <Button onClick={onCancel} className="upgrade-confirm-cancel" sx={{ outline: 0 }}>
+                    Cancel
+                </Button>
+                <Button
+                    onClick={onConfirm}
+                    variant="contained"
+                    className="upgrade-confirm-confirm"
+                    startIcon={<CheckIcon />}
+                    sx={{ outline: 0 }}
+                >
+                    Confirm
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+}
+
 export default function UpgradesComponent() {
     const playerStore = usePlayerStore();
     const purchaseUpgradeTier = usePlayerStore((s) => s.purchaseUpgradeTier);
@@ -47,6 +125,10 @@ export default function UpgradesComponent() {
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [filterLabels, setFilterLabels] = useState<string[]>(['all']);
     const [selectedUpgrade, setSelectedUpgrade] = useState<IUpgradeItem | null>(null);
+    const [confirmPurchaseDialogOpen, setConfirmPurchaseDialogOpen] = useState(false);
+
+    const [upgradeToPurchase, setUpgradeToPurchase] = useState<IUpgradeItem | null>(null);
+    const [tierToPurchase, setTierToPurchase] = useState<IUpgradeTier | null>(null);
 
     useEffect(() => {
         const labels = new Set<string>();
@@ -98,6 +180,24 @@ export default function UpgradesComponent() {
         );
     }, [debouncedSearchTerm, filter, hideFullyUpgraded, purchasedUpgrades, showOwned]);
 
+    const handleConfirmPurchaseDialogClose = () => {
+        setConfirmPurchaseDialogOpen(false);
+    };
+
+    const handlePurchase = (upgrade: IUpgradeItem, nextTier: IUpgradeTier) => {
+        if (!nextTier) return;
+        setUpgradeToPurchase(upgrade);
+        setTierToPurchase(nextTier);
+        setConfirmPurchaseDialogOpen(true);
+    };
+
+    const handleConfirmPurchase = () => {
+        if (!upgradeToPurchase || !tierToPurchase) return;
+        tierToPurchase.onPurchase(stationProxy);
+        purchaseUpgradeTier(upgradeToPurchase.key, tierToPurchase.tierId, tierToPurchase.cost);
+        setConfirmPurchaseDialogOpen(false);
+    };
+
     const handleShowOwnedChange = () => {
         setShowOwned((prev) => !prev);
     };
@@ -130,11 +230,6 @@ export default function UpgradesComponent() {
 
     const handleDetailsClose = () => {
         setSelectedUpgrade(null);
-    };
-
-    const handleDetailsPurchase = (upgrade: IUpgradeItem, tier: IUpgradeTier) => {
-        tier.onPurchase?.(stationProxy);
-        purchaseUpgradeTier(upgrade.key, tier.tierId, tier.cost);
     };
 
     return (
@@ -191,7 +286,7 @@ export default function UpgradesComponent() {
                 <Box className="upgrades-content" sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 360px', gap: 2 }}>
                     <Box className="upgrades-content-grid" sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 2 }}>
                             {displayedUpgrades.map((upg) => (
-                                <UpgradeComponent onClick={handleUpgradeClick} key={upg.key} upgrade={upg} selected={selectedUpgrade?.key === upg.key} />
+                                <UpgradeComponent onClick={handleUpgradeClick} key={upg.key} upgrade={upg} selected={selectedUpgrade?.key === upg.key} onPurchase={handlePurchase} />
                             ))}
                     </Box>
                     <Box className="upgrades-content-details" sx={{
@@ -205,7 +300,7 @@ export default function UpgradesComponent() {
                     }}>
                         <UpgradeDetails
                             upgrade={selectedUpgrade}
-                            onPurchase={handleDetailsPurchase}
+                            onPurchase={handlePurchase}
                             onClose={handleDetailsClose}
                         />
                     </Box>
@@ -226,6 +321,13 @@ export default function UpgradesComponent() {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <ConfirmDialog
+                open={confirmPurchaseDialogOpen}
+                upgrade={upgradeToPurchase}
+                tier={tierToPurchase}
+                onConfirm={handleConfirmPurchase}
+                onCancel={handleConfirmPurchaseDialogClose}
+            />
         </>
     );
 }

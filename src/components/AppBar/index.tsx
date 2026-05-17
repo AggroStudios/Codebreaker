@@ -1,4 +1,5 @@
 import { useEffect, useState, type MouseEvent as ReactMouseEvent } from 'react';
+import { useNavigate } from 'react-router';
 
 import {
     Box,
@@ -42,13 +43,13 @@ import CodeBreakerLogo from '../../assets/logos/codebreaker-logo.png';
 import './styles.scss';
 import { NotificationLevel } from '../../includes/OperatingSystem.interface';
 import MoneyLabel from '../MoneyLabel';
-import Settings from '../Settings';
-import About from '../About';
 import { usePlayerStore } from '../../stores/player';
+import { useUIStore } from '../../stores/ui';
 import { useStationContext } from '../../stores/stationContext';
 import { useAnchors } from '../AnchorsContext';
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
 import { formatMoney } from '../../lib/utils';
+import { ExitToAppOutlined } from '@mui/icons-material';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -167,6 +168,9 @@ export default function AppBarComponent() {
     );
 
     const { moneyAnchorRef } = useAnchors();
+    const navigate = useNavigate();
+    const openSettings = useUIStore((s) => s.openSettings);
+    const openAbout = useUIStore((s) => s.openAbout);
 
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const [mobileAnchorEl, setMobileAnchorEl] = useState<HTMLElement | null>(
@@ -177,8 +181,6 @@ export default function AppBarComponent() {
     const [messageAnchorEl, setMessageAnchorEl] = useState<HTMLElement | null>(
         null,
     );
-    const [settingsOpen, setSettingsOpen] = useState(false);
-    const [aboutOpen, setAboutOpen] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState<
         { mode: 'one'; index: number } | { mode: 'all' } | null
     >(null);
@@ -214,16 +216,20 @@ export default function AppBarComponent() {
     const handleSettingsOpen = () => {
         setAnchorEl(null);
         setMobileAnchorEl(null);
-        setSettingsOpen(true);
+        openSettings();
     };
-    const handleSettingsClose = () => setSettingsOpen(false);
 
     const handleAboutOpen = () => {
         setAnchorEl(null);
         setMobileAnchorEl(null);
-        setAboutOpen(true);
+        openAbout();
     };
-    const handleAboutClose = () => setAboutOpen(false);
+
+    const handleLogout = () => {
+        setAnchorEl(null);
+        setMobileAnchorEl(null);
+        navigate('/');
+    };
 
     const menuId = 'primary-search-account-menu';
     const notificationId = 'primary-search-notification-menu';
@@ -362,10 +368,13 @@ export default function AppBarComponent() {
                     </ListItemIcon>
                     <ListItemText primary="About" />
                 </MenuItem>
+                <MenuItem onClick={handleLogout}>
+                    <ListItemIcon>
+                        <ExitToAppOutlined fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="Logout" />
+                </MenuItem>
             </Menu>
-
-            <Settings open={settingsOpen} onClose={handleSettingsClose} />
-            <About open={aboutOpen} onClose={handleAboutClose} />
 
             <Menu
                 anchorEl={mobileAnchorEl}

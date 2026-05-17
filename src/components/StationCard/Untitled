@@ -1,8 +1,0 @@
-                <CardActions disableSpacing sx={{
-                    display: 'flex',
-                    flexWrap: 'nowrap',
-                    alignItems: 'stretch',
-                    alignContent: 'space-between',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between'
-                }}>
