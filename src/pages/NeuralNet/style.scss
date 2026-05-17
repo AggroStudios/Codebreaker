@@ -1,3 +1,39 @@
+.neural-net-page {
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.neural-net-page .page-header {
+    flex-shrink: 0;
+}
+
+.neural-net-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 2em;
+    box-sizing: border-box;
+}
+
+.neural-net-grid {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) minmax(0, 2fr);
+    gap: 20px;
+    align-items: stretch;
+}
+
+@media (max-width: 1100px) {
+    .neural-net-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Header chips (matches Station / Dark Web / Server Racks) ──────── */
 .neural-net-header .MuiChip-root {
     display: inline-flex;
     align-items: center;
@@ -11,6 +47,7 @@
     line-height: 1;
     white-space: nowrap;
     height: 18px !important;
+    font-family: var(--font-code);
 
     & svg {
         width: 14px;
@@ -35,6 +72,15 @@
         }
     }
 
+    &.orange {
+        border-color: #ff9800;
+        color: #ff9800;
+
+        & svg {
+            color: #ff9800;
+        }
+    }
+
     &.warning {
         border-color: #ff2828;
         color: #ff2828;
@@ -48,10 +94,15 @@
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: #0af5b0;
-        box-shadow: 0 0 6px #0af5b0;
+        background: currentColor;
+        box-shadow: 0 0 6px currentColor;
         animation: statusPulse 1.6s ease-in-out infinite;
         flex-shrink: 0;
         display: inline-block;
     }
+}
+
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.5; }
 }

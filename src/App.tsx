@@ -40,6 +40,7 @@ import ServersData from './data/servers';
 import { useServersStore } from './stores/servers';
 import ServersDailyOffers from './lib/servers-dailyOffers';
 import DataCenter from './lib/dataCenter';
+import NeuralNet from './lib/neuralNet';
 
 const TitleScreenRoute = lazy(() => import('./pages/TitleScreen'));
 const TerminalRoute = lazy(() => import('./pages/Terminal'));
@@ -78,6 +79,9 @@ export default function App() {
 
         const dataCenterProcess = new DataCenter();
         operatingSystem.addProcess(dataCenterProcess);
+
+        const neuralNetProcess = new NeuralNet();
+        operatingSystem.addProcess(neuralNetProcess);
 
         if (stationProxy.exponent) {
             operatingSystem.setExponent(stationProxy.exponent);

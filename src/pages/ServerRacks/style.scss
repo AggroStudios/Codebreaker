@@ -1,3 +1,167 @@
+.server-racks-page {
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.server-racks-page .page-header {
+    flex-shrink: 0;
+}
+
+.server-racks-content {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 2em;
+    box-sizing: border-box;
+}
+
+.server-racks-content > * {
+    flex-shrink: 0;
+}
+
+.server-racks-picker-row {
+    margin-bottom: 1em;
+}
+
+.server-racks-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 280px) minmax(0, 1fr) minmax(300px, 340px);
+    gap: 16px;
+    align-items: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+@media (max-width: 1300px) {
+    .server-racks-grid {
+        grid-template-columns: minmax(240px, 260px) minmax(0, 1fr);
+    }
+    .server-racks-grid > :nth-child(3) {
+        display: none;
+    }
+}
+
+/* ── Inventory (children of StationCard CardContent) ─────────────── */
+.racks-inventory-hint {
+    padding: 10px 16px;
+    background: rgba(10, 245, 176, 0.05);
+    color: #0af5b0;
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(10, 245, 176, 0.08);
+    flex-shrink: 0;
+}
+
+.racks-inventory-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+}
+
+.racks-inventory-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.4);
+    text-align: center;
+}
+
+.racks-inventory-unlock {
+    font-family: 'Fira Code', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.35);
+    text-align: center;
+}
+
+/* ── Rack chip decorations ─────────────────────────────────────────── */
+.server-chip .screw {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.server-chip .led {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.server-chip .led-blink {
+    animation: ledBlink 1.4s steps(1, end) infinite;
+}
+
+.server-chip .led-blink-fast {
+    animation: ledBlinkFast 0.4s steps(1, end) infinite;
+}
+
+.server-chip .vent {
+    width: 26px;
+    background-image: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.06) 0 1px,
+        rgba(0, 0, 0, 0.4) 1px 3px
+    );
+    border-radius: 2px;
+    flex-shrink: 0;
+    align-self: center;
+}
+
+.server-chip .vent-small {
+    width: 14px;
+    height: 8px;
+    background-image: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.06) 0 1px,
+        rgba(0, 0, 0, 0.4) 1px 2px
+    );
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+/* ── Rack unit live-dot ────────────────────────────────────────────── */
+.live-dot-mini {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #0af5b0;
+    box-shadow: 0 0 4px #0af5b0;
+    display: inline-block;
+    animation: statusPulse 1.6s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+/* ── Packet-flow SVG lines ─────────────────────────────────────────── */
+.packet-line {
+    animation: packetFlow 1.2s linear infinite;
+}
+
+/* ── Header chips (matches Station / Dark Web) ─────────────────────── */
 .server-racks-header .MuiChip-root {
     display: inline-flex;
     align-items: center;
@@ -11,6 +175,7 @@
     line-height: 1;
     white-space: nowrap;
     height: 18px !important;
+    font-family: var(--font-code);
 
     & svg {
         width: 14px;
@@ -35,6 +200,15 @@
         }
     }
 
+    &.orange {
+        border-color: #ff9800;
+        color: #ff9800;
+
+        & svg {
+            color: #ff9800;
+        }
+    }
+
     &.warning {
         border-color: #ff2828;
         color: #ff2828;
@@ -48,10 +222,45 @@
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: #0af5b0;
-        box-shadow: 0 0 6px #0af5b0;
+        background: currentColor;
+        box-shadow: 0 0 6px currentColor;
         animation: statusPulse 1.6s ease-in-out infinite;
         flex-shrink: 0;
         display: inline-block;
     }
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────────── */
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+}
+
+@keyframes dropPulse {
+    0%, 100% {
+        box-shadow: inset 0 0 0 0 rgba(10, 245, 176, 0);
+    }
+    50% {
+        box-shadow: inset 0 0 12px 0 rgba(10, 245, 176, 0.45);
+    }
+}
+
+@keyframes packetFlow {
+    0%   { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -14; }
+}
+
+@keyframes ledBlink {
+    0%, 60% { opacity: 1; }
+    61%, 100% { opacity: 0.25; }
+}
+
+@keyframes ledBlinkFast {
+    0%, 40% { opacity: 1; }
+    41%, 100% { opacity: 0.2; }
+}
+
+@keyframes scanX {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }

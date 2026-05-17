@@ -25,7 +25,7 @@ export enum BlockUnit {
     gigabytes = 'GB',
     terabytes = 'TB',
     petabytes = 'PB',
-}
+};
 
 export interface ICipherType {
     name: string;
@@ -41,7 +41,7 @@ export interface ICipherType {
     cipherTier?: string | null; // The tier ID of the auto-cipher upgrade that can break this cipher type.
     requiredArchitecture: ProcessorArchitecture[];
     manualMode?: React.ComponentType<MiniGameProps>[];
-}
+};
 
 export interface CipherEntry {
     cipher?: Cipher;
@@ -49,10 +49,10 @@ export interface CipherEntry {
     type?: ICipherType;
     state?: CipherState;
     autoCipher: boolean;
-}
+};
 
 export interface CipherBreakState {
     entries: Record<string, CipherEntry>;
     update: (id: string, partial: Partial<CipherEntry>) => void;
     removeEntry: (id: string) => void;
-}
+};
