@@ -1,14 +1,25 @@
-import { Card, Typography, CardContent, Grid, Avatar, SvgIconTypeMap, Chip, Box, Button } from '@mui/material';
-import { IDarkWebFaction, ReputationTiers, RiskTier } from '../../includes/DarkWeb.interface';
-import './style.scss';
-import GlyphCardHeader from '../common/GlyphCardHeader';
-import { ForumOutlined, GppGoodOutlined, LocalOfferOutlined, SendOutlined, ShieldOutlined, WarningAmberOutlined } from '@mui/icons-material';
-import { OverridableComponent } from '@mui/material/OverridableComponent';
-import clsx from 'clsx';
-import { OfferCipher, ReputationProgress } from './components';
-import { Stat } from '../common/Stat';
 import { useEffect, useState } from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import ForumOutlined from '@mui/icons-material/ForumOutlined';
+import GppGoodOutlined from '@mui/icons-material/GppGoodOutlined';
+import LocalOfferOutlined from '@mui/icons-material/LocalOfferOutlined';
+import SendOutlined from '@mui/icons-material/SendOutlined';
+import ShieldOutlined from '@mui/icons-material/ShieldOutlined';
+import WarningAmberOutlined from '@mui/icons-material/WarningAmberOutlined';
+import { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import { IDarkWebFaction, ReputationTiers, RiskTier } from '../../includes/DarkWeb.interface';
+import { FactionAvatar, GlyphCardHeader, Stat } from '../common';
+import { OverridableComponent } from '@mui/material/OverridableComponent';
+import { OfferCipher, ReputationProgress } from './components';
 import { ICipherType } from '../../includes/Cipher.interface';
+import clsx from 'clsx';
+import './style.scss';
 
 const DarkWebChipIcon: Record<RiskTier, OverridableComponent<SvgIconTypeMap<object, 'svg'>>> = {
     [RiskTier.low]: GppGoodOutlined,
@@ -64,15 +75,15 @@ export default function DarkWebCard(props: IDarkWebCardProps) {
         <Grid size={{sm: 12, lg: 6, xl: 4}} key={props.faction.id}>
             <Card className="dark-web-card background">
                 <GlyphCardHeader
-                    className={props.faction.color.className}
-                    title={props.faction.name}
-                    subheader={`${props.faction.handle} · ${props.faction.region}`}
-                    glyphColor={props.faction.color.color}
+                    color={props.faction.color.className}
                     online={props.faction.online}
+                    subheader={`${props.faction.handle} · ${props.faction.region}`}
+                    title={props.faction.name}
                     avatar={
-                        <Avatar variant="rounded" className={props.faction.color.className}>
-                            <props.faction.glyph />
-                        </Avatar>
+                        <FactionAvatar
+                            color={props.faction.color.className}
+                            glyph={props.faction.glyph}
+                        />
                     }
                     action={
                         <Chip className={clsx('dark-web-chip', props.faction.riskTier.toLowerCase())} label={ChipLabel} size="small" variant="outlined" avatar={

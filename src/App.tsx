@@ -1,7 +1,8 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
-import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider, useColorScheme } from '@mui/material/styles';
+import { useSiteTheme } from './theme';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -14,7 +15,6 @@ import LoadingScreen from './components/LoadingScreen';
 import Settings from './components/Settings';
 import About from './components/About';
 
-import { darkTheme } from './theme';
 import { useUIStore } from './stores/ui';
 
 import { playerStoreProxy } from './stores/player';
@@ -57,7 +57,8 @@ const UpgradesRoute = lazy(() => import('./pages/Upgrades'));
 const PrestigeRoute = lazy(() => import('./pages/Prestige'));
 const StatisticsRoute = lazy(() => import('./pages/Statistics'));
 
-export default function App() {
+const AppWithProviders = () => {
+    const { mode } = useColorScheme();
     const [loadingProgress, setLoadingProgress] = useState(0);
     const [persistMismatchOpen, setPersistMismatchOpen] = useState(false);
 
@@ -152,9 +153,12 @@ export default function App() {
     const closeSettings = useUIStore((s) => s.closeSettings);
     const closeAbout = useUIStore((s) => s.closeAbout);
 
+    if(!mode){
+        return null;
+    }
+
     return (
-        <ThemeProvider theme={darkTheme}>
-            <CssBaseline />
+        <>
             <NotifierProvider>
                 <AnchorsProvider>
                     <StationStoreProvider
@@ -226,6 +230,17 @@ export default function App() {
                     </Button>
                 </DialogActions>
             </Dialog>
+        </>
+    )
+}
+
+export default function App() {
+    const theme = useSiteTheme();
+
+    return (
+        <ThemeProvider theme={theme} defaultMode="dark">
+            <CssBaseline enableColorScheme />
+            <AppWithProviders/>
         </ThemeProvider>
     );
 }

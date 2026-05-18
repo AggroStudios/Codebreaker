@@ -21,27 +21,6 @@
     position: relative;
     overflow: hidden;
 
-    & span.dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        flex-shrink: 0;
-        display: inline-block;
-        background: #999999;
-        box-shadow: 0 0 6px #999999;
-    }
-
-    & .glyph-card-header__title {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    & .online {
-        background: #0af5b0 !important;
-        box-shadow: 0 0 6px #0af5b0 !important;
-    }
-
     .glyph-card-header__header {
         position: relative;
         z-index: 1;
