@@ -33,7 +33,7 @@
 }
 
 .server-filters__title {
-    font-size: 0.75rem !important;
+    font-size: 13px !important;
     font-weight: 700 !important;
     letter-spacing: 0.08em;
     line-height: 1.2 !important;
@@ -41,7 +41,7 @@
 
 .server-filters__section-label {
     display: block;
-    font-size: 0.6875rem !important;
+    font-size: 12px !important;
     font-weight: 600 !important;
     letter-spacing: 0.06em;
     color: var(--fg-secondary) !important;
@@ -86,7 +86,7 @@
     border: 1px solid transparent;
     color: var(--fg-primary);
     text-transform: none;
-    font-size: 0.8125rem;
+    font-size: 14px;
     font-weight: 500;
 
     &:hover {
@@ -115,7 +115,7 @@
 }
 
 .server-filters__tier-count {
-    font-size: 0.75rem;
+    font-size: 13px;
     font-weight: 600;
     color: var(--fg-secondary);
     font-variant-numeric: tabular-nums;
@@ -129,7 +129,7 @@
 
 .server-filters__chip {
     height: 28px !important;
-    font-size: 0.6875rem !important;
+    font-size: 12px !important;
     font-weight: 600 !important;
     letter-spacing: 0.04em;
     border-radius: var(--radius-pill) !important;
@@ -164,7 +164,7 @@
     display: flex;
     justify-content: space-between;
     margin-top: var(--space-1);
-    font-size: 0.6875rem;
+    font-size: 12px;
     font-weight: 500;
     color: var(--fg-secondary);
     letter-spacing: 0.02em;
@@ -183,7 +183,7 @@
 }
 
 .server-filters__toggle-label {
-    font-size: 0.8125rem !important;
+    font-size: 14px !important;
     color: var(--fg-primary) !important;
 }
 
@@ -193,7 +193,7 @@
     border-color: var(--color-border) !important;
     color: var(--fg-primary) !important;
     font-weight: 700 !important;
-    font-size: 0.6875rem !important;
+    font-size: 12px !important;
     letter-spacing: 0.06em;
     padding-top: var(--space-2) !important;
     padding-bottom: var(--space-2) !important;
