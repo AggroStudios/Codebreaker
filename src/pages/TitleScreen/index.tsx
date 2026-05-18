@@ -5,6 +5,7 @@ import MatrixRain from '../../components/title/MatrixRain';
 import TerminalLog from '../../components/title/TerminalLog';
 import SystemReadout from '../../components/title/SystemReadout';
 import TitleMenu, { TitleMenuId } from '../../components/title/TitleMenu';
+import { useCharacterStore } from '../../stores/character';
 import { useUIStore } from '../../stores/ui';
 
 import codebreakerLogo from '../../assets/logos/codebreaker-logo.png';
@@ -38,6 +39,9 @@ export default function TitleScreen() {
     const handleSelect = (id: TitleMenuId) => {
         switch (id) {
             case 'new':
+                useCharacterStore.getState().reset();
+                navigate('/character-creation');
+                return;
             case 'continue':
                 navigate('/station');
                 return;

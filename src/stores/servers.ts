@@ -62,6 +62,8 @@ export type ServersStoreState = {
     setDailyOffers: (dailyOffers: DailyDeal[]) => void;
     purchaseServer: (server: Server) => void;
     sellServer: (server: Server) => void;
+    configureServer: (server: Server, config: NonNullable<Server['config']>) => void;
+    restartServer: (server: Server) => void;
 };
 
 const generateServerName = (state: ServersStoreState, tier: ServerTier) => {
@@ -88,11 +90,33 @@ export const useServersStore = create<ServersStoreState>()(
              }),
              purchaseServer: (server: Server) => set((state) => {
                 const serverName = generateServerName(state, server.tier);
-                return { purchasedServers: [...state.purchasedServers, { ...server, name: serverName }] };
+                const enriched: Server = {
+                    ...server,
+                    name: serverName,
+                    util: server.util ?? 0,
+                    uptime: server.uptime ?? '—',
+                    location: server.location ?? '—',
+                    earnings24h: server.earnings24h ?? 0,
+                    purchased: server.purchased ?? new Date().toISOString(),
+                };
+                return { purchasedServers: [...state.purchasedServers, enriched] };
              }),
              sellServer: (server: Server) => set((state) => {
-                return { purchasedServers: state.purchasedServers.filter((s: Server) => s.id !== server.id) };
+                // Identify by `name` (guaranteed unique by generateServerName) since `id` isn't populated.
+                return { purchasedServers: state.purchasedServers.filter((s: Server) => s.name !== server.name) };
              }),
+             configureServer: (server: Server, config) => set((state) => ({
+                purchasedServers: state.purchasedServers.map((s) =>
+                    s.name === server.name ? { ...s, config } : s,
+                ),
+             })),
+             restartServer: (server: Server) => set((state) => ({
+                purchasedServers: state.purchasedServers.map((s) =>
+                    s.name === server.name
+                        ? { ...s, uptime: 'just rebooted', util: 0 }
+                        : s,
+                ),
+             })),
         }),
         {
             name: 'servers-store',

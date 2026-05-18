@@ -85,6 +85,14 @@ export interface IRackedServer {
     position: number;
 }
 
+export interface ServerConfig {
+    /** ICipherType.name of the assigned workload. */
+    cipherId: string;
+    parallelism: number;
+    priority: 'eco' | 'balanced' | 'turbo';
+    autoRestart: boolean;
+}
+
 export interface Server {
     id?: string;
     name?: string;
@@ -107,4 +115,14 @@ export interface Server {
     load?: number;
     processes?: ICipherType[];
     discount?: number;
+
+    /** Purchase-time fields populated when the server is bought. */
+    util?: number;
+    uptime?: string;
+    location?: string;
+    earnings24h?: number;
+    /** ISO date the server was purchased. */
+    purchased?: string;
+    /** Per-server workload configuration. */
+    config?: ServerConfig;
 }
