@@ -13,7 +13,10 @@ export default defineConfig(
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { argsIgnorePattern: '^_' }
+        {
+            argsIgnorePattern: '^_',
+            ignoreRestSiblings: true
+        }
       ],
       'no-async-promise-executor': 'off',
       'quotes': ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],

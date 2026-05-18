@@ -1,5 +1,4 @@
 import { IDarkWebFaction, ReputationTiers, RiskTier } from '../includes/DarkWeb.interface';
-import { GavelRounded, HubOutlined, LocalFireDepartmentOutlined, Memory, SecurityOutlined, VisibilityOffOutlined } from '@mui/icons-material';
 import { CipherTypes } from './cipherList';
 
 export const darkWebFactions: IDarkWebFaction[] = [
@@ -7,7 +6,7 @@ export const darkWebFactions: IDarkWebFaction[] = [
         id: 'pale-circuit',
         name: 'Pale Circuit',
         handle: '@pale_circuit',
-        glyph: Memory,
+        glyph: 'Memory',
         color: {
             color: '#0af5b0',
             className: 'accent',
@@ -37,7 +36,7 @@ export const darkWebFactions: IDarkWebFaction[] = [
         id: 'null-syndicate',
         name: 'Null Syndicate',
         handle: '@null_syn',
-        glyph: SecurityOutlined,
+        glyph: 'SecurityOutlined',
         color: {
             color: '#26c6da',
             className: 'cyan',
@@ -57,7 +56,7 @@ export const darkWebFactions: IDarkWebFaction[] = [
         id: 'redline-cartel',
         name: 'Redline Cartel',
         handle: '@redline_cc',
-        glyph: LocalFireDepartmentOutlined,
+        glyph: 'LocalFireDepartmentOutlined',
         color: {
             color: '#ff5f6d',
             className: 'red',
@@ -77,7 +76,7 @@ export const darkWebFactions: IDarkWebFaction[] = [
         id: 'ghost-collective',
         name: 'Ghost Collective',
         handle: '@gh0st_collective',
-        glyph: VisibilityOffOutlined,
+        glyph: 'VisibilityOffOutlined',
         color: {
             color: '#9c7fe0',
             className: 'purple',
@@ -97,7 +96,7 @@ export const darkWebFactions: IDarkWebFaction[] = [
         id: 'iron-protocol',
         name: 'Iron Protocol',
         handle: '@ironproto',
-        glyph: GavelRounded,
+        glyph: 'GavelRounded',
         color: {
             color: '#ffb74d',
             className: 'orange',
@@ -127,7 +126,7 @@ export const darkWebFactions: IDarkWebFaction[] = [
         id: 'driftnet',
         name: 'Driftnet',
         handle: '@driftnet',
-        glyph: HubOutlined,
+        glyph: 'HubOutlined',
         color: {
             color: '#61dafb',
             className: 'blue',

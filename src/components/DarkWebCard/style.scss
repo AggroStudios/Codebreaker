@@ -67,11 +67,6 @@
     font-size: 11px !important;
 }
 
-.dark-web-card .dark-web-card-blurb {
-    min-height: 60px;
-    margin-bottom: 14px !important;
-}
-
 .dark-web-card .dark-web-card-reputation-label {
     letter-spacing: 0.18em !important;
     font-size: 12px !important;
@@ -231,71 +226,6 @@
 
     &.purple {
         color: #9c7fe0 !important;
-    }
-}
-
-.dark-web-card .glyph-card-header .MuiAvatar-rounded {
-    border-radius: 8px !important;
-    width: 52px !important;
-    height: 52px !important;
-
-    & svg {
-        width: 28px;
-        height: 28px;
-    }
-
-    &.accent {
-        background: linear-gradient(rgba(10, 245, 176, 0.3), rgba(10, 245, 176, 0.1)) !important;
-        border: 1px solid var(--accent) !important;
-
-        & svg {
-            color: var(--accent) !important;
-        }
-    }
-
-    &.cyan {
-        background: linear-gradient(rgba(38, 198, 218, 0.3), rgba(38, 198, 218, 0.1)) !important;
-        border: 1px solid #26c6da !important;
-
-        & svg {
-            color: #26c6da !important;
-        }
-    }
-
-    &.blue {
-        background: linear-gradient(rgba(97, 218, 251, 0.3), rgba(97, 218, 251, 0.1)) !important;
-        border: 1px solid #61dafb !important;
-
-        & svg {
-            color: #61dafb !important;
-        }
-    }
-
-    &.orange {
-        background: linear-gradient(rgba(255, 152, 0, 0.3), rgba(255, 152, 0, 0.1)) !important;
-        border: 1px solid #ff9800 !important;
-
-        & svg {
-            color: #ff9800 !important;
-        }
-    }
-
-    &.red {
-        background: linear-gradient(rgba(244, 67, 54, 0.3), rgba(244, 67, 54, 0.1)) !important;
-        border: 1px solid #ff2828 !important;
-
-        & svg {
-            color: #ff2828 !important;
-        }
-    }
-
-    &.purple {
-        border: 1px solid #9c7fe0 !important;
-        background: linear-gradient(rgba(156, 127, 224, 0.3), rgba(156, 127, 224, 0.1)) !important;
-
-        & svg {
-            color: #9c7fe0 !important;
-        }
     }
 }
 
