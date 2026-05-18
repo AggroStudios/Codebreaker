@@ -151,6 +151,8 @@ const createPlayerStore = () => create<PlayerState>()(
                 experience: 0,
                 nextLevel: experienceForLevel(1),
                 level: 1,
+                careerXp: 0,
+                lifetimePrestiges: 0,
                 notifications: [],
                 messages: [],
                 statistics: makeDefaults(),
@@ -202,9 +204,22 @@ const createPlayerStore = () => create<PlayerState>()(
                         experience,
                         level,
                         nextLevel,
+                        careerXp: state.player.careerXp + amount,
                     },
                 };
             }),
+            prestige: () =>
+                set((state) => ({
+                    player: {
+                        ...state.player,
+                        money: 0,
+                        experience: 0,
+                        level: 1,
+                        nextLevel: experienceForLevel(1),
+                        lifetimePrestiges: state.player.lifetimePrestiges + 1,
+                        // careerXp intentionally preserved.
+                    },
+                })),
             setMoneyLabel: (amount: number | null) =>
                 set(() => ({ moneyLabel: { amount, id: Date.now() } })),
             addMoney: (amount: number) =>

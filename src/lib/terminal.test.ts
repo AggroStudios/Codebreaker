@@ -49,6 +49,8 @@ describe('Terminal', () => {
                 experience: 0,
                 level: 1,
                 nextLevel: 2,
+                careerXp: 0,
+                lifetimePrestiges: 0,
                 notifications: [],
                 messages: [],
                 statistics: {
@@ -62,6 +64,7 @@ describe('Terminal', () => {
                 },
             },
             earnExperience: vi.fn(),
+            prestige: vi.fn(),
             addMoney: vi.fn(),
             removeMoney: vi.fn(),
             deleteNotification: vi.fn(),

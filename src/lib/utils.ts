@@ -29,6 +29,7 @@ export const formatPower = (power: number) => {
 export const formatMoneyDay = (money: number) => formatMoney(money) + '/d';
 export const formatKw = (power: number) => `${power.toFixed(0)} kW`;
 export const formatGbps = (uplink: number) => uplink >= 1000 ? `${(uplink/1000).toFixed(1)} Tbps` : `${uplink} Gbps`;
+export const formatMbps = (mbps: number) => mbps >= 1000 ? `${(mbps/1000).toFixed(1)} Gbps` : `${mbps} Mbps`;
 export const formatMs = (latency: number) => `${latency} ms`;
 
 /** Compact integer with K / M / B suffix. */

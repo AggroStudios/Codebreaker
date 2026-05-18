@@ -82,7 +82,6 @@ export default function DataCenters() {
                     maxWidth: '100%',
                     flexDirection: 'column',
                     flexWrap: 'nowrap',
-                    marginTop: '2em',
                 }}
             >
                 <Grid container spacing={2} sx={{ flexShrink: 0, width: '100%', minWidth: 0 }}>

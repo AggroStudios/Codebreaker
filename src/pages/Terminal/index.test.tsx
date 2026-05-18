@@ -15,6 +15,8 @@ function createMockPlayerState(): PlayerState {
             experience: 0,
             level: 1,
             nextLevel: 2,
+            careerXp: 0,
+            lifetimePrestiges: 0,
             notifications: [],
             messages: [],
             statistics: {
@@ -42,6 +44,7 @@ function createMockPlayerState(): PlayerState {
         setMoneyLabel: vi.fn(),
         setXpLabel: vi.fn(),
         earnExperience: vi.fn(),
+        prestige: vi.fn(),
         addMoney: vi.fn(),
         removeMoney: vi.fn(),
         addNotification: vi.fn(),

@@ -67,8 +67,6 @@
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    // Side/top clamp; fixed 2em bottom gutter while map clamps above it.
-    padding: clamp(12px, 3vw, 2em) clamp(12px, 3vw, 2em) 2em;
 }
 
 // Outer column grid: nested row for stats, then size-12 map row (flex:1 in sx) fills remaining height.
@@ -79,4 +77,6 @@
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    // Side/top clamp; fixed 2em bottom gutter while map clamps above it.
+    padding: clamp(12px, 3vw, 2em) clamp(12px, 3vw, 2em) 2em;
 }

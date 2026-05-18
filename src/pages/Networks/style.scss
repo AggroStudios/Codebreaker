@@ -1,16 +1,62 @@
+.networks-page {
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.networks-page .page-header {
+    flex-shrink: 0;
+}
+
+.networks-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 2em;
+    box-sizing: border-box;
+}
+
+.networks-top-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 20px;
+    align-items: stretch;
+}
+
+@media (max-width: 1100px) {
+    .networks-top-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Station-firewall accent: solid border + outer glow (override the default
+   highlight's dotted border for this page). */
+.networks-page .station-card.highlight.accent {
+    border-style: solid;
+    border-color: rgba(10, 245, 176, 0.35);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6), 0 0 24px rgba(10, 245, 176, 0.08);
+}
+
+/* ── Chips: shared pill style across header + table/firewall rows ──── */
+.networks-page .MuiChip-root,
 .networks-header .MuiChip-root {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 2px 6px;
     border-radius: 9999px;
-    border: 1px solid #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.18);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
     line-height: 1;
     white-space: nowrap;
     height: 18px !important;
+    font-family: var(--font-code);
 
     & svg {
         width: 14px;
@@ -20,38 +66,60 @@
     &.accent {
         border-color: #0af5b0;
         color: #0af5b0;
-
-        & svg {
-            color: #0af5b0;
-        }
+        & svg { color: #0af5b0; }
     }
-
     &.cyan {
         border-color: #26c6da;
         color: #26c6da;
-
-        & svg {
-            color: #26c6da;
-        }
+        & svg { color: #26c6da; }
     }
-
+    &.orange {
+        border-color: #ff9800;
+        color: #ff9800;
+        & svg { color: #ff9800; }
+    }
     &.warning {
-        border-color: #ff2828;
-        color: #ff2828;
-
-        & svg {
-            color: #ff2828;
-        }
+        border-color: #f44336;
+        color: #f44336;
+        & svg { color: #f44336; }
     }
+}
 
-    & .live-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #0af5b0;
-        box-shadow: 0 0 6px #0af5b0;
-        animation: statusPulse 1.6s ease-in-out infinite;
-        flex-shrink: 0;
-        display: inline-block;
-    }
+/* ── Live dot ──────────────────────────────────────────────────────── */
+.networks-page .live-dot,
+.networks-header .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 6px currentColor;
+    animation: statusPulse 1.6s ease-in-out infinite;
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+/* Status-dot variants */
+.networks-page .live-dot.warn,
+.networks-header .live-dot.warn {
+    animation: none;
+}
+.networks-page .live-dot.idle,
+.networks-header .live-dot.idle {
+    animation: none;
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
+}
+.networks-page .live-dot.error,
+.networks-header .live-dot.error {
+    /* keeps the pulse via currentColor (chip variant sets the red) */
+}
+
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+}
+
+@keyframes scanX {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }

@@ -17,6 +17,10 @@ export type Player = {
     experience: number;
     level: number;
     nextLevel: number;
+    /** Total XP earned across the player's entire career — never decreases on prestige. */
+    careerXp: number;
+    /** Count of completed prestige cycles. */
+    lifetimePrestiges: number;
     notifications: Notification[];
     messages: Message[];
     statistics: IStatistics;
@@ -45,6 +49,8 @@ export interface PlayerState {
     setMoneyLabel: (amount: number | null) => void;
     setXpLabel: (amount: number | null, levelUp?: boolean) => void;
     earnExperience: (amount: number) => void;
+    /** Hard-reset of player state for prestige: money/level/experience back to fresh start, bumps lifetimePrestiges, careerXp preserved. */
+    prestige: () => void;
     addMoney: (amount: number) => void;
     removeMoney: (amount: number) => void;
     addNotification: (notification: Notification) => void;

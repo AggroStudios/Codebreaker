@@ -1,16 +1,25 @@
-import PageHeader from '../../components/common/PageHeader';
-import { SettingsBackupRestoreTwoTone } from '@mui/icons-material';
+import { Box } from '@mui/material';
+
+import PrestigeHeader from '../../components/Prestige/PrestigeHeader';
+import PrestigeStatusCard from '../../components/Prestige/PrestigeStatusCard';
+import MechanismCard from '../../components/Prestige/MechanismCard';
+import SkillTreeCard from '../../components/Prestige/SkillTreeCard';
 
 import './style.scss';
 
 export default function Prestige() {
     return (
-        <PageHeader
-            className="prestige-header"
-            title="Prestige"
-            subtitle="Upgrade your status and unlock new opportunities in the code breaking industry."
-            breadcrumbs={['home', 'prestige']}
-            icon={SettingsBackupRestoreTwoTone}
-        />
+        <Box className="prestige-page">
+            <PrestigeHeader />
+            <Box className="prestige-content">
+                <Box className="prestige-top-row">
+                    <PrestigeStatusCard />
+                    <MechanismCard />
+                </Box>
+                <Box sx={{ mt: 2.5 }}>
+                    <SkillTreeCard />
+                </Box>
+            </Box>
+        </Box>
     );
 }
