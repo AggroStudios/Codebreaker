@@ -14,6 +14,7 @@ import Layout from './Layout';
 import LoadingScreen from './components/LoadingScreen';
 import Settings from './components/Settings';
 import About from './components/About';
+import MusicPlayer from './components/MusicPlayer';
 
 import { useUIStore } from './stores/ui';
 
@@ -167,6 +168,7 @@ const AppWithProviders = () => {
                         useStationStore={useStationStore}
                         stationProxy={stationProxy}
                     >
+                        <MusicPlayer />
                         <BrowserRouter>
                             <Routes>
                                 <Route index element={

@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 
 import AppBar from './components/AppBar';
 import NavMenu from './components/NavMenu';
-import MusicPlayer from './components/MusicPlayer';
+// import MusicPlayer from './components/MusicPlayer';
 import ScreenGlow from './components/ScreenGlow';
 import { usePlayerStore } from './stores/player';
 import { useAppReadyStore } from './stores/appReady';
@@ -89,7 +89,6 @@ export default function Layout() {
         <>
             <Coachmarks open={showTutorial} />
             <ScreenGlow />
-            <MusicPlayer />
             <AppBar />
             <MainContainer background={getBackground(location.pathname)}>
                 <NavMenu />
