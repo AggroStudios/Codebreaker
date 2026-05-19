@@ -3,11 +3,13 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { Server } from '../includes/Servers.interface';
 import {
+    Cipher,
     INITIAL_SWITCHES,
     INITIAL_UPLINK,
     RACK_CATALOG,
     SwitchUnit,
     UplinkInfo,
+    seedCiphers,
     serverInstId,
     serverSize,
 } from '../includes/serverRacks.interface';
@@ -18,6 +20,8 @@ export interface InstalledServer {
     server: Server;
     /** Top-most U slot (1-indexed). */
     u: number;
+    /** Live cipher cycles running on this instance. Seeded at install time. */
+    ciphers?: Cipher[];
 }
 
 export interface Rack {
@@ -83,9 +87,11 @@ export const useRacksStore = create<RacksStoreState>()(
                     if (rack.id !== rackId) return rack;
                     const instId = serverInstId(server);
                     if (rack.installed.some((it) => it.instId === instId)) return rack;
+                    // Seed 0–2 mock ciphers so the hover tooltip has something to show.
+                    const ciphers: Cipher[] = seedCiphers(Math.floor(Math.random() * 3));
                     return {
                         ...rack,
-                        installed: [...rack.installed, { instId, server, u }],
+                        installed: [...rack.installed, { instId, server, u, ciphers }],
                     };
                 }),
             })),

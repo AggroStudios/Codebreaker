@@ -1,0 +1,61 @@
+.character-creation-page {
+    position: fixed;
+    inset: 0;
+    overflow-y: auto;
+    box-sizing: border-box;
+    color: rgba(255, 255, 255, 0.92);
+    background-color: #0a0e10;
+    background-image:
+        radial-gradient(ellipse at 50% 0%, rgba(10, 245, 176, 0.06), transparent 55%),
+        linear-gradient(rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0.72)),
+        url('../../assets/backgrounds/station_bg.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+.character-creation-page::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.04) 2px 4px);
+}
+
+.character-creation-inner {
+    position: relative;
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 32px 40px 60px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+@media (max-width: 720px) {
+    .character-creation-inner {
+        padding: 20px 24px 60px;
+    }
+}
+
+/* ── live-dot pulse (scoped) ───────────────────────────────────────── */
+.character-creation-page .char-live-dot {
+    animation: charStatusPulse 1.6s ease-in-out infinite;
+}
+
+.character-creation-page .char-cursor {
+    animation: charCursorBlink 1s steps(1) infinite;
+}
+
+@keyframes charStatusPulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.55; }
+}
+
+@keyframes charCursorBlink {
+    0%, 50%      { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+}

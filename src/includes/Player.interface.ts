@@ -1,4 +1,5 @@
 import { ICipherType } from './Cipher.interface';
+import { StatKey } from './Character.interface';
 import { Notification, Message } from './OperatingSystem.interface';
 import { Server } from './Servers.interface';
 import { IStatistics } from './Statistics.interface';
@@ -21,6 +22,8 @@ export type Player = {
     careerXp: number;
     /** Count of completed prestige cycles. */
     lifetimePrestiges: number;
+    /** Permanent stat bonuses applied by origin / character-creation choices. */
+    statBonuses: Record<StatKey, number>;
     notifications: Notification[];
     messages: Message[];
     statistics: IStatistics;

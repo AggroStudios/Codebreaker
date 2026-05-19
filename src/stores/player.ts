@@ -153,6 +153,7 @@ const createPlayerStore = () => create<PlayerState>()(
                 level: 1,
                 careerXp: 0,
                 lifetimePrestiges: 0,
+                statBonuses: { cryptography: 0, hardware: 0, stealth: 0, networking: 0 },
                 notifications: [],
                 messages: [],
                 statistics: makeDefaults(),

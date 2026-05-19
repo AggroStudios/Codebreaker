@@ -44,6 +44,7 @@ import NeuralNet from './lib/neuralNet';
 import Networks from './lib/networks';
 
 const TitleScreenRoute = lazy(() => import('./pages/TitleScreen'));
+const CharacterCreationRoute = lazy(() => import('./pages/CharacterCreation'));
 const TerminalRoute = lazy(() => import('./pages/Terminal'));
 const StationRoute = lazy(() => import('./pages/Station'));
 const LoginRoute = lazy(() => import('./components/Login'));
@@ -120,6 +121,7 @@ const AppWithProviders = () => {
         preloadImages(setLoadingProgress);
         // Preload all route chunks in the background so navigation is instant
         import('./pages/TitleScreen');
+        import('./pages/CharacterCreation');
         import('./pages/Terminal');
         import('./pages/Station');
         import('./components/Login');
@@ -170,6 +172,11 @@ const AppWithProviders = () => {
                                 <Route index element={
                                     <Suspense fallback={null}>
                                         <TitleScreenRoute />
+                                    </Suspense>
+                                } />
+                                <Route path="character-creation" element={
+                                    <Suspense fallback={null}>
+                                        <CharacterCreationRoute />
                                     </Suspense>
                                 } />
                                 <Route element={<Layout />}>
