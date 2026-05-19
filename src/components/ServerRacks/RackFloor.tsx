@@ -1,10 +1,12 @@
+import { useCallback, useMemo, useState } from 'react';
 import { Box, Chip, Typography } from '@mui/material';
 import { AcUnitOutlined, AddCircleOutlineRounded, DnsOutlined } from '@mui/icons-material';
 
 import StationCard, { StationCardAccentType } from '../StationCard';
 import { useRacksStore } from '../../stores/racks';
 import { RACK_CATALOG, RACK_WIDTH, serverSize } from '../../includes/serverRacks.interface';
-import RackUnit from './RackUnit';
+import RackUnit, { TileHoverCallbacks } from './RackUnit';
+import ServerHoverTooltip, { HoverState } from './ServerHoverTooltip';
 
 export default function RackFloor() {
     const racks = useRacksStore((s) => s.racks);
@@ -19,7 +21,25 @@ export default function RackFloor() {
     const ghostPrice = RACK_CATALOG[0].price;
     const subheader = `${racks.length} RACKS · ${installedCount} INSTALLED · ${totalU}U USED`;
 
+    const [hover, setHover] = useState<HoverState | null>(null);
+
+    const onTileEnter = useCallback<TileHoverCallbacks['onTileEnter']>((rack, installed, e) => {
+        setHover({ rack, installed, x: e.clientX, y: e.clientY });
+    }, []);
+    const onTileMove = useCallback<TileHoverCallbacks['onTileMove']>((e) => {
+        setHover((prev) => (prev ? { ...prev, x: e.clientX, y: e.clientY } : prev));
+    }, []);
+    const onTileLeave = useCallback<TileHoverCallbacks['onTileLeave']>(() => {
+        setHover(null);
+    }, []);
+
+    const hoverCallbacks = useMemo<TileHoverCallbacks>(
+        () => ({ onTileEnter, onTileMove, onTileLeave }),
+        [onTileEnter, onTileMove, onTileLeave],
+    );
+
     return (
+        <>
         <StationCard
             avatar={DnsOutlined}
             accent={StationCardAccentType.ACCENT}
@@ -60,7 +80,7 @@ export default function RackFloor() {
                 >
                     <Box sx={{ display: 'flex', gap: 2.25, alignItems: 'flex-start' }}>
                         {racks.map((r) => (
-                            <RackUnit key={r.id} rack={r} />
+                            <RackUnit key={r.id} rack={r} hoverCallbacks={hoverCallbacks} />
                         ))}
 
                         <Box
@@ -113,5 +133,7 @@ export default function RackFloor() {
                 </Box>
             }
         />
+        <ServerHoverTooltip hover={hover} />
+        </>
     );
 }

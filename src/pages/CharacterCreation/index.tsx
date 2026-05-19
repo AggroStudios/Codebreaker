@@ -31,7 +31,7 @@ const STEP_META: Record<1 | 2 | 3, { label: string; sub: string; path: string; i
     },
     2: {
         label: 'FORGE IDENTITY',
-        path: 'identity',
+        path: 'call-sign',
         sub: 'Lock your callsign, paint your avatar, pick a hometown, and choose the backstory that grants your starting attribute.',
         icon: FingerprintTwoTone,
     },
@@ -109,8 +109,6 @@ export default function CharacterCreation() {
     return (
         <Box className="character-creation-page">
             <Box className="character-creation-inner">
-                <BrandStrip />
-
                 <Box
                     sx={{
                         display: 'flex',
@@ -121,26 +119,27 @@ export default function CharacterCreation() {
                         mb: 3,
                     }}
                 >
-                    <Box sx={{ maxWidth: 640 }}>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.75,
-                                mb: 1.25,
-                                fontFamily: 'Fira Code, monospace',
-                                fontSize: 11,
-                                fontWeight: 600,
-                                letterSpacing: '0.18em',
-                                color: klass.accent,
-                                textTransform: 'uppercase',
-                            }}
-                        >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexDirection: 'row', width: '100%' }}>
+                        <Box sx={{
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            flex: '1 1 0',
+                            gap: 0.75,
+                            fontFamily: 'Fira Code, monospace',
+                            fontSize: 11,
+                            fontWeight: 600,
+                            letterSpacing: '0.18em',
+                            color: klass.accent,
+                            textTransform: 'uppercase',
+                    }}>
                             <Icon sx={{ fontSize: 14 }} />
                             <span>
-                                /home/operator/identity/{meta.path} · STEP {stepNum} / 03 — {meta.label}
+                                /home/identity/{meta.path} · STEP {stepNum} / 03 — {meta.label}
                             </span>
                         </Box>
+                        <BrandStrip />
+                    </Box>
+                    <Box sx={{ maxWidth: 640 }}>
                         <Typography
                             component="h1"
                             sx={{
@@ -152,7 +151,7 @@ export default function CharacterCreation() {
                                 mb: 1,
                             }}
                         >
-                            {draft.step === 1 ? 'Operator Class' : draft.step === 2 ? 'Identity' : 'Briefing'}
+                            {draft.step === 1 ? 'Operator Class' : draft.step === 2 ? 'Call Sign' : 'Briefing'}
                         </Typography>
                         <Typography sx={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5 }}>
                             {meta.sub}

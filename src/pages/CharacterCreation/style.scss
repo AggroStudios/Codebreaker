@@ -4,10 +4,15 @@
     overflow-y: auto;
     box-sizing: border-box;
     color: rgba(255, 255, 255, 0.92);
-    background:
-        radial-gradient(ellipse at 50% 0%, rgba(10, 245, 176, 0.06), transparent 55%),
-        linear-gradient(rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0.72));
     background-color: #0a0e10;
+    background-image:
+        radial-gradient(ellipse at 50% 0%, rgba(10, 245, 176, 0.06), transparent 55%),
+        linear-gradient(rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0.72)),
+        url('../../assets/backgrounds/station_bg.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
 }
 
 .character-creation-page::after {

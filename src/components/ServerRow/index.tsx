@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import './style.scss';
 import { Server } from '../../includes/Servers.interface';
@@ -9,6 +9,8 @@ import { SettingsTwoTone, RestartAltTwoTone, SellTwoTone } from '@mui/icons-mate
 import ConfigureModal from '../Servers/ConfigureModal';
 import RestartModal from '../Servers/RestartModal';
 import SellModal from '../Servers/SellModal';
+import { DATA_CENTERS } from '../../data/dataCenter';
+import { useRacksStore } from '../../stores/racks';
 
 interface ServerRowProps {
     server: Server;
@@ -34,6 +36,25 @@ export function ServerRow(props: ServerRowProps) {
     const [restartOpen, setRestartOpen] = useState(false);
     const [sellOpen, setSellOpen] = useState(false);
 
+    const racks = useRacksStore((s) => s.racks);
+    const selectedDcId = useRacksStore((s) => s.selectedDcId);
+
+    const install = useMemo(() => {
+        for (const rack of racks) {
+            const installed = rack.installed.find((it) => it.server.name === server.name);
+            if (installed) return { rack, installed };
+        }
+        return null;
+    }, [racks, server.name]);
+
+    const dc = DATA_CENTERS.find((d) => d.id === selectedDcId);
+    const locationLine = install
+        ? `${dc?.city ?? selectedDcId} · ${install.rack.name}`
+        : 'In storage';
+    const slotLine = install
+        ? `Slot U${install.installed.u} · ${install.rack.sku}`
+        : 'Not installed';
+
     return (
         <>
             <TableRow>
@@ -48,8 +69,14 @@ export function ServerRow(props: ServerRowProps) {
                 </TableCell>
                 <TableCell sx={{ width: '33.33%' }}>
                     <Box className="server-row-location">
-                        <Typography className="server-row-location-name" variant="body1">{server.location ?? 'N/A'}</Typography>
-                        <Typography className="server-row-uptime" variant="body2">Uptime: {server.uptime ?? 'N/A'}</Typography>
+                        <Typography
+                            className="server-row-location-name"
+                            variant="body1"
+                            sx={{ color: install ? undefined : 'rgba(255,255,255,0.45)' }}
+                        >
+                            {locationLine}
+                        </Typography>
+                        <Typography className="server-row-uptime" variant="body2">{slotLine}</Typography>
                     </Box>
                 </TableCell>
                 <TableCell>

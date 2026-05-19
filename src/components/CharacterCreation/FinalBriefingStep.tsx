@@ -129,14 +129,6 @@ function TransmissionTerminal() {
                         INCOMING TRANSMISSION
                     </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', gap: 0.75 }}>
-                    {['#ff5f57', '#febc2e', '#28c840'].map((c) => (
-                        <Box
-                            key={c}
-                            sx={{ width: 8, height: 8, borderRadius: '50%', background: c }}
-                        />
-                    ))}
-                </Box>
             </Box>
             <Box
                 sx={{

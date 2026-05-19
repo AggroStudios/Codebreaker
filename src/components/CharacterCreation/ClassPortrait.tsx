@@ -16,7 +16,7 @@ interface ClassPortraitProps {
 
 const DIMENSIONS: Record<PortraitSize, number | string> = {
     mini: 96,
-    recap: 64,
+    recap: 40,
     hero: 168,
     badge: '100%',
 };
@@ -30,17 +30,11 @@ const RADII: Record<PortraitSize, number> = {
 
 const GLYPH_SCALE: Record<PortraitSize, number> = {
     mini: 56,
-    recap: 36,
+    recap: 24,
     hero: 100,
     badge: 88,
 };
 
-const BRACKET_LEG: Record<PortraitSize, number> = {
-    mini: 12,
-    recap: 10,
-    hero: 14,
-    badge: 12,
-};
 
 export default function ClassPortrait({
     glyph: Glyph,
@@ -96,26 +90,6 @@ export default function ClassPortrait({
                     }}
                 />
             )}
-
-            {/* Corner brackets */}
-            {(['tl', 'tr', 'bl', 'br'] as const).map((corner) => {
-                const leg = BRACKET_LEG[size];
-                const base = {
-                    position: 'absolute' as const,
-                    width: leg,
-                    height: leg,
-                    border: `2px solid ${accent}`,
-                };
-                const pos =
-                    corner === 'tl'
-                        ? { top: 4, left: 4, borderRight: 0, borderBottom: 0 }
-                        : corner === 'tr'
-                            ? { top: 4, right: 4, borderLeft: 0, borderBottom: 0 }
-                            : corner === 'bl'
-                                ? { bottom: 4, left: 4, borderRight: 0, borderTop: 0 }
-                                : { bottom: 4, right: 4, borderLeft: 0, borderTop: 0 };
-                return <Box key={corner} sx={{ ...base, ...pos }} />;
-            })}
 
             {portraitId && size !== 'badge' && (
                 <Typography

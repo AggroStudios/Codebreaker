@@ -1,11 +1,18 @@
+import { MouseEvent as ReactMouseEvent, useEffect } from 'react';
 import { useDndContext, useDraggable, useDroppable } from '@dnd-kit/core';
 import { Box, IconButton, Typography } from '@mui/material';
 import { BoltOutlined, CloseOutlined } from '@mui/icons-material';
 
-import { Rack, canPlace, useRacksStore } from '../../stores/racks';
+import { InstalledServer, Rack, canPlace, useRacksStore } from '../../stores/racks';
 import { Server } from '../../includes/Servers.interface';
 import { RACK_WIDTH, U_HEIGHT, serverSize } from '../../includes/serverRacks.interface';
 import ServerChip from './ServerChip';
+
+export interface TileHoverCallbacks {
+    onTileEnter: (rack: Rack, installed: InstalledServer, e: ReactMouseEvent) => void;
+    onTileMove: (e: ReactMouseEvent) => void;
+    onTileLeave: () => void;
+}
 
 interface DragPayload {
     kind: 'inventory' | 'installed';
@@ -80,19 +87,25 @@ function SlotDroppable({ rackId, u, hover }: SlotDroppableProps) {
 
 interface InstalledTileProps {
     rack: Rack;
-    instId: string;
-    server: Server;
-    u: number;
+    installed: InstalledServer;
     hover: HoverInfo | null;
+    hoverCallbacks?: TileHoverCallbacks;
 }
 
-function InstalledTile({ rack, instId, server, u, hover }: InstalledTileProps) {
+function InstalledTile({ rack, installed, hover, hoverCallbacks }: InstalledTileProps) {
     const uninstallServer = useRacksStore((s) => s.uninstallServer);
+    const { instId, server, u } = installed;
     const size = serverSize(server);
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: `inst:${rack.id}:${instId}`,
         data: { kind: 'installed', server, instId, rackId: rack.id } satisfies DragPayload,
     });
+
+    // Hide the tooltip the moment a drag starts (mouseleave doesn't fire while
+    // the pointer is captured by @dnd-kit).
+    useEffect(() => {
+        if (isDragging) hoverCallbacks?.onTileLeave();
+    }, [isDragging, hoverCallbacks]);
 
     const beingMoved =
         isDragging || (hover?.sourceRackId === rack.id && hover?.sourceInstId === instId);
@@ -109,7 +122,15 @@ function InstalledTile({ rack, instId, server, u, hover }: InstalledTileProps) {
     };
 
     return (
-        <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+        <div
+            ref={setNodeRef}
+            style={style}
+            onMouseEnter={(e) => hoverCallbacks?.onTileEnter(rack, installed, e)}
+            onMouseMove={(e) => hoverCallbacks?.onTileMove(e)}
+            onMouseLeave={() => hoverCallbacks?.onTileLeave()}
+            {...listeners}
+            {...attributes}
+        >
             <ServerChip server={server} height={size * U_HEIGHT - 2} />
             <IconButton
                 size="small"
@@ -139,9 +160,10 @@ function InstalledTile({ rack, instId, server, u, hover }: InstalledTileProps) {
 
 interface RackUnitProps {
     rack: Rack;
+    hoverCallbacks?: TileHoverCallbacks;
 }
 
-export default function RackUnit({ rack }: RackUnitProps) {
+export default function RackUnit({ rack, hoverCallbacks }: RackUnitProps) {
     const hover = useHover(rack);
     const totalWatts = rack.installed.reduce((sum, it) => sum + (it.server.powerConsumption ?? 0), 0);
     const occupiedSlots = rack.installed.reduce((sum, it) => sum + serverSize(it.server), 0);
@@ -248,10 +270,9 @@ export default function RackUnit({ rack }: RackUnitProps) {
                     <InstalledTile
                         key={it.instId}
                         rack={rack}
-                        instId={it.instId}
-                        server={it.server}
-                        u={it.u}
+                        installed={it}
                         hover={hover}
+                        hoverCallbacks={hoverCallbacks}
                     />
                 ))}
             </Box>

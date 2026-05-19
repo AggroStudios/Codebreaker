@@ -88,3 +88,51 @@ export const statusColor = (s: 'UP' | 'DEGRADED' | 'DOWN'): string => {
 
 export const U_HEIGHT = 22;
 export const RACK_WIDTH = 280;
+
+/** Live cipher cycle running on an installed server. */
+export interface Cipher {
+    name: string;
+    /** 0–100 progress along the current cipher cycle. */
+    progress: number;
+    /** Human ETA label like `12s`, `1m 14s`, `8m 12s`. */
+    eta: string;
+}
+
+/** Pool the seeded ciphers are sampled from when a server is installed. */
+export const CIPHER_POOL: string[] = [
+    'SHA-256',
+    'RSA-2048',
+    'AES-128',
+    'BLAKE2',
+    'ChaCha20',
+    'MD5',
+    'CRC-32',
+    'AES-256',
+];
+
+const ETA_LABELS = ['4s', '12s', '32s', '1m', '1m 14s', '4m', '8m 12s', 'ETA pending'];
+
+/** Pick `count` ciphers at random from CIPHER_POOL. */
+export const seedCiphers = (count: number): Cipher[] => {
+    const choices = [...CIPHER_POOL].sort(() => Math.random() - 0.5).slice(0, count);
+    return choices.map((name) => ({
+        name,
+        progress: Math.round(Math.random() * 90),
+        eta: ETA_LABELS[Math.floor(Math.random() * ETA_LABELS.length)],
+    }));
+};
+
+/** Compute a coarse uptime string from a server's purchase ISO date. */
+export const computeUptime = (purchased?: string): string => {
+    if (!purchased) return '—';
+    const then = Date.parse(purchased);
+    if (!Number.isFinite(then)) return '—';
+    const ms = Date.now() - then;
+    if (ms < 60_000) return `${Math.max(1, Math.round(ms / 1000))}s`;
+    const minutes = Math.floor(ms / 60_000);
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ${minutes % 60}m`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ${hours % 24}h`;
+};
