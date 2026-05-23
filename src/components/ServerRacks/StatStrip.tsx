@@ -10,12 +10,17 @@ import {
 } from '@mui/icons-material';
 
 import { Stat } from '../common/Stat';
-import { useRacksStore } from '../../stores/racks';
+import { useRacksByDc, useRacksStore } from '../../stores/racks';
 import { useServersStore } from '../../stores/servers';
 import { serverInstId, serverSize } from '../../includes/serverRacks.interface';
 
-export default function StatStrip() {
-    const racks = useRacksStore((s) => s.racks);
+interface StatStripProps {
+    dcId: string;
+}
+
+export default function StatStrip({ dcId }: StatStripProps) {
+    const racks = useRacksByDc(dcId);
+    const allRacks = useRacksStore((s) => s.racks);
     const switches = useRacksStore((s) => s.switches);
     const purchased = useServersStore((s) => s.purchasedServers);
 
@@ -26,8 +31,9 @@ export default function StatStrip() {
             0,
         );
         const installedCount = racks.reduce((sum, r) => sum + r.installed.length, 0);
+        // "In Inventory" is global (a server is uninstalled if it isn't in ANY rack).
         const installedIds = new Set<string>();
-        racks.forEach((r) => r.installed.forEach((it) => installedIds.add(it.instId)));
+        allRacks.forEach((r) => r.installed.forEach((it) => installedIds.add(it.instId)));
         const inventoryCount = purchased.filter((s) => !installedIds.has(serverInstId(s))).length;
         const switchesUp = switches.filter((sw) => sw.status === 'UP').length;
         const portsUp = switches
@@ -56,7 +62,7 @@ export default function StatStrip() {
             totalWatts,
             avgLoad,
         };
-    }, [racks, switches, purchased]);
+    }, [racks, allRacks, switches, purchased]);
 
     const avgLoadDisplay = stats.avgLoad == null ? '—' : `${stats.avgLoad}%`;
     const avgLoadAccent =

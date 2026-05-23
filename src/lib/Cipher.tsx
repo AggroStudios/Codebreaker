@@ -4,6 +4,8 @@ import OperatingSystem from '../lib/OperatingSystem';
 import { Networking } from '../data/network';
 import { dataSizeFromSuffix } from './utils';
 import { cipherSpeedMultiplier } from '../stores/neuralNet';
+import { prestigeCipherSpeedMultiplier } from '../stores/prestige';
+import { advance, tickRate, workPerChar } from './cipherMath';
 
 export interface CipherDelegate {
     setGrid: (chars: Uint8Array, classes: Uint8Array) => void;
@@ -26,6 +28,10 @@ export default class Cipher implements Process {
     private _id: string;
     private downloadedBlocks: number = 0;
     private frame: number = 0;
+    /** Carry-over work units between callback ticks for the break accumulator. */
+    private _workAccum: number = 0;
+    /** OS game-speed exponent captured from the latest callback (defaults to 1×). */
+    private _exponent: number = 1;
     private _stationOs: OperatingSystem;
     private _stationNet: Networking;
     private _stationProcessor: IProcessorType;
@@ -80,6 +86,19 @@ export default class Cipher implements Process {
 
     public get cores() {
         return this._cipherType.parallelism;
+    }
+
+    /**
+     * Memory this cipher reserves on the station while running, in the same
+     * unit the OS resource accounting uses (GB — matches `IMemoryType.capacity`).
+     * `ICipherType.memoryRequired` is authored in MB, so divide by 1024 and
+     * round up so partial GB still claims a full GB slot. This is what
+     * `OperatingSystem.addProcess` reads to enforce the simultaneous-cipher
+     * cap based on the Codium Memory upgrade tier.
+     */
+    public get memoryRequired(): number {
+        const mb = this._cipherType.memoryRequired ?? 0;
+        return Math.ceil(mb / 1024);
     }
 
     public get state() {
@@ -156,6 +175,29 @@ export default class Cipher implements Process {
         this._delegate.setGrid(this._chars, this._classes);
     }
 
+    /**
+     * Solve a single random unsolved grid cell. Does NOT push a progress
+     * update — callers solving multiple chars per tick should batch the
+     * progress setter call themselves (see `breaking()`).
+     */
+    private solveOneChar() {
+        if (this.unsolvedIndexes.size === 0) return;
+        const targetPos = Math.floor(Math.random() * this.unsolvedIndexes.size);
+        let solvedIndex = 0;
+        let pos = 0;
+        for (const idx of this.unsolvedIndexes) {
+            if (pos === targetPos) {
+                solvedIndex = idx;
+                break;
+            }
+            pos += 1;
+        }
+        // '0' = index 73, '1' = index 74 in CHAR_SET; class 4 = 'broken'
+        this._chars[solvedIndex] = 73 + Math.round(Math.random());
+        this._classes[solvedIndex] = 4;
+        this.unsolvedIndexes.delete(solvedIndex);
+    }
+
     private breaking() {
         this._percentUse = 100;
 
@@ -168,30 +210,35 @@ export default class Cipher implements Process {
             return;
         }
 
+        // Combine every speed factor into a single per-tick rate, then
+        // drain `workPerChar` units per solved character via the
+        // accumulator. Factors stack multiplicatively so each system stays
+        // independently tunable:
+        //   - CPU gigaflops (faster silicon)
+        //   - Neural-net training bonus for this cipher
+        //   - OS game-loop exponent (master game-speed slider)
+        //   - Prestige skill tree bonuses (n1 +10%, n4 +20%)
         const neuralBonus = cipherSpeedMultiplier(this._cipherType.name);
-        const complexity = Math.round(10 * this._cipherType.complexity / neuralBonus);
-        if (this.frame > 0 && this.frame % parseFloat((complexity / this._stationProcessor.gigaflops).toFixed(3)) === 0) {
-            const targetPos = Math.floor(
-                Math.random() * this.unsolvedIndexes.size,
-            );
-            let solvedIndex = 0;
-            let pos = 0;
-            for (const idx of this.unsolvedIndexes) {
-                if (pos === targetPos) {
-                    solvedIndex = idx;
-                    break;
-                }
-                pos++;
-            }
-            // '0' = index 73, '1' = index 74 in CHAR_SET; class 4 = 'broken'
-            this._chars[solvedIndex] = 73 + Math.round(Math.random());
-            this._classes[solvedIndex] = 4;
-            this.unsolvedIndexes.delete(solvedIndex);
-            this.progress = Math.floor(
-                ((this.width * this.height - this.unsolvedIndexes.size) /
-                    (this.width * this.height)) *
-                    100,
-            );
+        const prestige = prestigeCipherSpeedMultiplier();
+        const rate =
+            tickRate(this._stationProcessor.gigaflops, neuralBonus) *
+            Math.max(0, this._exponent) *
+            prestige;
+        const work = workPerChar(this._cipherType.complexity);
+        const step = advance(this._workAccum, rate, work);
+        this._workAccum = step.accum;
+
+        // Never solve more chars than remain — anything past that is wasted
+        // accumulator work and would just churn delegate renders.
+        const toSolve = Math.min(step.solved, this.unsolvedIndexes.size);
+        for (let i = 0; i < toSolve; i += 1) {
+            this.solveOneChar();
+        }
+        // Single delegate notification per tick, regardless of how many
+        // chars we drained — keeps re-render pressure flat.
+        if (toSolve > 0) {
+            const total = this.width * this.height;
+            this.progress = Math.floor(((total - this.unsolvedIndexes.size) / total) * 100);
         }
 
         if (this.frame > 0 && this.frame % 5 === 0) {
@@ -228,9 +275,10 @@ export default class Cipher implements Process {
         }
     }
 
-    public callback(_: number) {
+    public callback(_frame: number, _count: number, exponent: number = 1) {
         if (this._state === CipherState.PAUSED) return;
 
+        this._exponent = exponent;
         this.frame++;
         switch (this._state) {
             case CipherState.DOWNLOADING:

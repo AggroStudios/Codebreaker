@@ -3,13 +3,17 @@ import { Box, Chip, Typography } from '@mui/material';
 import { AcUnitOutlined, AddCircleOutlineRounded, DnsOutlined } from '@mui/icons-material';
 
 import StationCard, { StationCardAccentType } from '../StationCard';
-import { useRacksStore } from '../../stores/racks';
+import { useRacksByDc, useRacksStore } from '../../stores/racks';
 import { RACK_CATALOG, RACK_WIDTH, serverSize } from '../../includes/serverRacks.interface';
 import RackUnit, { TileHoverCallbacks } from './RackUnit';
 import ServerHoverTooltip, { HoverState } from './ServerHoverTooltip';
 
-export default function RackFloor() {
-    const racks = useRacksStore((s) => s.racks);
+interface RackFloorProps {
+    dcId: string;
+}
+
+export default function RackFloor({ dcId }: RackFloorProps) {
+    const racks = useRacksByDc(dcId);
     const addRack = useRacksStore((s) => s.addRack);
 
     const installedCount = racks.reduce((sum, r) => sum + r.installed.length, 0);
@@ -84,7 +88,7 @@ export default function RackFloor() {
                         ))}
 
                         <Box
-                            onClick={() => addRack()}
+                            onClick={() => addRack(dcId)}
                             sx={{
                                 width: RACK_WIDTH,
                                 flex: `0 0 ${RACK_WIDTH}px`,

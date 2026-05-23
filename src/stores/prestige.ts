@@ -87,3 +87,21 @@ export const totalSpentPP = (allocated: Record<SkillId, boolean>): number =>
 /** Count of allocated skills (including Genesis). */
 export const skillsAllocated = (allocated: Record<SkillId, boolean>): number =>
     SKILLS.reduce((n, s) => n + (allocated[s.id] ? 1 : 0), 0);
+
+/**
+ * Cipher-speed multiplier from allocated prestige skills.
+ * - `n1` ("Quick Break") adds +10%.
+ * - `n4` ("Quantum Pipelines") adds +20%. Both stack — the skill catalog
+ *   explicitly notes Quantum Pipelines "compounds with Quick Break for
+ *   total +30% throughput."
+ *
+ * Returns `1` when neither skill is allocated. Read from outside React
+ * via `usePrestigeStore.getState()`.
+ */
+export const prestigeCipherSpeedMultiplier = (): number => {
+    const { allocated } = usePrestigeStore.getState();
+    let mult = 1;
+    if (allocated.n1) mult += 0.10;
+    if (allocated.n4) mult += 0.20;
+    return mult;
+};

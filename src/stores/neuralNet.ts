@@ -103,14 +103,67 @@ export const useNeuralNetStore = create<NeuralNetState>()(
 );
 
 // ── Derived math ───────────────────────────────────────────────────────────
-export const pointsAt = (seconds: number): number =>
-    seconds <= 0 ? 0 : Math.floor(Math.pow(1.05, seconds / 5) - 1);
 
-export const bonusFromPoints = (pts: number): number =>
-    Math.round(Math.log10(pts + 1) * 8 * 10) / 10;
+/**
+ * Tunable knobs for the training curve. Sqrt-based so each additional point
+ * costs progressively more session time — point N requires ~N² / POINTS_K²
+ * seconds. Never overflows the way the legacy `1.05^(s/5)` formula did.
+ */
+const POINTS_K = 4;
+/** Hard ceiling so a save with millions of seconds can't blow up downstream math. */
+const POINTS_CAP = 1_000_000;
+
+export const pointsAt = (seconds: number): number => {
+    if (!Number.isFinite(seconds) || seconds <= 0) return 0;
+    return Math.min(POINTS_CAP, Math.floor(POINTS_K * Math.sqrt(seconds)));
+};
+
+export const bonusFromPoints = (pts: number): number => {
+    if (!Number.isFinite(pts) || pts <= 0) return 0;
+    return Math.round(Math.log10(pts + 1) * 8 * 10) / 10;
+};
 
 export const modelLevelFromTotal = (totalPts: number): number =>
     totalPts <= 0 ? 0 : Math.floor(Math.log2(totalPts + 1));
+
+// ── Epoch curve ────────────────────────────────────────────────────────────
+// Each successive epoch takes EPOCH_GROWTH× longer than the previous one,
+// starting from EPOCH_BASE seconds. So epoch 1 lasts 30s, epoch 2 lasts 48s,
+// epoch 3 lasts ~77s, epoch 10 lasts ~1800s. Progress is exponentially
+// harder as the player advances — the user-requested pacing.
+const EPOCH_BASE = 30;
+const EPOCH_GROWTH = 1.6;
+const EPOCH_CAP = 9999;
+
+/** Cumulative seconds required to start epoch `n` (n=0 → 0). */
+const epochStart = (n: number): number =>
+    n <= 0 ? 0 : (EPOCH_BASE * (Math.pow(EPOCH_GROWTH, n) - 1)) / (EPOCH_GROWTH - 1);
+
+export interface EpochSnapshot {
+    /** Completed epoch count at this session time. */
+    count: number;
+    /** 0..100 percent through the *current* epoch. */
+    progress: number;
+    /** Whole-seconds remaining until the next epoch crosses over. */
+    remaining: number;
+    /** Total length (s) of the current epoch — handy for the "next epoch" label. */
+    duration: number;
+}
+
+export const epochProgressAt = (seconds: number): EpochSnapshot => {
+    if (!Number.isFinite(seconds) || seconds <= 0) {
+        return { count: 0, progress: 0, remaining: EPOCH_BASE, duration: EPOCH_BASE };
+    }
+    const rawN =
+        Math.log(1 + (seconds * (EPOCH_GROWTH - 1)) / EPOCH_BASE) / Math.log(EPOCH_GROWTH);
+    const count = Math.min(EPOCH_CAP, Math.floor(rawN));
+    const start = epochStart(count);
+    const end = epochStart(count + 1);
+    const duration = end - start;
+    const progress = duration > 0 ? Math.min(100, ((seconds - start) / duration) * 100) : 0;
+    const remaining = Math.max(0, Math.ceil(end - seconds));
+    return { count, progress, remaining, duration };
+};
 
 /** Total banked + in-flight points across every cipher. */
 export const computeTotalPoints = (state: NeuralNetState): number => {
@@ -127,8 +180,8 @@ export const computeTotalPoints = (state: NeuralNetState): number => {
 
 /**
  * Returns the speed-bonus multiplier (1.0 = no bonus, 1.12 = +12%) for the
- * given cipher name. Read from outside React via
- * `useNeuralNetStore.getState()`.
+ * given cipher name. Always finite ≥ 1 — never returns Infinity / NaN so
+ * downstream cipher-break math can't hang.
  */
 export const cipherSpeedMultiplier = (name: string): number => {
     const state = useNeuralNetStore.getState();
@@ -136,5 +189,7 @@ export const cipherSpeedMultiplier = (name: string): number => {
     const banked = entry?.seconds ?? 0;
     const inFlight = state.currentCipher === name ? state.sessionSeconds : 0;
     const pts = pointsAt(banked + inFlight);
-    return 1 + bonusFromPoints(pts) / 100;
+    const bonus = bonusFromPoints(pts);
+    const mult = 1 + bonus / 100;
+    return Number.isFinite(mult) ? mult : 1;
 };

@@ -195,7 +195,7 @@ const AppWithProviders = () => {
                                     <Route path="station" element={<StationRoute />} />
                                     <Route path="login" element={<LoginRoute />} />
                                     <Route path="servers" element={<ServersRoute />} />
-                                    <Route path="racks" element={<ServerRacksRoute />} />
+                                    <Route path="racks/:dcId?" element={<ServerRacksRoute />} />
                                     <Route path="dataCenters" element={<DataCentersRoute />} />
                                     <Route path="networks" element={<NetworksRoute />} />
                                     <Route path="darkWeb" element={<DarkWebRoute />} />

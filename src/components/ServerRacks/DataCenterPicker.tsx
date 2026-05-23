@@ -6,10 +6,10 @@ import {
     CheckOutlined,
     KeyboardArrowDownOutlined,
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router';
 
-import { DATA_CENTERS } from '../../data/dataCenter';
 import { useDataCentersStore } from '../../stores/dataCenters';
-import { useRacksStore } from '../../stores/racks';
+import { useActiveDataCenters } from './useActiveDataCenters';
 
 const FLAGS: Record<string, string> = {
     'us-west': '🇺🇸',
@@ -32,10 +32,14 @@ const FLAGS: Record<string, string> = {
 
 const flagFor = (id: string): string => FLAGS[id] ?? '🌐';
 
-export default function DataCenterPicker() {
-    const selectedDcId = useRacksStore((s) => s.selectedDcId);
-    const selectDC = useRacksStore((s) => s.selectDC);
+interface DataCenterPickerProps {
+    selectedDcId: string;
+}
+
+export default function DataCenterPicker({ selectedDcId }: DataCenterPickerProps) {
+    const navigate = useNavigate();
     const contracts = useDataCentersStore((s) => s.contracts);
+    const active = useActiveDataCenters();
 
     const [open, setOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -49,7 +53,11 @@ export default function DataCenterPicker() {
         return () => window.removeEventListener('mousedown', onClick);
     }, [open]);
 
-    const selected = DATA_CENTERS.find((d) => d.id === selectedDcId) ?? DATA_CENTERS[0];
+    const selected =
+        active.find((a) => a.dataCenter.id === selectedDcId) ?? active[0] ?? null;
+    if (!selected) return null;
+
+    // First contract in store insertion order acts as the player's primary DC.
     const primaryDcId = Object.keys(contracts)[0];
 
     return (
@@ -59,7 +67,7 @@ export default function DataCenterPicker() {
                 aria-expanded={open}
                 onClick={() => setOpen((o) => !o)}
                 sx={{
-                    minWidth: 240,
+                    minWidth: 280,
                     p: 1,
                     background: 'rgba(25,25,25,0.85)',
                     border: '1px solid rgba(10,245,176,0.30)',
@@ -72,7 +80,7 @@ export default function DataCenterPicker() {
                     '&:hover': { borderColor: 'rgba(10,245,176,0.55)' },
                 }}
             >
-                <span style={{ fontSize: 22, lineHeight: 1 }}>{flagFor(selected.id)}</span>
+                <span style={{ fontSize: 22, lineHeight: 1 }}>{flagFor(selected.dataCenter.id)}</span>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                     <Typography
                         sx={{
@@ -95,9 +103,21 @@ export default function DataCenterPicker() {
                             textOverflow: 'ellipsis',
                         }}
                     >
-                        {selected.name} · {selected.code}
+                        {selected.dataCenter.name} · {selected.dataCenter.code}
                     </Typography>
                 </Box>
+                <Typography
+                    sx={{
+                        fontFamily: 'Fira Code, monospace',
+                        fontSize: 10,
+                        color: 'rgba(255,255,255,0.55)',
+                        letterSpacing: '0.06em',
+                        whiteSpace: 'nowrap',
+                        ml: 1,
+                    }}
+                >
+                    {selected.contract.racks} rack{selected.contract.racks === 1 ? '' : 's'}
+                </Typography>
                 <KeyboardArrowDownOutlined
                     sx={{
                         color: 'rgba(255,255,255,0.55)',
@@ -114,7 +134,7 @@ export default function DataCenterPicker() {
                         position: 'absolute',
                         top: 'calc(100% + 6px)',
                         left: 0,
-                        minWidth: 320,
+                        minWidth: 360,
                         zIndex: 50,
                         background: 'rgba(28,28,30,0.98)',
                         backdropFilter: 'blur(8px)',
@@ -140,17 +160,16 @@ export default function DataCenterPicker() {
                     >
                         Switch Datacenter
                     </Box>
-                    {DATA_CENTERS.map((d) => {
+                    {active.map(({ dataCenter: d, contract }) => {
                         const isActive = d.id === selectedDcId;
                         const isPrimary = d.id === primaryDcId;
-                        const hasContract = contracts[d.id] != null;
                         return (
                             <Box
                                 key={d.id}
                                 role="option"
                                 aria-selected={isActive}
                                 onClick={() => {
-                                    selectDC(d.id);
+                                    navigate(`/racks/${d.id}`);
                                     setOpen(false);
                                 }}
                                 sx={{
@@ -206,8 +225,8 @@ export default function DataCenterPicker() {
                                             letterSpacing: '0.08em',
                                         }}
                                     >
-                                        {d.code} · TIER {d.tier}
-                                        {hasContract ? ` · ${contracts[d.id].powerKw} kW` : ' · NO CONTRACT'}
+                                        {d.code} · TIER {d.tier} · {contract.racks} rack
+                                        {contract.racks === 1 ? '' : 's'} · {contract.powerKw} kW
                                     </Typography>
                                 </Box>
                                 {isActive && (
@@ -231,7 +250,7 @@ export default function DataCenterPicker() {
                         }}
                         onClick={() => {
                             setOpen(false);
-                            window.location.assign('/dataCenters');
+                            navigate('/dataCenters');
                         }}
                     >
                         <AddBusinessOutlined sx={{ fontSize: 16 }} />

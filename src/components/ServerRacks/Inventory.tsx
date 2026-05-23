@@ -48,7 +48,11 @@ function DraggableInventoryItem({ server }: DraggableInventoryItemProps) {
     );
 }
 
-export default function Inventory() {
+interface InventoryProps {
+    dcId: string;
+}
+
+export default function Inventory({ dcId }: InventoryProps) {
     const navigate = useNavigate();
     const purchased = useServersStore((s) => s.purchasedServers);
     const installed = useInstalledInstIds();
@@ -108,7 +112,7 @@ export default function Inventory() {
                         fullWidth
                         variant="outlined"
                         startIcon={<AddOutlined />}
-                        onClick={() => addRack()}
+                        onClick={() => addRack(dcId)}
                     >
                         Buy New Rack
                     </Button>

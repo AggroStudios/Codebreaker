@@ -21,6 +21,7 @@ import {
 import StationCard, { StationCardAccentType } from '../../../components/StationCard';
 import {
     bonusFromPoints,
+    epochProgressAt,
     pointsAt,
     useNeuralNetStore,
 } from '../../../stores/neuralNet';
@@ -108,9 +109,11 @@ export default function ActiveTrainingCard() {
     const currentBonus = currentCipher
         ? bonusFromPoints(pointsAt((library[currentCipher]?.seconds ?? 0) + sessionSeconds))
         : 0;
-    const epochProgress = ((sessionSeconds % 60) / 60) * 100;
-    const epochRemaining = Math.max(0, 60 - Math.floor(sessionSeconds % 60));
-    const epochCount = Math.floor(sessionSeconds / 60);
+    // Each successive epoch is exponentially longer than the previous one.
+    const epoch = epochProgressAt(sessionSeconds);
+    const epochProgress = epoch.progress;
+    const epochRemaining = epoch.remaining;
+    const epochCount = epoch.count;
 
     const stateLabel = !currentCipher ? 'IDLE' : active ? 'TRAINING' : 'PAUSED';
     const stateColor =

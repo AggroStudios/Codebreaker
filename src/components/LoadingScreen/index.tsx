@@ -5,18 +5,19 @@ import LoadingImage from '../../assets/codebreaker-loading.jpg';
 
 import './LoadingScreen.scss';
 
+// Matches the deep teal at the edges of `codebreaker-loading.jpg` so the
+// letterbox bars on wide / tall viewports blend into the artwork instead
+// of reading as black borders.
+const LOADING_BG = '#151e23';
+
 const BackgroundElement = styled('div')({
     boxSizing: 'border-box',
     position: 'absolute',
     top: 0,
     left: 0,
     height: '100%',
-    backgroundImage: 'linear-gradient(rgba(0,0,0,1), rgba(0,0,0,1))',
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    backgroundAttachment: 'fixed',
-    backgroundPosition: 'center',
     width: '100%',
+    backgroundColor: LOADING_BG,
     zIndex: 9999,
 });
 

@@ -26,6 +26,8 @@ export interface InstalledServer {
 
 export interface Rack {
     id: string;
+    /** Region/data-center id the rack lives in. */
+    dcId: string;
     sku: string;
     name: string;
     slots: number;
@@ -55,7 +57,7 @@ export type RacksStoreState = {
     installServer: (rackId: string, u: number, server: Server) => void;
     moveServer: (srcRackId: string, dstRackId: string, instId: string, newU: number) => void;
     uninstallServer: (rackId: string, instId: string) => void;
-    addRack: (catalogSku?: string) => void;
+    addRack: (dcId: string, catalogSku?: string) => void;
     removeRack: (rackId: string) => void;
     assignRackToSwitch: (rackId: string, switchId: string | null) => void;
     cycleUplink: () => void;
@@ -64,6 +66,7 @@ export type RacksStoreState = {
 const defaultRacks = (): Rack[] => ([
     {
         id: makeRackId(),
+        dcId: 'us-west',
         sku: 'RK-42U',
         name: 'Rack A · Production',
         slots: 42,
@@ -135,14 +138,16 @@ export const useRacksStore = create<RacksStoreState>()(
                 ),
             })),
 
-            addRack: (catalogSku) => set((state) => {
+            addRack: (dcId, catalogSku) => set((state) => {
                 const tpl = RACK_CATALOG.find((c) => c.sku === catalogSku) ?? RACK_CATALOG[0];
-                const letter = String.fromCharCode(65 + state.racks.length);
+                const dcRackCount = state.racks.filter((r) => r.dcId === dcId).length;
+                const letter = String.fromCharCode(65 + dcRackCount);
                 return {
                     racks: [
                         ...state.racks,
                         {
                             id: makeRackId(),
+                            dcId,
                             sku: tpl.sku,
                             name: `Rack ${letter}`,
                             slots: tpl.slots,
@@ -174,6 +179,17 @@ export const useRacksStore = create<RacksStoreState>()(
                 uplink: state.uplink,
                 selectedDcId: state.selectedDcId,
             }),
+            merge: (persisted, current) => {
+                const p = (persisted ?? {}) as Partial<RacksStoreState>;
+                // Old saves don't have `dcId` on Rack — fall back to the
+                // legacy `selectedDcId` (or 'us-west').
+                const fallbackDc = p.selectedDcId ?? current.selectedDcId ?? 'us-west';
+                const racks: Rack[] = (p.racks ?? current.racks).map((r) => ({
+                    ...r,
+                    dcId: (r as Rack).dcId ?? fallbackDc,
+                }));
+                return { ...current, ...p, racks };
+            },
         },
     ),
 );
@@ -184,6 +200,13 @@ export const useInstalledInstIds = (): Set<string> => {
     const ids = new Set<string>();
     racks.forEach((r) => r.installed.forEach((it) => ids.add(it.instId)));
     return ids;
+};
+
+/** Racks installed in the given data center. */
+export const useRacksByDc = (dcId: string | null | undefined): Rack[] => {
+    const racks = useRacksStore((s) => s.racks);
+    if (!dcId) return [];
+    return racks.filter((r) => r.dcId === dcId);
 };
 
 /** Bounds + overlap check. ignoreInstId lets a server "overlap with itself" while moving. */
