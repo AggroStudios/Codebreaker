@@ -17,6 +17,7 @@ import PollOutlinedIcon from '@mui/icons-material/PollOutlined';
 
 export interface INavigationItem {
     title: string;
+    subtitle?: string;
     link: string;
     icon: OverridableComponent<SvgIconTypeMap<object, 'svg'>>;
     locked?: boolean;

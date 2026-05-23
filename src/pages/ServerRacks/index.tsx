@@ -55,6 +55,7 @@ export default function ServerRacks() {
 
     const dcIdParam = useDcIdParam();
     const activeDcs = useActiveDataCenters();
+    const selectedDcId = useRacksStore((s) => s.selectedDcId);
 
     const validParam =
         dcIdParam != null && activeDcs.some((a) => a.dataCenter.id === dcIdParam)
@@ -141,10 +142,8 @@ export default function ServerRacks() {
 
     // dcId missing or unknown → redirect to the first active contract.
     if (!validParam) {
-        return <Navigate to={`/racks/${activeDcs[0].dataCenter.id}`} replace />;
+        return <Navigate to={`/racks/${selectedDcId}`} replace />;
     }
-
-    const selectedDcId = validParam;
 
     return (
         <DndContext

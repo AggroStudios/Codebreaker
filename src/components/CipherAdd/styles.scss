@@ -18,6 +18,9 @@
         background-color: rgba(10, 245, 176, 0.8) !important;
         border-color: rgba(10, 245, 176, 0.8) !important;
     }
+    &:disabled {
+        background-color: var(--color-fg-disabled) !important;
+    }
 }
 
 .cipher-add-container {

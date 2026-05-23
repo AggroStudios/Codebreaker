@@ -81,6 +81,12 @@ export default class OperatingSystem {
         });
     }
 
+    public shutdown() {
+        this.stopGameLoop();
+        this._worker?.terminate();
+        this._worker = null;
+    }
+
     public get station(): StationStoreType | null {
         return this._station;
     }
@@ -230,7 +236,19 @@ export default class OperatingSystem {
         if (coreUsage + (process.cores || 0) > coreCount) {
             throw new OperatingSystemError(`Not enough cores available to add process '${process.id}'.`);
         }
-        
+
+        const isCipherProcess = typeof process?.id === 'string' && process.id.startsWith('cipher-');
+        if (isCipherProcess) {
+            const maxBreaks = this._station?.memory?.maxConcurrentBreaks ?? Infinity;
+            const cipherProcesses = this.processes.filter(
+                (p) => typeof p?.id === 'string' && p.id.startsWith('cipher-'),
+            );
+            const alreadyTracked = cipherProcesses.some((p) => p.id === process.id);
+            if (!alreadyTracked && cipherProcesses.length + 1 > maxBreaks) {
+                throw new OperatingSystemError(`No free cipher slots (${maxBreaks} max).`);
+            }
+        }
+
         const processIndex = this.processes.findIndex(
             (i) => i?.['id'] === process?.['id'],
         );

@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router';
 
 import { useDataCentersStore } from '../../stores/dataCenters';
 import { useActiveDataCenters } from './useActiveDataCenters';
+import { useRacksStore } from '../../stores/racks';
 
 const FLAGS: Record<string, string> = {
     'us-west': '🇺🇸',
@@ -40,6 +41,7 @@ export default function DataCenterPicker({ selectedDcId }: DataCenterPickerProps
     const navigate = useNavigate();
     const contracts = useDataCentersStore((s) => s.contracts);
     const active = useActiveDataCenters();
+    const selectDc = useRacksStore((s) => s.selectDC);
 
     const [open, setOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -59,6 +61,12 @@ export default function DataCenterPicker({ selectedDcId }: DataCenterPickerProps
 
     // First contract in store insertion order acts as the player's primary DC.
     const primaryDcId = Object.keys(contracts)[0];
+
+    const handleDcSelect = (dcId: string) => {
+        selectDc(dcId);
+        navigate(`/racks/${dcId}`);
+        setOpen(false);
+    }
 
     return (
         <Box ref={containerRef} sx={{ position: 'relative', display: 'inline-block' }}>
@@ -168,10 +176,7 @@ export default function DataCenterPicker({ selectedDcId }: DataCenterPickerProps
                                 key={d.id}
                                 role="option"
                                 aria-selected={isActive}
-                                onClick={() => {
-                                    navigate(`/racks/${d.id}`);
-                                    setOpen(false);
-                                }}
+                                onClick={() => handleDcSelect(d.id)}
                                 sx={{
                                     px: 1.5,
                                     py: 1,

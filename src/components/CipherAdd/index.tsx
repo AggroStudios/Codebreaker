@@ -2,8 +2,16 @@ import { useMemo, useState } from 'react';
 
 import { ICipherType } from '../../includes/Cipher.interface';
 import { formatMoney } from '../../lib/utils';
-import { Box, Select, Button, SelectChangeEvent, MenuItem, InputLabel, FormControl, LinearProgress, ListItemText, Typography, ListItem } from '@mui/material';
-import { AddCircleOutlineOutlined, MemoryTwoTone, PlayArrowTwoTone, TerminalTwoTone } from '@mui/icons-material';
+import { Box, Select, Button, SelectChangeEvent, MenuItem, InputLabel, FormControl, ListItemText, Typography, ListItem } from '@mui/material';
+import {
+    AddCircleOutlineOutlined,
+    BoltTwoTone,
+    DeveloperBoardTwoTone,
+    MemoryTwoTone,
+    PlayArrowTwoTone,
+    StarTwoTone,
+    TerminalTwoTone,
+} from '@mui/icons-material';
 
 import './styles.scss';
 import { useStationContext } from '../../stores/stationContext';
@@ -15,6 +23,47 @@ import StationCard, { StationCardAccentType } from '../StationCard';
 /** Convert authored cipher memory (MB) to the GB units the station's memory capacity uses. */
 const cipherMemoryGb = (type: ICipherType): number =>
     Math.ceil((type.memoryRequired ?? 0) / 1024);
+
+const complexityTier = (value: number): string => {
+    if (value < 2) return 'Low';
+    if (value < 5) return 'Med';
+    if (value < 10) return 'Hi';
+    return 'Xtr';
+};
+
+const STAT_LABEL_SX = {
+    fontFamily: 'Fira Code, monospace',
+    fontSize: 9,
+    fontWeight: 600,
+    letterSpacing: '0.16em',
+    textTransform: 'uppercase' as const,
+    color: 'rgba(255,255,255,0.55)',
+};
+
+const STAT_VALUE_SX = {
+    fontFamily: 'Fira Code, monospace',
+    fontSize: 12,
+    fontWeight: 600,
+    color: 'rgba(255,255,255,0.9)',
+};
+
+function CipherStat({
+    icon: Icon,
+    label,
+    value,
+}: {
+    icon: React.ElementType;
+    label: string;
+    value: string;
+}) {
+    return (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minHeight: 22 }}>
+            <Icon sx={{ fontSize: 14, color: 'rgba(10,245,176,0.85)' }} />
+            <Typography sx={{ ...STAT_LABEL_SX, flex: 1, textAlign: 'left' }}>{label}</Typography>
+            <Typography sx={STAT_VALUE_SX}>{value}</Typography>
+        </Box>
+    );
+}
 
 export default function CipherAdd({ onAdd }: { onAdd: (id: string, cipherType: ICipherType) => void }) {
     const [picked, setPicked] = useState('');
@@ -30,7 +79,10 @@ export default function CipherAdd({ onAdd }: { onAdd: (id: string, cipherType: I
     const pickedType = picked ? CipherTypes.find((c) => c.name === picked) ?? null : null;
     const pickedGb = pickedType ? cipherMemoryGb(pickedType) : 0;
     const wouldOverflow = pickedType != null && pickedGb > freeMemoryGb;
-    const memoryUsedPct = totalMemoryGb > 0 ? Math.min(100, (usedMemoryGb / totalMemoryGb) * 100) : 0;
+
+    const maxSlots = stationProxy.memory?.maxConcurrentBreaks ?? Infinity;
+    const slotsUsed = runningProcesses.length;
+    const slotsFull = slotsUsed >= maxSlots;
 
     const opts = CipherTypes
     .filter((t) => t.requiredArchitecture.includes(stationProxy.cpu.architecture as ProcessorArchitecture))
@@ -41,8 +93,15 @@ export default function CipherAdd({ onAdd }: { onAdd: (id: string, cipherType: I
         gb: cipherMemoryGb(t),
         fits: cipherMemoryGb(t) <= freeMemoryGb,
     }));
+
+    const buttonLabel = wouldOverflow
+        ? 'Memory Full'
+        : slotsFull
+            ? 'All Slots In Use'
+            : 'Begin Break';
+
     return (
-        
+
         <StationCard
             id="cipher-add-card"
             avatar={AddCircleOutlineOutlined}
@@ -61,67 +120,56 @@ export default function CipherAdd({ onAdd }: { onAdd: (id: string, cipherType: I
                     <Box
                         sx={{
                             width: '100%',
-                            mt: 1,
                             mb: 1.5,
                             p: 1.25,
                             background: 'rgba(0,0,0,0.30)',
                             border: '1px solid rgba(255,255,255,0.08)',
                             borderRadius: '8px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 0.75,
                         }}
                     >
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
-                            <MemoryTwoTone sx={{ fontSize: 14, color: 'rgba(10,245,176,0.85)' }} />
-                            <Typography
-                                sx={{
-                                    fontFamily: 'Fira Code, monospace',
-                                    fontSize: 10,
-                                    fontWeight: 600,
-                                    letterSpacing: '0.16em',
-                                    textTransform: 'uppercase',
-                                    color: 'rgba(255,255,255,0.55)',
-                                    flex: 1,
-                                }}
-                            >
-                                Memory
-                            </Typography>
-                            <Typography
-                                sx={{
-                                    fontFamily: 'Fira Code, monospace',
-                                    fontSize: 11,
-                                    fontWeight: 600,
-                                    color: 'rgba(255,255,255,0.85)',
-                                }}
-                            >
-                                {usedMemoryGb} / {totalMemoryGb} GB
-                            </Typography>
-                        </Box>
-                        <LinearProgress
-                            variant="determinate"
-                            value={memoryUsedPct}
+                        <Typography sx={{ ...STAT_LABEL_SX, mb: 0.5 }}>
+                            {pickedType ? `Cipher · ${pickedType.name}` : 'Cipher · --'}
+                        </Typography>
+                        <Box
                             sx={{
-                                height: 5,
-                                borderRadius: 3,
-                                backgroundColor: 'rgba(255,255,255,0.06)',
-                                '& .MuiLinearProgress-bar': {
-                                    backgroundColor: memoryUsedPct > 80 ? '#ff9800' : '#0af5b0',
-                                    boxShadow: memoryUsedPct > 80
-                                        ? '0 0 6px rgba(255,152,0,0.5)'
-                                        : '0 0 6px rgba(10,245,176,0.5)',
-                                },
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 1fr',
+                                columnGap: 1.5,
+                                rowGap: 0.5,
                             }}
-                        />
-                        {pickedType && (
-                            <Typography
-                                sx={{
-                                    fontFamily: 'Fira Code, monospace',
-                                    fontSize: 10,
-                                    color: wouldOverflow ? '#ff5252' : 'rgba(255,255,255,0.55)',
-                                    mt: 0.75,
-                                }}
-                            >
-                                {wouldOverflow
-                                    ? `Needs ${pickedGb} GB · only ${freeMemoryGb} GB free — upgrade Codium Memory`
-                                    : `Selected cipher reserves ${pickedGb} GB`}
+                        >
+                            <CipherStat
+                                icon={DeveloperBoardTwoTone}
+                                label="Cores"
+                                value={pickedType ? String(pickedType.parallelism) : '--'}
+                            />
+                            <CipherStat
+                                icon={BoltTwoTone}
+                                label="Complexity"
+                                value={pickedType ? `${complexityTier(pickedType.complexity)} · ${pickedType.complexity}` : '--'}
+                            />
+                            <CipherStat
+                                icon={MemoryTwoTone}
+                                label="Memory"
+                                value={pickedType ? `${pickedGb} GB` : '--'}
+                            />
+                            <CipherStat
+                                icon={StarTwoTone}
+                                label="XP"
+                                value={pickedType ? String(pickedType.xp) : '--'}
+                            />
+                        </Box>
+                        {wouldOverflow && (
+                            <Typography sx={{ fontFamily: 'Fira Code, monospace', fontSize: 10, color: '#ff5252', mt: 0.5 }}>
+                                Needs {pickedGb} GB · only {freeMemoryGb} GB free — upgrade Codium Memory
+                            </Typography>
+                        )}
+                        {!wouldOverflow && slotsFull && (
+                            <Typography sx={{ fontFamily: 'Fira Code, monospace', fontSize: 10, color: '#ff5252', mt: 0.5 }}>
+                                All slots in use — upgrade Codium Memory for more.
                             </Typography>
                         )}
                     </Box>
@@ -166,17 +214,18 @@ export default function CipherAdd({ onAdd }: { onAdd: (id: string, cipherType: I
                         <Button
                             className="cipher-add-button"
                             variant="contained" color="primary" fullWidth
-                            disabled={!picked || wouldOverflow}
+                            disabled={!picked || wouldOverflow || slotsFull}
                             onClick={() => {
                                 const t = CipherTypes.find((x) => x.name === picked);
                                 if (!t) return;
                                 if (cipherMemoryGb(t) > freeMemoryGb) return;
+                                if (slotsUsed >= maxSlots) return;
                                 onAdd(crypto.randomUUID(), t);
                                 setPicked('');
                             }}
                             startIcon={<PlayArrowTwoTone />}
                         >
-                            {wouldOverflow ? 'Memory Full' : 'Begin Break'}
+                            {buttonLabel}
                         </Button>
                     </div>
                 </div>

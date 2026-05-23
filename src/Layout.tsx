@@ -1,14 +1,41 @@
-import { Suspense, useEffect, useState } from 'react';
-import { Outlet, useLocation } from 'react-router';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { Route, Routes, useLocation } from 'react-router';
 import { styled } from '@mui/material/styles';
 
 import AppBar from './components/AppBar';
 import NavMenu from './components/NavMenu';
-// import MusicPlayer from './components/MusicPlayer';
 import ScreenGlow from './components/ScreenGlow';
-import { usePlayerStore } from './stores/player';
-import { useAppReadyStore } from './stores/appReady';
 import Coachmarks from './components/Coachmarks';
+import { NotifierProvider } from './components/Notifier';
+import { AnchorsProvider } from './components/AnchorsContext';
+
+import { usePlayerStore, playerStoreProxy } from './stores/player';
+import { useAppReadyStore } from './stores/appReady';
+import { useServersStore } from './stores/servers';
+import { createStationStore, makeStationProxy } from './stores/station';
+import { StationStoreProvider } from './stores/stationContext';
+
+import OperatingSystem from './lib/OperatingSystem';
+import TerminalController from './lib/terminal';
+import Statistics from './lib/statistics';
+import ServersDailyOffers from './lib/servers-dailyOffers';
+import DataCenter from './lib/dataCenter';
+import NeuralNet from './lib/neuralNet';
+import Networks from './lib/networks';
+import ServersData from './data/servers';
+
+const TerminalRoute = lazy(() => import('./pages/Terminal'));
+const StationRoute = lazy(() => import('./pages/Station'));
+const LoginRoute = lazy(() => import('./components/Login'));
+const ServersRoute = lazy(() => import('./pages/Servers'));
+const ServerRacksRoute = lazy(() => import('./pages/ServerRacks'));
+const DataCentersRoute = lazy(() => import('./pages/DataCenters'));
+const NetworksRoute = lazy(() => import('./pages/Networks'));
+const DarkWebRoute = lazy(() => import('./pages/DarkWeb'));
+const NeuralNetRoute = lazy(() => import('./pages/NeuralNet'));
+const UpgradesRoute = lazy(() => import('./pages/Upgrades'));
+const PrestigeRoute = lazy(() => import('./pages/Prestige'));
+const StatisticsRoute = lazy(() => import('./pages/Statistics'));
 
 const backgroundModules = import.meta.glob<string>(
     './assets/backgrounds/*_bg.png',
@@ -56,8 +83,74 @@ const GameContainer = styled('div')({
     overflowY: 'auto',
 });
 
+type Bootstrap = {
+    operatingSystem: OperatingSystem;
+    useStationStore: ReturnType<typeof createStationStore>;
+    stationProxy: ReturnType<typeof makeStationProxy>;
+    terminalController: TerminalController;
+};
+
+function createBootstrap(): Bootstrap {
+    const useStationStore = createStationStore();
+    const stationProxy = makeStationProxy(useStationStore);
+
+    const serversStore = useServersStore.getState();
+    serversStore.setServers(ServersData);
+
+    const operatingSystem = new OperatingSystem(playerStoreProxy);
+    operatingSystem.station = stationProxy;
+    stationProxy.os = operatingSystem;
+
+    operatingSystem.addProcess(new Statistics(playerStoreProxy));
+    operatingSystem.addProcess(new ServersDailyOffers());
+    operatingSystem.addProcess(new DataCenter());
+    operatingSystem.addProcess(new NeuralNet());
+    operatingSystem.addProcess(new Networks());
+
+    if (stationProxy.exponent) {
+        operatingSystem.setExponent(stationProxy.exponent);
+    }
+
+    operatingSystem.addProcess({
+        id: 'main',
+        callback: stationProxy.callback,
+    });
+
+    if (stationProxy.isRunning) {
+        operatingSystem.startGameLoop();
+    }
+
+    const terminalController = new TerminalController();
+
+    return { operatingSystem, useStationStore, stationProxy, terminalController };
+}
+
 export default function Layout() {
     const location = useLocation();
+
+    const [bootstrap, setBootstrap] = useState<Bootstrap | null>(null);
+
+    useEffect(() => {
+        const next = createBootstrap();
+        setBootstrap(next);
+
+        import('./pages/Terminal');
+        import('./pages/Station');
+        import('./components/Login');
+        import('./pages/Servers');
+        import('./pages/ServerRacks');
+        import('./pages/DataCenters');
+        import('./pages/Networks');
+        import('./pages/DarkWeb');
+        import('./pages/NeuralNet');
+        import('./pages/Upgrades');
+        import('./pages/Prestige');
+        import('./pages/Statistics');
+
+        return () => {
+            next.operatingSystem.shutdown();
+        };
+    }, []);
 
     const isAppReady = useAppReadyStore((s) => s.isAppReady);
     const hasSeenTutorial = usePlayerStore((s) => s.hasSeenTutorial);
@@ -85,19 +178,47 @@ export default function Layout() {
         );
     }, [hasSeenTutorial, tutorialStage, isAppReady, tutorialDisabled, resetTutorial]);
 
+    if (!bootstrap) return null;
+
     return (
-        <>
-            <Coachmarks open={showTutorial} />
-            <ScreenGlow />
-            <AppBar />
-            <MainContainer background={getBackground(location.pathname)}>
-                <NavMenu />
-                <GameContainer>
-                    <Suspense fallback={null}>
-                        <Outlet />
-                    </Suspense>
-                </GameContainer>
-            </MainContainer>
-        </>
+        <NotifierProvider>
+            <AnchorsProvider>
+                <StationStoreProvider
+                    useStationStore={bootstrap.useStationStore}
+                    stationProxy={bootstrap.stationProxy}
+                >
+                    <Coachmarks open={showTutorial} />
+                    <ScreenGlow />
+                    <AppBar />
+                    <MainContainer background={getBackground(location.pathname)}>
+                        <NavMenu />
+                        <GameContainer>
+                            <Suspense fallback={null}>
+                                <Routes>
+                                    <Route path="terminal" element={
+                                        <TerminalRoute
+                                            terminalController={bootstrap.terminalController}
+                                            operatingSystem={bootstrap.operatingSystem}
+                                        />
+                                    } />
+                                    <Route path="station" element={<StationRoute />} />
+                                    <Route path="login" element={<LoginRoute />} />
+                                    <Route path="servers" element={<ServersRoute />} />
+                                    <Route path="racks/:dcId?" element={<ServerRacksRoute />} />
+                                    <Route path="dataCenters" element={<DataCentersRoute />} />
+                                    <Route path="networks" element={<NetworksRoute />} />
+                                    <Route path="darkWeb" element={<DarkWebRoute />} />
+                                    <Route path="neuralNet" element={<NeuralNetRoute />} />
+                                    <Route path="upgrades" element={<UpgradesRoute />} />
+                                    <Route path="prestige" element={<PrestigeRoute />} />
+                                    <Route path="stats" element={<StatisticsRoute />} />
+                                    <Route path="*" />
+                                </Routes>
+                            </Suspense>
+                        </GameContainer>
+                    </MainContainer>
+                </StationStoreProvider>
+            </AnchorsProvider>
+        </NotifierProvider>
     );
 }

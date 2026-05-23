@@ -99,6 +99,7 @@ export interface IMemoryType {
     type: MemoryType;
     manufacturer: string;
     model: string;
+    maxConcurrentBreaks: number;
     toString: () => string;
 }
 
