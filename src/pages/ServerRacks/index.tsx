@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 import {
     DndContext,
@@ -29,7 +29,9 @@ import PageHeader from '../../components/common/PageHeader';
 import { ApartmentTwoTone } from '@mui/icons-material';
 import { PublicOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
-import { WarningAmberOutlined } from '@mui/icons-material';
+import { WarningAmberOutlined, AssignmentLateOutlined, HourglassTopOutlined } from '@mui/icons-material';
+
+import { useDataCentersStore } from '../../stores/dataCenters';
 
 interface DragPayload {
     kind: 'inventory' | 'installed';
@@ -55,12 +57,27 @@ export default function ServerRacks() {
 
     const dcIdParam = useDcIdParam();
     const activeDcs = useActiveDataCenters();
+    const contracts = useDataCentersStore((s) => s.contracts);
     const selectedDcId = useRacksStore((s) => s.selectedDcId);
+    const selectDc = useRacksStore((s) => s.selectDC);
 
-    const validParam =
+    const hasSignedContracts = Object.keys(contracts).length > 0;
+
+    // URL param is the source of truth; fall back to the persisted store selection,
+    // then to the first active contract if neither is currently valid.
+    const fallbackDcId = activeDcs.some((a) => a.dataCenter.id === selectedDcId)
+        ? selectedDcId
+        : activeDcs[0]?.dataCenter.id;
+    const currentDcId =
         dcIdParam != null && activeDcs.some((a) => a.dataCenter.id === dcIdParam)
             ? dcIdParam
-            : null;
+            : fallbackDcId;
+
+    // Keep the persisted picker in sync with whatever the URL is showing, so a
+    // direct nav to /racks/eu-west updates the store-driven UI (picker, etc.).
+    useEffect(() => {
+        if (currentDcId && currentDcId !== selectedDcId) selectDc(currentDcId);
+    }, [currentDcId, selectedDcId, selectDc]);
 
     const uplinkClass = STATUS_CLASS[uplink.status];
     const switchAlerts = switches.filter((sw) => sw.status !== 'UP').length;
@@ -106,8 +123,8 @@ export default function ServerRacks() {
         ? serverSize(activeDrag.server) * U_HEIGHT - 2
         : 0;
 
-    // No active contracts → empty state directing the player to the DataCenters page.
-    if (activeDcs.length === 0) {
+    // No contracts signed at all → prompt the player to lease one.
+    if (!hasSignedContracts) {
         return (
             <Box className="server-racks-page">
                 <PageHeader
@@ -128,8 +145,20 @@ export default function ServerRacks() {
                         textAlign: 'center',
                     }}
                 >
-                    <Typography sx={{ fontSize: 16, color: 'rgba(255,255,255,0.65)', maxWidth: 480 }}>
-                        You don't have any active data-center contracts yet. Lease one to start
+                    <AssignmentLateOutlined sx={{ fontSize: 56, color: 'rgba(10,245,176,0.45)' }} />
+                    <Typography
+                        sx={{
+                            fontFamily: 'Fira Code, monospace',
+                            fontSize: 11,
+                            letterSpacing: '0.22em',
+                            color: 'rgba(255,255,255,0.45)',
+                            textTransform: 'uppercase',
+                        }}
+                    >
+                        No signed contracts
+                    </Typography>
+                    <Typography sx={{ fontSize: 16, color: 'rgba(255,255,255,0.75)', maxWidth: 480 }}>
+                        You haven't signed a data-center contract yet. Lease one to start
                         deploying racks and installing servers.
                     </Typography>
                     <Button variant="contained" onClick={() => navigate('/dataCenters')}>
@@ -140,9 +169,56 @@ export default function ServerRacks() {
         );
     }
 
-    // dcId missing or unknown → redirect to the first active contract.
-    if (!validParam) {
-        return <Navigate to={`/racks/${selectedDcId}`} replace />;
+    // Has signed contracts but none ACTIVE yet → provisioning state.
+    if (activeDcs.length === 0) {
+        return (
+            <Box className="server-racks-page">
+                <PageHeader
+                    className="server-racks-header"
+                    title="Server Racks"
+                    subtitle="Your contracts are still being provisioned."
+                    breadcrumbs={['home', 'server_racks']}
+                    icon={ApartmentTwoTone}
+                />
+                <Box
+                    className="server-racks-content"
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 2,
+                        textAlign: 'center',
+                    }}
+                >
+                    <HourglassTopOutlined sx={{ fontSize: 56, color: 'rgba(255,170,40,0.55)' }} />
+                    <Typography
+                        sx={{
+                            fontFamily: 'Fira Code, monospace',
+                            fontSize: 11,
+                            letterSpacing: '0.22em',
+                            color: 'rgba(255,170,40,0.75)',
+                            textTransform: 'uppercase',
+                        }}
+                    >
+                        Provisioning
+                    </Typography>
+                    <Typography sx={{ fontSize: 16, color: 'rgba(255,255,255,0.75)', maxWidth: 480 }}>
+                        Your data-center contracts are being provisioned. Once they come online,
+                        you'll be able to rack servers here.
+                    </Typography>
+                    <Button variant="contained" onClick={() => navigate('/dataCenters')}>
+                        Open Data Centers
+                    </Button>
+                </Box>
+            </Box>
+        );
+    }
+
+    // URL param missing or unknown → normalize the URL to the resolved dcId.
+    if (!currentDcId) return null;
+    if (dcIdParam !== currentDcId) {
+        return <Navigate to={`/racks/${currentDcId}`} replace />;
     }
 
     return (
@@ -157,7 +233,7 @@ export default function ServerRacks() {
                     className="server-racks-header"
                     title="Server Racks"
                     subtitle="Install your servers, wire racks through switches, and manage the uplink to keep your code-breaking floor online."
-                    breadcrumbs={['home', 'server_racks', selectedDcId]}
+                    breadcrumbs={['home', 'server_racks', currentDcId]}
                     icon={ApartmentTwoTone}
                     actions={
                         <div className="chips">
@@ -189,12 +265,12 @@ export default function ServerRacks() {
                 />
                 <Box className="server-racks-content">
                     <Box className="server-racks-picker-row">
-                        <DataCenterPicker selectedDcId={selectedDcId} />
+                        <DataCenterPicker selectedDcId={currentDcId} />
                     </Box>
-                    <StatStrip dcId={selectedDcId} />
+                    <StatStrip dcId={currentDcId} />
                     <Box className="server-racks-grid">
-                        <Inventory dcId={selectedDcId} />
-                        <RackFloor dcId={selectedDcId} />
+                        <Inventory dcId={currentDcId} />
+                        <RackFloor dcId={currentDcId} />
                         <NetworkPanel />
                     </Box>
                 </Box>

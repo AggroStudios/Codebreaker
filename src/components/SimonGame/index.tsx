@@ -63,8 +63,6 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, chances = 3, on
       if (isActive) {
         try {
           const sound = new Audio(btn.sound);
-          console.log('sfxVolume', sfxVolume);
-          console.log('mutedSfx', mutedSfx);
           sound.volume = mutedSfx ? 0 : sfxVolume;
           sound.play();
         }
@@ -211,7 +209,7 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, chances = 3, on
     inputCountRef.current = 0;
     chancesLeftRef.current = chances;
     showSequence(seq, 1);
-    onProgress(0);
+    onProgress?.(0);
   }, [rounds, chances, showSequence, onProgress]);
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -262,7 +260,7 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, chances = 3, on
         setTimeout(() => {
           drawCanvas(null, 'lost', currentRound);
           onLose();
-          onProgress(100);
+          onProgress?.(100);
         }, 220);
       } else {
         phaseRef.current = 'showing';
@@ -279,12 +277,12 @@ export const SimonGame: React.FC<MiniGameProps> = ({ rounds = 5, chances = 3, on
         phaseRef.current = 'won';
         setTimeout(() => {
           drawCanvas(null, 'won', currentRound);
-          onProgress(100);
+          onProgress?.(100);
           onWin();
         }, 220);
       } else {
         roundRef.current = next;
-        onProgress(progress);
+        onProgress?.(progress);
         setTimeout(() => showSequence(sequenceRef.current, next), 500);
       }
     }

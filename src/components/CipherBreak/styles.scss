@@ -22,11 +22,26 @@
     margin-bottom: 10px;
 }
 
-.cipher-success {
+.cipher-success,
+.cipher-error {
+    position: relative;
+}
+
+.cipher-success::after,
+.cipher-error::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 1;
+}
+
+.cipher-success::after {
     animation: successPulse 1s !important;
 }
 
-.cipher-error {
+.cipher-error::after {
     animation: errorPulse 1s !important;
 }
 
@@ -198,24 +213,24 @@
 
 @keyframes successPulse {
     0% {
-        background-color: rgba(25, 25, 25, 0.8);
+        background-color: rgba(0, 128, 0, 0);
     }
     25% {
-        background-color: rgba(0, 128, 0, 0.8);
+        background-color: rgba(0, 128, 0, 0.55);
     }
     100% {
-        background-color: rgba(25, 25, 25, 0.8);
+        background-color: rgba(0, 128, 0, 0);
     }
 }
 
 @keyframes errorPulse {
     0% {
-        background-color: rgba(25, 25, 25, 0.8);
+        background-color: rgba(128, 0, 0, 0);
     }
     25% {
-        background-color: rgba(128, 0, 0, 0.8);
+        background-color: rgba(128, 0, 0, 0.55);
     }
     100% {
-        background-color: rgba(25, 25, 25, 0.8);
+        background-color: rgba(128, 0, 0, 0);
     }
 }

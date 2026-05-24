@@ -19,10 +19,11 @@ export default function XpLabel({
         const anchor = xpAnchorRef.current;
         if (anchor) {
             const rect = anchor.getBoundingClientRect();
-            const offset = Math.round(Math.random() * (rect.width / 2));
+            const offsetX = Math.round(Math.random() * (rect.width / 2));
+            const offsetY = Math.round(Math.random() * (rect.height / 2));
             el.style.setProperty('--rotation', `${rotation}deg`);
-            el.style.top = `${rect.top}px`;
-            el.style.left = `${rect.left + offset}px`;
+            el.style.top = `${(rect.height / 4) + offsetY}px`;
+            el.style.left = `${(rect.width / 4) + offsetX}px`;
         } else {
             el.style.top = '100px';
             el.style.left = '100px';

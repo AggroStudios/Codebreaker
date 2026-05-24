@@ -480,7 +480,7 @@ export const TurnTwo: React.FC<MiniGameProps> = ({
                 matchedRef.current++;
                 lockedRef.current = false;
 
-                onProgressRef.current(Math.round((matchedRef.current / rounds) * 100));
+                onProgressRef.current?.(Math.round((matchedRef.current / rounds) * 100));
                 drawCanvas();
                 if (matchedRef.current === rounds) {
                     setTimeout(() => {

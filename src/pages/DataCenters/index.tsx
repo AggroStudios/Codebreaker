@@ -5,7 +5,7 @@ import './style.scss';
 import { DATA_CENTERS } from '../../data/dataCenter';
 import { WorldMap } from '../../components/WorldMap';
 import { DataCenterCard } from '../../components/WorldMap/components';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { IDataCenter } from '../../includes/DataCenter.interface';
 import { Box, Grid } from '@mui/material';
 import { Stat } from '../../components/common/Stat';
@@ -24,10 +24,6 @@ export default function DataCenters() {
     const totalPower = formatKw(Object.values(contracts).reduce((acc, contract) => acc + contract.powerKw || 0, 0));
     const totalUplink = formatGbps(Object.values(contracts).reduce((acc, contract) => acc + contract.uplinkGbps || 0, 0));
     const dailyLeaseCost = formatMoneyDay(Object.keys(contracts).reduce((acc, region) => acc + DATA_CENTERS.find((dc) => dc.id === region)?.baseLeaseDay || 0, 0));
-
-    useEffect(() => {
-        console.log('contracts', contracts);
-    }, [contracts]);
 
     const handleSignContract = (dataCenterId: string) => {
         const dataCenter = DATA_CENTERS.find((dc) => dc.id === dataCenterId);

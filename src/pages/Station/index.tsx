@@ -17,6 +17,7 @@ import { ImportantDevicesOutlined, ScheduleOutlined, ShieldOutlined } from '@mui
 import clsx from 'clsx';
 
 import PageHeader from '../../components/common/PageHeader';
+import { useThreatsStore } from '../../stores/threats';
 
 function StationHeader({ uptime, threats }) {
     return (
@@ -42,6 +43,7 @@ export default function StationComponent() {
     const { showTutorial } = usePlayerStore();
 
     const setStation = useCipherStore((s) => s.setStation);
+    const threatCount = useThreatsStore((s) => s.threatCount);
     
     useEffect(() => {
         showTutorial('station');
@@ -55,7 +57,7 @@ export default function StationComponent() {
 
     return (
         <>
-            <StationHeader uptime="4:00:00" threats={3} />
+            <StationHeader uptime="4:00:00" threats={threatCount} />
             <div className="card">
                 <Grid container spacing={2}>
                     <Grid size={4} id="coachmark-statistics">

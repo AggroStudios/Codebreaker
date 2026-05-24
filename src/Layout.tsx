@@ -22,7 +22,9 @@ import ServersDailyOffers from './lib/servers-dailyOffers';
 import DataCenter from './lib/dataCenter';
 import NeuralNet from './lib/neuralNet';
 import Networks from './lib/networks';
+import ThreatWatcher from './lib/threats';
 import ServersData from './data/servers';
+import ThreatPuzzleModal from './components/ThreatPuzzleModal';
 
 const TerminalRoute = lazy(() => import('./pages/Terminal'));
 const StationRoute = lazy(() => import('./pages/Station'));
@@ -106,6 +108,7 @@ function createBootstrap(): Bootstrap {
     operatingSystem.addProcess(new DataCenter());
     operatingSystem.addProcess(new NeuralNet());
     operatingSystem.addProcess(new Networks());
+    operatingSystem.addProcess(new ThreatWatcher(operatingSystem));
 
     if (stationProxy.exponent) {
         operatingSystem.setExponent(stationProxy.exponent);
@@ -189,6 +192,7 @@ export default function Layout() {
                 >
                     <Coachmarks open={showTutorial} />
                     <ScreenGlow />
+                    <ThreatPuzzleModal />
                     <AppBar />
                     <MainContainer background={getBackground(location.pathname)}>
                         <NavMenu />

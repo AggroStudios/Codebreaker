@@ -25,7 +25,7 @@ import { Stat } from '../common/Stat';
 import { ShimmerProgress } from '../common/ShimmerProgress';
 import clsx from 'clsx';
 import { usePlayerStore } from '../../stores/player';
-import { useEffect } from 'react';
+import { useNavigate } from 'react-router';
     
 // ── DataCenter pin ──────────────────────────────────────────────────────────────
 export function DataCenterPin({ dataCenter, signed, selected, onClick, scale = 1 }: IDataCenterContractProps) {
@@ -173,6 +173,8 @@ interface IDataCenterCardProps {
 
 export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, onUpgradeUplink, onAddRack, onClose, floating = false }: IDataCenterCardProps) {
     
+    const navigate = useNavigate();
+
     const money = usePlayerStore((state) => state.player.money);
     const signed = !!contract;
     
@@ -181,10 +183,6 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
     
     const uplinkIdx = signed ? Math.max(0, UPLINK_TIERS.findIndex((t) => t.gbps === contract.uplinkGbps)) : -1;
     const nextUplink = signed && uplinkIdx < UPLINK_TIERS.length - 1 ? UPLINK_TIERS[uplinkIdx + 1] : null;
-    
-    useEffect(() => {
-        console.log('contract', contract);
-    }, [contract]);
 
     if (!dataCenter) {
         return (
@@ -421,7 +419,13 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
             <CardActions style={{ justifyContent: 'space-between', padding: '12px 16px' }}>
                 {signed ? (
                     <>
-                        <Button className="data-center-card-floor-plan-button" variant="text" color="primary" startIcon={<OpenInNewOutlined fontSize="small" />}>
+                        <Button
+                            className="data-center-card-floor-plan-button"
+                            variant="text"
+                            color="primary"
+                            startIcon={<OpenInNewOutlined fontSize="small" />}
+                            onClick={() => navigate(`/racks/${dataCenter.id}`)}
+                        >
                             View Floor Plan
                         </Button>
                         <Button

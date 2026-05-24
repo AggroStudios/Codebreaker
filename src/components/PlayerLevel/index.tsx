@@ -22,13 +22,6 @@ export default function PlayerLevel() {
                     {`Level ${player.level}`}
                 </Typography>
                 <Box sx={{ width: '100%' }}>
-                    {xpLabel?.data?.amount != null && (
-                        <XpLabel
-                            key={xpLabel.id}
-                            amount={xpLabel.data.amount}
-                            levelUp={xpLabel.data.levelUp}
-                        />
-                    )}
                     <LinearProgress
                         className="playerLevelProgress"
                         variant="determinate"
@@ -40,6 +33,13 @@ export default function PlayerLevel() {
                         {`${player.experience} / ${player.nextLevel} XP`}
                     </Typography>
                 </Box>
+                {xpLabel?.data?.amount != null && (
+                    <XpLabel
+                        key={xpLabel.id}
+                        amount={xpLabel.data.amount}
+                        levelUp={xpLabel.data.levelUp}
+                    />
+                )}
             </CardContent>
         </Card>
     );

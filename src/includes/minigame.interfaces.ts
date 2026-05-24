@@ -3,5 +3,5 @@ export interface MiniGameProps {
     chances?: number;
     onWin: () => void;
     onLose: () => void;
-    onProgress: (progress: number) => void;
+    onProgress?: (progress: number) => void;
 }

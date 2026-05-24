@@ -153,7 +153,6 @@ const ServersMarketplace = () => {
     };
 
     const handleBuy = (server: Server) => {
-        console.log('handleBuy', server);
         purchaseServer(server);
     };
 
