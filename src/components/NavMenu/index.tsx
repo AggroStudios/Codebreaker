@@ -68,7 +68,7 @@ const StyledDrawerSpacer = styled('div')({
 const RouterLinkInner = (
     props: React.ComponentProps<typeof Link>,
     ref: Ref<HTMLAnchorElement>,
-) => <Link ref={ref} {...props} viewTransition />;
+) => <Link ref={ref} {...props} />;
 const RouterLink = forwardRef(RouterLinkInner);
 
 const StyledA = styled(RouterLink)({

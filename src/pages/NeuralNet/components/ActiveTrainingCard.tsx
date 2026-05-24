@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
     Box,
     Button,
@@ -92,14 +91,6 @@ export default function ActiveTrainingCard() {
     const togglePause = useNeuralNetStore((s) => s.togglePause);
     const commitSession = useNeuralNetStore((s) => s.commitSession);
     const setActive = useNeuralNetStore((s) => s.setActive);
-
-    // Force a re-render once per second so the session time visibly ticks.
-    const [, setTick] = useState(0);
-    useEffect(() => {
-        if (!active) return;
-        const id = setInterval(() => setTick((t) => t + 1), 250);
-        return () => clearInterval(id);
-    }, [active]);
 
     const cipherInfo = NEURAL_NET_CIPHERS.find((c) => c.name === currentCipher);
     const sessionPts = currentCipher

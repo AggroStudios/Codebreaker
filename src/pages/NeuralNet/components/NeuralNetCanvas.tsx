@@ -277,6 +277,16 @@ export default function NeuralNetCanvas({
                 ctx.fillText(`> training: ${cipherName.toLowerCase()}`, padX, padY * 0.55);
             }
 
+            // When paused with no residual animation, stop the loop entirely
+            // so we don't burn CPU/GPU + GC churn drawing a static frame.
+            const hasResidue =
+                s.nodes.some((n) => n.activation > 0.01) ||
+                s.edges.some((e) => e.pulses.length > 0);
+            if (!active && !hasResidue) {
+                s.raf = 0;
+                return;
+            }
+
             s.raf = requestAnimationFrame(tick);
         };
 
@@ -284,6 +294,10 @@ export default function NeuralNetCanvas({
         return () => {
             running = false;
             cancelAnimationFrame(s.raf);
+            // Drop in-flight pulses so they don't keep allocating gradients
+            // in the next loop when deps change (e.g., cipher switch).
+            for (const e of s.edges) e.pulses.length = 0;
+            for (const n of s.nodes) n.activation = 0;
         };
     }, [active, intensity, cipherName]);
 

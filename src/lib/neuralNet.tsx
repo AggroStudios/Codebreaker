@@ -5,7 +5,7 @@ import { useNeuralNetStore } from '../stores/neuralNet';
 const FPS = 60;
 
 /** Bank training time into the store at this cadence (seconds). */
-const TICK_INTERVAL_S = 0.2;
+const TICK_INTERVAL_S = 1;
 
 export default class NeuralNet implements Process {
     private _accum = 0;
