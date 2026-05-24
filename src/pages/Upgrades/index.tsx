@@ -193,7 +193,7 @@ export default function UpgradesComponent() {
 
     const handleConfirmPurchase = () => {
         if (!upgradeToPurchase || !tierToPurchase) return;
-        tierToPurchase.onPurchase(stationProxy);
+        tierToPurchase.onPurchase?.(stationProxy);
         purchaseUpgradeTier(upgradeToPurchase.key, tierToPurchase.tierId, tierToPurchase.cost);
         setConfirmPurchaseDialogOpen(false);
     };

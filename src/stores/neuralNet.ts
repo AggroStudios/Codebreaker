@@ -118,9 +118,23 @@ export const pointsAt = (seconds: number): number => {
     return Math.min(POINTS_CAP, Math.floor(POINTS_K * Math.sqrt(seconds)));
 };
 
+/**
+ * Speed-bonus curve. Divisor delays the ramp-up so the first few minutes of
+ * training stay under ~1%; multiplier sets the top-end shape. Sample values
+ * with pointsAt(s) = 4·√s:
+ *   1 min  (~30 pts)   → ~1.0%
+ *   5 min  (~70 pts)   → ~1.9%
+ *   1 hr   (~240 pts)  → ~4.2%
+ *   5 hr   (~540 pts)  → ~6.2%
+ *   24 hr  (~1175 pts) → ~8.4%
+ *   cap    (1M pts)    → ~28.5%
+ */
+const BONUS_DIVISOR = 80;
+const BONUS_SCALE = 7;
+
 export const bonusFromPoints = (pts: number): number => {
     if (!Number.isFinite(pts) || pts <= 0) return 0;
-    return Math.round(Math.log10(pts + 1) * 8 * 10) / 10;
+    return Math.round(Math.log10(pts / BONUS_DIVISOR + 1) * BONUS_SCALE * 10) / 10;
 };
 
 export const modelLevelFromTotal = (totalPts: number): number =>
