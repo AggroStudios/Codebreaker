@@ -12,6 +12,7 @@ import DatasetIcon from '@mui/icons-material/Dataset';
 import HubIcon from '@mui/icons-material/Hub';
 import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
 import ThermostatOutlinedIcon from '@mui/icons-material/ThermostatOutlined';
+import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import { NetworkFiber, NetworkCable, Networking, NetworkDSL } from './network';
 import { StationStoreType } from '../includes/Process.interface';
 import { CodiumProcessor, CodiumProcessor64, CodiumProcessorX8, CodiumProcessorQuantum1, CodiumProcessorQuantumX, CodiumProcessorSingularity } from './processors';
@@ -668,6 +669,51 @@ export const UpgradeList: IUpgradeItem[] = [
                         tierId: 'mk6'
                     },
                 ]
+            },
+        ],
+    },
+    {
+        key: 'sentinel-protocol',
+        name: 'Sentinel Protocol',
+        description: 'Adaptive intrusion-detection suite that masks the station\'s signature and pre-classifies hostile traffic. Lowers the chance of a probe slipping through and shortens the response window when one does.',
+        category: 'security',
+        icon: ShieldOutlinedIcon,
+        tags: ['security', 'software', 'passive'],
+        tiers: [
+            {
+                tierId: 'mk1',
+                title: 'Mk I',
+                cost: 5000,
+                description: 'Heuristic signature filter. -1 challenge round, -1% intrusion chance.',
+                callout: 'Watchful',
+            },
+            {
+                tierId: 'mk2',
+                title: 'Mk II',
+                cost: 10000,
+                description: 'Real-time traffic classifier. -2 challenge rounds, -2% intrusion chance.',
+                callout: 'Vigilant',
+            },
+            {
+                tierId: 'mk3',
+                title: 'Mk III',
+                cost: 20000,
+                description: 'Rotating signature decoys. -3 challenge rounds, -3% intrusion chance.',
+                callout: 'Cloaked',
+            },
+            {
+                tierId: 'mk4',
+                title: 'Mk IV',
+                cost: 40000,
+                description: 'Predictive countermeasures. -4 challenge rounds, -4% intrusion chance.',
+                callout: 'Phantom',
+            },
+            {
+                tierId: 'mk5',
+                title: 'Mk V',
+                cost: 75000,
+                description: 'Station signature scrubbed beyond detection. Hostile probes can no longer find you.',
+                callout: 'Silent',
             },
         ],
     },

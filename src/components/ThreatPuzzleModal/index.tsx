@@ -8,6 +8,9 @@ import { TurnTwo } from '../TurnTwo';
 import { ScreenGlowType } from '../ScreenGlow';
 import { useStationContext } from '../../stores/stationContext';
 import { useThreatsStore } from '../../stores/threats';
+import { usePlayerStore } from '../../stores/player';
+import { sentinelTierCount, THREAT_BASE_ROUNDS } from '../../includes/sentinel';
+import MasterMind from '../MasterMind';
 
 const RED = '#e74c3c';
 
@@ -15,11 +18,19 @@ type Phase = 'playing' | 'failed';
 
 const noopClose = () => {};
 
+const miniGames = {
+    simon: SimonGame,
+    turnTwo: TurnTwo,
+    mastermind: MasterMind,
+};
+
 export default function ThreatPuzzleModal() {
     const active = useThreatsStore((s) => s.active);
     const miniGame = useThreatsStore((s) => s.miniGame);
     const attempt = useThreatsStore((s) => s.attempt);
     const threatCount = useThreatsStore((s) => s.threatCount);
+    const sentinelTiers = usePlayerStore((s) => sentinelTierCount(s.purchasedUpgrades));
+    const rounds = Math.max(1, THREAT_BASE_ROUNDS - sentinelTiers);
 
     const { stationProxy } = useStationContext();
     const stationRef = useRef(stationProxy);
@@ -56,7 +67,7 @@ export default function ThreatPuzzleModal() {
 
     if (!active) return null;
 
-    const MiniGame = miniGame === 'simon' ? SimonGame : TurnTwo;
+    const MiniGame = miniGames[miniGame];
 
     const footer =
         phase === 'failed' ? (
@@ -132,7 +143,7 @@ export default function ThreatPuzzleModal() {
             {phase === 'playing' ? (
                 <MiniGame
                     key={`${miniGame}-${attempt}`}
-                    rounds={5}
+                    rounds={rounds}
                     onWin={handleWin}
                     onLose={handleLose}
                 />

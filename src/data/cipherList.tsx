@@ -2,6 +2,7 @@ import { BlockUnit, ICipherType } from '../includes/Cipher.interface';
 import { ProcessorArchitecture } from '../includes/Process.interface';
 import { SimonGame } from '../components/SimonGame';
 import { TurnTwo } from '../components/TurnTwo';
+import MasterMind from '../components/MasterMind';
 
 export const CipherTypes: ICipherType[] = [
     {
@@ -16,7 +17,7 @@ export const CipherTypes: ICipherType[] = [
         payout: 100,
         xp: 10,
         requiredArchitecture: [ProcessorArchitecture.risc32, ProcessorArchitecture.risc64],
-        manualMode: [SimonGame, TurnTwo]
+        manualMode: [SimonGame, TurnTwo, MasterMind]
     },
     {
         name: 'Simon Cipher',
@@ -45,6 +46,20 @@ export const CipherTypes: ICipherType[] = [
         xp: 10,
         requiredArchitecture: [ProcessorArchitecture.risc32, ProcessorArchitecture.risc64],
         manualMode: [TurnTwo]
+    },
+    {
+        name: 'Mastermind Cipher',
+        complexity: 1,
+        parallelism: 1,
+        memoryRequired: 1024,
+        block: {
+            size: 1024,
+            unit: BlockUnit.kilobytes,
+        },
+        payout: 100,
+        xp: 10,
+        requiredArchitecture: [ProcessorArchitecture.risc32, ProcessorArchitecture.risc64],
+        manualMode: [MasterMind]
     },
     {
         name: 'CRC-32',

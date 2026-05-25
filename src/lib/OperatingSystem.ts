@@ -286,10 +286,11 @@ export default class OperatingSystem {
     }
 
     setExponent(amount: number) {
+        if (!Number.isFinite(amount)) return;
         this.currentExponent = amount;
         this._worker?.postMessage({
             type: OperatingSystemWorkerMessageType.SET_EXPONENT,
-            data: amount,
+            data: { exponent: amount },
         });
     }
 

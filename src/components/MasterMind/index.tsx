@@ -19,11 +19,16 @@ const ROW_GAP = 4;
 const PALETTE_H_MIN = 44;
 const PALETTE_H_RATIO = 0.18;
 
-type GamePhase = 'playing' | 'won' | 'lost';
+type GamePhase = 'idle' | 'playing' | 'won' | 'lost';
+
+type PegStatus = 'correct' | 'misplaced' | 'absent';
 
 interface Feedback {
     black: number;
     white: number;
+    /** Per-slot status indexed the same as the guess — used so feedback dots
+     *  render aligned with the guess column they describe. */
+    slots: PegStatus[];
 }
 
 interface BoardLayout {
@@ -54,10 +59,12 @@ function computeLayout(w: number, h: number, chances: number, rounds: number): B
 function computeFeedback(guess: number[], code: number[]): Feedback {
     const g = [...guess];
     const c = [...code];
+    const slots: PegStatus[] = new Array(guess.length).fill('absent');
     let black = 0;
     let white = 0;
     for (let i = 0; i < g.length; i++) {
         if (g[i] === c[i]) {
+            slots[i] = 'correct';
             black++;
             g[i] = -1;
             c[i] = -2;
@@ -67,11 +74,12 @@ function computeFeedback(guess: number[], code: number[]): Feedback {
         if (g[i] < 0) continue;
         const idx = c.indexOf(g[i]);
         if (idx >= 0) {
+            slots[i] = 'misplaced';
             white++;
             c[idx] = -2;
         }
     }
-    return { black, white };
+    return { black, white, slots };
 }
 
 export const MasterMind: React.FC<MiniGameProps> = ({
@@ -82,7 +90,7 @@ export const MasterMind: React.FC<MiniGameProps> = ({
     onProgress,
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const phaseRef = useRef<GamePhase>('playing');
+    const phaseRef = useRef<GamePhase>('idle');
     const codeRef = useRef<number[]>([]);
     const guessesRef = useRef<number[][]>([]);
     const feedbackRef = useRef<Feedback[]>([]);
@@ -103,7 +111,7 @@ export const MasterMind: React.FC<MiniGameProps> = ({
         currentGuessRef.current = new Array(rounds).fill(-1);
         guessesRef.current = [];
         feedbackRef.current = [];
-        phaseRef.current = 'playing';
+        phaseRef.current = 'idle';
         selectedColorRef.current = 0;
     }, [rounds]);
 
@@ -120,6 +128,90 @@ export const MasterMind: React.FC<MiniGameProps> = ({
         ctx.clearRect(0, 0, w, h);
         ctx.fillStyle = '#080c0a';
         ctx.fillRect(0, 0, w, h);
+
+        if (phaseRef.current === 'idle') {
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            ctx.fillStyle = '#0af5b0';
+            ctx.shadowColor = '#0af5b0';
+            ctx.shadowBlur = 14;
+            ctx.font = `700 ${Math.floor(h * 0.13)}px Inter, system-ui, sans-serif`;
+            ctx.fillText('MASTERMIND', w / 2, h * 0.14);
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = 'rgba(255,255,255,0.55)';
+            ctx.font = `${Math.floor(h * 0.055)}px "Fira Code", monospace`;
+            ctx.fillText(
+                `Crack the ${rounds}-color code · ${chances} attempts`,
+                w / 2,
+                h * 0.26,
+            );
+
+            const legendStartY = h * 0.42;
+            const legendLineH = h * 0.11;
+            const legendDotR = Math.max(4, h * 0.028);
+            const legendDotX = w * 0.20;
+            const legendTextX = legendDotX + legendDotR * 2.8;
+
+            const legend: {
+                fill: string;
+                glow: string | null;
+                stroke: string | null;
+                label: string;
+            }[] = [
+                {
+                    fill: '#0af5b0',
+                    glow: '#0af5b0',
+                    stroke: null,
+                    label: 'correct color in the correct position',
+                },
+                {
+                    fill: '#f39c12',
+                    glow: '#f39c12',
+                    stroke: null,
+                    label: 'correct color, wrong position',
+                },
+                {
+                    fill: 'rgba(255,255,255,0.06)',
+                    glow: null,
+                    stroke: 'rgba(255,255,255,0.25)',
+                    label: 'color is not in the code',
+                },
+            ];
+
+            ctx.textAlign = 'left';
+            ctx.font = `${Math.floor(h * 0.055)}px Inter, system-ui, sans-serif`;
+            legend.forEach((row, i) => {
+                const cy = legendStartY + i * legendLineH;
+                ctx.beginPath();
+                ctx.arc(legendDotX, cy, legendDotR, 0, Math.PI * 2);
+                ctx.fillStyle = row.fill;
+                if (row.glow) {
+                    ctx.shadowColor = row.glow;
+                    ctx.shadowBlur = 8;
+                }
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                if (row.stroke) {
+                    ctx.strokeStyle = row.stroke;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+                ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                ctx.fillText(row.label, legendTextX, cy);
+            });
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#0af5b0';
+            ctx.shadowColor = '#0af5b0';
+            ctx.shadowBlur = 10;
+            ctx.font = `700 ${Math.floor(h * 0.075)}px Inter, system-ui, sans-serif`;
+            ctx.fillText('CLICK TO START', w / 2, h * 0.88);
+            ctx.shadowBlur = 0;
+
+            return;
+        }
 
         const L = computeLayout(w, h, chances, rounds);
         const currentRowIdx = guessesRef.current.length;
@@ -166,34 +258,48 @@ export const MasterMind: React.FC<MiniGameProps> = ({
             const rightX = PAD + L.slotsW + ROW_GAP;
             if (isPlayed) {
                 const fb = feedbackRef.current[row];
-                const fbCols = Math.ceil(Math.sqrt(rounds));
-                const fbR = Math.max(2, L.pegR * 0.32);
-                const fbSpacing = fbR * 2.4;
-                const gridSize = fbCols;
-                const gridStartX = rightX + L.submitW / 2 - (gridSize * fbSpacing) / 2 + fbR;
-                const gridStartY = y - (gridSize * fbSpacing) / 2 + fbR;
+                const slotSpacing = (L.submitW - 4) / rounds;
+                const fbR = Math.max(3, Math.min(slotSpacing * 0.42, L.rowH * 0.32));
+                const startX = rightX + (L.submitW - slotSpacing * rounds) / 2 + slotSpacing / 2;
 
-                let idx = 0;
-                for (let p = 0; p < fb.black; p++, idx++) {
-                    const px = gridStartX + (idx % fbCols) * fbSpacing;
-                    const py = gridStartY + Math.floor(idx / fbCols) * fbSpacing;
+                // Dot at column i reflects the status of guess column i, so
+                // the player can see which specific peg is correct / misplaced
+                // / absent.
+                for (let i = 0; i < rounds; i++) {
+                    const px = startX + i * slotSpacing;
+                    let fill: string;
+                    let glow: string | null = null;
+                    let stroke: string | null = null;
+
+                    switch (fb.slots[i]) {
+                        case 'correct':
+                            fill = '#0af5b0';
+                            glow = '#0af5b0';
+                            break;
+                        case 'misplaced':
+                            fill = '#f39c12';
+                            glow = '#f39c12';
+                            break;
+                        default:
+                            fill = 'rgba(255,255,255,0.06)';
+                            stroke = 'rgba(255,255,255,0.18)';
+                    }
+
                     ctx.beginPath();
-                    ctx.arc(px, py, fbR, 0, Math.PI * 2);
-                    ctx.fillStyle = '#0af5b0';
-                    ctx.shadowColor = '#0af5b0';
-                    ctx.shadowBlur = 4;
+                    ctx.arc(px, y, fbR, 0, Math.PI * 2);
+                    ctx.fillStyle = fill;
+                    if (glow) {
+                        ctx.shadowColor = glow;
+                        ctx.shadowBlur = 8;
+                    }
                     ctx.fill();
-                }
-                for (let p = 0; p < fb.white; p++, idx++) {
-                    const px = gridStartX + (idx % fbCols) * fbSpacing;
-                    const py = gridStartY + Math.floor(idx / fbCols) * fbSpacing;
-                    ctx.beginPath();
-                    ctx.arc(px, py, fbR, 0, Math.PI * 2);
-                    ctx.fillStyle = 'rgba(255,255,255,0.78)';
                     ctx.shadowBlur = 0;
-                    ctx.fill();
+                    if (stroke) {
+                        ctx.strokeStyle = stroke;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
                 }
-                ctx.shadowBlur = 0;
             } else if (isCurrent) {
                 const btnH = L.rowH * 0.78;
                 const btnW = L.submitW - 6;
@@ -329,6 +435,11 @@ export const MasterMind: React.FC<MiniGameProps> = ({
     }, [rounds, chances, drawCanvas]);
 
     const handleClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+        if (phaseRef.current === 'idle') {
+            phaseRef.current = 'playing';
+            drawCanvas();
+            return;
+        }
         if (phaseRef.current !== 'playing') return;
         const canvas = canvasRef.current;
         if (!canvas) return;
