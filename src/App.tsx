@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, useColorScheme } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
@@ -20,6 +20,7 @@ import MusicPlayer from './components/MusicPlayer';
 import { useUIStore } from './stores/ui';
 import { useMusicPlayerStore } from './stores/musicPlayer';
 import { useAppReadyStore } from './stores/appReady';
+import { useSessionStore } from './stores/session';
 
 import { preloadImages } from './lib/preloader';
 
@@ -31,6 +32,12 @@ import {
 
 const TitleScreenRoute = lazy(() => import('./pages/TitleScreen'));
 const CharacterCreationRoute = lazy(() => import('./pages/CharacterCreation'));
+
+function InitializedLayoutRoute() {
+    const isInitialized = useSessionStore((s) => s.isInitialized);
+    if (!isInitialized) return <Navigate to="/" replace />;
+    return <Layout />;
+}
 
 const AppWithProviders = () => {
     const { mode } = useColorScheme();
@@ -88,7 +95,7 @@ const AppWithProviders = () => {
                             <CharacterCreationRoute />
                         </Suspense>
                     } />
-                    <Route path="*" element={<Layout />} />
+                    <Route path="*" element={<InitializedLayoutRoute />} />
                 </Routes>
             </BrowserRouter>
             <LoadingScreen

@@ -7,6 +7,7 @@ import SystemReadout from '../../components/title/SystemReadout';
 import TitleMenu, { TitleMenuId } from '../../components/title/TitleMenu';
 import { useCharacterStore } from '../../stores/character';
 import { useUIStore } from '../../stores/ui';
+import { useSessionStore } from '../../stores/session';
 
 import codebreakerLogo from '../../assets/logos/codebreaker-logo.png';
 import aggroLogo from '../../assets/logos/AggroStudios.png';
@@ -40,9 +41,11 @@ export default function TitleScreen() {
         switch (id) {
             case 'new':
                 useCharacterStore.getState().reset();
+                useSessionStore.getState().setInitialized();
                 navigate('/character-creation');
                 return;
             case 'continue':
+                useSessionStore.getState().setInitialized();
                 navigate('/station');
                 return;
             case 'settings':
