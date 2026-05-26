@@ -5,7 +5,7 @@ import { BoltOutlined, CloseOutlined } from '@mui/icons-material';
 
 import { InstalledServer, Rack, canPlace, useRacksStore } from '../../stores/racks';
 import { Server } from '../../includes/Servers.interface';
-import { RACK_WIDTH, U_HEIGHT, serverSize } from '../../includes/serverRacks.interface';
+import { RACK_CATALOG, RACK_WIDTH, U_HEIGHT, serverSize } from '../../includes/serverRacks.interface';
 import ServerChip from './ServerChip';
 
 export interface TileHoverCallbacks {
@@ -52,12 +52,14 @@ interface SlotDroppableProps {
     rackId: string;
     u: number;
     hover: HoverInfo | null;
+    disabled?: boolean;
 }
 
-function SlotDroppable({ rackId, u, hover }: SlotDroppableProps) {
+function SlotDroppable({ rackId, u, hover, disabled }: SlotDroppableProps) {
     const { setNodeRef } = useDroppable({
         id: `slot:${rackId}:${u}`,
         data: { rackId, u },
+        disabled,
     });
 
     const inHoverRange =
@@ -90,15 +92,17 @@ interface InstalledTileProps {
     installed: InstalledServer;
     hover: HoverInfo | null;
     hoverCallbacks?: TileHoverCallbacks;
+    suspended?: boolean;
 }
 
-function InstalledTile({ rack, installed, hover, hoverCallbacks }: InstalledTileProps) {
+function InstalledTile({ rack, installed, hover, hoverCallbacks, suspended }: InstalledTileProps) {
     const uninstallServer = useRacksStore((s) => s.uninstallServer);
     const { instId, server, u } = installed;
     const size = serverSize(server);
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: `inst:${rack.id}:${instId}`,
         data: { kind: 'installed', server, instId, rackId: rack.id } satisfies DragPayload,
+        disabled: suspended,
     });
 
     // Hide the tooltip the moment a drag starts (mouseleave doesn't fire while
@@ -118,7 +122,7 @@ function InstalledTile({ rack, installed, hover, hoverCallbacks }: InstalledTile
         height: size * U_HEIGHT - 2,
         opacity: beingMoved ? 0.35 : 1,
         touchAction: 'none',
-        cursor: 'grab',
+        cursor: suspended ? 'default' : 'grab',
     };
 
     return (
@@ -128,32 +132,34 @@ function InstalledTile({ rack, installed, hover, hoverCallbacks }: InstalledTile
             onMouseEnter={(e) => hoverCallbacks?.onTileEnter(rack, installed, e)}
             onMouseMove={(e) => hoverCallbacks?.onTileMove(e)}
             onMouseLeave={() => hoverCallbacks?.onTileLeave()}
-            {...listeners}
-            {...attributes}
+            {...(suspended ? {} : listeners)}
+            {...(suspended ? {} : attributes)}
         >
-            <ServerChip server={server} height={size * U_HEIGHT - 2} />
-            <IconButton
-                size="small"
-                aria-label={`Uninstall ${server.name ?? server.model}`}
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    uninstallServer(rack.id, instId);
-                }}
-                sx={{
-                    position: 'absolute',
-                    top: 1,
-                    right: 2,
-                    width: size === 1 ? 16 : 18,
-                    height: size === 1 ? 16 : 18,
-                    padding: 0,
-                    color: 'rgba(255,255,255,0.6)',
-                    background: 'rgba(0,0,0,0.4)',
-                    '&:hover': { color: '#f44336', background: 'rgba(0,0,0,0.6)' },
-                }}
-            >
-                <CloseOutlined sx={{ fontSize: size === 1 ? 12 : 14 }} />
-            </IconButton>
+            <ServerChip server={server} height={size * U_HEIGHT - 2} idle={suspended} />
+            {!suspended && (
+                <IconButton
+                    size="small"
+                    aria-label={`Uninstall ${server.name ?? server.model}`}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        uninstallServer(rack.id, instId);
+                    }}
+                    sx={{
+                        position: 'absolute',
+                        top: 1,
+                        right: 2,
+                        width: size === 1 ? 16 : 18,
+                        height: size === 1 ? 16 : 18,
+                        padding: 0,
+                        color: 'rgba(255,255,255,0.6)',
+                        background: 'rgba(0,0,0,0.4)',
+                        '&:hover': { color: '#f44336', background: 'rgba(0,0,0,0.6)' },
+                    }}
+                >
+                    <CloseOutlined sx={{ fontSize: size === 1 ? 12 : 14 }} />
+                </IconButton>
+            )}
         </div>
     );
 }
@@ -161,13 +167,20 @@ function InstalledTile({ rack, installed, hover, hoverCallbacks }: InstalledTile
 interface RackUnitProps {
     rack: Rack;
     hoverCallbacks?: TileHoverCallbacks;
+    suspended?: boolean;
 }
 
-export default function RackUnit({ rack, hoverCallbacks }: RackUnitProps) {
+export default function RackUnit({ rack, hoverCallbacks, suspended }: RackUnitProps) {
     const hover = useHover(rack);
-    const totalWatts = rack.installed.reduce((sum, it) => sum + (it.server.powerConsumption ?? 0), 0);
-    const occupiedSlots = rack.installed.reduce((sum, it) => sum + serverSize(it.server), 0);
-    const fillPct = Math.round((occupiedSlots / rack.slots) * 100);
+    // Suspended racks are powered down — every server in them draws 0 W.
+    const totalWatts = suspended
+        ? 0
+        : rack.installed.reduce((sum, it) => sum + (it.server.powerConsumption ?? 0), 0);
+    const powerCapacity = RACK_CATALOG.find((c) => c.sku === rack.sku)?.power ?? 0;
+    const powerPct = powerCapacity > 0
+        ? Math.min(100, Math.round((totalWatts / powerCapacity) * 100))
+        : 0;
+    const overCapacity = powerCapacity > 0 && totalWatts > powerCapacity;
 
     const bodyHeight = rack.slots * U_HEIGHT;
 
@@ -178,11 +191,14 @@ export default function RackUnit({ rack, hoverCallbacks }: RackUnitProps) {
                 width: RACK_WIDTH,
                 flex: `0 0 ${RACK_WIDTH}px`,
                 background: 'linear-gradient(180deg, rgba(35,35,38,0.92), rgba(20,20,22,0.92))',
-                border: '1px solid rgba(255,255,255,0.10)',
+                border: suspended
+                    ? '1px solid rgba(154,160,166,0.30)'
+                    : '1px solid rgba(255,255,255,0.10)',
                 borderRadius: '10px',
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
+                filter: suspended ? 'saturate(0.4)' : undefined,
             }}
         >
             <Box
@@ -197,13 +213,27 @@ export default function RackUnit({ rack, hoverCallbacks }: RackUnitProps) {
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
                 }}
             >
-                <span className="live-dot-mini" />
+                <span
+                    className={suspended ? undefined : 'live-dot-mini'}
+                    style={
+                        suspended
+                            ? {
+                                  width: 6,
+                                  height: 6,
+                                  borderRadius: '50%',
+                                  background: '#9aa0a6',
+                                  display: 'inline-block',
+                                  flexShrink: 0,
+                              }
+                            : undefined
+                    }
+                />
                 <Typography
                     sx={{
                         flex: 1,
                         fontFamily: 'Fira Code, monospace',
                         fontSize: 12,
-                        color: '#0af5b0',
+                        color: suspended ? 'rgba(154,160,166,0.85)' : '#0af5b0',
                         letterSpacing: '0.06em',
                         textTransform: 'uppercase',
                         whiteSpace: 'nowrap',
@@ -212,6 +242,7 @@ export default function RackUnit({ rack, hoverCallbacks }: RackUnitProps) {
                     }}
                 >
                     {rack.name}
+                    {suspended ? ' · OFF' : ''}
                 </Typography>
                 <Typography
                     sx={{
@@ -263,7 +294,7 @@ export default function RackUnit({ rack, hoverCallbacks }: RackUnitProps) {
                 </Box>
 
                 {Array.from({ length: rack.slots }, (_, i) => (
-                    <SlotDroppable key={i} rackId={rack.id} u={i + 1} hover={hover} />
+                    <SlotDroppable key={i} rackId={rack.id} u={i + 1} hover={hover} disabled={suspended} />
                 ))}
 
                 {rack.installed.map((it) => (
@@ -273,6 +304,7 @@ export default function RackUnit({ rack, hoverCallbacks }: RackUnitProps) {
                         installed={it}
                         hover={hover}
                         hoverCallbacks={hoverCallbacks}
+                        suspended={suspended}
                     />
                 ))}
             </Box>
@@ -288,7 +320,7 @@ export default function RackUnit({ rack, hoverCallbacks }: RackUnitProps) {
                     background: 'rgba(0,0,0,0.3)',
                 }}
             >
-                <BoltOutlined sx={{ fontSize: 12, color: '#0af5b0' }} />
+                <BoltOutlined sx={{ fontSize: 12, color: overCapacity ? '#f44336' : '#0af5b0' }} />
                 <Typography
                     sx={{
                         fontFamily: 'Fira Code, monospace',
@@ -296,15 +328,19 @@ export default function RackUnit({ rack, hoverCallbacks }: RackUnitProps) {
                         color: 'rgba(255,255,255,0.7)',
                     }}
                 >
-                    {totalWatts}W
+                    {totalWatts}/{powerCapacity}W
                 </Typography>
                 <Box sx={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 9999, overflow: 'hidden', ml: 1, mr: 1 }}>
                     <Box
                         sx={{
-                            width: `${Math.min(100, fillPct)}%`,
+                            width: `${powerPct}%`,
                             height: '100%',
-                            background: 'linear-gradient(90deg, #0af5b0, #26c6da)',
-                            boxShadow: '0 0 6px rgba(10,245,176,0.6)',
+                            background: overCapacity
+                                ? 'linear-gradient(90deg, #ff9800, #f44336)'
+                                : 'linear-gradient(90deg, #0af5b0, #26c6da)',
+                            boxShadow: overCapacity
+                                ? '0 0 6px rgba(244,67,54,0.6)'
+                                : '0 0 6px rgba(10,245,176,0.6)',
                         }}
                     />
                 </Box>
@@ -312,10 +348,10 @@ export default function RackUnit({ rack, hoverCallbacks }: RackUnitProps) {
                     sx={{
                         fontFamily: 'Fira Code, monospace',
                         fontSize: 10,
-                        color: '#0af5b0',
+                        color: overCapacity ? '#f44336' : '#0af5b0',
                     }}
                 >
-                    {fillPct}%
+                    {powerPct}%
                 </Typography>
             </Box>
         </Box>

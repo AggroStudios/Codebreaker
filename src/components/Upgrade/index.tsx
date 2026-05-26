@@ -172,11 +172,9 @@ export default function UpgradeComponent(props: UpgradeComponentProps) {
                         </div>
                     </div>
 
-                    {currentTierCount === 0 && nextTier && (
-                        <div className="upgrade-overview">
-                            {upgrade.description}
-                        </div>
-                    )}
+                    <div className="upgrade-overview">
+                        {upgrade.description}
+                    </div>
 
                     {nextTier ? (
                         <div className={clsx('upgrade-next', isLocked && 'locked', currentTierCount === 0 && 'initial')}>

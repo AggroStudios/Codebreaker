@@ -674,7 +674,7 @@ export const UpgradeList: IUpgradeItem[] = [
     },
     {
         key: 'sentinel-protocol',
-        name: 'Sentinel Protocol',
+        name: 'Wraith Screen',
         description: 'Adaptive intrusion-detection suite that masks the station\'s signature and pre-classifies hostile traffic. Lowers the chance of a probe slipping through and shortens the response window when one does.',
         category: 'security',
         icon: ShieldOutlinedIcon,

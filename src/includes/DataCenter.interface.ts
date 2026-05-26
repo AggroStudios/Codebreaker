@@ -21,7 +21,7 @@ export interface IDataCenterContractProps {
     scale?: number;
 }
 
-export type IDataCenterContractStatus = 'ACTIVE' | 'PROVISIONING';
+export type IDataCenterContractStatus = 'ACTIVE' | 'PROVISIONING' | 'SUSPENDED';
 
 export interface IDataCenterContract {
     racks: number;

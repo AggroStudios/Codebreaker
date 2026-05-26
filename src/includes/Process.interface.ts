@@ -37,6 +37,8 @@ export type StationStoreType = {
     count: number;
     exponent: number;
     isRunning: boolean;
+    uptime: number;
+    setUptime: (elapsed: number) => void;
     setRunning: (running: boolean) => void;
     callback: (frame: number, count: number, exponent: number) => void;
     cpuActivity: { x: number; y: number }[];

@@ -16,7 +16,7 @@ export const useActiveDataCenters = (): ActiveDcContract[] => {
     return useMemo(() => {
         const out: ActiveDcContract[] = [];
         for (const [id, contract] of Object.entries(contracts)) {
-            if (contract.status !== 'ACTIVE') continue;
+            if (!['ACTIVE', 'SUSPENDED'].includes(contract.status)) continue;
             const dc = DATA_CENTERS.find((d) => d.id === id);
             if (!dc) continue;
             out.push({ dataCenter: dc, contract });

@@ -6,7 +6,7 @@ import { NotificationLevel } from '../includes/OperatingSystem.interface';
 import { StationStoreType } from '../includes/Process.interface';
 
 import WorkerOperatingSystem from './worker/OperatingSystem?worker';
-import { OperatingSystemWorkerMessage, OperatingSystemWorkerMessageType, type OSUpdateGameLoopData } from './worker/OperatingSystem';
+import { OperatingSystemWorkerMessage, OperatingSystemWorkerMessageType, type OSUpdateGameLoopData, FPS } from './worker/OperatingSystem';
 import { IApplication } from '../includes/Terminal.interface';
 import { dataSizeFromSuffix } from './utils';
 import { useStorageStore } from '../stores/storage';
@@ -297,17 +297,24 @@ export default class OperatingSystem {
     // Main function
     update() {
         // console.debug('[OperatingSystem] - Update');
-        if (
-            this._station &&
-            Math.round(this.currentFrame * 1000) % 100 === 0
-        ) {
-            const coreUsage = this.processes.filter((process: Process) => !process.paused).reduce(
-                (acc, process) => acc + (process.cores * (process.percentUse || 0) || 0),
-                0,
-            );
-            const coreCount = this._station?.cpu?.cores || 1;
-            const cpuUsage = Math.round((coreUsage / coreCount) * 100);
-            this._cpuActivity.usage(cpuUsage);
+        if (this._station) {
+
+            const newSecond = Math.round((1 / FPS) * this.currentFrame);
+            console.log(this.currentFrame, 1 / FPS);
+            if (this._station.uptime + newSecond > this._station.uptime) {
+                console.log('Updating uptime!');
+                this._station.setUptime(this._station.uptime + newSecond);
+            }
+
+            if (Math.round(this.currentFrame * 1000) % 100 === 0) {
+                const coreUsage = this.processes.filter((process: Process) => !process.paused).reduce(
+                    (acc, process) => acc + (process.cores * (process.percentUse || 0) || 0),
+                    0,
+                );
+                const coreCount = this._station?.cpu?.cores || 1;
+                const cpuUsage = Math.round((coreUsage / coreCount) * 100);
+                this._cpuActivity.usage(cpuUsage);
+            }
         }
 
         for (const process of this.processes.filter((process: Process) => !process.paused)) {

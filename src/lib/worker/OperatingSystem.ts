@@ -20,7 +20,7 @@ export type OSSetExponentData = {
     exponent: number;
 }
 
-const FPS = 60;
+export const FPS = 60;
 
 let interval: null | NodeJS.Timeout = null;
 let currentFrame: number = 0;

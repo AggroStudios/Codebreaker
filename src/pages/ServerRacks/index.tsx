@@ -29,7 +29,7 @@ import PageHeader from '../../components/common/PageHeader';
 import { ApartmentTwoTone } from '@mui/icons-material';
 import { PublicOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
-import { WarningAmberOutlined, AssignmentLateOutlined, HourglassTopOutlined } from '@mui/icons-material';
+import { WarningAmberOutlined, AssignmentLateOutlined, HourglassTopOutlined, PauseCircleOutlined } from '@mui/icons-material';
 
 import { useDataCentersStore } from '../../stores/dataCenters';
 
@@ -82,6 +82,9 @@ export default function ServerRacks() {
     const uplinkClass = STATUS_CLASS[uplink.status];
     const switchAlerts = switches.filter((sw) => sw.status !== 'UP').length;
 
+    const currentContract = currentDcId ? contracts[currentDcId] : null;
+    const isSuspended = currentContract?.status === 'SUSPENDED';
+
     const [activeDrag, setActiveDrag] = useState<DragPayload | null>(null);
 
     const sensors = useSensors(
@@ -104,6 +107,11 @@ export default function ServerRacks() {
 
         const targetRack = racks.find((r) => r.id === target.rackId);
         if (!targetRack) return;
+
+        // Defense-in-depth: even if the droppable slipped through, never install
+        // or move servers into a rack belonging to a suspended DC.
+        const targetContract = contracts[targetRack.dcId];
+        if (targetContract?.status === 'SUSPENDED') return;
 
         const size = serverSize(payload.server);
 
@@ -237,6 +245,16 @@ export default function ServerRacks() {
                     icon={ApartmentTwoTone}
                     actions={
                         <div className="chips">
+                            {isSuspended && (
+                                <Chip
+                                    label="DC SUSPENDED"
+                                    size="small"
+                                    variant="outlined"
+                                    className={clsx('orange')}
+                                    style={{ marginRight: 6 }}
+                                    icon={<PauseCircleOutlined fontSize="small" />}
+                                />
+                            )}
                             <Chip
                                 label={`UPLINK ${uplink.status}`}
                                 size="small"
@@ -270,7 +288,7 @@ export default function ServerRacks() {
                     <StatStrip dcId={currentDcId} />
                     <Box className="server-racks-grid">
                         <Inventory dcId={currentDcId} />
-                        <RackFloor dcId={currentDcId} />
+                        <RackFloor dcId={currentDcId} suspended={isSuspended} />
                         <NetworkPanel />
                     </Box>
                 </Box>

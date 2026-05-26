@@ -29,6 +29,8 @@ export const createStationStore = () =>
                 count: 0,
                 exponent: 0,
                 isRunning: false,
+                uptime: 0,
+                setUptime: (uptime: number) => set(() => ({ uptime })),
                 setRunning: (running: boolean) => set(() => ({ isRunning: running })),
                 callback: (frame: number, count: number, exponent: number) =>
                     set(() => ({ frame, count, exponent })),
