@@ -92,6 +92,21 @@ const getComponents = () => {
         }
       },
     },
+    UpgradeCategoryIcon: {
+      defaultProps: {},
+      styleOverrides: {
+        root: {
+          width: 40,
+          height: 40,
+          borderRadius: '8px !important',
+          backgroundColor: 'var(--category-color-soft)',
+          color: 'var(--category-color)',
+          border: '1px solid var(--category-color-border)',
+          flexShrink: 0,
+          '& .MuiSvgIcon-root': { fontSize: 22 },
+        },
+      },
+    },
     // MuiAccordion: {
     //   variants: [
     //     {
