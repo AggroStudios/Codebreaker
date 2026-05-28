@@ -29,6 +29,7 @@ import {
     GAME_PERSISTENCE_VERSION,
     PERSISTENCE_VERSION_KEY,
 } from './lib/persistenceVersion';
+import BreakpointReporter from './theme/BreakpointReporter.tsx';
 
 const TitleScreenRoute = lazy(() => import('./pages/TitleScreen'));
 const CharacterCreationRoute = lazy(() => import('./pages/CharacterCreation'));
@@ -127,12 +128,14 @@ const AppWithProviders = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <BreakpointReporter/>
         </>
     )
 }
 
 export default function App() {
     const theme = useSiteTheme();
+    console.log('==> theme: ', theme);
 
     return (
         <ThemeProvider theme={theme} defaultMode="dark">

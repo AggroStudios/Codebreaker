@@ -1,0 +1,725 @@
+/* ----------------------------------------------------------------------------
+ * Upgrade card
+ * ------------------------------------------------------------------------- */
+
+.upgrade {
+    --category-color: var(--color-fg-secondary);
+    --category-color-soft: rgba(255, 255, 255, 0.07);
+    --category-color-border: rgba(255, 255, 255, 0.18);
+    --category-glow: rgba(255, 255, 255, 0.18);
+
+    position: relative !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    min-height: 240px !important;
+    height: 100% !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    background: rgba(20, 22, 26, 0.5) !important;
+    backdrop-filter: blur(8px) !important;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease !important;
+    cursor: pointer;
+
+    &.software {
+        --category-color: #26c6da;
+        --category-color-soft: rgba(38, 198, 218, 0.12);
+        --category-color-border: rgba(38, 198, 218, 0.45);
+        --category-glow: rgba(38, 198, 218, 0.45);
+    }
+
+    &.network {
+        --category-color: #9c7fe0;
+        --category-color-soft: rgba(103, 58, 183, 0.18);
+        --category-color-border: rgba(156, 127, 224, 0.45);
+        --category-glow: rgba(103, 58, 183, 0.45);
+    }
+
+    &.hardware {
+        --category-color: #ff9800;
+        --category-color-soft: rgba(255, 152, 0, 0.14);
+        --category-color-border: rgba(255, 152, 0, 0.45);
+        --category-glow: rgba(255, 152, 0, 0.45);
+    }
+
+    &.security {
+        --category-color: #ff4040;
+        --category-color-soft: rgba(255, 64, 64, 0.14);
+        --category-color-border: rgba(255, 64, 64, 0.45);
+        --category-glow: rgba(255, 64, 64, 0.45);
+    }
+
+    &.selected {
+        border-color: var(--category-color-border) !important;
+        box-shadow: 0 0 14px var(--category-glow) !important;
+    }
+
+    &.locked,
+    &.maxed {
+        opacity: 0.92;
+    }
+}
+
+/* ----------------------------------------------------------------------------
+ * Header (avatar + title + subtitle + tier pill / lock pill)
+ * ------------------------------------------------------------------------- */
+
+.upgrade .upgrade-header {
+    align-items: center !important;
+    padding: 14px 14px 8px !important;
+}
+
+.upgrade .upgrade-header .MuiCardHeader-content {
+    align-self: center !important;
+}
+
+.upgrade .upgrade-header .MuiCardHeader-title {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: var(--color-fg) !important;
+    user-select: none !important;
+    line-height: 1.15 !important;
+}
+
+.upgrade .upgrade-header .MuiCardHeader-subheader {
+    margin-top: 2px !important;
+}
+
+.upgrade .upgrade-header .MuiCardHeader-action {
+    align-self: center !important;
+    margin: 0 !important;
+}
+
+.upgrade-category-icon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    background-color: var(--category-color-soft) !important;
+    color: var(--category-color) !important;
+    border: 1px solid var(--category-color-border) !important;
+}
+
+.upgrade-category-icon .MuiSvgIcon-root {
+    font-size: 22px !important;
+}
+
+.upgrade-category {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.10em !important;
+    text-transform: capitalize !important;
+    font-family: var(--font-code) !important;
+    color: var(--category-color) !important;
+    user-select: none !important;
+}
+
+.upgrade-header-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.upgrade-tier-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 8px;
+    font-family: var(--font-code);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--category-color);
+    background-color: var(--category-color-soft);
+    border: 1px solid var(--category-color-border);
+    border-radius: 6px;
+    user-select: none;
+}
+
+.upgrade-lock-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: #ff4040;
+    background-color: rgba(255, 64, 64, 0.10);
+    border: 1px solid rgba(255, 64, 64, 0.45);
+    border-radius: 6px;
+    user-select: none;
+}
+
+.upgrade-lock-pill .MuiSvgIcon-root {
+    font-size: 16px;
+}
+
+/* ----------------------------------------------------------------------------
+ * Body
+ * ------------------------------------------------------------------------- */
+
+.upgrade .upgrade-body {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 0 14px 12px !important;
+}
+
+/* Tier meter ----------------------------------------------------------------*/
+
+.upgrade-tier-meter {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    user-select: none;
+}
+
+.upgrade-tier-meter-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-code);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-fg-secondary);
+}
+
+.upgrade-tier-meter-progress {
+    color: var(--color-fg);
+    font-weight: 700;
+}
+
+.upgrade-tier-meter-bars {
+    display: flex;
+    gap: 4px;
+}
+
+.upgrade .upgrade-tier-meter-bar {
+    flex: 1 1 0;
+    height: 6px;
+    border-radius: 2px;
+    background-color: rgba(255, 255, 255, 0.08);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.upgrade .upgrade-tier-meter-bar.filled {
+    background-color: var(--category-color) !important;
+    box-shadow: 0 0 6px var(--category-glow);
+}
+
+.upgrade .upgrade-tier-meter-bar.next {
+    background-color: var(--accent) !important;
+    opacity: 0.6;
+    box-shadow: 0 0 6px rgba(10, 245, 176, 0.4);
+}
+
+/* Next tier preview ---------------------------------------------------------*/
+
+.upgrade-next {
+    position: relative;
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--category-color);
+    border-radius: 6px;
+    padding: 10px 12px;
+    background-color: rgba(255, 255, 255, 0.025);
+
+    &.locked {
+        opacity: 0.9;
+    }
+
+    &.maxed {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-color: rgba(10, 245, 176, 0.30);
+        border-left-color: var(--accent);
+        background-color: rgba(10, 245, 176, 0.06);
+    }
+}
+
+.upgrade-maxed-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.upgrade-maxed-icon .MuiSvgIcon-root {
+    font-size: 28px;
+    filter: drop-shadow(0 0 6px rgba(10, 245, 176, 0.55));
+}
+
+.upgrade-maxed-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    user-select: none;
+}
+
+.upgrade-maxed-title {
+    font-family: var(--font-code);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(10, 245, 176, 0.4);
+}
+
+.upgrade-maxed-subtitle {
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--color-fg-secondary);
+}
+
+.upgrade-next-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.upgrade-overview {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--color-fg-secondary);
+    user-select: none;
+}
+
+.upgrade-next-label {
+    font-family: var(--font-code);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-fg-secondary);
+    font-weight: 700;
+    user-select: none;
+
+    &.initial {
+        color: var(--category-color);
+    }
+}
+
+.upgrade-next-callout {
+    font-family: var(--font-code);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--category-color);
+    user-select: none;
+}
+
+.upgrade-next-description {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--color-fg);
+    user-select: none;
+}
+
+/* Requirements --------------------------------------------------------------*/
+
+.upgrade-requires {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 64, 64, 0.25);
+    border-radius: 6px;
+    background-color: rgba(255, 64, 64, 0.04);
+}
+
+.upgrade-requires-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-code);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #ff4040;
+    user-select: none;
+}
+
+.upgrade-requires-head .MuiSvgIcon-root {
+    font-size: 14px;
+}
+
+.upgrade-requires-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.upgrade-requires-list li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-fg-secondary);
+    user-select: none;
+}
+
+.upgrade-requires-list .MuiSvgIcon-root {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.upgrade-requires-name {
+    flex: 1;
+    color: var(--color-fg);
+}
+
+.upgrade-requires-tier {
+    font-family: var(--font-code);
+    font-size: 11px;
+    color: var(--color-fg-secondary);
+    letter-spacing: 0.06em;
+}
+
+/* ----------------------------------------------------------------------------
+ * Footer (tags + cost + button)
+ * ------------------------------------------------------------------------- */
+
+.upgrade .upgrade-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 0 14px 14px !important;
+    border-top: 1px solid var(--color-border);
+    margin-top: auto !important;
+    padding-top: 12px !important;
+}
+
+.upgrade-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    width: 100%;
+}
+
+.upgrade-tags .MuiChip-root {
+    padding: 0 !important;
+    font-size: 10px !important;
+    height: 18px !important;
+    border-radius: 9px !important;
+    border: 1px solid var(--color-border) !important;
+    color: var(--color-fg-secondary) !important;
+    background-color: transparent !important;
+    cursor: default !important;
+    text-transform: lowercase !important;
+    letter-spacing: 0.04em !important;
+}
+
+.upgrade-tags .MuiChip-label {
+    padding: 0 8px !important;
+    font-size: 10px !important;
+    user-select: none !important;
+}
+
+.upgrade-tags .MuiChip-root.software {
+    color: #26c6da !important;
+    border-color: rgba(38, 198, 218, 0.45) !important;
+}
+
+.upgrade-tags .MuiChip-root.network {
+    color: #9c7fe0 !important;
+    border-color: rgba(156, 127, 224, 0.45) !important;
+}
+
+.upgrade-tags .MuiChip-root.hardware {
+    color: #ff9800 !important;
+    border-color: rgba(255, 152, 0, 0.45) !important;
+}
+
+.upgrade-tags .MuiChip-root.security {
+    color: #ff4040 !important;
+    border-color: rgba(255, 64, 64, 0.45) !important;
+}
+
+.upgrade-tags .MuiChip-root.active {
+    color: var(--accent) !important;
+    border-color: rgba(10, 245, 176, 0.45) !important;
+}
+
+.upgrade-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+}
+
+.upgrade-cost-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    user-select: none;
+}
+
+.upgrade-cost-label {
+    font-family: var(--font-code);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-fg-secondary);
+}
+
+.upgrade-cost {
+    font-family: var(--font-code);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-fg);
+    line-height: 1;
+
+    &.available {
+        color: var(--accent);
+        text-shadow: 0 0 10px rgba(10, 245, 176, 0.5);
+    }
+
+    &.cant-afford {
+        color: #ff4040;
+    }
+
+    &.locked {
+        color: var(--color-fg-secondary);
+    }
+
+    &.maxed {
+        color: var(--color-fg-secondary);
+    }
+}
+
+.upgrade-button.MuiButton-root {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 8px;
+    box-shadow: none;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.upgrade-button.MuiButton-root .MuiButton-startIcon {
+    margin-right: 6px;
+}
+
+.upgrade-button.MuiButton-root .MuiButton-startIcon .MuiSvgIcon-root {
+    font-size: 16px;
+}
+
+.upgrade-button.purchase.MuiButton-root {
+    background-color: var(--accent);
+    color: var(--color-fg-on-accent);
+}
+
+.upgrade-button.purchase.MuiButton-root:hover {
+    background-color: var(--accent);
+    box-shadow: 0 0 14px rgba(10, 245, 176, 0.55);
+}
+
+.upgrade-button.cant-afford.MuiButton-root.Mui-disabled {
+    background-color: var(--color-bg-cant-afford);
+    color: #ff4040;
+    border: 1px solid rgba(255, 64, 64, 0.25);
+}
+
+.upgrade-button.locked.MuiButton-root.Mui-disabled {
+    background-color: rgba(255, 255, 255, 0.04);
+    color: var(--color-fg-secondary);
+    border: 1px solid var(--color-border);
+}
+
+.upgrade-button.maxed.MuiButton-root.Mui-disabled {
+    background-color: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(10, 245, 176, 0.30);
+}
+
+/* ----------------------------------------------------------------------------
+ * Confirm purchase dialog
+ * ------------------------------------------------------------------------- */
+
+.upgrade-confirm-dialog {
+    --category-color: var(--color-fg-secondary);
+    --category-color-soft: rgba(255, 255, 255, 0.07);
+    --category-color-border: rgba(255, 255, 255, 0.18);
+    --category-glow: rgba(255, 255, 255, 0.18);
+
+    border: 1px solid var(--color-border) !important;
+    border-radius: 14px !important;
+    background: rgba(20, 22, 26, 0.9) !important;
+    backdrop-filter: blur(8px) !important;
+    overflow: hidden !important;
+}
+
+.upgrade-confirm-dialog.software {
+    --category-color: #26c6da;
+    --category-color-soft: rgba(38, 198, 218, 0.12);
+    --category-color-border: rgba(38, 198, 218, 0.45);
+    --category-glow: rgba(38, 198, 218, 0.45);
+}
+
+.upgrade-confirm-dialog.network {
+    --category-color: #9c7fe0;
+    --category-color-soft: rgba(103, 58, 183, 0.18);
+    --category-color-border: rgba(156, 127, 224, 0.45);
+    --category-glow: rgba(103, 58, 183, 0.45);
+}
+
+.upgrade-confirm-dialog.hardware {
+    --category-color: #ff9800;
+    --category-color-soft: rgba(255, 152, 0, 0.14);
+    --category-color-border: rgba(255, 152, 0, 0.45);
+    --category-glow: rgba(255, 152, 0, 0.45);
+}
+
+.upgrade-confirm-dialog.security {
+    --category-color: #ff4040;
+    --category-color-soft: rgba(255, 64, 64, 0.14);
+    --category-color-border: rgba(255, 64, 64, 0.45);
+    --category-glow: rgba(255, 64, 64, 0.45);
+}
+
+.upgrade-confirm-dialog-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 16px 20px 12px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-fg);
+}
+
+.upgrade-confirm-dialog-subtitle {
+    font-family: var(--font-code);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-fg-secondary);
+}
+
+.upgrade-confirm-dialog-content {
+    padding: 18px 20px 16px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.upgrade-confirm-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.upgrade-confirm-preview-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.upgrade-confirm-preview-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+    line-height: 1.2;
+}
+
+.upgrade-confirm-preview-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-fg);
+}
+
+.upgrade-confirm-preview-separator {
+    color: var(--color-fg-disabled);
+}
+
+.upgrade-confirm-preview-tier {
+    font-family: var(--font-code);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--category-color);
+}
+
+.upgrade-confirm-preview-description {
+    margin: 0 !important;
+    font-size: 12px !important;
+    color: var(--color-fg-secondary) !important;
+    line-height: 1.4 !important;
+}
+
+.upgrade-confirm-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.upgrade-confirm-total-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-fg-secondary);
+}
+
+.upgrade-confirm-total-value {
+    font-family: var(--font-code);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+    text-shadow: 0 0 12px rgba(10, 245, 176, 0.45);
+}
+
+.upgrade-confirm-dialog-actions {
+    padding: 14px 20px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.upgrade-confirm-cancel.MuiButton-root {
+    color: var(--color-fg);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 10px;
+    padding: 8px 20px;
+}
+
+.upgrade-confirm-confirm.MuiButton-root {
+    background: var(--accent);
+    color: var(--color-fg-on-accent);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 10px;
+    padding: 8px 22px;
+}
+
+.upgrade-confirm-confirm.MuiButton-root:hover {
+    background: var(--accent);
+    box-shadow: 0 0 14px rgba(10, 245, 176, 0.55);
+}

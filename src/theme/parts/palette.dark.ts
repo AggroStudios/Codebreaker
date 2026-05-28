@@ -56,6 +56,7 @@ const getPaletteDark = ({ augmentColor }) => {
         mode: 'dark',
         background: {
             bright: grey[800],
+            card: 'rgb(20, 22, 26)',
             default: grey[900],
             paper: '#333',
         },

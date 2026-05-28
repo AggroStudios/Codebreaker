@@ -10,6 +10,12 @@ import {
 import { getPaletteDarkComponents } from './parts/palette.dark.components.js';
 import { getPaletteLightComponents } from './parts/palette.light.components.js';
 
+declare module '@mui/material/styles' {
+    interface BreakpointOverrides {
+        xx: true;
+    }
+}
+
 export const useSiteTheme = () => {
     const siteTheme = useMemo(() => {
         //Part 1 - Provides augmentColor, allows easy addition of colors to palette

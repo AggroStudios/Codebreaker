@@ -1,16 +1,9 @@
-declare module '@mui/material/styles' {
-  interface BreakpointOverrides {
-    xx: true;
-  }
-}
-
-const breakpoints = {
+//The default Mui breakpoints
+export default {
   xs: 0,
   sm: 600,
   md: 900,
   lg: 1200,
   xl: 1536,
-  xx: 1700,
+  xx: 2000,
 };
-
-export default breakpoints;

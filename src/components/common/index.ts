@@ -1,3 +1,4 @@
+export { default as ChipGlow } from './ChipGlow'
 export { default as FactionAvatar } from './FactionAvatar'
 export { default as GlyphCardHeader } from './GlyphCardHeader'
 export { default as GlyphWall, type GlyphWallProps } from './GlyphWall'

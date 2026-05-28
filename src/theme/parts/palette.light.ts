@@ -10,6 +10,7 @@ const getPaletteLight = ({ augmentColor }) => {
     mode: 'light',
     background: {
       bright: grey[50],
+      card: 'rgb(20, 22, 26)',
       default: grey[100],
       paper: '#fff',
     },

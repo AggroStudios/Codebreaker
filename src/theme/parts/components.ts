@@ -1,3 +1,4 @@
+import { alpha } from '@mui/material/styles';
 //import { green, grey, red } from '@mui/material/colors';
 
 const getComponents = () => {
@@ -35,6 +36,17 @@ const getComponents = () => {
         },
 
       }),
+    },
+    ChipGlow: {
+      defaultProps: {},
+      styleOverrides: {
+        root: ({ theme }) => ({
+          height: theme.spacing(3.5),
+          '& .MuiChip-label': {
+            padding: theme.spacing(0,3),
+          }
+        }),
+      },
     },
     Glyph: {
       defaultProps: {},
@@ -90,21 +102,6 @@ const getComponents = () => {
         online: {
           animation: 'statusPulse 1.6s ease-in-out infinite',
         }
-      },
-    },
-    UpgradeCategoryIcon: {
-      defaultProps: {},
-      styleOverrides: {
-        root: {
-          width: 40,
-          height: 40,
-          borderRadius: '8px !important',
-          backgroundColor: 'var(--category-color-soft)',
-          color: 'var(--category-color)',
-          border: '1px solid var(--category-color-border)',
-          flexShrink: 0,
-          '& .MuiSvgIcon-root': { fontSize: 22 },
-        },
       },
     },
     // MuiAccordion: {
@@ -228,10 +225,12 @@ const getComponents = () => {
     // },
     MuiCard: {
       styleOverrides: {
-        root: {
-          backdropFilter: `blur(6px)`,
-          WebkitBackdropFilter: `blur(6px)`,
-        },
+        root: ({ theme }) => ({
+          backdropFilter: `blur(2px)`,
+          backgroundColor: alpha(theme.palette.background.card, 0.6),
+          backgroundImage: 'none',
+          WebkitBackdropFilter: `blur(2px)`,
+        }),
       },
     },
     // MuiCardActions: {
@@ -248,6 +247,23 @@ const getComponents = () => {
     //     },
     //   },
     // },
+    MuiChip: {
+      defaultProps: {
+        color: 'default',
+        variant: 'outlined'
+      },
+      styleOverrides: {
+        root: {},
+      },
+      variants: [
+        {
+          props: { variant: 'outlined-glow' }, // Example of custom props
+          style: ({ theme }) => ({
+            boxShadow: `0 0 10px ${theme.palette.accent.main}`
+          }),
+        },
+      ],
+    },
     // MuiCheckbox: {
     //   defaultProps: {
     //     color: "secondary",
