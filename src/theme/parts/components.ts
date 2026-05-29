@@ -362,21 +362,17 @@ const getComponents = () => {
     //     size: "medium",
     //   },
     // },
-    // MuiInput: {
-    //   styleOverrides: {
-    //     root: {
-    //       fontSize: "1.6rem",
-    //       lineHeight: "1.9rem",
-    //       padding: 0,
-    //     },
-    //     input: ({ theme }) => ({
-    //       padding: theme.spacing(1, 1),
-    //     }),
-    //     inputMultiline: ({ theme }) => ({
-    //       padding: theme.spacing(1, 2),
-    //     }),
-    //   },
-    // },
+    MuiInput: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          color: theme.palette.text.secondary,
+        }),
+        sizeSmall:({ theme }) => ({
+          height: theme.spacing(3.5),
+          padding: theme.spacing(1,1)
+        }),
+      },
+    },
     // MuiInputBase: {
     //   styleOverrides: {
     //     root: {
@@ -480,55 +476,62 @@ const getComponents = () => {
     //     }),
     //   },
     // },
-    // MuiOutlinedInput: {
-    //   styleOverrides: {
-    //     root: ({ theme }) => ({
-    //       fontSize: "1.6rem",
-    //       lineHeight: "1.9rem",
-    //       padding: 0,
-    //       "&.MuiInputBase-adornedStart": {
-    //         ".MuiInputAdornment-root": {
-    //           height: "4rem",
-    //           justifyContent: "center",
-    //           margin: 0,
-    //           maxHeight: "unset",
-    //           width: "auto",
-    //         },
-    //         ".MuiOutlinedInput-input, .MuiOutlinedInput-root.MuiInputBase-multiline":
-    //           {
-    //             padding: "1rem 1.6rem 1rem .8rem",
-    //           },
-    //       },
-    //       "&.Mui-disabled": {
-    //         ".MuiOutlinedInput-notchedOutline": {
-    //           borderColor: theme.palette.textField.borderColor,
-    //           opacity: theme.palette.action.disabledOpacity,
-    //           pointerEvents: "auto",
-    //         },
-    //         ".MuiInputAdornment-root": {
-    //           opacity: theme.palette.action.disabledOpacity,
-    //         },
-    //       },
-    //       "&.Mui-focused": {
-    //         ".MuiOutlinedInput-notchedOutline": {
-    //           borderColor: theme.palette.textField.focused.borderColor,
-    //           outline: 0,
-    //         },
-    //       },
-    //     }),
-    //     input: ({ theme }) => ({
-    //       backgroundColor: theme.palette.textField.backgroundColor,
-    //       padding: "1rem 1.6rem",
-    //     }),
-    //     inputMultiline: ({ theme }) => ({
-    //       backgroundColor: theme.palette.textField.backgroundColor,
-    //       padding: "1rem 1.6rem",
-    //     }),
-    //     notchedOutline: ({ theme }) => ({
-    //       borderColor: theme.palette.textField.borderColor,
-    //     }),
-    //   },
-    // },
+    MuiInputBase: {
+      styleOverrides: {
+        sizeSmall: ({ theme }) => ({
+          fontSize: theme.typography.caption,
+        })
+      }
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: () => ({
+          // fontSize: '1.6rem',
+          // lineHeight: '1.9rem',
+          // padding: 0,
+          // '&.MuiInputBase-adornedStart': {
+          //   '.MuiInputAdornment-root': {
+          //     height: '4rem',
+          //     justifyContent: 'center',
+          //     margin: 0,
+          //     maxHeight: 'unset',
+          //     width: 'auto',
+          //   },
+          //   '.MuiOutlinedInput-input, .MuiOutlinedInput-root.MuiInputBase-multiline':
+          //     {
+          //       padding: '1rem 1.6rem 1rem .8rem',
+          //     },
+          // },
+          // '&.Mui-disabled': {
+          //   '.MuiOutlinedInput-notchedOutline': {
+          //     borderColor: theme.palette.textField.borderColor,
+          //     opacity: theme.palette.action.disabledOpacity,
+          //     pointerEvents: 'auto',
+          //   },
+          //   '.MuiInputAdornment-root': {
+          //     opacity: theme.palette.action.disabledOpacity,
+          //   },
+          // },
+          // '&.Mui-focused': {
+          //   '.MuiOutlinedInput-notchedOutline': {
+          //     borderColor: theme.palette.textField.focused.borderColor,
+          //     outline: 0,
+          //   },
+          // },
+        }),
+        input: ({ theme }) => ({
+          //backgroundColor: theme.palette.textField.backgroundColor,
+          padding: theme.spacing(0.5,1),
+        }),
+        // inputMultiline: ({ theme }) => ({
+        //   backgroundColor: theme.palette.textField.backgroundColor,
+        //   padding: theme.spacing(.5,1),
+        // }),
+        // notchedOutline: ({ theme }) => ({
+        //   borderColor: theme.palette.textField.borderColor,
+        // }),
+      },
+    },
     // MuiPaper: {
     //   variants: [
     //     {

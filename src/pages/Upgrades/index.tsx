@@ -278,10 +278,9 @@ export default function UpgradesComponent() {
                                 <Grid size={{ xs: 12, sm: 8, md: 'auto' }}>
                                     <TextField
                                         className="upgrades-search"
-                                        size="small"
-                                        placeholder="Search upgrades"
-                                        value={searchTerm}
                                         onChange={handleSearchTermChange}
+                                        placeholder="Search upgrades"
+                                        size="small"
                                         slotProps={{
                                             input: {
                                                 startAdornment: (
@@ -291,6 +290,7 @@ export default function UpgradesComponent() {
                                                 ),
                                             },
                                         }}
+                                        value={searchTerm}
                                     />
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 'auto' }}>
@@ -311,14 +311,14 @@ export default function UpgradesComponent() {
                                 </Grid>
                             </Grid>
                             <Grid container size={12}>
-                                <Grid container size={10} spacing={2} columns={{ xs: 1, sm: 1, md: 2, lg: 3, xl: 4, xx: 5 }} sx={{ alignItems: 'stretch' }}>
+                                <Grid container size={{ xs: 12, lg: 10 }} spacing={2} columns={{ xs: 1, sm: 1, md: 2, lg: 3, xl: 4, xx: 5 }} sx={{ alignItems: 'stretch' }}>
                                     {displayedUpgrades.map((upg) => (
                                         <Grid size={1}>
                                             <UpgradeComponent onClick={handleUpgradeClick} key={upg.key} upgrade={upg} selected={selectedUpgrade?.key === upg.key} onPurchase={handlePurchase} />
                                         </Grid>
                                     ))}
                                 </Grid>
-                                <Grid container size={2}>
+                                <Grid container size={{ xs: 0, lg: 2 }} sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'flex', xl: 'flex' } }}>
                                     <UpgradeDetails
                                         upgrade={selectedUpgrade}
                                         onPurchase={handlePurchase}
