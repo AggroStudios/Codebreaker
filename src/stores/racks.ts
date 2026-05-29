@@ -59,6 +59,7 @@ export type RacksStoreState = {
     uninstallServer: (rackId: string, instId: string) => void;
     addRack: (dcId: string, catalogSku?: string) => void;
     removeRack: (rackId: string) => void;
+    removeRacksByDc: (dcId: string) => void;
     assignRackToSwitch: (rackId: string, switchId: string | null) => void;
     cycleUplink: () => void;
 };
@@ -160,6 +161,10 @@ export const useRacksStore = create<RacksStoreState>()(
 
             removeRack: (rackId) => set((state) => ({
                 racks: state.racks.filter((r) => r.id !== rackId),
+            })),
+
+            removeRacksByDc: (dcId) => set((state) => ({
+                racks: state.racks.filter((r) => r.dcId !== dcId),
             })),
 
             assignRackToSwitch: (rackId, switchId) => set((state) => ({

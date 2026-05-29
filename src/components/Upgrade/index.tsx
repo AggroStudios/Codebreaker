@@ -170,30 +170,28 @@ export default function UpgradeComponent(props: UpgradeComponentProps) {
                     </div>
                 </div>
 
-                {currentTierCount === 0 && nextTier && (
-                    <div className="upgrade-overview">
-                        {upgrade.description}
-                    </div>
-                )}
+                <div className="upgrade-overview">
+                    {upgrade.description}
+                </div>
 
                 {nextTier ? (
                     <div className={clsx('upgrade-next', isLocked && 'locked', currentTierCount === 0 && 'initial')}>
                         <div className="upgrade-next-head">
-                            <span
-                                className={clsx(
-                                    'upgrade-next-label',
-                                    currentTierCount === 0 && 'initial',
-                                    upgrade.category,
-                                )}
-                            >
-                                {currentTierCount === 0
-                                    ? `Tier ${nextTier.title.replace(/^Mk\s*/i, '')}`
-                                    : `Next · ${nextTier.title}`}
-                            </span>
+                                <span
+                                    className={clsx(
+                                        'upgrade-next-label',
+                                        currentTierCount === 0 && 'initial',
+                                        upgrade.category,
+                                    )}
+                                >
+                                    {currentTierCount === 0
+                                        ? `Tier ${nextTier.title.replace(/^Mk\s*/i, '')}`
+                                        : `Next · ${nextTier.title}`}
+                                </span>
                             {nextTier.callout && (
                                 <span className={clsx('upgrade-next-callout', upgrade.category)}>
-                                    {nextTier.callout}
-                                </span>
+                                        {nextTier.callout}
+                                    </span>
                             )}
                         </div>
                         <div className="upgrade-next-description">
@@ -300,5 +298,6 @@ export default function UpgradeComponent(props: UpgradeComponentProps) {
                 </div>
             </CardActions>
         </Card>
+
     );
 }

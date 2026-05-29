@@ -12,11 +12,13 @@ import { Stat } from '../../components/common/Stat';
 import { formatKw, formatMoney, formatGbps, formatMoneyDay } from '../../lib/utils';
 import { usePlayerStore } from '../../stores/player';
 import { useDataCentersStore } from '../../stores/dataCenters';
+import { useRacksStore } from '../../stores/racks';
 import { useStationContext } from '../../stores/stationContext';
 
 export default function DataCenters() {
     const [selectedDataCenter, setSelectedDataCenter] = useState<IDataCenter | null>(null);
-    const { contracts, setContracts, upgradeContract } = useDataCentersStore();
+    const { contracts, setContracts, upgradeContract, suspendContract, resumeContract, deleteContract } = useDataCentersStore();
+    const removeRacksByDc = useRacksStore((s) => s.removeRacksByDc);
     const operatingSystem = useStationContext().stationProxy.os;
     const totalContracts = Object.keys(contracts).length;
     const availableContracts = Object.keys(DATA_CENTERS).length - totalContracts;
@@ -56,6 +58,25 @@ export default function DataCenters() {
         upgradeContract(dataCenterId, {
             uplinkGbps: uplink,
         });
+    };
+
+    const handleSuspendContract = (dataCenterId: string) => {
+        suspendContract(dataCenterId);
+    };
+
+    const handleResumeContract = (dataCenterId: string) => {
+        resumeContract(dataCenterId);
+    };
+
+    const handleCancelContract = (dataCenterId: string) => {
+        // Tear down the racks first so the servers fall back into inventory
+        // (they were never removed from purchasedServers — Inventory filters
+        // them out only while they're installed in a rack).
+        removeRacksByDc(dataCenterId);
+        deleteContract(dataCenterId);
+        if (selectedDataCenter?.id === dataCenterId) {
+            setSelectedDataCenter(null);
+        }
     };
 
     return (
@@ -127,6 +148,9 @@ export default function DataCenters() {
                                 onUpgradePower={handleUpgradePower}
                                 onUpgradeUplink={handleUpgradeUplink}
                                 onAddRack={handleAddRack}
+                                onSuspend={handleSuspendContract}
+                                onResume={handleResumeContract}
+                                onCancel={handleCancelContract}
                                 onClose={() => {
                                     setSelectedDataCenter(null);
                                 }}

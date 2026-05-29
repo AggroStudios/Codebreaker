@@ -10,9 +10,10 @@ import ServerHoverTooltip, { HoverState } from './ServerHoverTooltip';
 
 interface RackFloorProps {
     dcId: string;
+    suspended?: boolean;
 }
 
-export default function RackFloor({ dcId }: RackFloorProps) {
+export default function RackFloor({ dcId, suspended }: RackFloorProps) {
     const racks = useRacksByDc(dcId);
     const addRack = useRacksStore((s) => s.addRack);
 
@@ -84,55 +85,57 @@ export default function RackFloor({ dcId }: RackFloorProps) {
                 >
                     <Box sx={{ display: 'flex', gap: 2.25, alignItems: 'flex-start' }}>
                         {racks.map((r) => (
-                            <RackUnit key={r.id} rack={r} hoverCallbacks={hoverCallbacks} />
+                            <RackUnit key={r.id} rack={r} hoverCallbacks={hoverCallbacks} suspended={suspended} />
                         ))}
 
-                        <Box
-                            onClick={() => addRack(dcId)}
-                            sx={{
-                                width: RACK_WIDTH,
-                                flex: `0 0 ${RACK_WIDTH}px`,
-                                minHeight: 320,
-                                border: '2px dashed rgba(255,255,255,0.16)',
-                                borderRadius: '10px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: 1.25,
-                                color: 'rgba(255,255,255,0.55)',
-                                cursor: 'pointer',
-                                transition: 'all 225ms cubic-bezier(0,0,0.2,1)',
-                                '&:hover': {
-                                    borderColor: '#0af5b0',
-                                    color: '#0af5b0',
-                                    background: 'rgba(10,245,176,0.04)',
-                                },
-                            }}
-                        >
-                            <AddCircleOutlineRounded sx={{ fontSize: 40 }} />
-                            <Typography
+                        {!suspended && (
+                            <Box
+                                onClick={() => addRack(dcId)}
                                 sx={{
-                                    fontFamily: 'Fira Code, monospace',
-                                    fontSize: 12,
-                                    letterSpacing: '0.18em',
-                                    textTransform: 'uppercase',
+                                    width: RACK_WIDTH,
+                                    flex: `0 0 ${RACK_WIDTH}px`,
+                                    minHeight: 320,
+                                    border: '2px dashed rgba(255,255,255,0.16)',
+                                    borderRadius: '10px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: 1.25,
+                                    color: 'rgba(255,255,255,0.55)',
+                                    cursor: 'pointer',
+                                    transition: 'all 225ms cubic-bezier(0,0,0.2,1)',
+                                    '&:hover': {
+                                        borderColor: '#0af5b0',
+                                        color: '#0af5b0',
+                                        background: 'rgba(10,245,176,0.04)',
+                                    },
                                 }}
                             >
-                                Add Rack
-                            </Typography>
-                            <Typography
-                                sx={{
-                                    fontFamily: 'Fira Code, monospace',
-                                    fontSize: 10,
-                                    color: 'rgba(255,255,255,0.4)',
-                                    letterSpacing: '0.16em',
-                                    textTransform: 'uppercase',
-                                }}
-                            >
-                                From ${ghostPrice.toLocaleString()}
-                            </Typography>
-                        </Box>
+                                <AddCircleOutlineRounded sx={{ fontSize: 40 }} />
+                                <Typography
+                                    sx={{
+                                        fontFamily: 'Fira Code, monospace',
+                                        fontSize: 12,
+                                        letterSpacing: '0.18em',
+                                        textTransform: 'uppercase',
+                                    }}
+                                >
+                                    Add Rack
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        fontFamily: 'Fira Code, monospace',
+                                        fontSize: 10,
+                                        color: 'rgba(255,255,255,0.4)',
+                                        letterSpacing: '0.16em',
+                                        textTransform: 'uppercase',
+                                    }}
+                                >
+                                    From ${ghostPrice.toLocaleString()}
+                                </Typography>
+                            </Box>
+                        )}
                     </Box>
                 </Box>
             }

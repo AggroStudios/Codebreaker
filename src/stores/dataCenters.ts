@@ -14,6 +14,8 @@ export type DataCentersStore = {
     setContracts: (contracts: IDataCenterContractsByRegion) => void;
     upgradeContract: (contractId: string, upgrade: IDataCenterContractUpgrade) => void;
     activateContract: (contractId: string) => void;
+    suspendContract: (contractId: string) => void;
+    resumeContract: (contractId: string) => void;
     increaseSignedDays: (contractId: string) => void;
     deleteContract: (contractId: string) => void;
     resetContract: (contractId: string) => void;
@@ -34,6 +36,24 @@ export const useDataCentersStore = create<DataCentersStore>()(
                 },
             })),
             activateContract: (contractId) => set((state) => ({
+                contracts: {
+                    ...state.contracts,
+                    [contractId]: {
+                        ...state.contracts[contractId],
+                        status: 'ACTIVE',
+                    },
+                },
+            })),
+            suspendContract: (contractId) => set((state) => ({
+                contracts: {
+                    ...state.contracts,
+                    [contractId]: {
+                        ...state.contracts[contractId],
+                        status: 'SUSPENDED',
+                    },
+                },
+            })),
+            resumeContract: (contractId) => set((state) => ({
                 contracts: {
                     ...state.contracts,
                     [contractId]: {

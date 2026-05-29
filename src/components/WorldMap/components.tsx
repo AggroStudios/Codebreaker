@@ -1,4 +1,4 @@
-import { Avatar, Button, Card, CardActions, CardContent, CardHeader, Chip, IconButton, Table, TableBody, TableCell, TableRow } from '@mui/material';
+import { Avatar, Button, Card, CardActions, CardContent, CardHeader, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
 import { IDataCenter, IDataCenterContract, IDataCenterContractProps } from '../../includes/DataCenter.interface';
 import { formatGbps, formatKw, formatMoney, formatMoneyDay, formatMs, projectLngLat } from '../../lib/utils';
 import {
@@ -18,7 +18,11 @@ import {
     ShieldOutlined,
     OpenInNewOutlined,
     AddOutlined,
-    DrawOutlined
+    DrawOutlined,
+    PauseCircleOutlined,
+    PlayCircleOutlined,
+    CancelOutlined,
+    WarningAmberOutlined
 } from '@mui/icons-material';
 import { POWER_TIERS, UPLINK_TIERS } from '../../data/dataCenter';
 import { Stat } from '../common/Stat';
@@ -26,6 +30,7 @@ import { ShimmerProgress } from '../common/ShimmerProgress';
 import clsx from 'clsx';
 import { usePlayerStore } from '../../stores/player';
 import { useNavigate } from 'react-router';
+import { useState } from 'react';
     
 // ── DataCenter pin ──────────────────────────────────────────────────────────────
 export function DataCenterPin({ dataCenter, signed, selected, onClick, scale = 1 }: IDataCenterContractProps) {
@@ -167,13 +172,24 @@ interface IDataCenterCardProps {
     onUpgradePower: (id: string, power: number, cost: number) => void;
     onUpgradeUplink: (id: string, uplink: number, cost: number) => void;
     onAddRack: (id: string, cost: number) => void;
+    onSuspend?: (id: string) => void;
+    onResume?: (id: string) => void;
+    onCancel?: (id: string) => void;
     onClose: () => void;
     floating: boolean;
 }
 
-export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, onUpgradeUplink, onAddRack, onClose, floating = false }: IDataCenterCardProps) {
-    
+// Colors keyed by contract status — used for the status pill and accent UI.
+const STATUS_COLORS: Record<string, { fg: string; bg: string; border: string }> = {
+    ACTIVE:       { fg: '#0af5b0', bg: 'rgba(10,245,176,0.08)', border: 'rgba(10,245,176,0.32)' },
+    PROVISIONING: { fg: '#ff9800', bg: 'rgba(255,152,0,0.08)',  border: 'rgba(255,152,0,0.32)'  },
+    SUSPENDED:    { fg: '#9aa0a6', bg: 'rgba(154,160,166,0.10)', border: 'rgba(154,160,166,0.32)' },
+};
+
+export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, onUpgradeUplink, onAddRack, onSuspend, onResume, onCancel, onClose, floating = false }: IDataCenterCardProps) {
+
     const navigate = useNavigate();
+    const [cancelOpen, setCancelOpen] = useState(false);
 
     const money = usePlayerStore((state) => state.player.money);
     const signed = !!contract;
@@ -212,6 +228,7 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
     }
     
     return (
+        <>
         <Card className="data-center-card" style={{
             height: floating ? 'auto' : '100%',
             display: 'flex',
@@ -250,26 +267,84 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
             />
             
             <CardContent style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '8px 12px',
-                    background: signed ? (contract.status === 'ACTIVE' ? 'rgba(10,245,176,0.08)' : 'rgba(255,152,0,0.08)') : 'rgba(38,198,218,0.08)',
-                    border: `1px solid ${signed ? (contract.status === 'ACTIVE' ? 'rgba(10,245,176,0.32)' : 'rgba(255,152,0,0.32)') : 'rgba(38,198,218,0.32)'}`,
-                    borderRadius: 8,
-                }}>
-                    <span className="live-dot" style={{
-                        background: signed ? (contract.status === 'ACTIVE' ? '#0af5b0' : '#ff9800') : '#26c6da',
-                        boxShadow: `0 0 6px ${signed ? (contract.status === 'ACTIVE' ? '#0af5b0' : '#ff9800') : '#26c6da'}`,
-                    }} />
-                    <span style={{
-                        fontSize: 12, fontWeight: 600, letterSpacing: '0.10em',
-                        fontFamily: "'Fira Code', monospace",
-                        color: signed ? (contract.status === 'ACTIVE' ? '#0af5b0' : '#ff9800') : '#26c6da',
-                    }}>
-                        {signed ? `${contract.status} · LEASED ${contract.signedDays}d AGO` : 'NO CONTRACT · OPEN FOR LEASE'}
-                    </span>
-                </div>
-                    
+                {(() => {
+                    const status = signed ? contract.status : null;
+                    const palette = status
+                        ? STATUS_COLORS[status]
+                        : { fg: '#26c6da', bg: 'rgba(38,198,218,0.08)', border: 'rgba(38,198,218,0.32)' };
+                    return (
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: 8,
+                            padding: '8px 12px',
+                            background: palette.bg,
+                            border: `1px solid ${palette.border}`,
+                            borderRadius: 8,
+                        }}>
+                            <span className="live-dot" style={{
+                                background: palette.fg,
+                                boxShadow: `0 0 6px ${palette.fg}`,
+                            }} />
+                            <span style={{
+                                fontSize: 12, fontWeight: 600, letterSpacing: '0.10em',
+                                fontFamily: "'Fira Code', monospace",
+                                color: palette.fg,
+                            }}>
+                                {signed ? `${contract.status} · LEASED ${contract.signedDays}d AGO` : 'NO CONTRACT · OPEN FOR LEASE'}
+                            </span>
+                        </div>
+                    );
+                })()}
+
+                {signed && (onSuspend || onResume || onCancel) && (
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        {contract.status === 'ACTIVE' && onSuspend && (
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<PauseCircleOutlined fontSize="small" />}
+                                onClick={() => onSuspend(dataCenter.id)}
+                                sx={{
+                                    color: '#ff9800',
+                                    borderColor: 'rgba(255,152,0,0.5)',
+                                    '&:hover': { borderColor: '#ff9800', backgroundColor: 'rgba(255,152,0,0.08)' },
+                                }}
+                            >
+                                Suspend Lease
+                            </Button>
+                        )}
+                        {contract.status === 'SUSPENDED' && onResume && (
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<PlayCircleOutlined fontSize="small" />}
+                                onClick={() => onResume(dataCenter.id)}
+                                sx={{
+                                    color: '#0af5b0',
+                                    borderColor: 'rgba(10,245,176,0.5)',
+                                    '&:hover': { borderColor: '#0af5b0', backgroundColor: 'rgba(10,245,176,0.08)' },
+                                }}
+                            >
+                                Resume Lease
+                            </Button>
+                        )}
+                        {onCancel && (
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<CancelOutlined fontSize="small" />}
+                                onClick={() => setCancelOpen(true)}
+                                sx={{
+                                    color: '#e74c3c',
+                                    borderColor: 'rgba(231,76,60,0.5)',
+                                    '&:hover': { borderColor: '#e74c3c', backgroundColor: 'rgba(231,76,60,0.08)' },
+                                }}
+                            >
+                                Cancel Contract
+                            </Button>
+                        )}
+                    </div>
+                )}
+
                 {signed ? (
                     <>
                         <div style={{
@@ -456,5 +531,51 @@ export function DataCenterCard({ dataCenter, contract, onSign, onUpgradePower, o
                 )}
             </CardActions>
         </Card>
+        <Dialog
+            open={cancelOpen}
+            onClose={() => setCancelOpen(false)}
+            maxWidth="xs"
+            fullWidth
+        >
+            <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <WarningAmberOutlined sx={{ color: '#e74c3c' }} />
+                Cancel contract?
+            </DialogTitle>
+            <DialogContent>
+                <Typography sx={{ fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>
+                    Terminating the lease on <strong>{dataCenter.name}</strong> will tear down
+                    all racks in this region. Servers installed there will be returned to
+                    your inventory.
+                </Typography>
+                <Typography
+                    sx={{
+                        mt: 1.5, fontSize: 12,
+                        color: 'rgba(255,152,0,0.85)',
+                        fontFamily: "'Fira Code', monospace",
+                        letterSpacing: '0.08em',
+                    }}
+                >
+                    This action cannot be undone.
+                </Typography>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setCancelOpen(false)} sx={{ outline: 0 }}>
+                    Keep Contract
+                </Button>
+                <Button
+                    variant="contained"
+                    color="error"
+                    startIcon={<CancelOutlined />}
+                    onClick={() => {
+                        setCancelOpen(false);
+                        onCancel?.(dataCenter.id);
+                    }}
+                    sx={{ outline: 0 }}
+                >
+                    Cancel Contract
+                </Button>
+            </DialogActions>
+        </Dialog>
+        </>
     );
 }
