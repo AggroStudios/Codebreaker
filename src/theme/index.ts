@@ -57,6 +57,7 @@ export const useSiteTheme = () => {
         //Part 4 - Extend theme components. Access palette, spacing via function:
         return extendTheme(memoTheme, {
             components: getComponents(),
+            defaultColorScheme: 'dark'//Extend theme has changed... Enforce the mode here
         });
     }, []);
 
