@@ -3,6 +3,7 @@ import { UpgradeList, type IUpgradeItem } from '../../data/upgrades';
 import { usePlayerStore } from '../../stores/player';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Dialog from '@mui/material/Dialog';
@@ -56,36 +57,61 @@ function ConfirmDialog({
             slotProps={{ paper: { className: clsx('upgrade-confirm-dialog', upgrade?.category) } }}
         >
             <DialogTitle className="upgrade-confirm-dialog-title">
-                <span>Confirm Purchase</span>
-                <span className="upgrade-confirm-dialog-subtitle">Confirm Transaction</span>
+                <Stack direction="column" spacing={0.5}>
+                    <Typography variant="h4">
+                        Confirm Purchase
+                    </Typography>
+                    <Typography color="grey" variant="code">
+                        Confirm Transaction
+                    </Typography>
+                </Stack>
+
             </DialogTitle>
             <DialogContent className="upgrade-confirm-dialog-content">
                 {upgrade && tier && (
-                    <>
-                        <div className="upgrade-confirm-preview">
-                            <Avatar
-                                className={clsx('upgrade-category-icon', upgrade.category)}
-                                variant="rounded"
-                            >
-                                <upgrade.icon />
-                            </Avatar>
-                            <div className="upgrade-confirm-preview-body">
-                                <div className="upgrade-confirm-preview-head">
-                                    <span className="upgrade-confirm-preview-name">{upgrade.name}</span>
-                                    <span className="upgrade-confirm-preview-separator">·</span>
-                                    <span className="upgrade-confirm-preview-tier">{tier.title}</span>
-                                </div>
-                                <Typography className="upgrade-confirm-preview-description">
-                                    {tier.description}
-                                </Typography>
-                            </div>
-                        </div>
+                    <Grid container spacing={2}>
+                        <Grid container size={12}>
+                            <Grid size="auto">
+                                <Avatar
+                                    className={clsx('upgrade-category-icon', upgrade.category)}
+                                    variant="rounded"
+                                >
+                                    <upgrade.icon />
+                                </Avatar>
+                            </Grid>
+                            <Grid size="grow">
+                                <Stack direction="column">
+                                    <Stack
+                                        direction="row"
+                                        spacing={1}
+                                        sx={{
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <Typography variant="h5">
+                                            {upgrade.name}
+                                        </Typography>
+                                        <Typography>
+                                            &#183;
+                                        </Typography>
+                                        <Typography color="blue" variant="code">
+                                            {tier.title}
+                                        </Typography>
+                                    </Stack>
+                                    <Stack>
+                                        <Typography>
+                                            {tier.description}
+                                        </Typography>
+                                    </Stack>
+                                </Stack>
+                            </Grid>
+                        </Grid>
 
-                        <div className="upgrade-confirm-total">
+                        <Grid size={12} className="upgrade-confirm-total">
                             <span className="upgrade-confirm-total-label">Total</span>
                             <span className="upgrade-confirm-total-value">${formatMoney(tier.cost, 0)}</span>
-                        </div>
-                    </>
+                        </Grid>
+                    </Grid>
                 )}
             </DialogContent>
             <DialogActions className="upgrade-confirm-dialog-actions">
@@ -257,103 +283,87 @@ export default function UpgradesComponent() {
                     <Card>
                         <CardContent>
                             <Grid container spacing={3}>
-                            <Grid container spacing={1}>
-                                <Grid container size={{ xs: 12, sm: 12, md: 12, lg: 'auto' }} spacing={1}>
-                                    <Grid size="auto">
-                                        <FormLabel>Filter</FormLabel>
-                                    </Grid>
-                                    {filterLabels.map((label, idx: number) => {
-                                        const active = filter === label;
-                                        return (
-                                            <Grid key={`filter-label-${label}-${idx}`} size="auto">
-                                                <ChipGlow
-                                                    color={active && 'accent'}
-                                                    label={capitalize(label)}
-                                                    onClick={() => handleFilterClick(label)}
-                                                />
-                                            </Grid>
-                                        )
-                                    })}
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 8, md: 'auto' }}>
-                                    <TextField
-                                        className="upgrades-search"
-                                        onChange={handleSearchTermChange}
-                                        placeholder="Search upgrades"
-                                        size="small"
-                                        slotProps={{
-                                            input: {
-                                                startAdornment: (
-                                                    <InputAdornment position="start">
-                                                        <SearchIcon fontSize="small" />
-                                                    </InputAdornment>
-                                                ),
-                                            },
-                                        }}
-                                        value={searchTerm}
-                                    />
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 'auto' }}>
-                                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-                                        <FormControlLabel className="show-owned" control={
-                                            <Switch
-                                                checked={showOwned}
-                                                onChange={handleShowOwnedChange}
-                                                color="primary"
-                                            />} label="Show Owned" />
-                                        <FormControlLabel className="hide-fully-upgraded" control={
-                                            <Switch
-                                                checked={hideFullyUpgraded}
-                                                onChange={handleHideFullyUpgradedChange}
-                                                color="primary"
-                                            />} label="Hide Fully Upgraded" />
-                                    </Stack>
-                                </Grid>
-                            </Grid>
-                            <Grid container size={12}>
-                                <Grid container size={{ xs: 12, lg: 10 }} spacing={2} columns={{ xs: 1, sm: 1, md: 2, lg: 3, xl: 4, xx: 5 }} sx={{ alignItems: 'stretch' }}>
-                                    {displayedUpgrades.map((upg) => (
-                                        <Grid size={1}>
-                                            <UpgradeComponent onClick={handleUpgradeClick} key={upg.key} upgrade={upg} selected={selectedUpgrade?.key === upg.key} onPurchase={handlePurchase} />
+                                <Grid container spacing={1} size={12} sx={{
+                                    justifyContent: 'space-between',
+                                    alignItems: 'flex-start',
+                                }}>
+                                    <Grid container size={{ xs: 12, sm: 12, md: 'auto' }} spacing={1}>
+                                        <Grid size="auto">
+                                            <FormLabel>Filter</FormLabel>
                                         </Grid>
-                                    ))}
+                                        {filterLabels.map((label, idx: number) => {
+                                            const active = filter === label;
+                                            return (
+                                                <Grid key={`filter-label-${label}-${idx}`} size="auto">
+                                                    <ChipGlow
+                                                        color={active && 'accent'}
+                                                        label={capitalize(label)}
+                                                        onClick={() => handleFilterClick(label)}
+                                                    />
+                                                </Grid>
+                                            )
+                                        })}
+                                    </Grid>
+                                    <Grid container size={{ xs: 12, sm: 8, md: 'auto' }}>
+                                        <Grid size="auto">
+                                            <TextField
+                                                className="upgrades-search"
+                                                onChange={handleSearchTermChange}
+                                                placeholder="Search upgrades"
+                                                size="small"
+                                                slotProps={{
+                                                    input: {
+                                                        startAdornment: (
+                                                            <InputAdornment position="start">
+                                                                <SearchIcon fontSize="small" />
+                                                            </InputAdornment>
+                                                        ),
+                                                    },
+                                                }}
+                                                value={searchTerm}
+                                            />
+                                        </Grid>
+                                        <Grid size="auto">
+                                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+                                                <FormControlLabel className="show-owned" control={
+                                                    <Switch
+                                                        checked={showOwned}
+                                                        onChange={handleShowOwnedChange}
+                                                        color="primary"
+                                                    />} label="Show Owned" />
+                                                <FormControlLabel className="hide-fully-upgraded" control={
+                                                    <Switch
+                                                        checked={hideFullyUpgraded}
+                                                        onChange={handleHideFullyUpgradedChange}
+                                                        color="primary"
+                                                    />} label="Hide Fully Upgraded" />
+                                            </Stack>
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
-                                <Grid container size={{ xs: 0, lg: 2 }} sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'flex', xl: 'flex' } }}>
-                                    <UpgradeDetails
-                                        upgrade={selectedUpgrade}
-                                        onPurchase={handlePurchase}
-                                        onClose={handleDetailsClose}
-                                    />
+                                <Grid container size={12} spacing={2}>
+                                    <Grid container size="grow" spacing={2} columns={{ xs: 1, sm: 1, md: 2, lg: 3, xl: 4, xx: 5, xxx: 5, xxxx: 6 }} sx={{ alignItems: 'stretch' }}>
+                                        {displayedUpgrades.map((upg) => (
+                                            <Grid size={1}>
+                                                <UpgradeComponent onClick={handleUpgradeClick} key={upg.key} upgrade={upg} selected={selectedUpgrade?.key === upg.key} onPurchase={handlePurchase} />
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                    <Grid container size="auto" sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'flex', xl: 'flex' } }}>
+                                        <Box sx={{ size: '360px' }}>
+                                            <UpgradeDetails
+                                                upgrade={selectedUpgrade}
+                                                onPurchase={handlePurchase}
+                                                onClose={handleDetailsClose}
+                                            />
+                                        </Box>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
                             </Grid>
                         </CardContent>
                     </Card>
                 </StyledUpgradesGrid>
             </Grid>
-
-                {/*<Box className="upgrades-content" sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 360px', gap: 2 }}>*/}
-                {/*    <Box className="upgrades-content-grid" sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 2 }}>*/}
-                {/*            {displayedUpgrades.map((upg) => (*/}
-                {/*                <UpgradeComponent onClick={handleUpgradeClick} key={upg.key} upgrade={upg} selected={selectedUpgrade?.key === upg.key} onPurchase={handlePurchase} />*/}
-                {/*            ))}*/}
-                {/*    </Box>*/}
-                {/*    <Box className="upgrades-content-details" sx={{*/}
-                {/*            position: 'sticky',*/}
-                {/*            height: '100%',*/}
-                {/*            width: '360px',*/}
-                {/*            overflow: 'hidden',*/}
-                {/*            display: 'flex', flexDirection: 'column',*/}
-                {/*            paddingTop: '10px',*/}
-                {/*            paddingRight: '14px',*/}
-                {/*    }}>*/}
-                {/*        <UpgradeDetails*/}
-                {/*            upgrade={selectedUpgrade}*/}
-                {/*            onPurchase={handlePurchase}*/}
-                {/*            onClose={handleDetailsClose}*/}
-                {/*        />*/}
-                {/*    </Box>*/}
-                {/*</Box>*/}
 
             <Dialog open={cantAffordDialogOpen} onClose={handleCantAffordDialogClose}>
                 <DialogTitle>Upgrade Purchase</DialogTitle>

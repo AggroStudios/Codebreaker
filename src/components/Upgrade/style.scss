@@ -594,17 +594,6 @@
     --category-glow: rgba(255, 64, 64, 0.45);
 }
 
-.upgrade-confirm-dialog-title {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: 16px 20px 12px !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--color-fg);
-}
-
 .upgrade-confirm-dialog-subtitle {
     font-family: var(--font-code);
     font-size: 11px;
@@ -621,45 +610,45 @@
 }
 
 .upgrade-confirm-preview {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.02);
+    //display: flex;
+    //align-items: center;
+    //gap: 12px;
+    //padding: 12px;
+    //border: 1px solid rgba(255, 255, 255, 0.08);
+    //border-radius: 8px;
+    //background: rgba(255, 255, 255, 0.02);
 }
 
 .upgrade-confirm-preview-body {
-    flex: 1;
-    min-width: 0;
+    //flex: 1;
+    //min-width: 0;
 }
 
 .upgrade-confirm-preview-head {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 2px;
-    line-height: 1.2;
+    //display: flex;
+    //align-items: center;
+    //gap: 8px;
+    //margin-bottom: 2px;
+    //line-height: 1.2;
 }
 
 .upgrade-confirm-preview-name {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--color-fg);
+    //font-size: 16px;
+    //font-weight: 700;
+    //color: var(--color-fg);
 }
 
 .upgrade-confirm-preview-separator {
-    color: var(--color-fg-disabled);
+    //color: var(--color-fg-disabled);
 }
 
 .upgrade-confirm-preview-tier {
-    font-family: var(--font-code);
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--category-color);
+    //font-family: var(--font-code);
+    //font-size: 14px;
+    //font-weight: 700;
+    //letter-spacing: 0.08em;
+    //text-transform: uppercase;
+    //color: var(--category-color);
 }
 
 .upgrade-confirm-preview-description {

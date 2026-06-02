@@ -309,25 +309,24 @@ const getComponents = () => {
     //     },
     //   },
     // },
-    // MuiDialogContent: {
-    //   styleOverrides: {
-    //     root: {
-    //       padding: "2.4rem",
-    //     },
-    //     dividers: {
-    //       borderBottom: " unset",
-    //     },
-    //   },
-    // },
-    // MuiDialogTitle: {
-    //   styleOverrides: {
-    //     root: ({ theme }) => ({
-    //       fontSize: theme.typography.h4.fontSize,
-    //       lineHeight: theme.typography.h4.lineHeight,
-    //       padding: theme.spacing(3, 6, 3, 3),
-    //     }),
-    //   },
-    // },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          padding: theme.spacing(2, 3, 2, 3),
+        }),
+        dividers: {
+          borderBottom: ' unset',
+        },
+      },
+    },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderBottom: `1px solid rgba(255, 255, 255, 0.06)`,
+          padding: theme.spacing(2, 3, 2, 3),
+        }),
+      },
+    },
     // MuiDialogContentText: {
     //   styleOverrides: {
     //     root: ({ theme }) => ({

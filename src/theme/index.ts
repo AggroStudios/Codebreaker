@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { createTheme, extendTheme, type PaletteOptions } from '@mui/material/styles';
 import {
     breakpoints,
@@ -13,6 +13,23 @@ import { getPaletteLightComponents } from './parts/palette.light.components.js';
 declare module '@mui/material/styles' {
     interface BreakpointOverrides {
         xx: true;
+        xxx: true;
+        xxxx: true;
+    }
+    interface TypographyVariants {
+        code: React.CSSProperties;
+        terminal: React.CSSProperties;
+    }
+    interface TypographyVariantsOptions {
+        code?: React.CSSProperties;
+        terminal?: React.CSSProperties;
+    }
+}
+
+declare module '@mui/material/Typography' {
+    interface TypographyPropsVariantOverrides {
+        code: true;
+        terminal: true;
     }
 }
 

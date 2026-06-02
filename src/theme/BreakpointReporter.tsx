@@ -15,7 +15,9 @@ export default function BreakpointReporter() {
             <ReporterChip label="md" sx={{ display: { xs: 'none', sm: 'none', md: 'inline-flex', lg: 'none' } }} />
             <ReporterChip label="lg" sx={{ display: { xs: 'none', md: 'none', lg: 'inline-flex', xl: 'none' } }} />
             <ReporterChip label="xl" sx={{ display: { xs: 'none', lg: 'none', xl: 'inline-flex', xx: 'none' } }} />
-            <ReporterChip label="xx" sx={{ display: { xs: 'none', xl: 'none', xx: 'inline-flex' } }} />
+            <ReporterChip label="xx" sx={{ display: { xs: 'none', xl: 'none', xx: 'inline-flex', xxx: 'none' } }} />
+            <ReporterChip label="xxx" sx={{ display: { xl: 'none', xx: 'none', xxx: 'inline-flex', xxxx: 'none' } }} />
+            <ReporterChip label="xxxx" sx={{ display: { xx: 'none', xxx: 'none', xxxx: 'inline-flex' } }} />
         </Box>
     );
 }

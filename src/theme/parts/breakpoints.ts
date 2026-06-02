@@ -6,4 +6,6 @@ export default {
   lg: 1200,
   xl: 1536,
   xx: 2000,
+  xxx: 2400,
+  xxxx: 2800,
 };
