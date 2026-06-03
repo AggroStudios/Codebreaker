@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { UpgradeList, type IUpgradeItem } from '../../data/upgrades';
 import { usePlayerStore } from '../../stores/player';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -17,12 +16,9 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import CheckIcon from '@mui/icons-material/Check';
 import PublishTwoToneIcon from '@mui/icons-material/PublishTwoTone';
 import SearchIcon from '@mui/icons-material/Search';
 import { formatMoney } from '../../lib/utils';
-import clsx from 'clsx';
 import UpgradeComponent from '../../components/Upgrade';
 import { capitalize } from '@mui/material/utils';
 import PageHeader from '../../components/common/PageHeader';
@@ -30,108 +26,9 @@ import { ChipGlow, Stat } from '../../components/common';
 import UpgradeDetails from '../../components/UpgradeDetails';
 import { useStationContext } from '../../stores/stationContext';
 import type { IUpgradeTier } from '../../data/upgrades';
+import { UpgradesConfirmDialog } from './UpgradesConfirmDialog';
 import './style.scss';
 import { styled } from '@mui/material/styles';
-
-interface ConfirmDialogProps {
-    open: boolean;
-    upgrade: IUpgradeItem | null;
-    tier: IUpgradeTier | null;
-    onConfirm: () => void;
-    onCancel: () => void;
-}
-
-function ConfirmDialog({
-    open,
-    upgrade,
-    tier,
-    onConfirm,
-    onCancel,
-}: ConfirmDialogProps) {
-    return (
-        <Dialog
-            open={open}
-            onClose={onCancel}
-            maxWidth="sm"
-            fullWidth
-            slotProps={{ paper: { className: clsx('upgrade-confirm-dialog', upgrade?.category) } }}
-        >
-            <DialogTitle className="upgrade-confirm-dialog-title">
-                <Stack direction="column" spacing={0.5}>
-                    <Typography variant="h4">
-                        Confirm Purchase
-                    </Typography>
-                    <Typography color="grey" variant="code">
-                        Confirm Transaction
-                    </Typography>
-                </Stack>
-
-            </DialogTitle>
-            <DialogContent className="upgrade-confirm-dialog-content">
-                {upgrade && tier && (
-                    <Grid container spacing={2}>
-                        <Grid container size={12}>
-                            <Grid size="auto">
-                                <Avatar
-                                    className={clsx('upgrade-category-icon', upgrade.category)}
-                                    variant="rounded"
-                                >
-                                    <upgrade.icon />
-                                </Avatar>
-                            </Grid>
-                            <Grid size="grow">
-                                <Stack direction="column">
-                                    <Stack
-                                        direction="row"
-                                        spacing={1}
-                                        sx={{
-                                            alignItems: 'center',
-                                        }}
-                                    >
-                                        <Typography variant="h5">
-                                            {upgrade.name}
-                                        </Typography>
-                                        <Typography>
-                                            &#183;
-                                        </Typography>
-                                        <Typography color="blue" variant="code">
-                                            {tier.title}
-                                        </Typography>
-                                    </Stack>
-                                    <Stack>
-                                        <Typography>
-                                            {tier.description}
-                                        </Typography>
-                                    </Stack>
-                                </Stack>
-                            </Grid>
-                        </Grid>
-
-                        <Grid size={12} className="upgrade-confirm-total">
-                            <span className="upgrade-confirm-total-label">Total</span>
-                            <span className="upgrade-confirm-total-value">${formatMoney(tier.cost, 0)}</span>
-                        </Grid>
-                    </Grid>
-                )}
-            </DialogContent>
-            <DialogActions className="upgrade-confirm-dialog-actions">
-                <Button onClick={onCancel} className="upgrade-confirm-cancel" sx={{ outline: 0 }}>
-                    Cancel
-                </Button>
-                <Button
-                    onClick={onConfirm}
-                    variant="contained"
-                    className="upgrade-confirm-confirm"
-                    startIcon={<CheckIcon />}
-                    sx={{ outline: 0 }}
-                >
-                    Confirm
-                </Button>
-            </DialogActions>
-        </Dialog>
-    );
-}
-
 
 export const StyledUpgradesGrid = styled(Grid)(({ theme }) => ({
     margin: theme.spacing(0,2)
@@ -381,7 +278,7 @@ export default function UpgradesComponent() {
                 </DialogActions>
             </Dialog>
 
-            <ConfirmDialog
+            <UpgradesConfirmDialog
                 open={confirmPurchaseDialogOpen}
                 upgrade={upgradeToPurchase}
                 tier={tierToPurchase}
