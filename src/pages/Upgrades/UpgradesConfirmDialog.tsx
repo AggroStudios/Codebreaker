@@ -41,7 +41,7 @@ export function UpgradesConfirmDialog({
                     <Typography variant="h4">
                         Confirm Purchase
                     </Typography>
-                    <Typography color="grey" variant="code">
+                    <Typography color="grey" variant="code4">
                         Confirm Transaction
                     </Typography>
                 </Stack>
@@ -74,7 +74,7 @@ export function UpgradesConfirmDialog({
                                         <Typography>
                                             &#183;
                                         </Typography>
-                                        <Typography color="blue" variant="code">
+                                        <Typography color="blue" variant="code4">
                                             {tier.title}
                                         </Typography>
                                     </Stack>
