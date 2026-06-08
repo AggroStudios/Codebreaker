@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo, CSSProperties } from 'react';
 import { createTheme, extendTheme, type PaletteOptions } from '@mui/material/styles';
 import {
     breakpoints,
@@ -17,19 +17,40 @@ declare module '@mui/material/styles' {
         xxxx: true;
     }
     interface TypographyVariants {
-        code: React.CSSProperties;
-        terminal: React.CSSProperties;
+        code1: CSSProperties;
+        code2: CSSProperties;
+        code3: CSSProperties;
+        code4: CSSProperties;
+        code5: CSSProperties;
+        terminal1: CSSProperties;
+        terminal2: CSSProperties;
+        terminal3: CSSProperties;
+        terminal4: CSSProperties;
     }
     interface TypographyVariantsOptions {
-        code?: React.CSSProperties;
-        terminal?: React.CSSProperties;
+        code1: CSSProperties;
+        code2: CSSProperties;
+        code3: CSSProperties;
+        code4: CSSProperties;
+        code5: CSSProperties;
+        terminal1: CSSProperties;
+        terminal2: CSSProperties;
+        terminal3: CSSProperties;
+        terminal4: CSSProperties;
     }
 }
 
 declare module '@mui/material/Typography' {
     interface TypographyPropsVariantOverrides {
-        code: true;
-        terminal: true;
+        code1: true;
+        code2: true;
+        code3: true;
+        code4: true;
+        code5: true;
+        terminal1: true;
+        terminal2: true;
+        terminal3: true;
+        terminal4: true;
     }
 }
 

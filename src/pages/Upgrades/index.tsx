@@ -16,13 +16,15 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import PublishTwoToneIcon from '@mui/icons-material/PublishTwoTone';
 import SearchIcon from '@mui/icons-material/Search';
 import { formatMoney } from '../../lib/utils';
 import UpgradeComponent from '../../components/Upgrade';
 import { capitalize } from '@mui/material/utils';
 import PageHeader from '../../components/common/PageHeader';
-import { ChipGlow, Stat } from '../../components/common';
+//import { ChipGlow, Stat } from '../../components/common';
+import { ChipGlow } from '../../components/common';
 import UpgradeDetails from '../../components/UpgradeDetails';
 import { useStationContext } from '../../stores/stationContext';
 import type { IUpgradeTier } from '../../data/upgrades';
@@ -166,12 +168,22 @@ export default function UpgradesComponent() {
                         subtitle={`Station modifications. Each upgrade has multiple tiers — purchase the next tier to make it more powerful. Some upgrades require prerequisites.`}
                         breadcrumbs={['home', 'upgrades']}
                         actions={
-                            <Stat
-                                className="balance-display"
-                                label="Available Balance"
-                                value={`$${formatMoney(playerStore.player.money)}`}
-                                accent="accent"
-                            />
+                        <Card>
+                            <CardContent>
+                                <Stack direction="column" spacing={0} sx={{ alignItems: 'flex-end' }}>
+                                    <Typography color="grey" variant="code4">
+                                        Available Balance
+                                    </Typography>
+                                    <Typography variant="code1">{`$${formatMoney(playerStore.player.money)}`}</Typography>
+                                </Stack>
+                            </CardContent>
+                        </Card>
+                        // <Stat
+                        //     className="balance-display"
+                        //     label="Available Balance"
+                        //     value={`$${formatMoney(playerStore.player.money)}`}
+                        //     accent="accent"
+                        // />
                         }
                         icon={PublishTwoToneIcon}
                     />

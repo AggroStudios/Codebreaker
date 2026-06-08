@@ -1,19 +1,60 @@
+const codeBase = {
+  fontFamily: `'Fira Code', 'Fira Code VF', 'source-code-pro', Menlo, Monaco, Consolas, 'Courier New', monospace`,
+  fontWeight: 700,
+  letterSpacing: `0.15em`,
+  //textTransform: `uppercase`,
+}
+
+const terminalBase = {
+  fontFamily: `'ibm_vga', monospace`,
+}
+
 export default {
   fontFamily: `'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif`,
   fontSize: 14,
   htmlFontSize: 10,
   lineHeight: 19,
   //Custom typography props
-  code: {
-    fontFamily: `'Fira Code', 'Fira Code VF', 'source-code-pro', Menlo, Monaco, Consolas, 'Courier New', monospace`,
-    fontSize: 14,
-    fontWeight: 700,
-    letterSpacing: `0.15em`,
+  code1: {
+    ...codeBase,
+    fontSize: 24,
     textTransform: `uppercase`,
   },
-  terminal: {
-    fontFamily: `'ibm_vga', monospace`,
+  code2: {
+    ...codeBase,
+    fontSize: 20,
+    textTransform: `uppercase`,
+  },
+  code3: {
+    ...codeBase,
+    fontSize: 16,
+    textTransform: `uppercase`,
+  },
+  code4: {
+    ...codeBase,
     fontSize: 14,
+    textTransform: `uppercase`,
+  },
+  code5: {
+    ...codeBase,
+    fontSize: 12,
+    textTransform: `uppercase`,
+  },
+  terminal1: {
+    ...terminalBase,
+    fontSize: 18,
+  },
+  terminal2: {
+    ...terminalBase,
+    fontSize: 16,
+  },
+  terminal3: {
+    ...terminalBase,
+    fontSize: 14,
+  },
+  terminal4: {
+    ...terminalBase,
+    fontSize: 12,
   },
   //Standard typography props
   body1: {

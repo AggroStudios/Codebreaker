@@ -690,16 +690,28 @@ const getComponents = () => {
     //     },
     //   },
     // },
-    // MuiTypography: {
-    //   defaultProps: {
-    //     variant: "body1",
-    //   },
-    //   styleOverrides: {
-    //     gutterBottom: {
-    //       marginBottom: "1em", //Proportional to the font-size of the variant
-    //     },
-    //   },
-    // },
+    MuiTypography: {
+      defaultProps: {
+        variant: 'body1',
+        variantMapping: {
+          code1: 'h2',
+          code2: 'h2',
+          h3: 'h2',
+          h4: 'h2',
+          h5: 'h2',
+          h6: 'h2',
+          subtitle1: 'h2',
+          subtitle2: 'h2',
+          body1: 'span',
+          body2: 'span',
+        },
+      },
+      styleOverrides: {
+        gutterBottom: {
+          marginBottom: '1em', //Proportional to the font-size of the variant
+        },
+      },
+    },
     //Keeps useMediaQuery from refreshing twice
     //https://mui.com/material-ui/react-use-media-query/#api
     MuiUseMediaQuery: {
