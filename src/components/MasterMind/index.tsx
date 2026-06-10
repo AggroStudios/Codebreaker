@@ -56,6 +56,33 @@ function computeLayout(w: number, h: number, chances: number, rounds: number): B
     return { paletteH, boardTop, boardH, rowH, submitW, slotsW, slotW, pegR, rowYAt };
 }
 
+/** Picks black or white text for legibility over the given peg colour, so the
+ *  number stays readable regardless of the underlying hue. */
+function textColorFor(hex: string): string {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return lum > 0.6 ? '#0a0a0a' : '#ffffff';
+}
+
+/** Draws a centred label on a peg. Used to print the colour's number (for
+ *  colour-blind / low-vision players) and the feedback symbols. */
+function drawPegLabel(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    r: number,
+    label: string,
+    textColor: string,
+): void {
+    ctx.fillStyle = textColor;
+    ctx.font = `700 ${Math.max(7, Math.floor(r * 1.15))}px "Fira Code", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, x, y);
+}
+
 function computeFeedback(guess: number[], code: number[]): Feedback {
     const g = [...guess];
     const c = [...code];
@@ -158,24 +185,28 @@ export const MasterMind: React.FC<MiniGameProps> = ({
                 fill: string;
                 glow: string | null;
                 stroke: string | null;
+                symbol: string | null;
                 label: string;
             }[] = [
                 {
                     fill: '#0af5b0',
                     glow: '#0af5b0',
                     stroke: null,
+                    symbol: '✓',
                     label: 'correct color in the correct position',
                 },
                 {
                     fill: '#f39c12',
                     glow: '#f39c12',
                     stroke: null,
+                    symbol: '!',
                     label: 'correct color, wrong position',
                 },
                 {
                     fill: 'rgba(255,255,255,0.06)',
                     glow: null,
                     stroke: 'rgba(255,255,255,0.25)',
+                    symbol: null,
                     label: 'color is not in the code',
                 },
             ];
@@ -198,6 +229,12 @@ export const MasterMind: React.FC<MiniGameProps> = ({
                     ctx.lineWidth = 1;
                     ctx.stroke();
                 }
+                if (row.symbol) {
+                    drawPegLabel(ctx, legendDotX, cy, legendDotR, row.symbol, textColorFor(row.fill));
+                }
+                ctx.textAlign = 'left';
+                ctx.font = `${Math.floor(h * 0.055)}px Inter, system-ui, sans-serif`;
+                ctx.textBaseline = 'middle';
                 ctx.fillStyle = 'rgba(255,255,255,0.85)';
                 ctx.fillText(row.label, legendTextX, cy);
             });
@@ -252,6 +289,17 @@ export const MasterMind: React.FC<MiniGameProps> = ({
                     : 'rgba(255,255,255,0.10)';
                 ctx.lineWidth = isCurrent ? 1.5 : 1;
                 ctx.stroke();
+
+                if (colorIdx >= 0) {
+                    drawPegLabel(
+                        ctx,
+                        x,
+                        y,
+                        L.pegR,
+                        String(colorIdx + 1),
+                        textColorFor(COLORS[colorIdx]),
+                    );
+                }
             }
 
             // Right column: feedback for played rows, submit button for current row
@@ -270,15 +318,18 @@ export const MasterMind: React.FC<MiniGameProps> = ({
                     let fill: string;
                     let glow: string | null = null;
                     let stroke: string | null = null;
+                    let symbol: string | null = null;
 
                     switch (fb.slots[i]) {
                         case 'correct':
                             fill = '#0af5b0';
                             glow = '#0af5b0';
+                            symbol = '✓'; // checkmark
                             break;
                         case 'misplaced':
                             fill = '#f39c12';
                             glow = '#f39c12';
+                            symbol = '!';
                             break;
                         default:
                             fill = 'rgba(255,255,255,0.06)';
@@ -298,6 +349,9 @@ export const MasterMind: React.FC<MiniGameProps> = ({
                         ctx.strokeStyle = stroke;
                         ctx.lineWidth = 1;
                         ctx.stroke();
+                    }
+                    if (symbol) {
+                        drawPegLabel(ctx, px, y, fbR, symbol, textColorFor(fill));
                     }
                 }
             } else if (isCurrent) {
@@ -350,6 +404,7 @@ export const MasterMind: React.FC<MiniGameProps> = ({
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
             }
+            drawPegLabel(ctx, cx, paletteY, colorR, String(i + 1), textColorFor(COLORS[i]));
         }
 
         // End-state overlay
@@ -375,13 +430,16 @@ export const MasterMind: React.FC<MiniGameProps> = ({
             const codeStart = w / 2 - (codeSpacing * (rounds - 1)) / 2;
             const codeY = h / 2 + h * 0.13;
             for (let i = 0; i < rounds; i++) {
+                const cx = codeStart + i * codeSpacing;
+                const colorIdx = codeRef.current[i];
                 ctx.beginPath();
-                ctx.arc(codeStart + i * codeSpacing, codeY, codeR, 0, Math.PI * 2);
-                ctx.fillStyle = COLORS[codeRef.current[i]];
-                ctx.shadowColor = COLORS[codeRef.current[i]];
+                ctx.arc(cx, codeY, codeR, 0, Math.PI * 2);
+                ctx.fillStyle = COLORS[colorIdx];
+                ctx.shadowColor = COLORS[colorIdx];
                 ctx.shadowBlur = 6;
                 ctx.fill();
                 ctx.shadowBlur = 0;
+                drawPegLabel(ctx, cx, codeY, codeR, String(colorIdx + 1), textColorFor(COLORS[colorIdx]));
             }
         }
     }, [rounds, chances]);

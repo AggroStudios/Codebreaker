@@ -133,7 +133,7 @@ const AppWithProviders = () => {
 
 export default function App() {
     const theme = useSiteTheme();
-
+    
     return (
         <ThemeProvider theme={theme} defaultMode="dark">
             <CssBaseline enableColorScheme />

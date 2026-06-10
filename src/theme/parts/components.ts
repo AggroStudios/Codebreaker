@@ -30,6 +30,17 @@ const getComponents = () => {
             opacity: 1
           }
         },
+        '@keyframes shimmer': {
+          '0%': {
+            transform: 'translateX(-100%)'
+          },
+          '50%': {
+            transform: 'translateX(100%)'
+          },
+          '100%': {
+            transform: 'translateX(100%)'
+          }
+        },
         '*:focus': {
           outline: 'none !important',
         },
@@ -77,19 +88,46 @@ const getComponents = () => {
       defaultProps: {},
       styleOverrides: {
         root: ({ theme }) => ({
-          backgroundColor: '#999',
+          backgroundColor: theme.palette.grey.main,
           borderRadius: '50%',
-          boxShadow: `0 0 6px #999`,
+          boxShadow: `0 0 6px ${theme.palette.grey.main}`,
           display: 'inline-block',
           flexShrink: 0,
+          verticalAlign: 'middle',
+          alignItems: 'center',
           height: theme.spacing(1),
           margin: `auto ${theme.spacing(1)} auto auto`,
           opacity: 1,
           width: theme.spacing(1),
         }),
-        online: {
+        online: ({ theme }) => ({
           animation: 'statusPulse 1.6s ease-in-out infinite',
-        }
+          backgroundColor: theme.palette.green.main,
+          boxShadow: `0 0 6px ${theme.palette.green.main}`,
+        }),
+      },
+    },
+    DarkWebCardReputation: {
+      defaultProps: {},
+      styleOverrides: {
+        root: ({ theme }) => ({
+          color: theme.palette.accent.main,
+        }),
+        label: ({ theme }) => ({
+          letterSpacing: '0.18em',
+          fontSize: 12,
+          fontWeight: 700,
+          fontFamily: theme.typography.fontFamily,
+          color: theme.palette.secondary.main,
+        }),
+        value: ({ theme }) => ({
+          fontFamily: '"Fira Code", "Fira Code VF", monospace',
+          fontWeight: 700,
+          fontSize: 14,
+          lineHeight: 1.2,
+          letterSpacing: '0.06em',
+          color: theme.palette.accent.main,
+        }),
       },
     },
     // MuiAccordion: {

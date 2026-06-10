@@ -32,6 +32,7 @@ import clsx from 'clsx';
 import { WarningAmberOutlined, AssignmentLateOutlined, HourglassTopOutlined, PauseCircleOutlined } from '@mui/icons-material';
 
 import { useDataCentersStore } from '../../stores/dataCenters';
+import { LiveDot } from '../../components/common';
 
 interface DragPayload {
     kind: 'inventory' | 'installed';
@@ -261,7 +262,7 @@ export default function ServerRacks() {
                                 variant="outlined"
                                 className={uplinkClass}
                                 style={{ marginRight: 6 }}
-                                icon={<span className="live-dot" />}
+                                icon={<LiveDot online={uplink.status === 'UP'} />}
                                 aria-live="polite"
                             />
                             <Chip

@@ -49,7 +49,7 @@ export default function GlyphCardHeader({
                 }
                 title={
                     <Typography noWrap variant="h2">
-                        <LiveDot color="accent" online={online}/>{title}
+                        <LiveDot online={online}/>{title}
                     </Typography>
                 }
                 {...rest}
