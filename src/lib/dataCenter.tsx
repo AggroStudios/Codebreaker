@@ -6,17 +6,23 @@ import { playerStoreProxy } from '../stores/player';
 
 export default class DataCenter implements Process {
     private _currentCount: number = 0;
-    private _dataCenterStore: DataCentersStore;
     private _playerStore: PlayerState;
 
     constructor() {
         this._playerStore = playerStoreProxy;
-        this._dataCenterStore = useDataCentersStore.getState();
         this.activateContracts();
     }
 
     public get id() {
         return 'dataCenter-provisioning';
+    }
+
+    /** Always read the live store state. Caching the snapshot from
+     *  getState() in the constructor freezes `contracts` to whatever existed
+     *  at construction, so contracts signed later are never seen and
+     *  signedDays increments are never observed. */
+    private get _dataCenterStore(): DataCentersStore {
+        return useDataCentersStore.getState();
     }
 
     private activateContracts() {

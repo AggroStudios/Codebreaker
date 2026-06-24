@@ -13,13 +13,11 @@ import { formatKw, formatMoney, formatGbps, formatMoneyDay } from '../../lib/uti
 import { usePlayerStore } from '../../stores/player';
 import { useDataCentersStore } from '../../stores/dataCenters';
 import { useRacksStore } from '../../stores/racks';
-import { useStationContext } from '../../stores/stationContext';
 
 export default function DataCenters() {
     const [selectedDataCenter, setSelectedDataCenter] = useState<IDataCenter | null>(null);
     const { contracts, setContracts, upgradeContract, suspendContract, resumeContract, deleteContract } = useDataCentersStore();
     const removeRacksByDc = useRacksStore((s) => s.removeRacksByDc);
-    const operatingSystem = useStationContext().stationProxy.os;
     const totalContracts = Object.keys(contracts).length;
     const availableContracts = Object.keys(DATA_CENTERS).length - totalContracts;
     const totalRacks = Object.values(contracts).reduce((acc, contract) => acc + contract.racks || 0, 0);
@@ -36,7 +34,7 @@ export default function DataCenters() {
                 rackCap: dataCenter?.baseRacks || 0,
                 powerKw: 4,
                 uplinkGbps: 1,
-                signedDays: operatingSystem.frame,
+                signedDays: 0,
                 status: 'PROVISIONING',
             },
         });
