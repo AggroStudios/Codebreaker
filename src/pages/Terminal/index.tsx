@@ -41,7 +41,7 @@ type TerminalOutputOptions = {
 const terminalTheme = createTheme();
 
 export const Header = styled('div')(({ theme }) => ({
-    fontSize: '1.5em',
+    fontSize: '1em',
     background: 'rgba(66, 66, 66, 1)',
     borderRadius: `${theme.spacing(1)} ${theme.spacing(1)} 0 0`,
 }));
