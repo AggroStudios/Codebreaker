@@ -1,7 +1,7 @@
 {
   "name": "codebreaker",
   "private": true,
-  "version": "0.6.134",
+  "version": "0.6.137",
   "type": "module",
   "scripts": {
     "dev": "NODE_ENV=LOCAL_DEV vite --open",
@@ -29,7 +29,7 @@
     "node": "^24.15.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "react-router": "^7.15.0",
+    "react-router": "^7.15.1",
     "zustand": "^5.0.12"
   },
   "devDependencies": {
@@ -48,12 +48,12 @@
     "config": "^4.4.1",
     "eslint": "^10.3.0",
     "husky": "^9.1.7",
-    "js-yaml": "^4.1.1",
+    "js-yaml": "^4.2.0",
     "jsdom": "^29.0.2",
     "sass": "^1.99.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.3",
-    "vite": "^8.0.8",
+    "vite": "^8.1.0",
     "vite-plugin-eslint": "^1.8.1",
     "vitest": "^4.1.4"
   }
