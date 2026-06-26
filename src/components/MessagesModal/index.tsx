@@ -71,14 +71,23 @@ import {
     MessageAttachment,
 } from '../../includes/messages.interface';
 import { usePlayerStore } from '../../stores/player';
+import { classConfigFor } from '../../data/classConfig';
 
 type SvgIcon = OverridableComponent<SvgIconTypeMap<object, 'svg'>>;
 
-const ACCENT = '#0af5b0';
 const MONO = 'var(--font-code)';
 const UI = 'var(--font-ui)';
 const DANGER = '#ff5f6d';
 const VIOLET = '#9b8cff';
+
+/**
+ * The active operator class's accent hex (e.g. `#26c6da`), matching the app-wide
+ * accent driven by `player.classId`. Returned as a hex so the `${ACCENT}<alpha>`
+ * concatenations used throughout the modal stay valid. Each component reads it
+ * via `const ACCENT = useAccent();`.
+ */
+const useAccent = (): string =>
+    classConfigFor(usePlayerStore((s) => s.player.classId)).accent;
 
 const FACTION_GLYPHS: Record<string, SvgIcon> = {
     Memory,
@@ -227,6 +236,7 @@ function PriorityDot({ msg }: { msg: FactionMessage }) {
 }
 
 function SectionLabel({ children }: { children: ReactNode }) {
+    const ACCENT = useAccent();
     return (
         <Box
             sx={{
@@ -260,6 +270,7 @@ function SectionLabel({ children }: { children: ReactNode }) {
 // ── window chrome ─────────────────────────────────────────────────────────
 
 function WindowChrome({ onClose, onCompose }: { onClose: () => void; onCompose: () => void }) {
+    const ACCENT = useAccent();
     return (
         <Box
             sx={{
@@ -416,6 +427,7 @@ function LeftRail({
     folderCounts: Record<string, number>;
     unreadByFaction: Record<string, number>;
 }) {
+    const ACCENT = useAccent();
     return (
         <Box
             sx={{
@@ -621,6 +633,7 @@ function ThreadRow({
     selected: boolean;
     onSelect: () => void;
 }) {
+    const ACCENT = useAccent();
     const faction = factionById(msg.factionId);
     return (
         <Box
@@ -737,6 +750,7 @@ function ThreadList({
     query: string;
     onQuery: (q: string) => void;
 }) {
+    const ACCENT = useAccent();
     return (
         <Box
             sx={{
@@ -824,6 +838,7 @@ function ThreadList({
 // ── message body ────────────────────────────────────────────────────────────
 
 function MetaCell({ label, value, accent }: { label: string; value: ReactNode; accent?: boolean }) {
+    const ACCENT = useAccent();
     return (
         <>
             <Box component="span" sx={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600 }}>
@@ -837,6 +852,7 @@ function MetaCell({ label, value, accent }: { label: string; value: ReactNode; a
 }
 
 function BodyBlock({ block, prevType }: { block: MessageBodyBlock; prevType?: string }) {
+    const ACCENT = useAccent();
     switch (block.type) {
         case 'line':
             return <Box sx={{ mb: 1.5 }}>{block.text}</Box>;
@@ -937,14 +953,15 @@ function SealedView({ faction }: { faction?: IDarkWebFaction }) {
     );
 }
 
-const ATTACHMENT_PALETTE: Record<string, { Icon: SvgIcon; color: string }> = {
-    contract: { Icon: DescriptionTwoTone, color: ACCENT },
-    data: { Icon: DataObjectTwoTone, color: '#26c6da' },
-    challenge: { Icon: ExtensionTwoTone, color: VIOLET },
-};
-
 function AttachmentCard({ att }: { att: MessageAttachment }) {
-    const { Icon, color } = ATTACHMENT_PALETTE[att.kind] ?? { Icon: InsertDriveFileTwoTone, color: 'rgba(255,255,255,0.6)' };
+    const ACCENT = useAccent();
+    // `contract` tracks the class accent; `data`/`challenge` are semantic colors.
+    const palette: Record<string, { Icon: SvgIcon; color: string }> = {
+        contract: { Icon: DescriptionTwoTone, color: ACCENT },
+        data: { Icon: DataObjectTwoTone, color: '#26c6da' },
+        challenge: { Icon: ExtensionTwoTone, color: VIOLET },
+    };
+    const { Icon, color } = palette[att.kind] ?? { Icon: InsertDriveFileTwoTone, color: 'rgba(255,255,255,0.6)' };
     return (
         <Box
             sx={{
@@ -987,6 +1004,7 @@ function ActionButton({
     onClick?: () => void;
     tone?: 'accent' | 'danger';
 }) {
+    const ACCENT = useAccent();
     const isAccent = tone === 'accent';
     const isDanger = tone === 'danger';
     const color = isAccent ? ACCENT : isDanger ? DANGER : 'rgba(255,255,255,0.78)';
@@ -1019,6 +1037,7 @@ function ActionButton({
 }
 
 function MessageBody({ msg, onReply }: { msg: FactionMessage | null; onReply: () => void }) {
+    const ACCENT = useAccent();
     if (!msg) {
         return (
             <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 2, p: 5, color: 'rgba(255,255,255,0.3)', fontFamily: MONO, letterSpacing: '0.18em', textTransform: 'uppercase', fontSize: 12 }}>
@@ -1159,6 +1178,7 @@ function ComposeView({
     onSend: (recipient: string, body: string) => void;
     onDiscard: () => void;
 }) {
+    const ACCENT = useAccent();
     const [factionId, setFactionId] = useState(accentInitialFaction);
     const [subject, setSubject] = useState(initialSubject);
     const [body, setBody] = useState('');
@@ -1397,6 +1417,7 @@ function ComposeView({
 // ── corner brackets ───────────────────────────────────────────────────────
 
 function CornerBrackets() {
+    const ACCENT = useAccent();
     const base = {
         position: 'absolute' as const,
         width: 16,
@@ -1420,6 +1441,7 @@ function CornerBrackets() {
 
 export default function MessagesModal({ open, onClose, onSelectMessage, onTransmit }: MessagesModalProps) {
     const messages = usePlayerStore((s) => s.player.messages);
+    const ACCENT = useAccent();
 
     const [folderId, setFolderId] = useState('inbox');
     const [factionFilter, setFactionFilter] = useState<string | null>(null);
