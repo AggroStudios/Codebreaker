@@ -69,6 +69,7 @@ export default function CharacterCreation() {
         usePlayerStore.setState((s) => ({
             player: {
                 ...s.player,
+                classId: identity.classId,
                 money: klassNow.startingWallet,
                 statBonuses: origin
                     ? {

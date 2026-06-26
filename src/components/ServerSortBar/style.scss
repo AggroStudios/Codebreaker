@@ -53,14 +53,14 @@
     }
 
     &:hover {
-        border-color: rgba(10, 245, 176, 0.55) !important;
+        border-color: rgba(var(--accent-rgb), 0.55) !important;
     }
 
     &.Mui-selected {
         background-color: var(--accent-dim) !important;
         color: var(--accent) !important;
-        border-color: rgba(10, 245, 176, 0.55) !important;
-        box-shadow: inset 0 0 0 1px rgba(10, 245, 176, 0.12);
+        border-color: rgba(var(--accent-rgb), 0.55) !important;
+        box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.12);
     }
 
     & svg {

@@ -94,7 +94,7 @@ export default function ServerDailyDealCard({
             <div className="server-daily-deal-card__backdrop" aria-hidden />
             <div className="server-daily-deal-card__row">
                 <div className="server-daily-deal-card__inner">
-                    <div className="server-daily-deal-card__row">
+                    <div className="server-daily-deal-card__tags">
                         <div className={clsx('server-daily-deal-card__badge', tierClass)}>
                             <Bolt fontSize="small" />
                             <span>Deal of the day</span>

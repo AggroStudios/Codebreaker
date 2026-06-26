@@ -16,7 +16,14 @@ import { useRacksStore } from '../../stores/racks';
 
 export default function DataCenters() {
     const [selectedDataCenter, setSelectedDataCenter] = useState<IDataCenter | null>(null);
-    const { contracts, setContracts, upgradeContract, suspendContract, resumeContract, deleteContract } = useDataCentersStore();
+    // Select slices individually so the page only re-renders when `contracts`
+    // changes, not on every unrelated data-center store write.
+    const contracts = useDataCentersStore((s) => s.contracts);
+    const setContracts = useDataCentersStore((s) => s.setContracts);
+    const upgradeContract = useDataCentersStore((s) => s.upgradeContract);
+    const suspendContract = useDataCentersStore((s) => s.suspendContract);
+    const resumeContract = useDataCentersStore((s) => s.resumeContract);
+    const deleteContract = useDataCentersStore((s) => s.deleteContract);
     const removeRacksByDc = useRacksStore((s) => s.removeRacksByDc);
     const totalContracts = Object.keys(contracts).length;
     const availableContracts = Object.keys(DATA_CENTERS).length - totalContracts;

@@ -33,6 +33,8 @@ const mockStation = (cores: number | null) =>
         cpu: cores !== null ? { cores } : null,
         cpuActivity: [],
         setCpuActivity: vi.fn(),
+        uptime: 0,
+        setUptime: vi.fn(),
     }) as unknown as StationStoreType;
 
 const mockProcess = {

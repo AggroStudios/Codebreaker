@@ -1,16 +1,19 @@
-import { useEffect, useState, type MouseEvent as ReactMouseEvent } from 'react';
+import {
+    useEffect,
+    useMemo,
+    useState,
+    type MouseEvent as ReactMouseEvent,
+    type ReactNode,
+    type CSSProperties,
+} from 'react';
 import { useNavigate } from 'react-router';
 
 import {
     Box,
-    AppBar,
-    Toolbar,
     IconButton,
-    Typography,
-    InputBase,
+    Badge,
     Menu,
     MenuItem,
-    Badge,
     ListItemIcon,
     ListItemText,
     Divider,
@@ -21,15 +24,12 @@ import {
     DialogActions,
     Button,
 } from '@mui/material';
-import { styled, alpha } from '@mui/material/styles';
 
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import SearchIcon from '@mui/icons-material/Search';
-import MoreIcon from '@mui/icons-material/More';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import PauseCircleIcon from '@mui/icons-material/PauseCircle';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InfoTwoTone from '@mui/icons-material/InfoTwoTone';
 import WarningTwoTone from '@mui/icons-material/WarningTwoTone';
@@ -38,57 +38,20 @@ import DoneAllIcon from '@mui/icons-material/DoneAll';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { ExitToAppOutlined } from '@mui/icons-material';
 
-import CodeBreakerLogo from '../../assets/logos/codebreaker-logo.png';
 import './styles.scss';
 import { NotificationLevel } from '../../includes/OperatingSystem.interface';
 import MoneyLabel from '../MoneyLabel';
+import XpLabel from '../XpLabel';
 import { usePlayerStore } from '../../stores/player';
 import { useUIStore } from '../../stores/ui';
+import { useCharacterStore } from '../../stores/character';
 import { useStationContext } from '../../stores/stationContext';
 import { useAnchors } from '../AnchorsContext';
 import { useMusicPlayerStore } from '../../stores/musicPlayer';
 import { formatMoney } from '../../lib/utils';
-import { ExitToAppOutlined } from '@mui/icons-material';
-
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(3),
-        width: 'auto',
-    },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 1, 1, 0),
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('md')]: {
-            width: '20ch',
-        },
-    },
-}));
+import MessagesModal from '../MessagesModal';
 
 const notificationIcon = (level: NotificationLevel) => {
     switch (level) {
@@ -103,11 +66,59 @@ const notificationIcon = (level: NotificationLevel) => {
     }
 };
 
-function GameFrameCounter() {
-    const { stationProxy, useStationStore } = useStationContext();
-    const isRunning = useStationStore((s) => s.isRunning);
-    const playing = useMusicPlayerStore((s) => s.playing);
-    const playMusic = useMusicPlayerStore((s) => s.play);
+/** Clamp a comms count for badge display. */
+const clampBadge = (n: number) => (n > 99 ? '99+' : n);
+
+/** Derive 2-character avatar initials from a callsign (e.g. "cipher_07" → "C7"). */
+function deriveInitials(callsign: string): string {
+    const cleaned = callsign.replace(/[^a-z0-9]/gi, '');
+    if (!cleaned) return '??';
+    const first = cleaned[0].toUpperCase();
+    const last = cleaned[cleaned.length - 1].toUpperCase();
+    return cleaned.length === 1 ? first : `${first}${last}`;
+}
+
+/** Deterministic operator id stamp derived from the callsign (e.g. "0xA3-91F4-CB07"). */
+function deriveOperatorId(callsign: string): string {
+    let hash = 0x811c9dc5;
+    for (let i = 0; i < callsign.length; i++) {
+        hash ^= callsign.charCodeAt(i);
+        hash = Math.imul(hash, 0x01000193);
+    }
+    const hex = (hash >>> 0).toString(16).toUpperCase().padStart(8, '0');
+    return `0x${hex.slice(0, 2)}-${hex.slice(2, 6)}-${hex.slice(6, 8)}07`;
+}
+
+/** Bracket-cornered chrome panel shared by the header read-outs. */
+function ChromePanel({
+    children,
+    className,
+    style,
+    panelRef,
+}: {
+    children: ReactNode;
+    className?: string;
+    style?: CSSProperties;
+    panelRef?: (el: HTMLDivElement | null) => void;
+}) {
+    return (
+        <div
+            ref={panelRef}
+            className={`bracketFrame chrPanel ${className ?? ''}`}
+            style={style}
+        >
+            <span className="brC brTl" />
+            <span className="brC brTr" />
+            <span className="brC brBl" />
+            <span className="brC brBr" />
+            {children}
+        </div>
+    );
+}
+
+/** Live game-loop telemetry read-out (frame / count / exponent). */
+function FrameReadout() {
+    const { useStationStore } = useStationContext();
 
     const [display, setDisplay] = useState(() => {
         const s = useStationStore.getState();
@@ -122,39 +133,63 @@ function GameFrameCounter() {
         return () => clearInterval(id);
     }, [useStationStore]);
 
+    return (
+        <ChromePanel>
+            <span className="chrLabel">Frame</span>
+            <span className="chrValue chrValueSm">{display.frame.toFixed(3)}</span>
+            <span className="chrSep" />
+            <span className="chrLabel">Cnt</span>
+            <span className="chrValue chrValueSm">{display.count}</span>
+            <span className="chrSep" />
+            <span className="chrLabel">Exp</span>
+            <span className="chrValue chrValueSm">×{display.exponent}</span>
+        </ChromePanel>
+    );
+}
+
+/** Pause / resume the game loop (and kick off music on first start). */
+function PauseButton() {
+    const { stationProxy, useStationStore } = useStationContext();
+    const isRunning = useStationStore((s) => s.isRunning);
+    const playing = useMusicPlayerStore((s) => s.playing);
+    const playMusic = useMusicPlayerStore((s) => s.play);
+
     const handleToggle = () => {
         stationProxy.os?.toggleGameLoop();
         if (!playing) {
             playMusic();
         }
     };
+
     return (
-        <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            className="gameFrameCounter"
-            sx={{ display: { xs: 'none', sm: 'block' } }}
-        >
-            Frame: {display.frame.toFixed(3)} | Count: {display.count} | Exponent: {display.exponent}
+        <Tooltip title={isRunning ? 'Pause' : 'Resume'}>
             <IconButton
-                size="large"
+                className="chrIconBtn"
                 aria-label="Start/Stop Game Timer"
-                color="inherit"
-                style={{ outline: 0 }}
                 onClick={handleToggle}
             >
-                {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
+                {isRunning ? (
+                    <PauseCircleIcon sx={{ fontSize: 20 }} />
+                ) : (
+                    <PlayCircleIcon sx={{ fontSize: 20 }} />
+                )}
             </IconButton>
-        </Typography>
+        </Tooltip>
     );
 }
 
 export default function AppBarComponent() {
     const money = usePlayerStore((s) => s.player.money);
+    const level = usePlayerStore((s) => s.player.level);
+    const experience = usePlayerStore((s) => s.player.experience);
+    const nextLevel = usePlayerStore((s) => s.player.nextLevel);
+    const playerName = usePlayerStore((s) => s.player.name);
     const messages = usePlayerStore((s) => s.player.messages);
     const notifications = usePlayerStore((s) => s.player.notifications);
     const moneyLabel = usePlayerStore((s) => s.moneyLabel);
+    const xpLabel = usePlayerStore((s) => s.xpLabel);
+    const classId = usePlayerStore((s) => s.player.classId);
+    console.log('Player class:', classId);
     const markAllNotificationsAsRead = usePlayerStore(
         (s) => s.markAllNotificationsAsRead,
     );
@@ -167,185 +202,182 @@ export default function AppBarComponent() {
         (s) => s.deleteAllNotifications,
     );
 
-    const { moneyAnchorRef } = useAnchors();
+    const callsign =
+        useCharacterStore((s) => s.identity?.callsign) || playerName || 'operator';
+
+    const { stationProxy } = useStationContext();
+    const { moneyAnchorRef, xpAnchorRef } = useAnchors();
     const navigate = useNavigate();
     const openSettings = useUIStore((s) => s.openSettings);
     const openAbout = useUIStore((s) => s.openAbout);
 
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-    const [mobileAnchorEl, setMobileAnchorEl] = useState<HTMLElement | null>(
-        null,
-    );
     const [notificationAnchorEl, setNotificationAnchorEl] =
         useState<HTMLElement | null>(null);
-    const [messageAnchorEl, setMessageAnchorEl] = useState<HTMLElement | null>(
-        null,
-    );
+    const [messagesOpen, setMessagesOpen] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState<
         { mode: 'one'; index: number } | { mode: 'all' } | null
     >(null);
 
     const isMenuOpen = Boolean(anchorEl);
-    const isMobileMenuOpen = Boolean(mobileAnchorEl);
     const isNotificationMenuOpen = Boolean(notificationAnchorEl);
-    const isMessageMenuOpen = Boolean(messageAnchorEl);
 
-    const handleProfileMenuOpen = (event: ReactMouseEvent<HTMLElement>) => {
+    const handleProfileMenuOpen = (event: ReactMouseEvent<HTMLElement>) =>
         setAnchorEl(event.currentTarget);
-    };
-
-    const handleMobileMenuOpen = (event: ReactMouseEvent<HTMLElement>) => {
-        setMobileAnchorEl(event.currentTarget);
-    };
-
-    const handleNotificationMenuOpen = (
-        event: ReactMouseEvent<HTMLElement>,
-    ) => {
+    const handleNotificationMenuOpen = (event: ReactMouseEvent<HTMLElement>) =>
         setNotificationAnchorEl(event.currentTarget);
-    };
-
-    const handleMessageMenuOpen = (event: ReactMouseEvent<HTMLElement>) => {
-        setMessageAnchorEl(event.currentTarget);
-    };
 
     const handleMenuClose = () => setAnchorEl(null);
-    const handleMobileMenuClose = () => setMobileAnchorEl(null);
     const handleNotificationMenuClose = () => setNotificationAnchorEl(null);
-    const handleMessageMenuClose = () => setMessageAnchorEl(null);
 
     const handleSettingsOpen = () => {
         setAnchorEl(null);
-        setMobileAnchorEl(null);
         openSettings();
     };
 
     const handleAboutOpen = () => {
         setAnchorEl(null);
-        setMobileAnchorEl(null);
         openAbout();
     };
 
     const handleLogout = () => {
         setAnchorEl(null);
-        setMobileAnchorEl(null);
         navigate('/');
     };
 
     const menuId = 'primary-search-account-menu';
     const notificationId = 'primary-search-notification-menu';
-    const messageId = 'primary-search-message-menu';
-    const mobileMenuId = 'primary-search-account-menu-mobile';
 
     const unreadMessages = messages.filter((m) => m.unread).length;
-    const unreadNotifications = notifications.filter(
-        (n) => n.unread,
-    ).length;
+    const unreadNotifications = notifications.filter((n) => n.unread).length;
+
+    const xpPct = nextLevel > 0 ? Math.min(experience / nextLevel, 1) : 0;
+    const initials = useMemo(() => deriveInitials(callsign), [callsign]);
+    const operatorId = useMemo(() => deriveOperatorId(callsign), [callsign]);
 
     return (
-        <Box sx={{ flexGrow: 1 }}>
-            <AppBar
-                position="fixed"
-                style={{ background: 'rgba(50, 50, 50, 0.75)' }}
-            >
-                <Toolbar>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ display: { xs: 'none', sm: 'block' } }}
-                        style={{ width: '240px', textAlign: 'left' }}
-                    >
-                        <img
-                            src={CodeBreakerLogo}
-                            className="mainLogo"
-                            alt="Code Breaker Logo"
-                        />
-                    </Typography>
-                    <Search>
-                        <SearchIconWrapper>
-                            <SearchIcon />
-                        </SearchIconWrapper>
-                        <StyledInputBase
-                            placeholder="Search..."
-                            inputProps={{ 'aria-label': 'search' }}
-                        />
-                    </Search>
-                    <Box sx={{ flexGrow: 1 }} className="centerContent">
-                        <GameFrameCounter />
-                    </Box>
-                    <Box
-                        ref={(el: HTMLElement | null) => {
-                            moneyAnchorRef.current = el;
-                        }}
-                        sx={{ display: { xs: 'none', md: 'flex' } }}
-                    >
-                        {moneyLabel?.amount != null && (
-                            <MoneyLabel
-                                key={moneyLabel.id}
-                                amount={moneyLabel.amount}
-                            />
-                        )}
-                        <Typography variant="body2" className="moneyLabel">
-                            ${formatMoney(money)}
-                        </Typography>
-                    </Box>
-                    <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                        <IconButton
-                            size="large"
-                            color="inherit"
-                            aria-controls={messageId}
-                            onClick={handleMessageMenuOpen}
-                            style={{ outline: 0 }}
-                        >
-                            <Badge
-                                badgeContent={unreadMessages}
-                                color="error"
-                            >
-                                <MailIcon />
-                            </Badge>
-                        </IconButton>
-                        <IconButton
-                            size="large"
-                            color="inherit"
-                            style={{ outline: 0 }}
-                            aria-controls={notificationId}
-                            onClick={handleNotificationMenuOpen}
-                        >
-                            <Badge
-                                badgeContent={unreadNotifications}
-                                color="error"
-                            >
-                                <NotificationsIcon />
-                            </Badge>
-                        </IconButton>
-                        <IconButton
-                            size="large"
-                            aria-label="Account of current user"
-                            aria-controls={menuId}
-                            aria-haspopup="true"
-                            onClick={handleProfileMenuOpen}
-                            color="inherit"
-                            style={{ outline: 0 }}
-                        >
-                            <AccountCircle />
-                        </IconButton>
-                    </Box>
-                    <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-                        <IconButton
-                            size="large"
-                            aria-label="show more"
-                            aria-controls={mobileMenuId}
-                            aria-haspopup="true"
-                            onClick={handleMobileMenuOpen}
-                            color="inherit"
-                            style={{ outline: 0 }}
-                        >
-                            <MoreIcon />
-                        </IconButton>
-                    </Box>
-                </Toolbar>
-            </AppBar>
+        <header className="titleTop">
+            {/* System Online */}
+            <ChromePanel>
+                <span className="navLiveDot" />
+                <span className="chrLabel">System Online</span>
+                <span className="chrDot">·</span>
+                <span className="chrChannel">secure channel</span>
+            </ChromePanel>
 
+            {/* Frame counter */}
+            <FrameReadout />
+
+            {/* Wallet (emphasized) — money label anchor */}
+            <ChromePanel
+                className="chrWallet"
+                style={{
+                    borderColor: 'rgba(var(--accent-rgb),0.4)',
+                    background: 'rgba(var(--accent-rgb),0.05)',
+                }}
+                panelRef={(el) => {
+                    moneyAnchorRef.current = el;
+                }}
+            >
+                <AccountBalanceWalletIcon
+                    sx={{ fontSize: 16, color: 'var(--accent)' }}
+                />
+                <div className="chrWalletStack">
+                    <span className="chrLabel">Available Balance</span>
+                    <span className="chrValue money">${formatMoney(money)}</span>
+                </div>
+                {moneyLabel?.amount != null && (
+                    <MoneyLabel key={moneyLabel.id} amount={moneyLabel.amount} />
+                )}
+            </ChromePanel>
+
+            {/* Operator level + XP — xp label anchor */}
+            <ChromePanel
+                panelRef={(el) => {
+                    xpAnchorRef.current = el;
+                }}
+            >
+                <div className="chrLevelStack">
+                    <div className="chrLevelTop">
+                        <span className="chrLabel">Operator Lvl</span>
+                        <span className="chrLevelNum">{level}</span>
+                    </div>
+                    <div className="chrXpRow">
+                        <div className="chrXpTrack">
+                            <div
+                                className="chrXpFill"
+                                style={{ width: `${xpPct * 100}%` }}
+                            />
+                        </div>
+                        <span className="chrXpReadout">
+                            {experience}/{nextLevel}
+                        </span>
+                    </div>
+                </div>
+                {xpLabel?.data?.amount != null && (
+                    <XpLabel
+                        key={xpLabel.id}
+                        amount={xpLabel.data.amount}
+                        levelUp={xpLabel.data.levelUp}
+                    />
+                )}
+            </ChromePanel>
+
+            <Box sx={{ flexGrow: 1 }} />
+
+            {/* Pause */}
+            <PauseButton />
+
+            {/* Comms */}
+            <Tooltip title="Messages">
+                <IconButton
+                    className="chrIconBtn"
+                    aria-label="Open messages"
+                    onClick={() => setMessagesOpen(true)}
+                >
+                    <Badge badgeContent={clampBadge(unreadMessages)} color="error">
+                        <MailIcon sx={{ fontSize: 18 }} />
+                    </Badge>
+                </IconButton>
+            </Tooltip>
+            <Tooltip title="Notifications">
+                <IconButton
+                    className="chrIconBtn"
+                    aria-controls={notificationId}
+                    onClick={handleNotificationMenuOpen}
+                >
+                    <Badge
+                        badgeContent={clampBadge(unreadNotifications)}
+                        color="error"
+                    >
+                        <NotificationsIcon sx={{ fontSize: 18 }} />
+                    </Badge>
+                </IconButton>
+            </Tooltip>
+
+            {/* Operator stamp */}
+            <div
+                className="chrOperator"
+                role="button"
+                tabIndex={0}
+                aria-controls={menuId}
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setAnchorEl(e.currentTarget);
+                    }
+                }}
+            >
+                <div className="chrAvatar">{initials}</div>
+                <div className="chrOperatorMeta">
+                    <div className="h">{callsign}</div>
+                    <div className="r">{operatorId}</div>
+                </div>
+            </div>
+
+            {/* ── Account menu ──────────────────────────────────────────── */}
             <Menu
                 anchorEl={anchorEl}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -376,58 +408,7 @@ export default function AppBarComponent() {
                 </MenuItem>
             </Menu>
 
-            <Menu
-                anchorEl={mobileAnchorEl}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                id={mobileMenuId}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                open={isMobileMenuOpen}
-                onClose={handleMobileMenuClose}
-            >
-                <MenuItem>
-                    <IconButton
-                        size="large"
-                        aria-label="show new mails"
-                        color="inherit"
-                        style={{ outline: 0 }}
-                    >
-                        <Badge badgeContent={unreadMessages} color="error">
-                            <MailIcon />
-                        </Badge>
-                    </IconButton>
-                    <p>Messages</p>
-                </MenuItem>
-                <MenuItem>
-                    <IconButton
-                        size="large"
-                        aria-label="show new notifications"
-                        color="inherit"
-                        style={{ outline: 0 }}
-                    >
-                        <Badge
-                            badgeContent={unreadNotifications}
-                            color="error"
-                        >
-                            <NotificationsIcon />
-                        </Badge>
-                    </IconButton>
-                    <p>Notifications</p>
-                </MenuItem>
-                <MenuItem onClick={handleProfileMenuOpen}>
-                    <IconButton
-                        size="large"
-                        aria-label="account of current user"
-                        aria-controls="primary-search-account-menu"
-                        aria-haspopup="true"
-                        color="inherit"
-                        style={{ outline: 0 }}
-                    >
-                        <AccountCircle />
-                    </IconButton>
-                    <p>Profile</p>
-                </MenuItem>
-            </Menu>
-
+            {/* ── Notifications menu ────────────────────────────────────── */}
             <Menu
                 anchorEl={notificationAnchorEl}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -517,9 +498,7 @@ export default function AppBarComponent() {
                     ]
                 ) : (
                     <MenuItem onClick={handleNotificationMenuClose}>
-                        <span style={{ fontWeight: 'bold' }}>
-                            No notifications
-                        </span>
+                        <span style={{ fontWeight: 'bold' }}>No notifications</span>
                     </MenuItem>
                 )}
             </Menu>
@@ -530,7 +509,9 @@ export default function AppBarComponent() {
                 maxWidth="xs"
                 fullWidth
             >
-                <DialogTitle>Delete notification{deleteConfirm?.mode === 'all' ? 's' : ''}?</DialogTitle>
+                <DialogTitle>
+                    Delete notification{deleteConfirm?.mode === 'all' ? 's' : ''}?
+                </DialogTitle>
                 <DialogContent>
                     {deleteConfirm?.mode === 'all'
                         ? 'This will permanently delete all notifications.'
@@ -557,37 +538,15 @@ export default function AppBarComponent() {
                 </DialogActions>
             </Dialog>
 
-            <Menu
-                anchorEl={messageAnchorEl}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                id={messageId}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                open={isMessageMenuOpen}
-                onClose={handleMessageMenuClose}
-            >
-                {messages.length > 0 ? (
-                    messages.map((message, index) => (
-                        <MenuItem
-                            key={index}
-                            onClick={() => markMessageAsRead(index)}
-                        >
-                            <span
-                                style={{
-                                    fontWeight: message.unread
-                                        ? 'bold'
-                                        : 'normal',
-                                }}
-                            >
-                                {index} - {message.body}
-                            </span>
-                        </MenuItem>
-                    ))
-                ) : (
-                    <MenuItem onClick={handleMessageMenuClose}>
-                        <span style={{ fontWeight: 'bold' }}>No messages</span>
-                    </MenuItem>
-                )}
-            </Menu>
-        </Box>
+            {/* ── Secure-comms messages modal ───────────────────────────── */}
+            <MessagesModal
+                open={messagesOpen}
+                onClose={() => setMessagesOpen(false)}
+                onSelectMessage={markMessageAsRead}
+                onTransmit={(recipient, body) =>
+                    stationProxy.os?.sendMessage(recipient, body)
+                }
+            />
+        </header>
     );
 }

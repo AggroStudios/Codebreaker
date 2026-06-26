@@ -1,5 +1,5 @@
 import { ICipherType } from './Cipher.interface';
-import { StatKey } from './Character.interface';
+import { HackerClassId, StatKey } from './Character.interface';
 import { Notification, Message } from './OperatingSystem.interface';
 import { Server } from './Servers.interface';
 import { IStatistics } from './Statistics.interface';
@@ -14,6 +14,8 @@ export interface IPurchasedUpgrade {
 
 export type Player = {
     name: string;
+    /** Operator class chosen at character creation; drives the accent theme. Null until chosen. */
+    classId: HackerClassId | null;
     money: number;
     experience: number;
     level: number;

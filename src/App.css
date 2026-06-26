@@ -58,12 +58,24 @@
 :root {
     /* Accent / Brand */
     --color-accent:         #0af5b0;   /* Primary teal-green — loading bar, CTA glow */
+    --accent-rgb:           10, 245, 176;  /* Accent channels; overridden per operator class */
     --color-accent-cyan:    #26c6da;   /* Terminal prompt color */
     --color-accent-logo:    #61dafb;   /* Logo hover glow (cyan-blue) */
 
     /* Codebreaker logo gradient (top → bottom) */
     --color-logo-top:       #00e5bf;
     --color-logo-bottom:    #003d35;
+
+    --color-green:          #0af5b0;
+    --color-red:            #ff2828;
+    --color-yellow:         #ff9800;
+    --color-blue:           #29b6f6;
+    --color-cyan:           #26c6da;
+    --color-purple:         #9c7fe0;
+    --color-orange:         #ffb74d;
+    --color-gray:           #808080;
+    --color-black:          #000000;
+    --color-white:          #ffffff;
 
     /* Status / Feedback */
     --color-income:         #28ff28;   /* Money earned — bright green with glow */
@@ -174,7 +186,7 @@
 /* ─── SEMANTIC TYPE RULES ─────────────────────────────────────────────────── */
 
 html {
-    scrollbar-color: rgba(10, 245, 176, 0.45) rgba(10, 245, 176, 0.25);
+    scrollbar-color: rgba(var(--accent-rgb), 0.45) rgba(var(--accent-rgb), 0.25);
 }
 
 body {

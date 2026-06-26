@@ -30,6 +30,8 @@ export default class OperatingSystem {
     private _worker: Worker | null = null;
     private _isRunning: boolean = false;
     private _storagePath: string = '/storage';
+    /** Frames the game loop has run; uptime seconds = floor(this / FPS). */
+    private _uptimeFrames: number = 0;
 
     constructor(player: PlayerState) {
         this._player = player;
@@ -94,6 +96,7 @@ export default class OperatingSystem {
     public set station(station: StationStoreType) {
         this._station = station;
         this._cpuActivity.state = station;
+        this._uptimeFrames = (station.uptime ?? 0) * FPS;
     }
 
     get storagePath() {
@@ -299,11 +302,11 @@ export default class OperatingSystem {
         // console.debug('[OperatingSystem] - Update');
         if (this._station) {
 
-            const newSecond = Math.round((1 / FPS) * this.currentFrame);
-            console.log(this.currentFrame, 1 / FPS);
-            if (this._station.uptime + newSecond > this._station.uptime) {
-                console.log('Updating uptime!');
-                this._station.setUptime(this._station.uptime + newSecond);
+            // Tick uptime in whole seconds — one store write per second, not per frame.
+            this._uptimeFrames++;
+            const uptimeSeconds = Math.floor(this._uptimeFrames / FPS);
+            if (uptimeSeconds !== this._station.uptime) {
+                this._station.setUptime(uptimeSeconds);
             }
 
             if (Math.round(this.currentFrame * 1000) % 100 === 0) {

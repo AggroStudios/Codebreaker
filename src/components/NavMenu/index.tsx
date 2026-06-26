@@ -1,168 +1,147 @@
-import {
-    List,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Drawer,
-    Divider,
-    Box,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { useMemo } from 'react';
 import { Link, useLocation } from 'react-router';
-import { forwardRef, type ReactNode, type Ref } from 'react';
 
 import LockTwoToneIcon from '@mui/icons-material/LockTwoTone';
 
-import { mainNavigation, secondaryNavigation } from '../../data/navigation';
+import {
+    mainNavigation,
+    secondaryNavigation,
+    type INavigationItem,
+} from '../../data/navigation';
+import { usePlayerStore } from '../../stores/player';
+import { useServersStore } from '../../stores/servers';
+import { useRacksStore } from '../../stores/racks';
+import { useDataCentersStore } from '../../stores/dataCenters';
 
+import CodeBreakerLogo from '../../assets/logos/codebreaker-logo.png';
 import AggroStudios from '../../assets/logos/AggroStudios.png';
 import './styles.scss';
-import PlayerLevel from '../PlayerLevel';
 
-const StyledLinkItemButton = styled(ListItemButton)(({ theme }) => ({
-    '&.Mui-selected': {
-        color: 'var(--accent)',
-        backgroundColor:
-            theme.palette.mode === 'dark'
-                ? 'rgba(10,245,176,0.08)'
-                : 'rgba(0, 0, 0, 0.08)',
-    },
-    '&.Mui-selected svg': {
-        color: 'var(--accent)',
-    },
-    '&.Mui-selected:hover': {
-        backgroundColor:
-            theme.palette.mode === 'dark'
-                ? 'rgba(121, 239, 204, 0.08)'
-                : 'rgba(0, 0, 0, 0.08)',
-    },
-}));
+// const APP_VERSION = import.meta.env.VITE_APP_VERSION ?? '';
 
-const StyledDrawer = styled(Drawer)({
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    top: 0,
-    width: 240,
-    height: '100%',
-    flexShrink: 0,
-    '.MuiDrawer-paper': {
-        position: 'relative',
-        width: 240,
-        background: 'rgba(50, 50, 50, 0.85)',
-        alignItems: 'stretch',
-    },
-});
+/**
+ * Resolves the right-aligned hint for a nav item, binding to live game state
+ * where it exists and falling back to the static descriptor from the data.
+ */
+function useNavHints(): Record<string, string> {
+    const level = usePlayerStore((s) => s.player.level);
+    const perks = usePlayerStore((s) => s.purchasedUpgrades.length);
+    const owned = useServersStore((s) => s.purchasedServers.length);
+    const racks = useRacksStore((s) => s.racks.length);
+    const sites = useDataCentersStore((s) => Object.keys(s.contracts).length);
 
-const StyledDrawerContainer = styled('div')({
-    overflow: 'auto',
-    height: '100%',
-    flexDirection: 'column',
-    display: 'flex',
-});
+    return useMemo(
+        () => ({
+            '/station': `lvl ${level} · home`,
+            '/servers': `${owned} owned`,
+            '/racks': `${racks} racks`,
+            '/dataCenters': `${sites} sites`,
+            '/upgrades': `${perks} perks`,
+        }),
+        [level, perks, owned, racks, sites],
+    );
+}
 
-const StyledDrawerSpacer = styled('div')({
-    flexGrow: 1,
-});
+interface TitleItemProps {
+    item: INavigationItem;
+    active: boolean;
+    hint?: string;
+}
 
-const RouterLinkInner = (
-    props: React.ComponentProps<typeof Link>,
-    ref: Ref<HTMLAnchorElement>,
-) => <Link ref={ref} {...props} />;
+/** Single nav row — caret · icon · LABEL · hint, matching the Title Screen menu. */
+function TitleItem({ item, active, hint }: TitleItemProps) {
+    const Icon = item.icon;
+    const locked = item.locked ?? false;
+    const className = ['titleItem', active ? 'active' : '', locked ? 'disabled' : '']
+        .filter(Boolean)
+        .join(' ');
 
-const RouterLink = forwardRef(RouterLinkInner);
+    const content = (
+        <>
+            <span className="caret">▸</span>
+            <span className="icon">{locked ? <LockTwoToneIcon /> : <Icon />}</span>
+            <span className="label">
+                <span>{locked ? 'Locked' : item.title}</span>
+                {item.badge && !locked && <span className="badge">{item.badge}</span>}
+            </span>
+            <span className="hint">{hint ?? item.hint}</span>
+        </>
+    );
 
-const StyledA = styled(RouterLink)({
-    '&:hover': {
-        color: 'white',
-    },
-    textDecoration: 'none',
-    color: 'inherit',
-    display: 'flex',
-    width: '100%',
-});
+    const id = `main-nav-item-${item.title.replaceAll(' ', '-').toLowerCase()}`;
 
-function ListItemNavLink(props: {
-    to: string;
-    id?: string;
-    disabled?: boolean;
-    children: ReactNode;
-}) {
-    const location = useLocation();
+    if (locked) {
+        return (
+            <li className={className} id={id} aria-disabled="true">
+                {content}
+            </li>
+        );
+    }
+
     return (
-        <div className="sideNavContainer" id={props.id}>
-            <StyledLinkItemButton
-                disabled={props.disabled}
-                selected={location.pathname === props.to}
-                {...({ component: StyledA, to: props.to } as object)}
+        <li>
+            <Link
+                to={item.link}
+                id={id}
+                className={className}
+                aria-current={active ? 'page' : undefined}
             >
-                {props.children}
-            </StyledLinkItemButton>
-        </div>
-    );
-}
-
-function MainListItems() {
-    return (
-        <List>
-            {mainNavigation.map((item, key) => {
-                const Icon = item.icon;
-                return (
-                    <ListItemNavLink
-                        key={key}
-                        disabled={item.locked || false}
-                        to={item.link}
-                        id={`main-nav-item-${item.title.replaceAll(' ', '-').toLowerCase()}`}
-                    >
-                        <ListItemIcon>
-                            {item.locked ? <LockTwoToneIcon /> : <Icon />}
-                        </ListItemIcon>
-                        <ListItemText
-                            primary={item.locked ? 'Locked' : item.title}
-                        />
-                    </ListItemNavLink>
-                );
-            })}
-        </List>
-    );
-}
-
-function SecondaryListItems() {
-    return (
-        <List>
-            {secondaryNavigation.map((item, key) => {
-                const Icon = item.icon;
-                return (
-                    <ListItemNavLink key={key} to={item.link}>
-                        <ListItemIcon>
-                            <Icon />
-                        </ListItemIcon>
-                        <ListItemText primary={item.title} />
-                    </ListItemNavLink>
-                );
-            })}
-        </List>
+                {content}
+            </Link>
+        </li>
     );
 }
 
 export default function NavMenu() {
+    const location = useLocation();
+    const hints = useNavHints();
+
+    const isActive = (link: string) => location.pathname === link;
+
     return (
-        <StyledDrawer
-            variant="persistent"
-            open={true}
-            style={{ display: 'flex' }}
-        >
-            <StyledDrawerContainer>
-                <Box sx={{ flexShrink: 1, flexGrow: 1, overflow: 'auto' }}>
-                    <Divider />
-                    <MainListItems />
-                    <Divider />
-                    <SecondaryListItems />
-                    <StyledDrawerSpacer />
-                </Box>
-                <PlayerLevel />
-                <img src={AggroStudios} className="aggroLogo" style={{ flexShrink: 0, flexGrow: 0 }} />
-            </StyledDrawerContainer>
-        </StyledDrawer>
+        <aside className="titleSide">
+            {/* Brand */}
+            <div className="titleBrand">
+                {/*
+                  width/height are the PNG's true intrinsic pixels so the
+                  browser knows the aspect ratio before it decodes; the inline
+                  height pins the rendered size on the first paint (before the
+                  stylesheet is injected) so the logo never flashes full-size.
+                */}
+                <img
+                    src={CodeBreakerLogo}
+                    className="brandLogo"
+                    alt="Codebreaker"
+                />
+            </div>
+
+            {/* Menu */}
+            <ul className="titleMenu">
+                <li className="titleMenuGroupLabel">Operations</li>
+                {mainNavigation.map((item) => (
+                    <TitleItem
+                        key={item.link}
+                        item={item}
+                        active={isActive(item.link)}
+                        hint={hints[item.link]}
+                    />
+                ))}
+                <li className="titleMenuGroupLabel">Meta</li>
+                {secondaryNavigation.map((item) => (
+                    <TitleItem
+                        key={item.link}
+                        item={item}
+                        active={isActive(item.link)}
+                        hint={hints[item.link]}
+                    />
+                ))}
+            </ul>
+
+            {/* AGGRO Studios badge */}
+            <div className="titleAggro">
+                <img src={AggroStudios} alt="AGGRO Studios" />
+                <div className="copy">© 2026 · Aggro Studios</div>
+            </div>
+        </aside>
     );
 }

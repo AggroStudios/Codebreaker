@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import { UpgradeList, type IUpgradeItem } from '../../data/upgrades';
 
 import { usePlayerStore } from '../../stores/player';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Button from '@mui/material/Button';
 
 import Dialog from '@mui/material/Dialog';
@@ -110,35 +110,29 @@ function ConfirmDialog({
 }
 
 export default function UpgradesComponent() {
-    const playerStore = usePlayerStore();
+    const money = usePlayerStore((s) => s.player.money);
     const purchaseUpgradeTier = usePlayerStore((s) => s.purchaseUpgradeTier);
     const { stationProxy } = useStationContext();
 
     const purchasedUpgrades = usePlayerStore((s) => s.purchasedUpgrades);
 
     const [cantAffordDialogOpen, setCantAffordDialogOpen] = useState(false);
-    const [displayedUpgrades, setDisplayedUpgrades] = useState<IUpgradeItem[]>(UpgradeList);
     const [filter, setFilter] = useState<string>('all');
     const [showOwned, setShowOwned] = useState(true);
     const [hideFullyUpgraded, setHideFullyUpgraded] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-    const [filterLabels, setFilterLabels] = useState<string[]>(['all']);
     const [selectedUpgrade, setSelectedUpgrade] = useState<IUpgradeItem | null>(null);
     const [confirmPurchaseDialogOpen, setConfirmPurchaseDialogOpen] = useState(false);
 
     const [upgradeToPurchase, setUpgradeToPurchase] = useState<IUpgradeItem | null>(null);
     const [tierToPurchase, setTierToPurchase] = useState<IUpgradeTier | null>(null);
 
-    useEffect(() => {
-        const labels = new Set<string>();
-        labels.add('all');
-        UpgradeList.forEach((upg) => {
-            upg.tags.forEach((tag) => {
-                labels.add(tag);
-            });
-        });
-        setFilterLabels(Array.from(labels));
+    // Static set of tag labels derived once from the upgrade catalogue.
+    const filterLabels = useMemo(() => {
+        const labels = new Set<string>(['all']);
+        UpgradeList.forEach((upg) => upg.tags.forEach((tag) => labels.add(tag)));
+        return Array.from(labels);
     }, []);
 
     useEffect(() => {
@@ -151,7 +145,9 @@ export default function UpgradesComponent() {
         };
     }, [searchTerm]);
 
-    useEffect(() => {
+    // Derived in-render (not state + effect) so opening the tab paints the
+    // filtered list once instead of re-rendering the full catalogue twice.
+    const displayedUpgrades = useMemo(() => {
         const purchasedTierCountByKey = purchasedUpgrades.reduce<Record<string, number>>(
             (acc, item) => {
                 acc[item.upgradeId] = (acc[item.upgradeId] ?? 0) + 1;
@@ -162,22 +158,20 @@ export default function UpgradesComponent() {
 
         const normalizedSearch = debouncedSearchTerm.trim().toLowerCase();
 
-        setDisplayedUpgrades(
-            UpgradeList.filter((upg) => {
-                const purchasedTierCount = purchasedTierCountByKey[upg.key] ?? 0;
-                const isOwned = purchasedTierCount > 0;
-                const isFullyUpgraded = purchasedTierCount >= upg.tiers.length;
+        return UpgradeList.filter((upg) => {
+            const purchasedTierCount = purchasedTierCountByKey[upg.key] ?? 0;
+            const isOwned = purchasedTierCount > 0;
+            const isFullyUpgraded = purchasedTierCount >= upg.tiers.length;
 
-                const tagMatches = filter === 'all' || upg.tags.includes(filter);
-                const searchMatches = normalizedSearch.length === 0
-                    || upg.name.toLowerCase().includes(normalizedSearch)
-                    || upg.description.toLowerCase().includes(normalizedSearch);
-                const ownedMatches = showOwned || !isOwned;
-                const fullyUpgradedMatches = !hideFullyUpgraded || !isFullyUpgraded;
+            const tagMatches = filter === 'all' || upg.tags.includes(filter);
+            const searchMatches = normalizedSearch.length === 0
+                || upg.name.toLowerCase().includes(normalizedSearch)
+                || upg.description.toLowerCase().includes(normalizedSearch);
+            const ownedMatches = showOwned || !isOwned;
+            const fullyUpgradedMatches = !hideFullyUpgraded || !isFullyUpgraded;
 
-                return tagMatches && searchMatches && ownedMatches && fullyUpgradedMatches;
-            }),
-        );
+            return tagMatches && searchMatches && ownedMatches && fullyUpgradedMatches;
+        });
     }, [debouncedSearchTerm, filter, hideFullyUpgraded, purchasedUpgrades, showOwned]);
 
     const handleConfirmPurchaseDialogClose = () => {
@@ -242,7 +236,7 @@ export default function UpgradesComponent() {
                     <Stat
                         className="balance-display"
                         label="Available Balance"
-                        value={`$${formatMoney(playerStore.player.money)}`}
+                        value={`$${formatMoney(money)}`}
                         accent="accent"
                     />
                 }

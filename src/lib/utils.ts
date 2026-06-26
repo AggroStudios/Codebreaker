@@ -20,6 +20,20 @@ export const formatMoney = (money: number, decimalPlaces: number = 2) => {
     });
 }
 
+/** Convert a `#rrggbb` (or `#rgb`) hex color to an `"r, g, b"` channel triple. */
+export const hexToRgbTriple = (hex: string): string => {
+    const h = hex.replace('#', '');
+    const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+    const r = parseInt(full.slice(0, 2), 16);
+    const g = parseInt(full.slice(2, 4), 16);
+    const b = parseInt(full.slice(4, 6), 16);
+    return `${r}, ${g}, ${b}`;
+};
+
+/** Convert a `#rrggbb` (or `#rgb`) hex color to an `rgba()` string. */
+export const hexToRgba = (hex: string, alpha: number): string =>
+    `rgba(${hexToRgbTriple(hex)}, ${alpha})`;
+
 export const formatPower = (power: number) => {
     const units = ['W', 'kW', 'MW', 'GW', 'TW'];
     const index = Math.floor(Math.log10(power) / 3);

@@ -63,7 +63,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    padding: 2em;
+    padding: 1em 2em 2em 2em;
     box-sizing: border-box;
 }
 
@@ -126,20 +126,80 @@
 }
 
 .servers-tabs {
+    min-height: 0;
 
-    & .MuiTab-root.Mui-selected {
-        color: var(--accent) !important;
-
-        &::after {
-            border-bottom: 2px solid var(--accent) !important;
-        }
-    }
-
-    & .MuiTab-root:focus {
-        outline: none;
+    & .MuiTabs-list {
+        background-color: var(--color-bg-card);
+        padding: var(--space-4);
+        border-radius: var(--radius-md);
+        margin-top: var(--space-4);
     }
 
     & .MuiTabs-indicator {
-        background-color: var(--accent) !important;
+        display: none;
+    }
+
+    & .MuiTabs-flexContainer {
+        gap: var(--space-2);
+    }
+
+    & .MuiTab-root {
+        min-height: 0;
+        padding: 8px 14px;
+        border: 1px solid transparent;
+        border-radius: var(--radius-md);
+        color: var(--fg-secondary);
+        font-family: var(--font-code);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        transition: color 150ms ease, border-color 150ms ease, background 150ms ease,
+            box-shadow 150ms ease;
+
+        & .MuiTab-icon,
+        & .MuiTab-iconWrapper {
+            margin-right: var(--space-2);
+
+            svg {
+                font-size: 18px;
+            }
+        }
+
+        &:hover {
+            color: var(--fg-primary);
+        }
+
+        &:focus {
+            outline: none;
+        }
+
+        &.Mui-selected {
+            color: var(--accent);
+            border-color: rgba(var(--accent-rgb), 0.5);
+            background: rgba(var(--accent-rgb), 0.06);
+            box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.15),
+                0 0 14px rgba(var(--accent-rgb), 0.15);
+
+            & .servers-tab__count {
+                color: var(--accent);
+                background: rgba(0, 0, 0, 0.4);
+                border-radius: var(--radius-pill);
+                padding: 1px 9px;
+            }
+        }
+    }
+
+    & .servers-tab__label {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    & .servers-tab__count {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--fg-secondary);
+        font-variant-numeric: tabular-nums;
     }
 }

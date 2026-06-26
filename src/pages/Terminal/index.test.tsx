@@ -11,6 +11,7 @@ function createMockPlayerState(): PlayerState {
     return {
         player: {
             name: 'TestPlayer',
+            classId: null,
             money: 0,
             experience: 0,
             level: 1,

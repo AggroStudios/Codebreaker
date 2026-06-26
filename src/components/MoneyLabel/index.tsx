@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useAnchors } from '../AnchorsContext';
 import './styles.scss';
 
@@ -26,9 +27,12 @@ export default function MoneyLabel({ amount }: { amount: number }) {
         });
     }, [amount, moneyAnchorRef]);
 
-    return (
+    // Portal to <body> so the position:fixed label is positioned relative to the
+    // viewport, not a backdrop-filtered/transformed ancestor (e.g. the app bar).
+    return createPortal(
         <div ref={divRef} className="glow">
             ${amount}
-        </div>
+        </div>,
+        document.body,
     );
 }

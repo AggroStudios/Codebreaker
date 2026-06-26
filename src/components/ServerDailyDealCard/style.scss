@@ -50,7 +50,7 @@
 .server-daily-deal-card__inner {
     position: relative;
     z-index: 1;
-    padding: 1.25rem 1.35rem 1.35rem;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -61,10 +61,10 @@
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    padding: 0.35rem 0.75rem;
+    padding: 0.2rem 0.75rem !important;
     border-radius: 9999px;
     font-family: var(--font-code, 'Fira Code', monospace);
-    font-size: 0.65rem;
+    font-size: 1rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -113,7 +113,7 @@
 }
 
 .server-daily-deal-card__badge-time {
-    color: rgba(10, 245, 176, 0.95);
+    color: rgba(var(--accent-rgb), 0.95);
     letter-spacing: 0.08em;
 }
 
@@ -130,6 +130,12 @@
     }
 }
 
+.server-daily-deal-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
 .server-daily-deal-card__copy {
     flex: 1;
     min-width: 0;
@@ -139,11 +145,11 @@
 }
 
 .server-daily-deal-card__eyebrow {
-    font-family: var(--font-code, 'Fira Code', monospace);
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    font-family: var(--font-code, 'Fira Code', monospace) !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.16em !important;
+    text-transform: uppercase !important;
 
     &.tier-entry {
         color: rgba(255, 255, 255, 0.95);
@@ -174,55 +180,56 @@
 }
 
 .server-daily-deal-card__model {
-    font-size: clamp(1.75rem, 4vw, 2.35rem);
-    font-weight: 700;
-    line-height: 1.1;
-    color: rgba(255, 255, 255, 0.96);
-    letter-spacing: -0.02em;
+    font-size: clamp(1.75rem, 4vw, 2.35rem) !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+    color: rgba(255, 255, 255, 0.96) !important;
+    letter-spacing: -0.02em !important;
 }
 
 .server-daily-deal-card__form {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    color: rgba(255, 255, 255, 0.45) !important;
 }
 
 .server-daily-deal-card__specs {
-    font-size: 14px;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.52);
-    max-width: 52ch;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    color: rgba(255, 255, 255, 0.52) !important;
+    max-width: 52ch !important;
 }
 
 .server-daily-deal-card__pricing {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: center !important;
     gap: 0.65rem 1rem;
-    margin-top: 0.35rem;
+    margin-top: 0.35rem !important;
 }
 
 .server-daily-deal-card__price-sale {
-    font-family: var(--font-code, 'Fira Code', monospace);
-    font-size: clamp(1.65rem, 3.5vw, 2.1rem);
-    font-weight: 700;
-    color: #0af5b0;
-    letter-spacing: -0.02em;
+    font-family: var(--font-code, 'Fira Code', monospace) !important;
+    font-size: clamp(1.65rem, 3.5vw, 2.1rem) !important;
+    font-weight: 700 !important;
+    color: #0af5b0 !important;
+    letter-spacing: -0.02em !important;
 }
 
 .server-daily-deal-card__price-list {
-    font-family: var(--font-code, 'Fira Code', monospace);
-    font-size: 1rem;
+    font-family: var(--font-code, 'Fira Code', monospace) !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
     color: rgba(255, 255, 255, 0.38);
-    text-decoration: line-through;
+    text-decoration: line-through !important;
 }
 
 .server-daily-deal-card__discount-chip {
-    padding: 0.2rem 0.55rem;
+    padding: 0.2rem 0.55rem !important;
     border-radius: 6px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    font-family: var(--font-code, 'Fira Code', monospace);
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    font-family: var(--font-code, 'Fira Code', monospace) !important;
     background: rgba(180, 40, 55, 0.55);
     border: 1px solid rgba(255, 80, 100, 0.35);
     color: rgba(255, 220, 224, 0.95);
@@ -243,12 +250,12 @@
     padding-left: 1.1rem;
     padding-right: 1.25rem;
     border-radius: 8px;
-    background: #0af5b0 !important;
+    background: var(--accent) !important;
     color: #0a0f0d !important;
-    box-shadow: 0 0 20px rgba(10, 245, 176, 0.25);
+    box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.25);
 
     &:hover {
-        background: #33ffc0 !important;
+        background: rgba(var(--accent-rgb), 0.8) !important;
     }
 }
 

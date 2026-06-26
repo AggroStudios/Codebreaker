@@ -16,6 +16,7 @@ import LoadingScreen from './components/LoadingScreen';
 import Settings from './components/Settings';
 import About from './components/About';
 import MusicPlayer from './components/MusicPlayer';
+import ClassAccentSync from './components/ClassAccentSync';
 
 import { useUIStore } from './stores/ui';
 import { useMusicPlayerStore } from './stores/musicPlayer';
@@ -25,6 +26,10 @@ import { useSessionStore } from './stores/session';
 import { preloadImages } from './lib/preloader';
 
 import './index.css';
+// Design-system tokens (fonts + :root CSS variables) — must load eagerly with
+// the app shell so the nav/header fonts and colors are correct on first paint,
+// rather than only once the lazy Station route injects this sheet.
+import './App.css';
 import {
     GAME_PERSISTENCE_VERSION,
     PERSISTENCE_VERSION_KEY,
@@ -82,6 +87,7 @@ const AppWithProviders = () => {
 
     return (
         <>
+            <ClassAccentSync />
             <MusicPlayer />
             <BrowserRouter>
                 <Routes>

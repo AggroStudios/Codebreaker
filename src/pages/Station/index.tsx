@@ -6,10 +6,9 @@ import StationStatistics from '../../components/StationStatistics';
 import CpuActivityWidget from '../../components/CpuActivity';
 
 import { useCipherStore } from '../../stores/cipher';
-import { useStationContext } from '../../stores/stationContext';
+import { useStationContext, useStationState } from '../../stores/stationContext';
 import { usePlayerStore } from '../../stores/player';
 
-import '../../App.css';
 import './style.scss';
 import CipherAdd from '../../components/CipherAdd';
 import { Chip } from '@mui/material';
@@ -18,6 +17,15 @@ import clsx from 'clsx';
 
 import PageHeader from '../../components/common/PageHeader';
 import { useThreatsStore } from '../../stores/threats';
+
+/** Formats a duration in seconds as `H:MM:SS`. */
+function formatUptime(totalSeconds: number): string {
+    const s = Math.max(0, Math.floor(totalSeconds));
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    return `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+}
 
 function StationHeader({ uptime, threats }) {
     return (
@@ -40,11 +48,14 @@ function StationHeader({ uptime, threats }) {
 
 export default function StationComponent() {
     const { stationProxy } = useStationContext();
-    const { showTutorial } = usePlayerStore();
+    // Select individual slices so the page doesn't re-render on every unrelated
+    // player/cipher store change (e.g. money ticking each income frame).
+    const showTutorial = usePlayerStore((s) => s.showTutorial);
 
     const setStation = useCipherStore((s) => s.setStation);
     const threatCount = useThreatsStore((s) => s.threatCount);
-    
+    const uptimeSeconds = useStationState((s) => s.uptime);
+
     useEffect(() => {
         showTutorial('station');
     }, []);
@@ -53,11 +64,13 @@ export default function StationComponent() {
         setStation(stationProxy);
     }, [setStation, stationProxy]);
 
-    const { runningProcesses, addProcess, removeProcess } = useCipherStore();
+    const runningProcesses = useCipherStore((s) => s.runningProcesses);
+    const addProcess = useCipherStore((s) => s.addProcess);
+    const removeProcess = useCipherStore((s) => s.removeProcess);
 
     return (
         <>
-            <StationHeader uptime="4:00:00" threats={threatCount} />
+            <StationHeader uptime={formatUptime(uptimeSeconds)} threats={threatCount} />
             <div className="card">
                 <Grid container spacing={2}>
                     <Grid size={4} id="coachmark-statistics">

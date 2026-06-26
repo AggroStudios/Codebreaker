@@ -28,6 +28,8 @@ import {
 } from '@mui/icons-material';
 
 import { HackerClass } from '../includes/Character.interface';
+import { CLASS_CONFIG } from './classConfig';
+import { hexToRgba } from '../lib/utils';
 
 export const HACKER_CLASSES: HackerClass[] = [
     {
@@ -37,9 +39,9 @@ export const HACKER_CLASSES: HackerClass[] = [
         classification: 'CRYPTOLOGIST · CLASS-A',
         glyph: FunctionsTwoTone,
         portraitId: 'CW-01',
-        accent: '#0af5b0',
-        accentSoft: 'rgba(10,245,176,0.14)',
-        accentEdge: 'rgba(10,245,176,0.36)',
+        accent: CLASS_CONFIG.cipherwright.accent,
+        accentSoft: hexToRgba(CLASS_CONFIG.cipherwright.accent, 0.14),
+        accentEdge: hexToRgba(CLASS_CONFIG.cipherwright.accent, 0.36),
         difficulty: 2,
         tagline: 'Reads block ciphers like sheet music.',
         bio:
@@ -66,7 +68,7 @@ export const HACKER_CLASSES: HackerClass[] = [
             desc: 'Instantly resolves one active cipher cycle of complexity ≤ 12 and refunds 50% of its power cost.',
         },
         recommended: ['Idle / long sessions', 'Neural Net builds', 'Solo prestige runs'],
-        startingWallet: 8400,
+        startingWallet: CLASS_CONFIG.cipherwright.startingWallet,
     },
     {
         id: 'operator',
@@ -75,9 +77,9 @@ export const HACKER_CLASSES: HackerClass[] = [
         classification: 'INFRASTRUCTURE · CLASS-B',
         glyph: DeveloperBoardTwoTone,
         portraitId: 'OP-04',
-        accent: '#26c6da',
-        accentSoft: 'rgba(38,198,218,0.14)',
-        accentEdge: 'rgba(38,198,218,0.36)',
+        accent: CLASS_CONFIG.operator.accent,
+        accentSoft: hexToRgba(CLASS_CONFIG.operator.accent, 0.14),
+        accentEdge: hexToRgba(CLASS_CONFIG.operator.accent, 0.36),
         difficulty: 1,
         tagline: 'Owns more rack space than most ISPs.',
         bio:
@@ -104,7 +106,7 @@ export const HACKER_CLASSES: HackerClass[] = [
             desc: 'Brings every offline node back to 100% utilization for 5 minutes with zero power penalty.',
         },
         recommended: ['Beginners', 'Active play', 'Marketplace flips'],
-        startingWallet: 12200,
+        startingWallet: CLASS_CONFIG.operator.startingWallet,
     },
     {
         id: 'phantom',
@@ -113,9 +115,9 @@ export const HACKER_CLASSES: HackerClass[] = [
         classification: 'SOCIAL ENGINEER · CLASS-S',
         glyph: VisibilityOffTwoTone,
         portraitId: 'PH-??',
-        accent: '#ff9800',
-        accentSoft: 'rgba(255,152,0,0.14)',
-        accentEdge: 'rgba(255,152,0,0.40)',
+        accent: CLASS_CONFIG.phantom.accent,
+        accentSoft: hexToRgba(CLASS_CONFIG.phantom.accent, 0.14),
+        accentEdge: hexToRgba(CLASS_CONFIG.phantom.accent, 0.4),
         difficulty: 4,
         tagline: 'Has been everyone. Has never been caught.',
         bio:
@@ -142,7 +144,7 @@ export const HACKER_CLASSES: HackerClass[] = [
             desc: 'Run any single mission with 0% heat and double payout. Cannot be detected, logged, or replayed.',
         },
         recommended: ['Advanced players', 'High-risk runs', 'Dark Web mains'],
-        startingWallet: 5800,
+        startingWallet: CLASS_CONFIG.phantom.startingWallet,
     },
 ];
 

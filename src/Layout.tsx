@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import { styled } from '@mui/material/styles';
 
@@ -26,18 +26,21 @@ import ThreatWatcher from './lib/threats';
 import ServersData from './data/servers';
 import ThreatPuzzleModal from './components/ThreatPuzzleModal';
 
-const TerminalRoute = lazy(() => import('./pages/Terminal'));
-const StationRoute = lazy(() => import('./pages/Station'));
-const LoginRoute = lazy(() => import('./components/Login'));
-const ServersRoute = lazy(() => import('./pages/Servers'));
-const ServerRacksRoute = lazy(() => import('./pages/ServerRacks'));
-const DataCentersRoute = lazy(() => import('./pages/DataCenters'));
-const NetworksRoute = lazy(() => import('./pages/Networks'));
-const DarkWebRoute = lazy(() => import('./pages/DarkWeb'));
-const NeuralNetRoute = lazy(() => import('./pages/NeuralNet'));
-const UpgradesRoute = lazy(() => import('./pages/Upgrades'));
-const PrestigeRoute = lazy(() => import('./pages/Prestige'));
-const StatisticsRoute = lazy(() => import('./pages/Statistics'));
+// Route components are imported eagerly. Every route is needed shortly after the
+// shell mounts (they were all preloaded immediately anyway), so lazy-loading only
+// added a blank Suspense gap on the first navigation to each one.
+import StationRoute from './pages/Station';
+import TerminalRoute from './pages/Terminal';
+import LoginRoute from './components/Login';
+import ServersRoute from './pages/Servers';
+import ServerRacksRoute from './pages/ServerRacks';
+import DataCentersRoute from './pages/DataCenters';
+import NetworksRoute from './pages/Networks';
+import DarkWebRoute from './pages/DarkWeb';
+import NeuralNetRoute from './pages/NeuralNet';
+import UpgradesRoute from './pages/Upgrades';
+import PrestigeRoute from './pages/Prestige';
+import StatisticsRoute from './pages/Statistics';
 
 const backgroundModules = import.meta.glob<string>(
     './assets/backgrounds/*_bg.png',
@@ -54,35 +57,68 @@ function getBackground(pathname: string): string | null {
     );
 }
 
-const MainContainer = styled('div', {
+// Title Console shell — full-viewport grid: [320px sidebar | 1fr main].
+const ShellRoot = styled('div', {
     shouldForwardProp: (prop) => prop !== 'background',
 })<{ background: string | null }>(({ background }) => ({
-    paddingTop: '64px',
-    boxSizing: 'border-box',
-    height: '100%',
-    width: '100%',
     position: 'absolute',
-    top: 0,
-    left: 0,
-    display: 'flex',
+    inset: 0,
+    display: 'grid',
+    gridTemplateColumns: '320px 1fr',
+    overflow: 'hidden',
+    color: 'rgba(255,255,255,0.87)',
+    backgroundColor: '#07090b',
+    // Per-route scene art sits behind the entire shell so the semi-transparent
+    // sidebar and header read as glass panels over the scene.
     backgroundImage: background
         ? `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${background}')`
         : 'none',
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
-    backgroundAttachment: 'fixed',
     backgroundPosition: 'center',
+    // Corner radial glows behind everything.
+    '&::before': {
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        background:
+            'radial-gradient(ellipse at 0% 0%, rgba(10,245,176,0.08), transparent 50%),' +
+            'radial-gradient(ellipse at 100% 100%, rgba(38,198,218,0.04), transparent 55%)',
+        pointerEvents: 'none',
+        zIndex: 0,
+    },
+    // Subtle scanline overlay across the whole shell.
+    '&::after': {
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        background:
+            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px)',
+        zIndex: 50,
+    },
 }));
+
+const MainColumn = styled('div')({
+    position: 'relative',
+    zIndex: 2,
+    gridColumn: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    minWidth: 0,
+    overflow: 'hidden',
+});
 
 const GameContainer = styled('div')({
     flexGrow: 1,
     minHeight: 0,
     display: 'flex',
-    height: '100%',
     flexDirection: 'column',
     transitionDuration: '225ms',
     transitionTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)',
     overflowY: 'auto',
+    // Transparent: the scene art is painted behind the whole shell (ShellRoot).
+    background: 'transparent',
 });
 
 type Bootstrap = {
@@ -137,19 +173,6 @@ export default function Layout() {
         const next = createBootstrap();
         setBootstrap(next);
 
-        import('./pages/Terminal');
-        import('./pages/Station');
-        import('./components/Login');
-        import('./pages/Servers');
-        import('./pages/ServerRacks');
-        import('./pages/DataCenters');
-        import('./pages/Networks');
-        import('./pages/DarkWeb');
-        import('./pages/NeuralNet');
-        import('./pages/Upgrades');
-        import('./pages/Prestige');
-        import('./pages/Statistics');
-
         return () => {
             next.operatingSystem.shutdown();
         };
@@ -193,11 +216,11 @@ export default function Layout() {
                     <Coachmarks open={showTutorial} />
                     <ScreenGlow />
                     <ThreatPuzzleModal />
-                    <AppBar />
-                    <MainContainer background={getBackground(location.pathname)}>
+                    <ShellRoot background={getBackground(location.pathname)}>
                         <NavMenu />
-                        <GameContainer>
-                            <Suspense fallback={null}>
+                        <MainColumn>
+                            <AppBar />
+                            <GameContainer>
                                 <Routes>
                                     <Route path="terminal" element={
                                         <TerminalRoute
@@ -218,9 +241,9 @@ export default function Layout() {
                                     <Route path="stats" element={<StatisticsRoute />} />
                                     <Route path="*" />
                                 </Routes>
-                            </Suspense>
-                        </GameContainer>
-                    </MainContainer>
+                            </GameContainer>
+                        </MainColumn>
+                    </ShellRoot>
                 </StationStoreProvider>
             </AnchorsProvider>
         </NotifierProvider>

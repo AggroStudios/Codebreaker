@@ -155,6 +155,8 @@ export default function ServerFilters({ servers, className, priceRange, onChange
                         size="small"
                         fullWidth
                         variant="standard"
+                        name="server-search"
+                        autoComplete="off"
                         slotProps={{
                             input: {
                                 startAdornment: (
@@ -167,6 +169,18 @@ export default function ServerFilters({ servers, className, priceRange, onChange
                                         />
                                     </InputAdornment>
                                 ),
+                            },
+                            // Keep password managers (LastPass, 1Password, Dashlane,
+                            // Chrome autofill) off this plain search field.
+                            htmlInput: {
+                                'data-lpignore': 'true',
+                                'data-1p-ignore': 'true',
+                                'data-form-type': 'other',
+                                'data-bwignore': 'true',
+                                autoComplete: 'off',
+                                autoCorrect: 'off',
+                                autoCapitalize: 'off',
+                                spellCheck: false,
                             },
                         }}
                     />
@@ -184,6 +198,7 @@ export default function ServerFilters({ servers, className, priceRange, onChange
                                     type="button"
                                     key={row.id ?? 'all-tiers'}
                                     role="listitem"
+                                    color="inherit"
                                     className={clsx(
                                         'server-filters__tier-row',
                                         selected && 'server-filters__tier-row--selected',

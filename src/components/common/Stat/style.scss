@@ -26,8 +26,8 @@
             }
 
             &.accent {
-                color: #0af5b0;
-                text-shadow: 0 0 12px rgba(10,245,176,0.4);
+                color: var(--accent);
+                text-shadow: 0 0 12px rgba(var(--accent-rgb), 0.4);
             }
             
             &.orange {
@@ -53,8 +53,8 @@
         animation: none !important;
 
         &.accent {
-            color: #0af5b0;
-            text-shadow: 0 0 12px rgba(10,245,176,0.4);
+            color: var(--accent);
+            text-shadow: 0 0 12px rgba(var(--accent-rgb), 0.4);
         }
 
         &.cyan {

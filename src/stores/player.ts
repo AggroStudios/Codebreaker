@@ -147,6 +147,7 @@ const createPlayerStore = () => create<PlayerState>()(
         (set) => ({
             player: {
                 name: 'Player',
+                classId: null,
                 money: 1000,
                 experience: 0,
                 nextLevel: experienceForLevel(1),

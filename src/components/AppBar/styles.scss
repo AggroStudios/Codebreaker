@@ -1,32 +1,274 @@
-.mainLogo {
-    height: 45px;
-    margin-top: 0.5em;
-    margin-left: 25px;
-    will-change: filter;
-    transition: filter 300ms;
+/* ── Title Console — Top header bar ──────────────────────────────────────── */
+.titleTop {
+    height: 76px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    background: rgba(10, 13, 16, 0.45);
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.1);
+    backdrop-filter: blur(2px);
 }
 
-.mainLogo:hover {
-    filter: drop-shadow(0 0 0.5em #61dafbaa);
+/* Bracket-cornered chrome panel */
+.bracketFrame {
+    position: relative;
+    background: rgba(12, 16, 18, 0.55);
+    border: 1px solid rgba(var(--accent-rgb), 0.18);
+    border-radius: 4px;
+    backdrop-filter: blur(2px);
 }
 
-.centerContent {
-    text-align: center;
+.brC {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: rgba(var(--accent-rgb), 0.75);
+    border-style: solid;
 }
 
-.moneyLabel {
-    font-family: var(--font-code) !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    color: var(--accent) !important;
-    letter-spacing: 0.05em !important;
-    text-shadow: 0 0 0.5em rgba(10, 245, 176, 0.5) !important;
-    margin-left: 12px !important;
+.brTl {
+    top: -1px;
+    left: -1px;
+    border-width: 1px 0 0 1px;
 }
 
-.gameFrameCounter {
-    font-family: var(--font-code) !important;
-    font-size: 12px !important;
-    color: var(--fg-3) !important;
-    letter-spacing: 0.03em !important;
+.brTr {
+    top: -1px;
+    right: -1px;
+    border-width: 1px 1px 0 0;
+}
+
+.brBl {
+    bottom: -1px;
+    left: -1px;
+    border-width: 0 0 1px 1px;
+}
+
+.brBr {
+    bottom: -1px;
+    right: -1px;
+    border-width: 0 1px 1px 0;
+}
+
+.chrPanel {
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-code);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.72);
+    height: 48px;
+    box-sizing: border-box;
+}
+
+.chrLabel {
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 9px;
+    font-family: var(--font-code);
+    white-space: nowrap;
+}
+
+.chrValue {
+    font-family: var(--font-code);
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    letter-spacing: 0.04em;
+}
+
+.chrValue.money {
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.55);
+    font-size: 17px;
+}
+
+.chrValueSm {
+    font-size: 12px;
+}
+
+.chrSep {
+    width: 1px;
+    height: 22px;
+    background: rgba(var(--accent-rgb), 0.18);
+}
+
+.chrDot {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.chrChannel {
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+}
+
+.chrWalletStack,
+.chrLevelStack {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}
+
+.chrWalletStack {
+    gap: 1px;
+}
+
+.chrLevelStack {
+    gap: 4px;
+}
+
+.chrLevelTop {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chrLevelNum {
+    font-family: var(--font-code);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.5);
+    letter-spacing: 0.04em;
+}
+
+.chrXpRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chrXpTrack {
+    width: 80px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.chrXpFill {
+    height: 100%;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 82%, #ffffff), var(--accent));
+    box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.5);
+}
+
+.chrXpReadout {
+    font-family: var(--font-code);
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+/* Live dot — pulsing system-online indicator */
+.navLiveDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+    animation: navPulse 1.6s ease-in-out infinite;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+@keyframes navPulse {
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.5);
+    }
+    50% {
+        opacity: 0.55;
+        box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navLiveDot {
+        animation: none;
+    }
+}
+
+/* Right-cluster icon buttons */
+.chrIconBtn.MuiIconButton-root {
+    width: 38px;
+    height: 38px;
+    background: rgba(12, 16, 18, 0.55);
+    border: 1px solid rgba(var(--accent-rgb), 0.18);
+    border-radius: 3px;
+    color: rgba(255, 255, 255, 0.75);
+    position: relative;
+    transition: all 180ms ease;
+    outline: 0;
+}
+
+.chrIconBtn.MuiIconButton-root:hover {
+    color: var(--accent);
+    border-color: rgba(var(--accent-rgb), 0.5);
+    background: rgba(var(--accent-rgb), 0.08);
+    box-shadow: inset 0 0 12px rgba(var(--accent-rgb), 0.1);
+}
+
+/* Operator stamp */
+.chrOperator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 10px 4px 6px;
+    cursor: pointer;
+    background: rgba(12, 16, 18, 0.55);
+    border: 1px solid rgba(var(--accent-rgb), 0.18);
+    border-radius: 3px;
+    position: relative;
+    transition: all 180ms ease;
+}
+
+.chrOperator:hover {
+    border-color: rgba(var(--accent-rgb), 0.5);
+    background: rgba(var(--accent-rgb), 0.08);
+}
+
+.chrAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 25%, #000000));
+    border: 1px solid rgba(var(--accent-rgb), 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-code);
+    font-weight: 700;
+    font-size: 13px;
+    color: #000;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.25);
+    flex-shrink: 0;
+}
+
+.chrOperatorMeta {
+    line-height: 1.2;
+    text-align: left;
+}
+
+.chrOperatorMeta .h {
+    font-family: var(--font-code);
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+    letter-spacing: 0.06em;
+}
+
+.chrOperatorMeta .r {
+    font-family: var(--font-code);
+    font-size: 9px;
+    color: rgba(var(--accent-rgb), 0.75);
+    letter-spacing: 0.18em;
 }

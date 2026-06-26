@@ -1,5 +1,225 @@
-.aggroLogo {
-    width: 150px;
-    margin: 0 auto;
-    margin-bottom: 15px;
+/* ── Title Console — Sidebar ─────────────────────────────────────────────── */
+.titleSide {
+    position: relative;
+    z-index: 2;
+    grid-column: 1;
+    height: 100%;
+    min-height: 0;
+    background: rgba(8, 11, 13, 0.55);
+    backdrop-filter: blur(2px);
+    border-right: 1px solid rgba(var(--accent-rgb), 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Brand block */
+.titleBrand {
+    padding: 22px 22px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.12);
+    position: relative;
+}
+
+.titleBrand .pre {
+    font-family: var(--font-code);
+    font-size: 9px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.titleBrand .rule {
+    height: 1px;
+    width: 28px;
+    background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), 0.5));
+}
+
+.titleBrand .rule.r {
+    background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.5), transparent);
+}
+
+.titleBrand .brandLogo {
+    height: 64px;
+    width: auto;
+    filter: drop-shadow(0 0 14px rgba(var(--accent-rgb), 0.4))
+        drop-shadow(0 0 32px rgba(var(--accent-rgb), 0.15));
+}
+
+.titleBrand .tag {
+    font-family: var(--font-code);
+    font-size: 9px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+/* Menu list */
+.titleMenu {
+    list-style: none;
+    padding: 12px 0 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.titleMenuGroupLabel {
+    padding: 14px 18px 6px;
+    font-family: var(--font-code);
+    font-size: 9px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.32);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.titleMenuGroupLabel::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.18), transparent);
+}
+
+.titleItem {
+    position: relative;
+    display: grid;
+    grid-template-columns: 22px 18px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 18px 11px 14px;
+    font-family: var(--font-code);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.015), transparent 80%);
+    border: 1px solid transparent;
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
+    cursor: pointer;
+    transition: all 180ms cubic-bezier(0, 0, 0.2, 1);
+    user-select: none;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.titleItem .caret {
+    opacity: 0;
+    color: var(--accent);
+    transform: translateX(-4px);
+    transition: all 180ms ease;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.titleItem .icon {
+    opacity: 0.7;
+    transition: opacity 180ms;
+    display: flex;
+    align-items: center;
+}
+
+.titleItem .icon svg {
+    font-size: 18px;
+}
+
+.titleItem .label {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.titleItem .label > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.titleItem .hint {
+    font-family: var(--font-code);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.32);
+    font-weight: 400;
+    text-transform: none;
+}
+
+.titleItem:hover,
+.titleItem.active {
+    color: var(--accent);
+    background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.18), rgba(var(--accent-rgb), 0.02) 90%);
+    border-color: rgba(var(--accent-rgb), 0.35);
+    border-left: 2px solid var(--accent);
+    padding-left: 13px;
+    text-shadow: 0 0 12px rgba(var(--accent-rgb), 0.6);
+    box-shadow: inset 0 0 24px rgba(var(--accent-rgb), 0.08);
+}
+
+.titleItem:hover .caret,
+.titleItem.active .caret {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.titleItem:hover .icon,
+.titleItem.active .icon {
+    opacity: 1;
+}
+
+.titleItem.active .hint {
+    color: rgba(var(--accent-rgb), 0.6);
+}
+
+.titleItem.disabled {
+    opacity: 0.45;
+    pointer-events: none;
+    cursor: default;
+}
+
+.titleItem .badge {
+    margin-left: 6px;
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    background: rgba(244, 67, 54, 0.85);
+    color: #fff;
+    letter-spacing: 0.06em;
+    box-shadow: 0 0 6px rgba(244, 67, 54, 0.5);
+    text-transform: none;
+}
+
+/* AGGRO Studios footer */
+.titleAggro {
+    padding: 16px 22px 22px;
+    border-top: 1px solid rgba(var(--accent-rgb), 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.titleAggro img {
+    width: 110px;
+    opacity: 0.85;
+}
+
+.titleAggro .copy {
+    font-family: var(--font-code);
+    font-size: 9px;
+    letter-spacing: 0.24em;
+    color: rgba(255, 255, 255, 0.35);
+    text-transform: uppercase;
 }

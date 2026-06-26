@@ -210,6 +210,7 @@ export default function Servers() {
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
     const purchasedServers = useServersStore((s) => s.purchasedServers);
+    const marketplaceCount = useServersStore((s) => s.servers.length);
     const playerMoney = usePlayerStore((s) => s.player.money);
     const totalRacks = useDataCentersStore((s) => Object.values(s.contracts).reduce((acc, contract) => acc + contract.racks || 0, 0));
 
@@ -281,13 +282,25 @@ export default function Servers() {
                         <Stat className="background" titleIcon={<WarningAmberOutlined />} titleIconAccent='orange' label="Alerts" value="1" accent="orange" subheader="Check Servers List" />
                     </Grid>
                 </Grid>
-                <Tabs value={value} onChange={handleChange} className="servers-tabs" scrollButtons={false}>
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    className="servers-tabs"
+                    scrollButtons={false}
+                    slotProps={{ indicator: { sx: { display: 'none' } } }}
+                >
                     <Tab
                         id="servers-tab-marketplace"
                         aria-controls="servers-tabpanel-marketplace"
                         icon={<StorefrontOutlined />}
                         iconPosition="start"
-                        label="Marketplace"
+                        disableRipple
+                        label={
+                            <span className="servers-tab__label">
+                                Marketplace
+                                <span className="servers-tab__count">{marketplaceCount}</span>
+                            </span>
+                        }
                         value={0}
                     />
                     <Tab
@@ -295,7 +308,13 @@ export default function Servers() {
                         aria-controls="servers-tabpanel-inventory"
                         icon={<DnsOutlined />}
                         iconPosition="start"
-                        label="My Servers"
+                        disableRipple
+                        label={
+                            <span className="servers-tab__label">
+                                My Servers
+                                <span className="servers-tab__count">{purchasedServers.length}</span>
+                            </span>
+                        }
                         value={1}
                     />
                 </Tabs>
